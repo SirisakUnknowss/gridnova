@@ -40,7 +40,7 @@ export function mountGlobalStatsView(root: HTMLElement, props: GlobalStatsProps)
       const avgMistakes = Number(summary?.avg_mistakes ?? 0).toFixed(1);
       const avgScore = summary?.avg_score ?? 0;
 
-      function playerName(row: any): string {
+      const playerName = (row: any): string => {
         const p = row.profiles;
         return escapeHtml(p?.display_name || p?.username || 'Anonymous');
       }
