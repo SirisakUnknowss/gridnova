@@ -8,6 +8,7 @@ import { track } from '@lib/analytics';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
+import { isPremium } from '@lib/premium';
 
 export interface ProfileProps {
   onBack: () => void;
@@ -59,7 +60,10 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
         </div>
-        <div class="badge-tag" style="margin-top:6px;">${isGuest ? 'GUEST' : 'MEMBER'}</div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;flex-wrap:wrap;">
+          <div class="badge-tag">${isGuest ? 'GUEST' : 'MEMBER'}</div>
+          ${!isGuest && isPremium() ? '<div class="badge-tag badge-tag--premium">✨ PREMIUM</div>' : ''}
+        </div>
         ${isGuest ? `
           <button class="btn btn--primary btn--small" id="prof-upgrade" style="margin-top:10px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>

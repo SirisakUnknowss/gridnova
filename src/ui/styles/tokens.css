@@ -25,6 +25,11 @@
   --color-gold: #ffd700;
   --color-xp: #ffeb3b;
 
+  /* Board color pack (overridden at runtime by applyBoardColor) */
+  --board-cell-bg:    rgba(108,92,231,0.06);
+  --board-cell-given: rgba(108,92,231,0.18);
+  --board-highlight:  rgba(108,92,231,0.12);
+
   /* Game board (default theme) */
   --cell-bg: #f0eeff;
   --cell-bg-given: #e6e0ff;

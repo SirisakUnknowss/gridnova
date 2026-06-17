@@ -161,6 +161,11 @@ Deno.serve(async (req) => {
     p_amount: xpReward,
   });
 
+  // Check and grant achievements
+  const { data: newAchievements } = await supabaseAdmin.rpc('check_and_grant_achievements', {
+    p_user_id: user.id,
+  });
+
   return respond(200, {
     score,
     is_personal_best: isPersonalBest,
@@ -168,5 +173,6 @@ Deno.serve(async (req) => {
       coins: coinReward,
       xp: xpReward,
     },
+    new_achievements: newAchievements ?? [],
   });
 });

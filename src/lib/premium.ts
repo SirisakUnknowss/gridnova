@@ -1,7 +1,8 @@
 // =====================================================================
 // Premium gating — single source of truth for "is this user premium?"
-// For now: localStorage flag (set when paywall stub succeeds in future).
+// Source priority: RevenueCat entitlement → localStorage flag (legacy/fallback)
 // =====================================================================
+import { isPremiumEntitled } from './purchases';
 
 const PREMIUM_KEY = 'sudoku_premium_v1';
 
@@ -15,6 +16,13 @@ export const PREMIUM_THEMES = new Set([
 export function isPremium(): boolean {
   try { return localStorage.getItem(PREMIUM_KEY) === '1'; }
   catch { return false; }
+}
+
+/** Async check — queries RC first, then caches result in localStorage */
+export async function checkAndSyncPremium(): Promise<boolean> {
+  const entitled = await isPremiumEntitled();
+  setPremium(entitled);
+  return entitled;
 }
 
 export function setPremium(active: boolean): void {

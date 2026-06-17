@@ -187,6 +187,11 @@ Deno.serve(async (req) => {
     hints_used: hintCount,
   });
 
+  // Check and grant achievements
+  const { data: newAchievements } = await supabaseAdmin.rpc('check_and_grant_achievements', {
+    p_user_id: user.id,
+  });
+
   return respond(200, {
     success: true,
     score,
@@ -200,5 +205,6 @@ Deno.serve(async (req) => {
       streak: streakResult?.[0]?.out_current_streak ?? null,
       streak_milestone: streakResult?.[0]?.is_new_milestone ?? false,
     },
+    new_achievements: newAchievements ?? [],
   });
 });

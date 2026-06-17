@@ -22,11 +22,15 @@ import { mountShopView } from './ui/views/shop';
 import { mountProfileView } from './ui/views/profile';
 import { mountAchievementsView } from './ui/views/achievements';
 import { mountStatsView } from './ui/views/stats';
+import { mountGlobalStatsView } from './ui/views/global-stats';
 import { mountRecapView } from './ui/views/recap';
 import { mountLedgerView } from './ui/views/ledger';
 import { showLevelUpModal } from './ui/views/level-up';
 import { applyTheme, loadCachedThemeId } from './lib/themes';
 import { applyBackground, loadCachedBgId } from './lib/backgrounds';
+import { applyBoardColorFromItem } from './lib/board-colors';
+import { initPurchases, isPremiumEntitled } from './lib/purchases';
+import { setPremium } from './lib/premium';
 import { levelFromXp } from './lib/level';
 import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
@@ -43,6 +47,7 @@ function clearView() {
     currentUnmount = null;
   }
   root.innerHTML = '';
+  window.scrollTo(0, 0);
 }
 
 async function loadUserData(): Promise<void> {
@@ -71,9 +76,22 @@ async function loadUserData(): Promise<void> {
       });
       if (equipped.theme_id) applyTheme(equipped.theme_id);
       if (equipped.background_id) applyBackground(equipped.background_id);
+      if ((equipped as any).board_color_id) {
+        api.getShopItem((equipped as any).board_color_id)
+          .then((item) => applyBoardColorFromItem(item))
+          .catch(() => {});
+      }
     }
     if (inventory) {
       useStore.getState().setInventory((inventory as any[]).map((r) => r.item_id));
+    }
+
+    // Init RevenueCat and sync premium entitlement
+    const userId = useStore.getState().user?.id;
+    if (userId) {
+      initPurchases(userId).then(() =>
+        isPremiumEntitled().then((entitled) => setPremium(entitled))
+      ).catch(() => {});
     }
   } catch (err) {
     console.warn('Failed to load user data:', err);
@@ -153,7 +171,13 @@ function showAchievements() {
 
 function showStats() {
   clearView();
-  const view = mountStatsView(root, { onBack: showProfile, nav: navCb });
+  const view = mountStatsView(root, { onBack: showProfile, nav: navCb, onGlobalStats: showGlobalStats });
+  currentUnmount = view.unmount;
+}
+
+function showGlobalStats() {
+  clearView();
+  const view = mountGlobalStatsView(root, { onBack: showStats, nav: navCb });
   currentUnmount = view.unmount;
 }
 
@@ -378,8 +402,10 @@ async function handleWin(result: GameResult, date?: string) {
     totalPlayers,
     coinsEarned: coins,
     xpEarned: xp,
+    isGuest,
     onContinue: showHome,
     onShare: date ? () => shareResult(result, date, rank, totalPlayers) : undefined,
+    onSignUp: isGuest ? () => showAuthModal({ mode: 'signup', onSuccess: showHome, onCancel: showHome }) : undefined,
   });
 }
 

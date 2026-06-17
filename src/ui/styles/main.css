@@ -121,6 +121,11 @@ h3 { font-size: 18px; }
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }
+.badge-tag--premium {
+  background: linear-gradient(135deg, #667eea, #a78bfa);
+  color: white;
+  font-weight: 700;
+}
 
 .save-banner {
   width: 100%;
@@ -376,12 +381,12 @@ h3 { font-size: 18px; }
   border-bottom: 1px solid var(--border-thin);
   position: relative;
 }
-.cell.given { font-weight: 400; color: var(--cell-text); background: var(--cell-bg-given); }
-.cell.user  { color: var(--cell-text-user); font-weight: 400; }
+.cell.given { font-weight: 400; color: var(--cell-text); background: var(--board-cell-given, var(--cell-bg-given)); }
+.cell.user  { color: var(--cell-text-user); font-weight: 400; background: var(--board-cell-bg, var(--cell-bg)); }
 .cell.hint  { color: var(--cell-text-hint); font-weight: 400; }
 .cell.conflict { color: var(--cell-text-conflict) !important; background: var(--cell-bg-conflict) !important; }
 .cell.selected { background: var(--cell-bg-selected) !important; box-shadow: inset 0 0 0 3px #6c5ce7; }
-.cell.related  { background: var(--cell-bg-related); }
+.cell.related  { background: var(--board-highlight, var(--cell-bg-related)); }
 .cell.same-num { background: var(--cell-bg-same); }
 .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid var(--border-thick); }
 .cell:nth-child(n+19):nth-child(-n+27),
@@ -480,6 +485,8 @@ h3 { font-size: 18px; }
 .numpad button:hover  { background: #ede8ff; border-color: #c4b5fd; }
 .numpad button:active { transform: scale(0.92); }
 .numpad button.done  { opacity: 0.25; pointer-events: none; }
+.heart { color: #f87171; font-size: 18px; letter-spacing: 1px; }
+.heart--lost { color: rgba(255,255,255,0.15); }
 .numpad-num {
   font-size: clamp(20px, 5vw, 28px);
   font-weight: 400;
@@ -822,6 +829,24 @@ h3 { font-size: 18px; }
   display: flex; gap: 10px; justify-content: center;
   margin-top: 16px;
 }
+
+.win-guest-prompt {
+  background: linear-gradient(135deg, rgba(108,92,231,0.12), rgba(167,139,250,0.08));
+  border: 1px solid rgba(108,92,231,0.25);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 14px 0 4px;
+  text-align: center;
+}
+.win-guest-prompt p { font-size: 13px; opacity: 0.9; margin-bottom: 10px; }
+.btn--accent {
+  background: linear-gradient(135deg, #6c5ce7, #a78bfa);
+  color: white;
+  border: none;
+  font-weight: 700;
+  width: 100%;
+}
+.btn--accent:hover { opacity: 0.9; }
 
 /* ===== Auth Modal ===== */
 .auth-modal {

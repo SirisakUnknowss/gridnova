@@ -56,3 +56,4 @@ ios/App/App/public/
 
 # Generated database types
 src/lib/database.types.ts
+.env

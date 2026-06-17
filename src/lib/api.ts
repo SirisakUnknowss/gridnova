@@ -114,6 +114,12 @@ export async function updateProfile(updates: { display_name?: string; country?: 
 }
 
 // === Shop ===
+export async function getShopItem(id: string) {
+  const { data, error } = await supabase.from('shop_items').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getShopItems(category?: string) {
   let q = supabase.from('shop_items').select('*').eq('available', true);
   if (category) q = q.eq('category', category);
@@ -163,6 +169,26 @@ export async function getGlobalSummary() {
     .maybeSingle();
   if (error) throw error;
   return data;
+}
+
+export async function getGlobalTopRecords() {
+  const [fastest, highest] = await Promise.all([
+    supabase
+      .from('user_game_history')
+      .select('time_seconds, level, profiles(display_name, username)')
+      .eq('mode', 'daily')
+      .order('time_seconds', { ascending: true })
+      .limit(5),
+    supabase
+      .from('user_game_history')
+      .select('score, level, profiles(display_name, username)')
+      .order('score', { ascending: false })
+      .limit(5),
+  ]);
+  return {
+    fastest: fastest.data ?? [],
+    highest: highest.data ?? [],
+  };
 }
 
 // === Visitor Counter ===

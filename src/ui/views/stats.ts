@@ -24,6 +24,7 @@ interface StatRow {
 export interface StatsProps {
   onBack: () => void;
   nav: BottomNavCallbacks;
+  onGlobalStats?: () => void;
 }
 
 async function loadStats(): Promise<StatRow> {
@@ -70,7 +71,7 @@ export function mountStatsView(root: HTMLElement, props: StatsProps): { unmount:
       <div class="top-bar">
         <button class="icon-btn" id="stats-back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">${ic.chart(16)} Stats</h2>
-        <span style="width:38px;"></span>
+        <button class="icon-btn" id="stats-global-btn" title="Global Stats" style="font-size:11px;opacity:0.7;">${ic.globe(18)}</button>
       </div>
       <div id="stats-body" class="stats-body"><div class="shop-loading">Loading stats…</div></div>
     </section>
@@ -179,6 +180,7 @@ export function mountStatsView(root: HTMLElement, props: StatsProps): { unmount:
   }
 
   root.querySelector('#stats-back')?.addEventListener('click', props.onBack);
+  root.querySelector('#stats-global-btn')?.addEventListener('click', () => props.onGlobalStats?.());
 
   void load();
 

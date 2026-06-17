@@ -12,12 +12,14 @@ export interface WinModalProps {
   coinsEarned: number;
   xpEarned: number;
   isPersonalBest?: boolean;
+  isGuest?: boolean;
   onContinue: () => void;
   onShare?: () => void;
+  onSignUp?: () => void;
 }
 
 export function showWinModal(props: WinModalProps): void {
-  const { result, rank, totalPlayers, coinsEarned, xpEarned, isPersonalBest } = props;
+  const { result, rank, totalPlayers, coinsEarned, xpEarned, isPersonalBest, isGuest } = props;
 
   const existing = document.getElementById('win-modal-root');
   if (existing) existing.remove();
@@ -53,9 +55,16 @@ export function showWinModal(props: WinModalProps): void {
         ${ic.coin(14)} +${coinsEarned} coins · ${ic.star(14)} +${xpEarned} XP
       </p>
 
+      ${isGuest ? `
+        <div class="win-guest-prompt">
+          <p>Save your streak & see leaderboard ranks</p>
+          <button class="btn btn--accent" id="win-signup">Create free account</button>
+        </div>
+      ` : ''}
+
       <div class="modal-buttons">
         ${props.onShare ? `<button class="btn btn--secondary" id="win-share">Share</button>` : ''}
-        <button class="btn" id="win-continue">Continue</button>
+        <button class="btn${isGuest ? ' btn--secondary' : ''}" id="win-continue">${isGuest ? 'Continue as Guest' : 'Continue'}</button>
       </div>
     </div>
   `;
@@ -68,6 +77,10 @@ export function showWinModal(props: WinModalProps): void {
   });
   wrapper.querySelector('#win-share')?.addEventListener('click', () => {
     props.onShare?.();
+  });
+  wrapper.querySelector('#win-signup')?.addEventListener('click', () => {
+    wrapper.remove();
+    props.onSignUp?.();
   });
 }
 

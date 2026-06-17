@@ -93,7 +93,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
             <div class="game-stats-row">
               <div class="stat-block">
                 <span class="stat-label">MISTAKES</span>
-                <span class="stat-value"><span id="mistake-count">0</span>/3</span>
+                <span class="stat-value" id="hearts-display">
+                  <span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span>
+                </span>
               </div>
               <div class="stat-block">
                 <span class="stat-label">TIME</span>
@@ -174,7 +176,13 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const boardEl    = root.querySelector('#board') as HTMLElement;
   const numpadEl   = root.querySelector('#numpad') as HTMLElement;
   const timerEl    = root.querySelector('#timer') as HTMLElement;
-  const mistakeEl  = root.querySelector('#mistake-count') as HTMLElement;
+  const heartsEl   = root.querySelector('#hearts-display') as HTMLElement;
+
+  function renderHearts(count: number) {
+    heartsEl.innerHTML = [0, 1, 2]
+      .map(i => `<span class="heart${i < count ? ' heart--lost' : ''}">♥</span>`)
+      .join('');
+  }
   const hintCountEl = root.querySelector('#hint-count') as HTMLElement;
   const hintBtn    = root.querySelector('#hint-btn') as HTMLButtonElement;
   const undoBtn    = root.querySelector('#undo-btn') as HTMLButtonElement;
@@ -233,7 +241,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
     if (n !== solution[r][c]) {
       mistakes++;
-      mistakeEl.textContent = String(mistakes);
+      renderHearts(mistakes);
       mistakesDelta = 1;
       sfxError();
       if (mistakes >= 3) {
@@ -288,7 +296,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     noteMask[entry.r][entry.c] = new Set(entry.prevNotes);
     if (entry.mistakesDelta > 0) {
       mistakes = Math.max(0, mistakes - entry.mistakesDelta);
-      mistakeEl.textContent = String(mistakes);
+      renderHearts(mistakes);
     }
     syncUndoRedo();
     rerender();
@@ -302,7 +310,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     noteMask[entry.r][entry.c] = new Set(entry.nextNotes);
     if (entry.mistakesDelta > 0) {
       mistakes += entry.mistakesDelta;
-      mistakeEl.textContent = String(mistakes);
+      renderHearts(mistakes);
     }
     syncUndoRedo();
     rerender();

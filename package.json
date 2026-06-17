@@ -36,6 +36,7 @@
     "@capacitor/share": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
+    "@revenuecat/purchases-js": "^1.43.0",
     "@sentry/browser": "^10.53.1",
     "@supabase/supabase-js": "^2.39.0",
     "idb": "^8.0.0",
@@ -55,6 +56,8 @@
     "vite": "^5.0.0",
     "vite-plugin-pwa": "^0.17.0",
     "vitest": "^1.0.0",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
     "workbox-window": "^7.0.0"
   },
   "engines": {

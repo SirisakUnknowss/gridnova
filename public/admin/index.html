@@ -166,6 +166,9 @@
     .btn-unban { background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3); color:#10b981; padding:7px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
     .btn-ban:hover   { background:rgba(248,113,113,.3); }
     .btn-unban:hover { background:rgba(16,185,129,.3); }
+    .btn-action { background:rgba(102,126,234,.12); border:1px solid rgba(102,126,234,.3); color:#667eea; padding:7px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+    .btn-action:hover { background:rgba(102,126,234,.25); }
+    .detail-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
     .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
     .detail-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px; }
     @media(max-width:768px){ .detail-grid,.detail-grid-3 { grid-template-columns:1fr; } .member-cards { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); } }
@@ -1122,6 +1125,9 @@ function renderMemberDetail(d) {
           ? `<button class="btn-unban" onclick="adminUnban('${p.id}')">✅ Unban</button>`
           : `<button class="btn-ban"   onclick="adminBan('${p.id}')">⛔ Ban</button>`
         }
+        <button class="btn-action" onclick="adminAdjustCoins('${p.id}')">🪙 Adjust Coins</button>
+        <button class="btn-action" onclick="adminResetStreak('${p.id}')">🔥 Reset Streak</button>
+        <button class="btn-action" onclick="adminGiveItem('${p.id}')">🎁 Give Item</button>
       </div>
     </div>
 
@@ -1260,6 +1266,45 @@ async function adminUnban(userId) {
   if (!session) return;
   const ok = await callRpcParam('admin_unban_user', { p_user_id: userId }, session.access_token);
   if (ok !== null) { alert('Unban สำเร็จ'); openMemberDetail(userId); }
+  else alert('เกิดข้อผิดพลาด');
+}
+
+async function callAdminAction(action, payload) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return false;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/admin-actions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body: JSON.stringify({ action, ...payload }),
+    });
+    return res.ok;
+  } catch { return false; }
+}
+
+async function adminAdjustCoins(userId) {
+  const input = prompt('ปรับ Coins (ใส่ + หรือ - เช่น 100 หรือ -50):');
+  if (input === null) return;
+  const amount = parseInt(input, 10);
+  if (isNaN(amount)) { alert('ตัวเลขไม่ถูกต้อง'); return; }
+  const reason = prompt('เหตุผล (ไม่บังคับ):') ?? 'admin_adjust';
+  const ok = await callAdminAction('adjust_coins', { user_id: userId, amount, reason });
+  if (ok) { alert(`ปรับ Coins ${amount > 0 ? '+' : ''}${amount} สำเร็จ`); openMemberDetail(userId); }
+  else alert('เกิดข้อผิดพลาด');
+}
+
+async function adminResetStreak(userId) {
+  if (!confirm('รีเซ็ต Streak ของผู้ใช้นี้?')) return;
+  const ok = await callAdminAction('reset_streak', { user_id: userId });
+  if (ok) { alert('รีเซ็ต Streak สำเร็จ'); openMemberDetail(userId); }
+  else alert('เกิดข้อผิดพลาด');
+}
+
+async function adminGiveItem(userId) {
+  const itemId = prompt('ใส่ item_id ที่ต้องการมอบให้ (เช่น theme_sakura):');
+  if (!itemId?.trim()) return;
+  const ok = await callAdminAction('give_item', { user_id: userId, item_id: itemId.trim() });
+  if (ok) { alert(`มอบ "${itemId}" สำเร็จ`); openMemberDetail(userId); }
   else alert('เกิดข้อผิดพลาด');
 }
 

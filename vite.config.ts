@@ -20,10 +20,13 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Sudoku Daily',
-        short_name: 'Sudoku',
+        name: 'GridNova',
+        short_name: 'GridNova',
         description: 'Daily Sudoku puzzle with global leaderboard',
         theme_color: '#667eea',
         background_color: '#667eea',
@@ -38,15 +41,8 @@ export default defineConfig({
           { src: 'icons/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/,
-            handler: 'NetworkFirst',
-            options: { cacheName: 'supabase-api', networkTimeoutSeconds: 5 },
-          },
-        ],
       },
     }),
   ],
