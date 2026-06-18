@@ -26,13 +26,13 @@ Before each release:
 cd sudoku
 ./scripts/generate-keystore.sh
 ```
-This creates `android/app/sudoku-daily-release.keystore`. **Back it up immediately** — losing it means you can never push updates to your Play Store listing.
+This creates `android/app/gridnova-release.keystore`. **Back it up immediately** — losing it means you can never push updates to your Play Store listing.
 
 #### 1b. Create `android/keystore.properties` (NOT committed)
 ```properties
-storeFile=sudoku-daily-release.keystore
+storeFile=gridnova-release.keystore
 storePassword=your-long-store-password
-keyAlias=sudoku-daily
+keyAlias=gridnova
 keyPassword=your-long-key-password
 ```
 
@@ -83,7 +83,7 @@ cd sudoku
 
 Then:
 1. **Play Console → Internal testing → Create new release**
-2. Upload `releases/sudoku-daily-v0.1.0.aab`
+2. Upload `releases/gridnova-v0.1.0.aab`
 3. Release notes (250 chars max)
 4. Save → Review → Roll out
 5. Add yourself + testers under "Testers" list
@@ -154,7 +154,7 @@ git push --tags
 gh release create v0.1.0 \
   --title "v0.1.0 — Phase 1-3 features" \
   --notes-file releases/v0.1.0.md \
-  releases/sudoku-daily-v0.1.0.apk
+  releases/gridnova-v0.1.0.apk
 ```
 
 Don't attach the AAB — that's for Play Store only. APK is fine for sideload / archival.

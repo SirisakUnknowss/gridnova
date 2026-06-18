@@ -1,8 +1,8 @@
 {
-  "name": "sudoku-daily",
+  "name": "gridnova",
   "version": "1.0.0",
   "type": "module",
-  "description": "Sudoku Daily — engagement-focused puzzle game",
+  "description": "Gridnova — engagement-focused puzzle game",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

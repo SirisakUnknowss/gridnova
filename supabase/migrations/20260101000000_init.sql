@@ -1,5 +1,5 @@
 -- =====================================================================
--- Sudoku Daily — Initial Schema
+-- Gridnova — Initial Schema
 -- See docs/02-technical/database-schema.md for documentation
 -- =====================================================================
 

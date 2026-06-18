@@ -86,7 +86,7 @@ grep -q "migrateFromV1" src/main.ts && pass "migration wired in main.ts" || fail
 section "10. Mobile (Capacitor)"
 [ -d android ] && pass "android/ project exists" || fail "android/ missing"
 [ -d ios/App ] && pass "ios/App project exists" || fail "ios/App missing"
-[ -f sudoku-daily-debug.apk ] && pass "APK built ($(ls -lh sudoku-daily-debug.apk | awk '{print $5}'))" || warn "APK not built yet"
+[ -f gridnova-debug.apk ] && pass "APK built ($(ls -lh gridnova-debug.apk | awk '{print $5}'))" || warn "APK not built yet"
 
 section "11. Supabase local (optional)"
 if command -v supabase >/dev/null 2>&1; then

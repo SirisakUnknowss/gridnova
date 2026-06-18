@@ -86,7 +86,7 @@ export function showWinModal(props: WinModalProps): void {
 
 export function buildShareText(result: GameResult, date?: string, rank?: number, total?: number): string {
   const lines = [
-    `🧩 Sudoku Daily${date ? ' #' + date : ''}`,
+    `🧩 Gridnova${date ? ' #' + date : ''}`,
     `⏱ ${formatTime(result.timeSeconds)} · ❌ ${result.mistakes} · 💡 ${result.hintsUsed}`,
   ];
   if (rank && total) lines.push(`🏆 Rank #${rank} / ${total}`);
@@ -165,7 +165,7 @@ export async function generateShareImage(
   ctx.font = '700 15px "Inter", system-ui, -apple-system, sans-serif';
   ctx.letterSpacing = '3px';
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fillText('SUDOKU DAILY', W / 2, 78);
+  ctx.fillText('GRIDNOVA', W / 2, 78);
   ctx.letterSpacing = '0px';
 
   if (date) {

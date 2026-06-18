@@ -68,7 +68,7 @@ export function showOnboarding(props: OnboardingProps): void {
     if (step === 0) {
       body = `
         <div class="onb-emoji" style="color:var(--brand-primary);">${ic.wave(48)}</div>
-        <h2>Welcome to Sudoku Daily!</h2>
+        <h2>Welcome to Gridnova!</h2>
         <p class="onb-sub">Let's set up your account. What should we call you?</p>
         <label class="auth-field" style="margin-top:14px;">
           <span>Nickname (optional)</span>

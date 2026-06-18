@@ -193,7 +193,7 @@
 
 ```json
 {
-  "name": "sudoku-daily",
+  "name": "gridnova",
   "version": "0.1.0",
   "type": "module",
   "scripts": {

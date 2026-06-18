@@ -449,7 +449,7 @@ async function shareResult(result: GameResult, date: string, rank?: number, tota
 
   // Strategy 1: Web Share API Level 2 — share as image file (iOS / Android / Chrome)
   if (blob) {
-    const testFile = new File([blob], 'sudoku-daily.png', { type: 'image/png' });
+    const testFile = new File([blob], 'gridnova.png', { type: 'image/png' });
     if (navigator.share && navigator.canShare?.({ files: [testFile] })) {
       try {
         await navigator.share({ files: [testFile], text: 'gridnova.pages.dev' });
@@ -477,7 +477,7 @@ async function shareResult(result: GameResult, date: string, rank?: number, tota
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `sudoku-daily-${date}.png`;
+    a.download = `gridnova-${date}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

@@ -35,15 +35,15 @@ mkdir -p "$OUT_DIR"
 AAB_SRC="android/app/build/outputs/bundle/release/app-release.aab"
 APK_SRC="android/app/build/outputs/apk/release/app-release.apk"
 
-cp "$AAB_SRC" "$OUT_DIR/sudoku-daily-v${VERSION}.aab"
-cp "$APK_SRC" "$OUT_DIR/sudoku-daily-v${VERSION}.apk"
+cp "$AAB_SRC" "$OUT_DIR/gridnova-v${VERSION}.aab"
+cp "$APK_SRC" "$OUT_DIR/gridnova-v${VERSION}.apk"
 
 echo
 echo "✅  Release artifacts:"
-ls -lh "$OUT_DIR/sudoku-daily-v${VERSION}.aab" "$OUT_DIR/sudoku-daily-v${VERSION}.apk"
+ls -lh "$OUT_DIR/gridnova-v${VERSION}.aab" "$OUT_DIR/gridnova-v${VERSION}.apk"
 echo
 echo "Next steps:"
 echo "  1. Upload the .aab to Play Console → Internal testing"
 echo "  2. Attach the .apk to a GitHub Release for sideload"
 echo "  3. (Recommended) Test the signed APK on a real device first:"
-echo "     adb install $OUT_DIR/sudoku-daily-v${VERSION}.apk"
+echo "     adb install $OUT_DIR/gridnova-v${VERSION}.apk"

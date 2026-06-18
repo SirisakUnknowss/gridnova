@@ -8,8 +8,8 @@
 # =====================================================================
 set -euo pipefail
 
-KEYSTORE_PATH="${KEYSTORE_PATH:-android/app/sudoku-daily-release.keystore}"
-KEY_ALIAS="${KEY_ALIAS:-sudoku-daily}"
+KEYSTORE_PATH="${KEYSTORE_PATH:-android/app/gridnova-release.keystore}"
+KEY_ALIAS="${KEY_ALIAS:-gridnova}"
 VALIDITY_DAYS="${VALIDITY_DAYS:-10000}"   # ~27 years (Play Store recommendation: >=25y)
 
 if [[ -f "$KEYSTORE_PATH" ]]; then
@@ -50,7 +50,7 @@ echo "       updates to the existing listing — ever."
 echo "    2. Save the keystore + key passwords in a password manager."
 echo "    3. Add the path to .gitignore (it's already covered by *.keystore)."
 echo "    4. Create android/keystore.properties (NOT committed):"
-echo "         storeFile=sudoku-daily-release.keystore"
+echo "         storeFile=gridnova-release.keystore"
 echo "         storePassword=YOUR_STORE_PASSWORD"
 echo "         keyAlias=$KEY_ALIAS"
 echo "         keyPassword=YOUR_KEY_PASSWORD"
