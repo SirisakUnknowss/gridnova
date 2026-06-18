@@ -35,7 +35,7 @@
   --cell-bg-given: #e6e0ff;
   --cell-bg-selected: #d8cffc;
   --cell-bg-related: #e8e3ff;
-  --cell-bg-same: #fde68a;
+  --cell-bg-same: rgba(253, 230, 138, 0.5);
   --cell-bg-conflict: #fee2e2;
   --cell-text: #1e1b4b;
   --cell-text-user: #6c5ce7;

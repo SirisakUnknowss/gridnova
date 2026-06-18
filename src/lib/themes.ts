@@ -36,7 +36,7 @@ const CLASSIC: Partial<ThemeTokens> = {
   '--cell-bg-given': '#f5f5f5',
   '--cell-bg-selected': '#bbdefb',
   '--cell-bg-related': '#e3f2fd',
-  '--cell-bg-same': '#fde68a',   // amber — clearly distinct from blue related
+  '--cell-bg-same': 'rgba(253, 230, 138, 0.5)',   // amber — clearly distinct from blue related
   '--cell-bg-conflict': '#ffebee',
   '--cell-text': '#1a1a2e',
   '--cell-text-user': '#1976d2',
@@ -69,7 +69,7 @@ export const THEMES: Record<string, ThemeMeta> = {
       '--cell-bg-given': '#1a1a2e',
       '--cell-bg-selected': '#3949ab',
       '--cell-bg-related': '#2c2c54',
-      '--cell-bg-same': '#78500a',   // dark amber — distinct from dark purple related
+      '--cell-bg-same': 'rgba(120, 80, 10, 0.5)',   // dark amber — distinct from dark purple related
       '--cell-text': '#e0e0e0',
       '--cell-text-user': '#82b1ff',
       '--cell-text-hint': '#69f0ae',
