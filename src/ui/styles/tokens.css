@@ -26,9 +26,9 @@
   --color-xp: #ffeb3b;
 
   /* Board color pack (overridden at runtime by applyBoardColor) */
-  --board-cell-bg:    rgba(108,92,231,0.06);
-  --board-cell-given: rgba(108,92,231,0.18);
-  --board-highlight:  rgba(108,92,231,0.07);
+  --board-cell-bg:    rgba(108,92,231,0.03);
+  --board-cell-given: rgba(108,92,231,0.09);
+  --board-highlight:  rgba(108,92,231,0.035);
 
   /* Game board (default theme) */
   --cell-bg: #f0eeff;
