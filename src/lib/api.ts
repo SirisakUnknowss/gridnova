@@ -144,7 +144,7 @@ export async function purchaseItem(itemId: string) {
   return supabase.functions.invoke('purchase-item', { body: { item_id: itemId } });
 }
 
-export async function equipItem(payload: { theme_id?: string; background_id?: string; avatar?: any }) {
+export async function equipItem(payload: { theme_id?: string; background_id?: string; board_color_id?: string; avatar?: any }) {
   return supabase.functions.invoke('equip-item', { body: payload });
 }
 

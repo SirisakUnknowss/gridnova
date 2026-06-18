@@ -9,6 +9,7 @@ type View = 'loading' | 'login' | 'home' | 'game' | 'leaderboard' | 'shop' | 'pr
 interface Equipped {
   theme_id: string | null;
   background_id: string | null;
+  board_color_id: string | null;
   avatar: { emoji?: string; [k: string]: unknown };
 }
 
@@ -44,7 +45,7 @@ export const useStore = create<AppState>((set, get) => ({
   level: 1,
   currentStreak: 0,
   longestStreak: 0,
-  equipped: { theme_id: null, background_id: null, avatar: { emoji: '👤' } },
+  equipped: { theme_id: null, background_id: null, board_color_id: null, avatar: { emoji: '👤' } },
   inventory: [],
   currentView: 'loading',
 

@@ -7,6 +7,7 @@ import { escapeHtml, formatNumber } from '@lib/format';
 import { track } from '@lib/analytics';
 import { applyTheme, themePreview, THEMES } from '@lib/themes';
 import { applyBackground, BACKGROUNDS, bgPreviewIcon } from '@lib/backgrounds';
+import { applyBoardColorFromItem } from '@lib/board-colors';
 import { countUp, floatReward } from '@lib/animate';
 import { PREMIUM_THEMES, isPremium } from '@lib/premium';
 import { showPaywall } from './paywall';
@@ -20,7 +21,7 @@ export interface ShopProps {
   nav: BottomNavCallbacks;
 }
 
-type Category = 'theme' | 'background' | 'avatar' | 'all';
+type Category = 'theme' | 'background' | 'board_color' | 'avatar' | 'all';
 
 interface ShopItem {
   id: string;
@@ -32,6 +33,7 @@ interface ShopItem {
   unlock_type: string;
   available: boolean;
   sort_order: number;
+  metadata?: any;
 }
 
 const RARITY_LABEL: Record<string, string> = {
@@ -58,8 +60,21 @@ function avatarPreviewIcon(id: string): string {
   return AVATAR_EMOJI[id] ?? '👤';
 }
 
+function boardColorPreviewIcon(id: string): string {
+  if (id.includes('default')) return '💜';
+  if (id.includes('ocean')) return '💙';
+  if (id.includes('forest')) return '💚';
+  if (id.includes('sakura')) return '💗';
+  if (id.includes('midnight')) return '🖤';
+  if (id.includes('ember')) return '🧡';
+  return '▦';
+}
+
 const CATEGORY_TABS: { key: Category; label: string }[] = [
   { key: 'all', label: 'All' },
+  { key: 'theme', label: 'Themes' },
+  { key: 'background', label: 'Backgrounds' },
+  { key: 'board_color', label: 'Board Colors' },
   { key: 'avatar', label: 'Avatars' },
 ];
 
@@ -134,7 +149,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       return;
     }
     const filtered = activeCat === 'all'
-      ? items.filter((i) => i.category !== 'theme' && i.category !== 'background')
+      ? items
       : items.filter((i) => i.category === activeCat);
     if (!filtered.length) {
       gridEl.innerHTML = `<div class="lb-empty"><p>${ic.empty(20)} No items here.</p></div>`;
@@ -149,7 +164,8 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       const isOwned = owned.has(item.id) || item.price_coin === 0;
       const isEquipped =
         (item.category === 'theme' && equipped.theme_id === item.id) ||
-        (item.category === 'background' && equipped.background_id === item.id);
+        (item.category === 'background' && equipped.background_id === item.id) ||
+        (item.category === 'board_color' && equipped.board_color_id === item.id);
       const canAfford = state.coins >= item.price_coin;
       const rarity = item.rarity ?? 'common';
 
@@ -168,6 +184,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       let preview = '🎁';
       if (item.category === 'theme') preview = themePreview(item.id);
       else if (item.category === 'background') preview = bgPreviewIcon(item.id);
+      else if (item.category === 'board_color') preview = boardColorPreviewIcon(item.id);
       else if (item.category === 'avatar') preview = avatarPreviewIcon(item.id);
 
       const previewable = item.category === 'theme';
@@ -237,9 +254,10 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
     const item = items.find((i) => i.id === itemId);
     if (!item) return;
     btn.disabled = true; btn.textContent = '…';
-    const payload: { theme_id?: string; background_id?: string } = {};
+    const payload: { theme_id?: string; background_id?: string; board_color_id?: string } = {};
     if (item.category === 'theme') payload.theme_id = itemId;
     else if (item.category === 'background') payload.background_id = itemId;
+    else if (item.category === 'board_color') payload.board_color_id = itemId;
 
     try {
       const { error } = await api.equipItem(payload);
@@ -248,6 +266,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       useStore.getState().setEquipped(payload);
       if (item.category === 'theme' && THEMES[itemId]) { applyTheme(itemId); sfxThemeChange(); }
       if (item.category === 'background' && BACKGROUNDS[itemId]) applyBackground(itemId);
+      if (item.category === 'board_color') applyBoardColorFromItem(item);
       props.onToast(`✓ ${item.name} equipped`);
       render();
     } catch (err) {
@@ -256,6 +275,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       useStore.getState().setEquipped(payload);
       if (item.category === 'theme' && THEMES[itemId]) { applyTheme(itemId); sfxThemeChange(); }
       if (item.category === 'background' && BACKGROUNDS[itemId]) applyBackground(itemId);
+      if (item.category === 'board_color') applyBoardColorFromItem(item);
       props.onToast(`✓ ${item.name} equipped (local)`);
       render();
     }
@@ -275,10 +295,15 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         useStore.getState().setEquipped({
           theme_id: equipped.theme_id ?? null,
           background_id: equipped.background_id ?? null,
+          board_color_id: equipped.board_color_id ?? null,
           avatar: equipped.avatar ?? { emoji: '👤' },
         });
         if (equipped.theme_id) applyTheme(equipped.theme_id);
         if (equipped.background_id) applyBackground(equipped.background_id);
+        if (equipped.board_color_id) {
+          const boardItem = items.find((i) => i.id === equipped.board_color_id);
+          if (boardItem) applyBoardColorFromItem(boardItem);
+        }
       }
       loading = false;
       render();

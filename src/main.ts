@@ -72,6 +72,7 @@ async function loadUserData(): Promise<void> {
       useStore.getState().setEquipped({
         theme_id: equipped.theme_id ?? null,
         background_id: equipped.background_id ?? null,
+        board_color_id: (equipped as any).board_color_id ?? null,
         avatar: equipped.avatar ?? { emoji: '👤' },
       });
       if (equipped.theme_id) applyTheme(equipped.theme_id);

@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   );
 
-  let payload: { theme_id?: string; background_id?: string; avatar?: Record<string, unknown> };
+  let payload: { theme_id?: string; background_id?: string; board_color_id?: string; avatar?: Record<string, unknown> };
   try {
     payload = await req.json();
   } catch {
@@ -62,13 +62,14 @@ Deno.serve(async (req) => {
     return reject('INVALID_PAYLOAD', 'Invalid payload', 400);
   }
 
-  const { theme_id, background_id, avatar } = payload;
+  const { theme_id, background_id, board_color_id, avatar } = payload;
 
   // Call the equip_item DB function
   const { data, error: rpcErr } = await supabaseAdmin.rpc('equip_item', {
     p_user_id: user.id,
     p_theme_id: theme_id ?? null,
     p_background_id: background_id ?? null,
+    p_board_color_id: board_color_id ?? null,
     p_avatar: avatar ?? null,
   });
 
@@ -86,6 +87,10 @@ Deno.serve(async (req) => {
       code = 'BACKGROUND_NOT_OWNED';
       status = 403;
       logMsg = `Equip failed: Background ${background_id} is not owned.`;
+    } else if (errMsg.includes('board_color_not_owned')) {
+      code = 'BOARD_COLOR_NOT_OWNED';
+      status = 403;
+      logMsg = `Equip failed: Board color ${board_color_id} is not owned.`;
     } else if (errMsg.includes('avatar_item_not_owned')) {
       code = 'AVATAR_ITEM_NOT_OWNED';
       status = 403;
@@ -108,11 +113,12 @@ Deno.serve(async (req) => {
   }
 
   // Log successful equip
-  await writeSystemLog(supabaseAdmin, 'info', 'shop', `Successfully equipped items: theme=${theme_id || 'none'}, bg=${background_id || 'none'}`, {
+  await writeSystemLog(supabaseAdmin, 'info', 'shop', `Successfully equipped items: theme=${theme_id || 'none'}, bg=${background_id || 'none'}, board_color=${board_color_id || 'none'}`, {
     user_id: user.id,
     email: user.email,
     theme_id,
     background_id,
+    board_color_id,
     avatar
   });
 
