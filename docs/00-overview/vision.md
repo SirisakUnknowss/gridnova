@@ -1,10 +1,10 @@
 # 🎯 Product Vision
 
 ## One-liner
-**Sudoku Daily** — เกม Sudoku ที่คนเปิดเล่นทุกวันเพื่อทำ daily puzzle, ไต่ leaderboard, สะสมเหรียญแต่งตัวละคร
+**Gridnova** — เกม Sudoku ที่คนเปิดเล่นทุกวันเพื่อทำ daily puzzle, ไต่ leaderboard, สะสมเหรียญแต่งตัวละคร
 
 ## Positioning Statement
-> สำหรับ **คนที่ชอบ puzzle/casual game บนมือถือ** ที่อยากมี **เกมเล่นวันละ 5-15 นาทีก่อนนอน/ระหว่างพัก**, **Sudoku Daily** เป็น Sudoku game ที่ **มี daily puzzle ระดับโลก, leaderboard แข่งจริง, และระบบ customization** — ต่างจาก **Sudoku.com** ที่เน้นเล่นคนเดียวและมีโฆษณารบกวน, ของเรา **focus ที่ engagement ผ่าน social mechanic และ progression**
+> สำหรับ **คนที่ชอบ puzzle/casual game บนมือถือ** ที่อยากมี **เกมเล่นวันละ 5-15 นาทีก่อนนอน/ระหว่างพัก**, **Gridnova** เป็น Sudoku game ที่ **มี daily puzzle ระดับโลก, leaderboard แข่งจริง, และระบบ customization** — ต่างจาก **Sudoku.com** ที่เน้นเล่นคนเดียวและมีโฆษณารบกวน, ของเรา **focus ที่ engagement ผ่าน social mechanic และ progression**
 
 ---
 

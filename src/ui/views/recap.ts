@@ -62,7 +62,7 @@ function buildShareText(r: Recap): string {
     r.bestTime != null && isFinite(r.bestTime) ? `⚡ Best: ${formatTime(r.bestTime)}` : '',
     `❌ ${r.totalMistakes} mistakes`,
     '',
-    'Play: sudokudaily.app',
+    'Play: gridnova.pages.dev',
   ].filter(Boolean);
   return lines.join('\n');
 }

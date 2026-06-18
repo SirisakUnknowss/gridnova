@@ -5,8 +5,8 @@
 | Env | Purpose | URL | Supabase |
 |---|---|---|---|
 | **local** | Dev machine | localhost:5173 | localhost:54321 |
-| **staging** | QA before prod | staging.sudokudaily.app | sudokudaily-staging |
-| **production** | Real users | sudokudaily.app | sudokudaily-prod |
+| **staging** | QA before prod | staging.gridnova.pages.dev | gridnova-staging |
+| **production** | Real users | gridnova.pages.dev | gridnova-prod |
 
 ---
 
@@ -38,14 +38,14 @@ supabase db reset
 ## 🧪 Staging
 
 ### Supabase Project
-- `sudokudaily-staging.supabase.co`
+- `gridnova-staging.supabase.co`
 - Free tier
 - Separate DB from prod
 - Same migrations as prod
 
 ### Web Hosting
-- Cloudflare Pages: `sudokudaily-staging`
-- Domain: `staging.sudokudaily.app`
+- Cloudflare Pages: `gridnova-staging`
+- Domain: `staging.gridnova.pages.dev`
 - Auto-deploy: push to `staging` branch
 
 ### `.env.staging` (in CI)
@@ -63,7 +63,7 @@ VITE_SENTRY_DSN=<staging dsn>
 - Email: use Inbucket or real SMTP with test domain
 
 ### Mobile
-- Android: separate `app.sudokudaily.staging` package
+- Android: separate `app.gridnova.staging` package
 - iOS: separate bundle ID
 
 ---
@@ -76,8 +76,8 @@ VITE_SENTRY_DSN=<staging dsn>
 - Auto backups daily
 
 ### Web Hosting
-- Cloudflare Pages: `sudokudaily`
-- Domain: `sudokudaily.app`
+- Cloudflare Pages: `gridnova`
+- Domain: `gridnova.pages.dev`
 - Auto-deploy: push to `main`
 
 ### `.env.production` (in CI)
@@ -91,8 +91,8 @@ VITE_SENTRY_DSN=<prod dsn>
 ```
 
 ### Mobile
-- Android: `app.sudokudaily`
-- iOS: `app.sudokudaily`
+- Android: `app.gridnova`
+- iOS: `app.gridnova`
 
 ---
 

@@ -78,7 +78,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          projectName: sudokudaily
+          projectName: gridnova
           directory: dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -163,7 +163,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
-          packageName: app.sudokudaily
+          packageName: app.gridnova
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
 

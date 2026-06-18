@@ -12,7 +12,7 @@ import type { Difficulty } from './engine/types';
 import { todayUtc } from './lib/format';
 import { mountHomeView } from './ui/views/home';
 import { mountGameView, type GameResult } from './ui/views/game';
-import { showWinModal, buildShareText } from './ui/views/win-modal';
+import { showWinModal, buildShareText, generateShareImage } from './ui/views/win-modal';
 import { mountSplash } from './ui/views/splash';
 import { showAuthModal } from './ui/views/auth-modal';
 import { mountLeaderboardView } from './ui/views/leaderboard';
@@ -442,9 +442,50 @@ async function refreshStreakAndToast() {
 async function shareResult(result: GameResult, date: string, rank?: number, total?: number) {
   track(Events.SHARE_RESULT, { date, rank });
   const text = buildShareText(result, date, rank, total);
-  if (navigator.share) {
-    try { await navigator.share({ text }); return; } catch { /* fallback */ }
+
+  // Generate share image from Canvas
+  const blob = await generateShareImage(result, date, rank, total);
+
+  // Strategy 1: Web Share API Level 2 — share as image file (iOS / Android / Chrome)
+  if (blob) {
+    const testFile = new File([blob], 'sudoku-daily.png', { type: 'image/png' });
+    if (navigator.share && navigator.canShare?.({ files: [testFile] })) {
+      try {
+        await navigator.share({ files: [testFile], text: 'gridnova.pages.dev' });
+        return;
+      } catch (err) {
+        // User cancelled → don't fallback
+        if ((err as Error).name === 'AbortError') return;
+        // Other error → continue to fallback
+      }
+    }
   }
+
+  // Strategy 2: Web Share API (text only — browsers without file sharing support)
+  if (navigator.share) {
+    try {
+      await navigator.share({ text });
+      return;
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
+    }
+  }
+
+  // Strategy 3: Download image as PNG (desktop fallback)
+  if (blob) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sudoku-daily-${date}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('📸 Image saved!');
+    return;
+  }
+
+  // Strategy 4: Copy text to clipboard (last resort)
   try {
     await navigator.clipboard.writeText(text);
     toast('Copied to clipboard!');
@@ -543,6 +584,17 @@ async function boot() {
         getCurrentUser(),
         new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000)),
       ]);
+
+      // Clean up OAuth redirect URL fragments/params after Supabase picks up the session
+      // e.g. #access_token=... (implicit flow) or ?code=... (PKCE flow)
+      const hasOAuthCallback =
+        window.location.hash.includes('access_token') ||
+        window.location.search.includes('code=') ||
+        window.location.search.includes('error=');
+      if (hasOAuthCallback) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
       if (user) {
         useStore.setState({ user });
         identify(user.id);

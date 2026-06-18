@@ -11,9 +11,9 @@
 4. Env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_POSTHOG_KEY`, etc.
 
 **Domain:**
-- Prod: `sudokudaily.app` (TBD)
-- Staging: `staging.sudokudaily.app`
-- Preview: `<branch>.sudokudaily.pages.dev` (auto by Cloudflare)
+- Prod: `gridnova.pages.dev` (TBD)
+- Staging: `staging.gridnova.pages.dev`
+- Preview: `<branch>.gridnova.pages.dev` (auto by Cloudflare)
 
 ### Build Command
 ```bash
@@ -36,7 +36,7 @@ npm run build
 ### Setup
 ```bash
 npm install @capacitor/core @capacitor/cli
-npx cap init "Sudoku Daily" "app.sudokudaily"
+npx cap init "Gridnova" "app.gridnova"
 
 npm install @capacitor/android @capacitor/ios
 npx cap add android
@@ -52,8 +52,8 @@ npm install @capacitor/push-notifications @capacitor/haptics \
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.sudokudaily',
-  appName: 'Sudoku Daily',
+  appId: 'app.gridnova',
+  appName: 'Gridnova',
   webDir: 'dist',
   server: { androidScheme: 'https' },
   plugins: {
@@ -252,12 +252,12 @@ npm run dev     # Vite dev server
 ```
 
 ### Staging
-- Supabase project: `sudokudaily-staging`
-- Cloudflare Pages: `staging.sudokudaily.app`
+- Supabase project: `gridnova-staging`
+- Cloudflare Pages: `staging.gridnova.pages.dev`
 - Use for QA before prod
 
 ### Production
-- Supabase project: `sudokudaily-prod`
-- Cloudflare Pages: `sudokudaily.app`
+- Supabase project: `gridnova-prod`
+- Cloudflare Pages: `gridnova.pages.dev`
 
 ดู `05-infrastructure/environments.md`

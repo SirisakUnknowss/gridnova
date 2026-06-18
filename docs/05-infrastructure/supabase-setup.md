@@ -75,8 +75,8 @@ supabase db reset
 ### Create Projects
 
 1. https://supabase.com → create 2 projects:
-   - `sudokudaily-staging`
-   - `sudokudaily-prod`
+   - `gridnova-staging`
+   - `gridnova-prod`
 
 2. Note these for each:
    - Project URL: `https://<ref>.supabase.co`
@@ -168,7 +168,7 @@ In Supabase Dashboard → Authentication:
 ### Settings
 - JWT expiry: 3600 (1 hour)
 - Refresh token expiry: 604800 (7 days)
-- Site URL: `https://sudokudaily.app`
+- Site URL: `https://gridnova.pages.dev`
 - Redirect URLs: add staging + dev URLs
 
 ---

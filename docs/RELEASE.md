@@ -1,6 +1,6 @@
 # Release Guide
 
-Step-by-step for shipping Sudoku Daily to the Play Store, App Store, and GitHub Releases.
+Step-by-step for shipping Gridnova to the Play Store, App Store, and GitHub Releases.
 
 ---
 
@@ -69,9 +69,9 @@ android {
 #### 1d. Play Console account
 - Cost: **$25 one-time**
 - Sign up: https://play.google.com/console/signup
-- Create a new app → "Sudoku Daily" → category: Games → subcategory: Puzzle
+- Create a new app → "Gridnova" → category: Games → subcategory: Puzzle
 - Fill: short description (80 chars), full description, screenshots (min 2, phone 16:9 1080×1920 recommended), feature graphic (1024×500), app icon (512×512 PNG)
-- Privacy policy URL: `https://sudokudaily.app/legal/PRIVACY` (or GitHub Pages of `legal/PRIVACY.md`)
+- Privacy policy URL: `https://gridnova.pages.dev/legal/PRIVACY` (or GitHub Pages of `legal/PRIVACY.md`)
 - Data safety form — fill honestly per `legal/PRIVACY.md`
 
 ### Per-release flow
@@ -100,7 +100,7 @@ When ready for production:
 ### One-time setup
 - Cost: **$99/year** Apple Developer Program
 - Sign up: https://developer.apple.com/programs/
-- App Store Connect → My Apps → "+" → New App → Bundle ID: `app.sudokudaily` (or whatever matches `ios/App/App.xcodeproj`)
+- App Store Connect → My Apps → "+" → New App → Bundle ID: `app.gridnova` (or whatever matches `ios/App/App.xcodeproj`)
 - Fill metadata (similar to Play Console)
 - Screenshots required: **6.7"** (1290×2796), **6.5"** (1242×2688), **iPad Pro 12.9"** (2048×2732) — at least 1 per size
 

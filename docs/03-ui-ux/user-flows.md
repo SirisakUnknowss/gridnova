@@ -266,10 +266,10 @@ Finish → submit (with original started_at)
   ↓
 [Share Sheet] (native)
   - Pre-formatted text:
-    "🧩 Sudoku Daily #2026-05-23
+    "🧩 Gridnova #2026-05-23
      ⏱ 7:42 · ❌ 0 · 💡 0
      🏆 Rank #142 / 8,432
-     sudokudaily.app"
+     gridnova.pages.dev"
   ↓
 User picks Instagram Story / Twitter / Line
   ↓

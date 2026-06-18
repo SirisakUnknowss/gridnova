@@ -1,6 +1,6 @@
 # 🌐 API Spec
 
-> API ของ Sudoku Daily — แบ่งเป็น Supabase REST (auto) + Edge Functions (custom)
+> API ของ Gridnova — แบ่งเป็น Supabase REST (auto) + Edge Functions (custom)
 
 ## 🔑 Base URL
 

@@ -22,7 +22,7 @@
 | PostHog | Free (1M events) | $0 |
 | Sentry | Free (5k errors) | $0 |
 | FCM | Free | $0 |
-| Domain (sudokudaily.app) | $12/yr | ~$1/mo |
+| Domain (gridnova.pages.dev) | $12/yr | ~$1/mo |
 | **Total** | | **~$1/mo** |
 
 #### Limits @ Free Tier (Supabase)

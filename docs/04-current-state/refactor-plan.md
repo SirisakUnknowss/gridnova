@@ -57,7 +57,7 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
-      manifest: { name: 'Sudoku Daily', short_name: 'Sudoku' },
+      manifest: { name: 'Gridnova', short_name: 'Sudoku' },
     }),
   ],
 });

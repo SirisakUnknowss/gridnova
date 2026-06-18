@@ -53,7 +53,12 @@ function makeStubClient(): SupabaseClient {
 
 export const supabase: SupabaseClient = hasSupabaseConfig
   ? (_supabase = createClient(url!, anonKey!, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce',
+      },
     }))
   : makeStubClient();
 

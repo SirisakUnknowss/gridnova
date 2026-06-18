@@ -1,6 +1,6 @@
-# 🧩 Sudoku Daily — Documentation Hub
+# 🧩 Gridnova — Documentation Hub
 
-> เอกสารกลางสำหรับโปรเจ็กต์ Sudoku Daily — เกม Sudoku แบบ retention-focused พร้อม daily quest, leaderboard, และ customization
+> เอกสารกลางสำหรับโปรเจ็กต์ Gridnova — เกม Sudoku แบบ retention-focused พร้อม daily quest, leaderboard, และ customization
 
 **สถานะปัจจุบัน:** Pre-MVP — มี v1 (single-player, localStorage) แล้ว กำลัง pivot ไปเป็น online + daily mode
 **Owner:** sirisak.unknowss@gmail.com

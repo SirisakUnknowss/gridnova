@@ -28,14 +28,14 @@
   /* Board color pack (overridden at runtime by applyBoardColor) */
   --board-cell-bg:    rgba(108,92,231,0.06);
   --board-cell-given: rgba(108,92,231,0.18);
-  --board-highlight:  rgba(108,92,231,0.12);
+  --board-highlight:  rgba(108,92,231,0.07);
 
   /* Game board (default theme) */
   --cell-bg: #f0eeff;
   --cell-bg-given: #e6e0ff;
   --cell-bg-selected: #d8cffc;
-  --cell-bg-related: #eae4ff;
-  --cell-bg-same: #c4b5fd;
+  --cell-bg-related: #e8e3ff;
+  --cell-bg-same: #fde68a;
   --cell-bg-conflict: #fee2e2;
   --cell-text: #1e1b4b;
   --cell-text-user: #6c5ce7;

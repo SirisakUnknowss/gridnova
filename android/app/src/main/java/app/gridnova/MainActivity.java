@@ -1,4 +1,4 @@
-package app.sudokudaily;
+package app.gridnova;
 
 import com.getcapacitor.BridgeActivity;
 

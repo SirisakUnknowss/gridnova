@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.sudokudaily',
-  appName: 'Sudoku Daily',
+  appId: 'app.gridnova',
+  appName: 'Gridnova',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
