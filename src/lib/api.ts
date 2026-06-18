@@ -103,7 +103,7 @@ export async function getProfile(userId: string) {
   return data;
 }
 
-export async function updateProfile(updates: { display_name?: string; country?: string; bio?: string }) {
+export async function updateProfile(updates: { display_name?: string; country?: string; bio?: string; avatar_url?: string | null }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   const { error } = await supabase
@@ -111,6 +111,30 @@ export async function updateProfile(updates: { display_name?: string; country?: 
     .update(updates)
     .eq('id', user.id);
   if (error) throw error;
+}
+
+export async function uploadAvatar(file: File): Promise<string> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const fileExt = file.name.split('.').pop() || 'png';
+  const filePath = `${user.id}/avatar_${Date.now()}.${fileExt}`;
+
+  // Upload file
+  const { error } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true,
+    });
+  if (error) throw error;
+
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(filePath);
+
+  return publicUrl;
 }
 
 // === Shop ===

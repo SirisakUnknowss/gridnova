@@ -51,9 +51,11 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
         </h2>
         <span style="width:38px;"></span>
       </div>
-
       <div class="profile-hero">
-        <button class="profile-avatar" id="prof-avatar-btn" title="Change avatar">${currentEmoji}</button>
+        <button class="profile-avatar" id="prof-avatar-btn" title="Change avatar" style="padding:0; overflow:hidden; display:inline-flex; align-items:center; justify-content:center;">
+          ${profile.avatar_url ? `<img src="${profile.avatar_url}" style="width:100%; height:100%; object-fit:cover;" />` : currentEmoji}
+        </button>
+        <input type="file" id="prof-file-input" style="display:none;" accept="image/*" />
         <div class="profile-name">
           <span id="prof-name">${escapeHtml(displayName)}</span>
           <button class="icon-btn--ghost" id="prof-edit-name" title="Edit name">
@@ -135,16 +137,129 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
         `).join('')}
       </div>
     </section>
+
+    <!-- Modal Options Dialog for Avatar -->
+    <div id="avatar-modal-bg" class="modal-bg">
+      <div class="modal" style="position: relative;">
+        <button class="modal-close" id="avatar-modal-close" aria-label="Close">×</button>
+        <h2 style="margin: 0 0 16px 0; font-size: 18px; text-align: center;">Edit Profile Picture</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button class="btn btn--primary" id="avatar-opt-upload" style="width: 100%;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Photo
+          </button>
+          <button class="btn btn--secondary" id="avatar-opt-emoji" style="width: 100%;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            Choose Emoji
+          </button>
+          <button class="btn btn--danger" id="avatar-opt-remove" style="width: 100%; display: ${profile.avatar_url ? 'block' : 'none'};">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Remove Photo
+          </button>
+          <button class="btn btn--ghost" id="avatar-opt-cancel" style="width: 100%; border: 1px solid var(--app-border);">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     ${bottomNavHTML('profile')}
   `;
   wireBottomNav(root, props.nav, 'profile');
 
   const avatarGrid = root.querySelector<HTMLElement>('#avatar-grid')!;
   const avatarBtn = root.querySelector<HTMLElement>('#prof-avatar-btn')!;
+  const fileInput = root.querySelector<HTMLInputElement>('#prof-file-input')!;
+  const avatarModal = root.querySelector<HTMLElement>('#avatar-modal-bg')!;
+  const optRemove = root.querySelector<HTMLElement>('#avatar-opt-remove')!;
 
   avatarBtn.addEventListener('click', () => {
-    avatarGrid.classList.toggle('hidden');
+    if (isGuest) {
+      avatarGrid.classList.toggle('hidden');
+    } else {
+      avatarModal.classList.add('active');
+    }
   });
+
+  if (!isGuest) {
+    root.querySelector('#avatar-modal-close')?.addEventListener('click', () => {
+      avatarModal.classList.remove('active');
+    });
+    root.querySelector('#avatar-opt-cancel')?.addEventListener('click', () => {
+      avatarModal.classList.remove('active');
+    });
+    avatarModal.addEventListener('click', (e) => {
+      if (e.target === avatarModal) {
+        avatarModal.classList.remove('active');
+      }
+    });
+
+    root.querySelector('#avatar-opt-upload')?.addEventListener('click', () => {
+      avatarModal.classList.remove('active');
+      fileInput.click();
+    });
+
+    root.querySelector('#avatar-opt-emoji')?.addEventListener('click', () => {
+      avatarModal.classList.remove('active');
+      avatarGrid.classList.remove('hidden');
+    });
+
+    optRemove?.addEventListener('click', async () => {
+      avatarModal.classList.remove('active');
+      const oldHtml = avatarBtn.innerHTML;
+      avatarBtn.innerHTML = `
+        <div class="spinner" style="width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-left-color: white;"></div>
+      `;
+      try {
+        await api.updateProfile({ avatar_url: null });
+        useStore.setState({
+          profile: { ...(useStore.getState().profile ?? {}), avatar_url: undefined }
+        });
+        const emoji = (useStore.getState().equipped.avatar?.emoji as string) ?? '👤';
+        avatarBtn.textContent = emoji;
+        if (optRemove) optRemove.style.display = 'none';
+        props.onToast('Photo removed');
+      } catch (err) {
+        avatarBtn.innerHTML = oldHtml;
+        props.onToast('Could not remove photo');
+        console.error(err);
+      }
+    });
+
+    fileInput.addEventListener('change', async () => {
+      if (!fileInput.files || fileInput.files.length === 0) return;
+      const file = fileInput.files[0];
+      
+      if (!file.type.startsWith('image/')) {
+        props.onToast('Please select an image file');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        props.onToast('File is too large (max 5MB)');
+        return;
+      }
+
+      const oldHtml = avatarBtn.innerHTML;
+      avatarBtn.innerHTML = `
+        <div class="spinner" style="width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-left-color: white;"></div>
+      `;
+
+      try {
+        const publicUrl = await api.uploadAvatar(file);
+        await api.updateProfile({ avatar_url: publicUrl });
+        useStore.setState({
+          profile: { ...(useStore.getState().profile ?? {}), avatar_url: publicUrl }
+        });
+        avatarBtn.innerHTML = `<img src="${publicUrl}" style="width:100%; height:100%; object-fit:cover;" />`;
+        if (optRemove) optRemove.style.display = 'block';
+        props.onToast('Profile photo updated');
+      } catch (err) {
+        avatarBtn.innerHTML = oldHtml;
+        props.onToast('Could not upload photo');
+        console.error(err);
+      } finally {
+        fileInput.value = '';
+      }
+    });
+  }
 
   avatarGrid.querySelectorAll<HTMLButtonElement>('.avatar-cell').forEach((cell) => {
     cell.addEventListener('click', async () => {
@@ -155,7 +270,15 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
       const newAvatar = { emoji };
       useStore.getState().setEquipped({ avatar: newAvatar });
       track('avatar_changed', { emoji });
+      
       try {
+        if (!isGuest) {
+          await api.updateProfile({ avatar_url: null });
+          useStore.setState({
+            profile: { ...(useStore.getState().profile ?? {}), avatar_url: undefined }
+          });
+          if (optRemove) optRemove.style.display = 'none';
+        }
         await api.equipItem({ avatar: newAvatar });
       } catch {
         // local-only fallback
