@@ -26,23 +26,23 @@
   --color-xp: #ffeb3b;
 
   /* Board color pack (overridden at runtime by applyBoardColor) */
-  --board-cell-bg:    rgba(108,92,231,0.03);
-  --board-cell-given: rgba(108,92,231,0.09);
-  --board-highlight:  rgba(108,92,231,0.035);
+  --board-cell-bg:    transparent;
+  --board-cell-given: transparent;
+  --board-highlight:  rgba(108,92,231,0.12);
 
   /* Game board (default theme) */
-  --cell-bg: #f0eeff;
-  --cell-bg-given: #e6e0ff;
-  --cell-bg-selected: #d8cffc;
-  --cell-bg-related: #e8e3ff;
-  --cell-bg-same: rgba(253, 230, 138, 0.5);
+  --cell-bg: #ffffff;
+  --cell-bg-given: transparent;
+  --cell-bg-selected: rgba(108,92,231,0.22);
+  --cell-bg-related: rgba(108,92,231,0.10);
+  --cell-bg-same: rgba(108,92,231,0.16);
   --cell-bg-conflict: #fee2e2;
   --cell-text: #1e1b4b;
   --cell-text-user: #6c5ce7;
   --cell-text-hint: #10b981;
   --cell-text-conflict: #dc2626;
-  --border-thick: #c4b5fd;
-  --border-thin: #ede9fe;
+  --border-thick: #b8a9f5;
+  --border-thin: #ddd6fe;
 
   /* Game view light theme */
   --game-bg: linear-gradient(160deg, #f0eeff 0%, #e8e2ff 100%);

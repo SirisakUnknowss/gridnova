@@ -364,7 +364,7 @@ h3 { font-size: 18px; }
   max-height: 100%;
   aspect-ratio: 1;
   background: var(--border-thick);
-  border: 2.5px solid var(--border-thick);
+  border: 2px solid var(--border-thick);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
@@ -381,7 +381,7 @@ h3 { font-size: 18px; }
   border-bottom: 1px solid var(--border-thin);
   position: relative;
 }
-.cell.given { font-weight: 400; color: var(--cell-text); background: var(--board-cell-given, var(--cell-bg-given)); }
+.cell.given { font-weight: 600; color: var(--cell-text); background: var(--board-cell-given, var(--cell-bg-given)); }
 .cell.user  { color: var(--cell-text-user); font-weight: 400; background: var(--board-cell-bg, var(--cell-bg)); }
 .cell.hint  { color: var(--cell-text-hint); font-weight: 400; }
 .cell.conflict { color: var(--cell-text-conflict) !important; background: var(--cell-bg-conflict) !important; }
