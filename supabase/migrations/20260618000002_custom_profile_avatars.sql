@@ -9,7 +9,7 @@ VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- 3. Storage policies for avatars bucket
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- 3.1. Allow public select access
 CREATE POLICY "Allow public read access to avatars"
@@ -48,6 +48,7 @@ CREATE POLICY "Allow owners to delete avatars"
   );
 
 -- 4. Recreate leaderboard_view to include p.avatar_url
+DROP VIEW IF EXISTS public.leaderboard_view;
 CREATE OR REPLACE VIEW public.leaderboard_view AS
 SELECT
   l.date,
@@ -142,7 +143,6 @@ DECLARE
   v_inventory   json;
   v_achievements json;
   v_coin_log    json;
-END;
 BEGIN
   IF auth.uid() IS NULL OR NOT EXISTS (
     SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin'

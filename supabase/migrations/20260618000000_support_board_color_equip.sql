@@ -101,4 +101,4 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.equip_item TO authenticated;
+GRANT EXECUTE ON FUNCTION public.equip_item(UUID, TEXT, TEXT, TEXT, JSONB) TO authenticated;
