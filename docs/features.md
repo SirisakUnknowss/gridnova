@@ -31,6 +31,72 @@
 
 ---
 
+## Coin Utility — ของที่ซื้อได้และมีประโยชน์จริง
+
+**ปัญหาตอนนี้:** coin สะสมได้ แต่ใช้แล้วไม่รู้สึกว่าคุ้ม ของในร้านส่วนใหญ่เป็น cosmetic
+
+### Consumables ที่มีผลต่อ gameplay จริง
+
+| ไอเทม | ราคา | ผล |
+|---|---|---|
+| **Hint Pack +3** | 100c | เพิ่ม hint อีก 3 ครั้งสำหรับเกมถัดไป |
+| **Streak Freeze** | 200c | กันสาย streak หาย 1 วัน (มีอยู่แล้วใน schema) |
+| **Coin Boost 2×** | 500c | coin ที่ได้จากเกมคูณ 2 เป็นเวลา 24 ชม. |
+| **Error Shield** | 150c | ป้องกันนับ mistake 1 ครั้ง (ใส่ผิดไม่นับ) |
+| **Time Freeze** | 80c | หยุด timer ได้ 60 วินาที (ใช้ระหว่างเล่น) |
+
+### Daily Shop Rotation
+- ของ consumable หมุนเวียนทุกวัน 3-4 รายการ
+- **Flash sale** บางวัน ลด 50% — สร้าง urgency
+
+### สิ่งที่ต้องสร้าง
+- Migration: `consumable_inventory` table (user_id, item_type, quantity)
+- Shop UI: tab "Consumables" แยกจาก cosmetic
+- Game UI: ปุ่มใช้ consumable ก่อนเริ่มเกม / ระหว่างเกม
+- Edge Function: validate + consume item ตอน submit score
+
+**ประมาณเวลา:** 4-6 ชม.
+
+---
+
+## Game Resume — กลับมาเล่นต่อจากที่ค้างไว้
+
+**ปัญหาตอนนี้:** ปิด browser / switch app → เกมหาย ต้องเริ่มใหม่
+
+### แนวทาง: Save State ใน localStorage + sync ขึ้น DB
+
+**ข้อมูลที่ต้อง save:**
+- puzzle date / level / stage
+- board state ปัจจุบัน (81 ตัวเลข)
+- moves history (สำหรับ replay + anti-cheat)
+- elapsed time, mistakes, hints used
+- timestamp ล่าสุดที่ save
+
+### Flow
+1. **Auto-save ทุก move** → `localStorage['gridnova_draft']`
+2. **Sync ขึ้น DB** → `user_game_drafts` table ทุก 30 วินาที (debounce)
+3. **ตอน boot** → เช็คว่ามี draft ค้างไหม → แสดง banner "Continue your game?"
+4. **Submit หรือ abandon** → ลบ draft
+
+### Resume Banner (Home Screen)
+```
+┌─────────────────────────────────┐
+│ 🎮 Continue Medium  •  05:32   │
+│ 47 cells filled  [Continue] [✕] │
+└─────────────────────────────────┘
+```
+
+### สิ่งที่ต้องสร้าง
+- `src/lib/draft.ts` — `saveDraft()`, `loadDraft()`, `clearDraft()`
+- Migration: `user_game_drafts` table (user_id, mode, puzzle_ref, board_state, moves, elapsed, updated_at)
+- Home UI: resume banner ถ้ามี draft
+- Game engine: `resumeGame(draft)` โหลด state กลับมา
+- Anti-cheat: ส่ง moves ทั้งหมดตั้งแต่ต้นตอน submit (ไม่ใช่แค่ draft)
+
+**ประมาณเวลา:** 4-5 ชม.
+
+---
+
 ## Share Cards (v2 — Social)
 
 **เป้าหมาย:** คนอยากแชร์เอง ไม่ใช่แค่มีปุ่มให้กด
