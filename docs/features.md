@@ -4,6 +4,35 @@
 
 ---
 
+## Notification System (ปรับปรุง)
+
+### ที่มีอยู่แล้ว ✅
+- Web Push infrastructure (VAPID keys, service worker, `push_tokens` table)
+- `send-push-reminders` Edge Function — เขียนแล้วแต่ยังไม่มี cron เรียก
+- Cron มีแค่ `generate-daily-puzzle` ยังไม่มี push cron
+
+### Notification Types ที่ควรเพิ่ม
+
+| Type | Trigger | ข้อความ |
+|---|---|---|
+| **Daily reminder** | cron 09:00 ทุกวัน (ถ้ายังไม่เล่น) | "🧩 Daily puzzle รอคุณอยู่!" |
+| **Streak warning** | cron 21:00 (streak > 3 + ยังไม่เล่นวันนี้) | "🔥 Streak 7 วันจะหายคืนนี้!" |
+| **Achievement unlock** | หลัง submit score | "🏆 Achievement unlocked!" |
+| **Streak milestone** | ครบ 7 / 30 / 100 วัน | "🔥 30 days streak! You're on fire!" |
+| **Referral success** | เพื่อนเล่นครบ 3 วัน | "🎉 เพื่อนคุณเริ่มเล่นแล้ว +300 coins" |
+| **Weekly recap** | cron วันจันทร์ 08:00 | "📊 สัปดาห์ที่แล้วคุณเล่น 5/7 วัน" |
+| **Event / Tournament** | manual trigger | "🏆 Weekly Tournament เริ่มแล้ว!" |
+
+### สิ่งที่ต้องสร้าง
+- **Cron jobs** — daily reminder 09:00 + streak warning 21:00
+- **Achievement/Streak push** — เรียกจาก `submit-daily-score` หลัง grant
+- **`notification_preferences` table** — user เปิด/ปิด type แยกกัน
+- **Notification Settings UI** — toggle แต่ละ type ใน Settings screen
+
+**ประมาณเวลา:** 3-4 ชม. (แค่ cron + achievement push) / 6-8 ชม. (ครบทุก type + settings)
+
+---
+
 ## Daily Challenge Calendar
 
 **แรงบันดาลใจ:** Calendar view แสดงวันที่เล่น daily challenge ในแต่ละเดือน
