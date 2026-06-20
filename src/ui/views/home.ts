@@ -43,10 +43,10 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   const displayName = state.profile?.display_name || state.profile?.username || (isGuest ? 'Guest' : 'Player');
   const equippedEmoji = (state.equipped.avatar?.emoji as string) ?? null;
   const avatarUrl = state.profile?.avatar_url ?? null;
-  const userIcon = equippedEmoji
-    ? `<span style="font-size:20px">${equippedEmoji}</span>`
-    : avatarUrl
-      ? `<img src="${avatarUrl}" class="user-avatar-img" alt="avatar" referrerpolicy="no-referrer">`
+  const userIcon = avatarUrl
+    ? `<img src="${avatarUrl}" class="user-avatar-img" alt="avatar" referrerpolicy="no-referrer">`
+    : equippedEmoji
+      ? `<span style="font-size:20px">${equippedEmoji}</span>`
       : isGuest ? ic.guest(20) : ic.member(20);
   const lvl = levelProgress(state.xp);
   const muted = isMuted();
