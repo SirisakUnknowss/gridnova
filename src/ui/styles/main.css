@@ -363,8 +363,7 @@ h3 { font-size: 18px; }
   height: auto;
   max-height: 100%;
   aspect-ratio: 1;
-  background: var(--border-thick);
-  border: 2px solid var(--border-thick);
+  border: 2px solid #b8a9f5;
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
@@ -377,8 +376,8 @@ h3 { font-size: 18px; }
   cursor: pointer;
   user-select: none;
   transition: background var(--duration-fast);
-  border-right: 1px solid var(--border-thin);
-  border-bottom: 1px solid var(--border-thin);
+  border-right: 1px solid #b8a9f5;
+  border-bottom: 1px solid #b8a9f5;
   position: relative;
 }
 .cell.given { font-weight: 400; color: var(--cell-text); background: var(--board-cell-given, var(--cell-bg-given)); }
