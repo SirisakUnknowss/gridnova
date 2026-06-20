@@ -3,7 +3,6 @@
 // =====================================================================
 import './ui/styles/main.css';
 import { getCurrentUser, onAuthChange } from './lib/auth';
-import { supabase } from './lib/supabase';
 import { useStore } from './state/store';
 import * as api from './lib/api';
 import { initAnalytics, track, identify, captureError, Events } from './lib/analytics';
@@ -68,16 +67,7 @@ async function loadUserData(): Promise<void> {
       currentStreak: progression.current_streak,
       longestStreak: progression.longest_streak ?? 0,
     });
-    if (profile) {
-      // Fallback: use OAuth avatar from auth metadata when profile.avatar_url is null
-      let profileToSet = profile;
-      if (!profile.avatar_url) {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        const metaUrl = authUser?.user_metadata?.avatar_url || authUser?.user_metadata?.picture || null;
-        if (metaUrl) profileToSet = { ...profile, avatar_url: metaUrl };
-      }
-      set({ profile: profileToSet });
-    }
+    if (profile) set({ profile });
     if (equipped) {
       useStore.getState().setEquipped({
         theme_id: equipped.theme_id ?? null,
