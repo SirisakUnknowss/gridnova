@@ -27,7 +27,8 @@ interface MemberRow {
   display_name: string | null;
   username: string | null;
   country: string | null;
-  avatar: unknown;
+  avatar: { emoji?: string } | null;
+  custom_avatar_url: string | null;
   total_players: number;
 }
 
@@ -166,9 +167,15 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
       const isMe = r.user_id === currentUserId;
       const name  = escapeHtml(r.display_name || r.username || 'Player');
       const badgeCls = r.rank === 1 ? 'lb-rank-1' : r.rank === 2 ? 'lb-rank-2' : r.rank === 3 ? 'lb-rank-3' : 'lb-rank-other';
+      const avatarHtml = r.custom_avatar_url
+        ? `<img src="${escapeHtml(r.custom_avatar_url)}" class="lb-avatar-img" referrerpolicy="no-referrer" alt="">`
+        : r.avatar?.emoji
+          ? `<span class="lb-avatar-emoji">${r.avatar.emoji}</span>`
+          : `<span class="lb-avatar-emoji">👤</span>`;
       return `
         <div class="lb-row${isMe ? ' is-me' : ''}" data-uid="${escapeHtml(r.user_id)}">
           <span class="lb-rank"><span class="lb-rank-badge ${badgeCls}">${r.rank}</span></span>
+          <span class="lb-avatar">${avatarHtml}</span>
           <div>
             <div class="lb-name">${name}${isMe ? ' <span class="lb-you">you</span>' : ''}</div>
             <div class="lb-sub-name">Finished today</div>
