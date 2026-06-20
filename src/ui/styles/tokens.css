@@ -28,7 +28,7 @@
   /* Board color pack (overridden at runtime by applyBoardColor) */
   --board-cell-bg:    var(--cell-bg);
   --board-cell-given: var(--cell-bg);
-  --board-highlight:  rgba(108,92,231,0.12);
+  --board-highlight:  rgba(108,92,231,0.08);
 
   /* Game board (default theme) */
   --cell-bg: #ffffff;
