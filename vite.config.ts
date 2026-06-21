@@ -15,6 +15,7 @@ export default defineConfig({
       '@lib': path.resolve(__dirname, './src/lib'),
       '@ui': path.resolve(__dirname, './src/ui'),
       '@state': path.resolve(__dirname, './src/state'),
+      '@images': path.resolve(__dirname, './src/images'),
     },
   },
   plugins: [

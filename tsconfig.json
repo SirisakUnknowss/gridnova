@@ -24,7 +24,8 @@
       "@engine/*": ["src/engine/*"],
       "@lib/*": ["src/lib/*"],
       "@ui/*": ["src/ui/*"],
-      "@state/*": ["src/state/*"]
+      "@state/*": ["src/state/*"],
+      "@images/*": ["src/images/*"]
     }
   },
   "include": ["src", "tests"],

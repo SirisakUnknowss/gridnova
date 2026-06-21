@@ -1090,6 +1090,12 @@ h3 { font-size: 18px; }
 .lb-rank-2 { background: #f1f5f9; color: #64748b; }
 .lb-rank-3 { background: #fef0e7; color: #c2410c; }
 .lb-rank-other { background: #ede9fe; color: var(--brand-primary); }
+.lb-rank-img { width: 36px; height: 36px; object-fit: contain; display: block; }
+.lb-rank-img--sm { width: 18px; height: 18px; }
+.lb-rank-other-wrap {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 600; color: var(--app-text-2);
+}
 .lb-avatar { display: flex; align-items: center; justify-content: center; }
 .lb-avatar-img {
   width: 32px; height: 32px; border-radius: 50%;

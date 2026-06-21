@@ -1,18 +1,10 @@
 // Card A — Win Result Card (600×600)
 import type { GameResult } from '@ui/views/game';
 import { formatTime } from '@lib/format';
-import { fillRoundRect, canvasToBlob, formatDateLabel } from './helpers';
+import { canvasToBlob } from './helpers';
 
 const W = 600;
 const H = 600;
-
-const DIFF_COLORS: Record<string, string> = {
-  easy: '#0bbf9c',
-  medium: '#f39c12',
-  hard: '#e74c3c',
-  'extra-hard': '#6c5ce7',
-  expert: '#2d1b69',
-};
 
 export interface WinCardData {
   result: GameResult;
@@ -20,6 +12,63 @@ export interface WinCardData {
   rank?: number;
   totalPlayers?: number;
   streak?: number;
+}
+
+function fillRR(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function strokeRR(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number, color: string, lw = 1) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function draw4Star(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  for (let i = 0; i < 4; i++) {
+    const a = i * Math.PI / 2 - Math.PI / 4;
+    ctx.lineTo(x + Math.cos(a) * size, y + Math.sin(a) * size);
+    ctx.lineTo(x + Math.cos(a + Math.PI / 4) * size * 0.38, y + Math.sin(a + Math.PI / 4) * size * 0.38);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawConfetti(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, rot: number) {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillRect(-3, -6, 6, 12);
+  ctx.restore();
 }
 
 export async function renderWinCard(data: WinCardData): Promise<Blob | null> {
@@ -31,141 +80,169 @@ export async function renderWinCard(data: WinCardData): Promise<Blob | null> {
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
-  // Background gradient
+  // ── Background gradient ───────────────────────────────────────────
   const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#3a2d9e');
+  bg.addColorStop(0, '#4a3abf');
   bg.addColorStop(0.5, '#6c5ce7');
-  bg.addColorStop(1, '#a78bfa');
+  bg.addColorStop(1, '#8b7ff5');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // Noise dots (subtle texture)
-  ctx.fillStyle = 'rgba(255,255,255,0.04)';
-  for (let i = 0; i < 80; i++) {
-    const px = Math.sin(i * 7.3) * W / 2 + W / 2;
-    const py = Math.cos(i * 5.7) * H / 2 + H / 2;
-    ctx.beginPath();
-    ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // Radial glow
+  const gl = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 260);
+  gl.addColorStop(0, 'rgba(180,160,255,0.25)');
+  gl.addColorStop(1, 'rgba(180,160,255,0)');
+  ctx.fillStyle = gl;
+  ctx.fillRect(0, 0, W, H);
 
-  // Inner card glass
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  fillRoundRect(ctx, 30, 30, W - 60, H - 60, 24);
+  // ── Confetti / sparkle decorations ───────────────────────────────
+  const sparkles = [
+    { x: 155, y: 155, size: 6 }, { x: 440, y: 130, size: 5 },
+    { x: 80,  y: 330, size: 5 }, { x: 530, y: 290, size: 4 },
+    { x: 55,  y: 420, size: 5 }, { x: 490, y: 480, size: 5 },
+    { x: 320, y: 530, size: 4 }, { x: 470, y: 530, size: 5 },
+  ];
+  sparkles.forEach(({ x, y, size }) =>
+    draw4Star(ctx, x, y, size, 'rgba(255,255,255,0.55)'));
 
-  // Top shimmer line
-  const shimmer = ctx.createLinearGradient(0, 0, W, 0);
-  shimmer.addColorStop(0, 'rgba(255,255,255,0)');
-  shimmer.addColorStop(0.5, 'rgba(255,255,255,0.35)');
-  shimmer.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = shimmer;
-  ctx.fillRect(30, 30, W - 60, 2);
+  [
+    { x: 100, y: 80,  color: '#f97316', rot: 0.4 },
+    { x: 480, y: 60,  color: '#10b981', rot: -0.3 },
+    { x: 380, y: 45,  color: '#f59e0b', rot: 0.8 },
+    { x: 130, y: 500, color: '#f97316', rot: 0.5 },
+    { x: 548, y: 170, color: '#10b981', rot: -0.6 },
+    { x: 200, y: 48,  color: '#f97316', rot: 1.1 },
+  ].forEach(({ x, y, color, rot }) => drawConfetti(ctx, x, y, color, rot));
+
+  // ── Trophy box ────────────────────────────────────────────────────
+  const tbx = W / 2 - 44, tby = 36, tbw = 88, tbh = 88;
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  fillRR(ctx, tbx, tby, tbw, tbh, 20);
+  strokeRR(ctx, tbx, tby, tbw, tbh, 20, 'rgba(255,255,255,0.35)');
+
+  ctx.font = '46px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🏆', W / 2, tby + tbh / 2 + 2);
+  ctx.textBaseline = 'alphabetic';
+
+  // ── Frosted glass card ────────────────────────────────────────────
+  const cx = 36, cy = 144, cw = W - 72, ch = H - 174;
+  ctx.fillStyle = 'rgba(255,255,255,0.13)';
+  fillRR(ctx, cx, cy, cw, ch, 24);
+  strokeRR(ctx, cx, cy, cw, ch, 24, 'rgba(255,255,255,0.25)');
+
+  // Inner top shimmer
+  const ig = ctx.createLinearGradient(0, cy, 0, cy + 60);
+  ig.addColorStop(0, 'rgba(255,255,255,0.12)');
+  ig.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.save();
+  ctx.fillStyle = ig;
+  ctx.beginPath();
+  ctx.moveTo(cx + 24, cy); ctx.lineTo(cx + cw - 24, cy);
+  ctx.arcTo(cx + cw, cy, cx + cw, cy + 24, 24);
+  ctx.lineTo(cx + cw, cy + 60); ctx.lineTo(cx, cy + 60);
+  ctx.arcTo(cx, cy, cx + 24, cy, 24);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 
   ctx.textAlign = 'center';
 
-  // GRIDNOVA label
-  ctx.font = '700 13px "Inter", system-ui, sans-serif';
-  ctx.letterSpacing = '4px';
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.fillText('GRIDNOVA', W / 2, 72);
-  ctx.letterSpacing = '0px';
-
-  // Difficulty badge
-  const diffColor = DIFF_COLORS[result.difficulty] ?? '#6c5ce7';
-  const diffLabel = result.difficulty.charAt(0).toUpperCase() + result.difficulty.slice(1).replace('-', ' ');
-  const badgeW = 100;
-  ctx.fillStyle = diffColor;
-  fillRoundRect(ctx, W / 2 - badgeW / 2, 84, badgeW, 26, 13);
-  ctx.font = '600 12px "Inter", system-ui, sans-serif';
-  ctx.fillStyle = '#fff';
-  ctx.fillText(diffLabel, W / 2, 101);
-
-  // Date
-  if (date) {
-    ctx.font = '400 12px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.38)';
-    ctx.fillText(formatDateLabel(date), W / 2, 128);
-  }
-
-  // Score
-  ctx.font = '700 80px "Inter", system-ui, sans-serif';
+  // ── Hero: time ────────────────────────────────────────────────────
+  ctx.font = '800 86px "Inter", system-ui, sans-serif';
   ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = 'rgba(0,0,0,0.3)';
-  ctx.shadowBlur = 24;
-  ctx.fillText(result.score.toLocaleString(), W / 2, 232);
+  ctx.shadowColor = 'rgba(0,0,0,0.2)';
+  ctx.shadowBlur = 8;
+  ctx.fillText(formatTime(result.timeSeconds), W / 2, cy + 98);
   ctx.shadowBlur = 0;
 
-  ctx.font = '500 11px "Inter", system-ui, sans-serif';
-  ctx.letterSpacing = '2px';
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.fillText('SCORE', W / 2, 252);
-  ctx.letterSpacing = '0px';
+  // Subtitle
+  ctx.font = '600 12px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillText('D A I L Y   P U Z Z L E   S O L V E D', W / 2, cy + 126);
 
   // Divider
-  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(80, 272); ctx.lineTo(W - 80, 272);
+  ctx.moveTo(cx + 50, cy + 144); ctx.lineTo(cx + cw - 50, cy + 144);
   ctx.stroke();
 
-  // Stats row (3 cells)
+  // ── Stats row ─────────────────────────────────────────────────────
+  const dateLabel = date ? new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
   const stats = [
-    { emoji: '⏱', label: formatTime(result.timeSeconds) },
-    { emoji: '❌', label: String(result.mistakes) },
-    { emoji: '💡', label: String(result.hintsUsed) },
+    { l: 'MISTAKES', v: String(result.mistakes) },
+    { l: 'HINTS',    v: String(result.hintsUsed) },
+    { l: 'DATE',     v: dateLabel },
   ];
-  const colW = (W - 80) / 3;
-  stats.forEach(({ emoji, label }, i) => {
-    const cx = 40 + colW * i + colW / 2;
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    fillRoundRect(ctx, cx - 60, 286, 120, 58, 12);
-    ctx.font = '400 20px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center';
-    ctx.fillText(`${emoji} ${label}`, cx, 316);
-    ctx.font = '400 10px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    const statNames = ['Time', 'Mistakes', 'Hints'];
-    ctx.fillText(statNames[i], cx, 332);
+
+  stats.forEach(({ l, v }, i) => {
+    const sx = cx + cw / 6 + i * (cw / 3);
+    const sy = cy + 172;
+    ctx.font = '600 11px "Inter", system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillText(l, sx, sy);
+    ctx.font = `700 ${v.length > 5 ? '24' : '32'}px "Inter", system-ui, sans-serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(v, sx, sy + 42);
   });
 
-  // Percentile / rank
-  if (rank && totalPlayers && totalPlayers > 0) {
-    const pct = Math.round((1 - rank / totalPlayers) * 100);
-    const rankText = pct >= 95
-      ? `Top ${100 - pct}% of players today 🏆`
-      : `Faster than ${pct}% of players today`;
+  // Vertical dividers
+  [1, 2].forEach(i => {
+    const dx = cx + i * (cw / 3);
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(dx, cy + 158); ctx.lineTo(dx, cy + 222);
+    ctx.stroke();
+  });
 
-    ctx.font = '600 15px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#ffd700';
-    ctx.shadowColor = 'rgba(255,215,0,0.5)';
-    ctx.shadowBlur = 12;
-    ctx.textAlign = 'center';
-    ctx.fillText(rankText, W / 2, 384);
-    ctx.shadowBlur = 0;
+  // ── Score ─────────────────────────────────────────────────────────
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(cx + 50, cy + 234); ctx.lineTo(cx + cw - 50, cy + 234);
+  ctx.stroke();
 
-    ctx.font = '400 12px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillText(`Rank #${rank} of ${totalPlayers} players`, W / 2, 404);
+  ctx.font = '600 11px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('S C O R E', W / 2, cy + 262);
+
+  ctx.font = '800 52px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = '#f59e0b';
+  ctx.shadowColor = 'rgba(245,158,11,0.45)';
+  ctx.shadowBlur = 20;
+  ctx.fillText(result.score.toLocaleString(), W / 2, cy + 320);
+  ctx.shadowBlur = 0;
+
+  // ── Percentile (if available) ─────────────────────────────────────
+  if (rank && totalPlayers && totalPlayers > 1) {
+    const pct = Math.round((1 - (rank - 1) / totalPlayers) * 100);
+    const pctText = pct >= 99 ? 'Top 1% today!' :
+                    pct >= 95 ? `Top ${100 - pct}% today` :
+                    `Faster than ${pct}% of players`;
+    ctx.font = '500 13px "Inter", system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText(pctText, W / 2, cy + 346);
   }
 
-  // Streak badge
+  // ── Streak (if available) ─────────────────────────────────────────
   if (streak && streak > 1) {
-    const sx = rank ? W - 100 : W / 2;
-    const sy = 428;
-    ctx.fillStyle = 'rgba(255,122,69,0.2)';
-    fillRoundRect(ctx, sx - 56, sy - 18, 112, 30, 15);
-    ctx.font = '600 14px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#ff7a45';
-    ctx.textAlign = 'center';
-    ctx.fillText(`🔥 ${streak} day streak`, sx, sy);
+    const sy2 = rank && totalPlayers ? cy + 370 : cy + 350;
+    ctx.font = '500 13px "Inter", system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,180,100,0.9)';
+    ctx.fillText(`🔥 ${streak} day streak`, W / 2, sy2);
   }
 
-  // Footer URL
-  ctx.font = '400 12px "Inter", system-ui, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.textAlign = 'center';
-  ctx.fillText('gridnova.pages.dev', W / 2, H - 36);
+  // ── Bottom GridNova pill ──────────────────────────────────────────
+  const py = cy + ch - 32, pw = 148, ph = 34;
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  fillRR(ctx, W / 2 - pw / 2, py - ph / 2, pw, ph, 17);
+  strokeRR(ctx, W / 2 - pw / 2, py - ph / 2, pw, ph, 17, 'rgba(255,255,255,0.3)');
+  ctx.font = '600 13px "Inter", system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillText('✦ GridNova', W / 2, py + 5);
 
   return canvasToBlob(canvas);
 }

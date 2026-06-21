@@ -7,6 +7,10 @@ import * as api from '@lib/api';
 import { formatTime, todayUtc, escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
+import img1st    from '@images/1st-prize.png';
+import img2nd    from '@images/2nd-place.png';
+import img3rd    from '@images/3rd-place.png';
+import imgTrophy from '@images/trophy-2.png';
 
 export interface LeaderboardProps {
   onBack: () => void;
@@ -49,6 +53,13 @@ function yesterdayUtc(): string {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() - 1);
   return d.toISOString().slice(0, 10);
+}
+
+function rankBadgeHtml(rank: number): string {
+  if (rank === 1) return `<img src="${img1st}" class="lb-rank-img" alt="1st">`;
+  if (rank === 2) return `<img src="${img2nd}" class="lb-rank-img" alt="2nd">`;
+  if (rank === 3) return `<img src="${img3rd}" class="lb-rank-img" alt="3rd">`;
+  return `<span class="lb-rank-other-wrap"><img src="${imgTrophy}" class="lb-rank-img lb-rank-img--sm" alt="">${rank}</span>`;
 }
 
 export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps): { unmount: () => void } {
@@ -166,7 +177,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
     listEl.innerHTML = memberRows.map((r) => {
       const isMe = r.user_id === currentUserId;
       const name  = escapeHtml(r.display_name || r.username || 'Player');
-      const badgeCls = r.rank === 1 ? 'lb-rank-1' : r.rank === 2 ? 'lb-rank-2' : r.rank === 3 ? 'lb-rank-3' : 'lb-rank-other';
+      const rankBadge = rankBadgeHtml(r.rank);
       const avatarHtml = r.custom_avatar_url
         ? `<img src="${escapeHtml(r.custom_avatar_url)}" class="lb-avatar-img" referrerpolicy="no-referrer" alt="">`
         : r.avatar?.emoji
@@ -174,7 +185,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
           : `<span class="lb-avatar-emoji">👤</span>`;
       return `
         <div class="lb-row${isMe ? ' is-me' : ''}" data-uid="${escapeHtml(r.user_id)}">
-          <span class="lb-rank"><span class="lb-rank-badge ${badgeCls}">${r.rank}</span></span>
+          <span class="lb-rank">${rankBadge}</span>
           <span class="lb-avatar">${avatarHtml}</span>
           <div>
             <div class="lb-name">${name}${isMe ? ' <span class="lb-you">you</span>' : ''}</div>
@@ -207,10 +218,9 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
     `;
     listEl.innerHTML = guestRows.map((r) => {
       const isMe = r.session_id === mySessionId;
-      const badgeCls = r.rank === 1 ? 'lb-rank-1' : r.rank === 2 ? 'lb-rank-2' : r.rank === 3 ? 'lb-rank-3' : 'lb-rank-other';
       return `
         <div class="lb-row${isMe ? ' is-me' : ''}" data-sid="${escapeHtml(r.session_id)}">
-          <span class="lb-rank"><span class="lb-rank-badge ${badgeCls}">${r.rank}</span></span>
+          <span class="lb-rank">${rankBadgeHtml(r.rank)}</span>
           <span class="lb-name lb-guest-id">
             ${escapeHtml(r.guest_display_id)}${isMe ? ' <span class="lb-you">you</span>' : ''}
           </span>

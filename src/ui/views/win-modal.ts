@@ -18,6 +18,80 @@ export interface WinModalProps {
   onSignUp?: () => void;
 }
 
+function launchConfetti(container: HTMLElement): () => void {
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9998;';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  container.appendChild(canvas);
+  const ctx = canvas.getContext('2d')!;
+
+  const COLORS = ['#f97316','#6c5ce7','#f59e0b','#10b981','#ec4899','#3b82f6','#a78bfa','#fbbf24'];
+  const COUNT = 120;
+
+  interface Piece {
+    x: number; y: number; vx: number; vy: number;
+    w: number; h: number; rot: number; rotV: number;
+    color: string; sway: number; swayT: number;
+    type: 'rect' | 'circle';
+  }
+
+  const pieces: Piece[] = Array.from({ length: COUNT }, () => ({
+    x: Math.random() * canvas.width,
+    y: -20 - Math.random() * 160,
+    vx: (Math.random() - 0.5) * 2.5,
+    vy: 1.5 + Math.random() * 3,
+    w: 6 + Math.random() * 8,
+    h: 10 + Math.random() * 14,
+    rot: Math.random() * Math.PI * 2,
+    rotV: (Math.random() - 0.5) * 0.18,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    sway: (Math.random() - 0.5) * 0.06,
+    swayT: Math.random() * Math.PI * 2,
+    type: Math.random() < 0.2 ? 'circle' : 'rect',
+  }));
+
+  let raf = 0;
+  let done = false;
+
+  function tick() {
+    if (done) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = 0;
+    for (const p of pieces) {
+      p.swayT += 0.04;
+      p.vx += Math.sin(p.swayT) * p.sway;
+      p.vy += 0.06;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.rotV;
+      if (p.y < canvas.height + 20) alive++;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, 1 - Math.max(0, p.y - canvas.height * 0.7) / (canvas.height * 0.3));
+      if (p.type === 'circle') {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+      ctx.restore();
+    }
+    if (alive > 0) {
+      raf = requestAnimationFrame(tick);
+    } else {
+      canvas.remove();
+    }
+  }
+
+  raf = requestAnimationFrame(tick);
+  return () => { done = true; cancelAnimationFrame(raf); canvas.remove(); };
+}
+
 export function showWinModal(props: WinModalProps): void {
   const { result, rank, totalPlayers, coinsEarned, xpEarned, isPersonalBest, isGuest } = props;
 
@@ -27,6 +101,9 @@ export function showWinModal(props: WinModalProps): void {
   const wrapper = document.createElement('div');
   wrapper.id = 'win-modal-root';
   wrapper.className = 'modal-bg active';
+
+  const stopConfetti = launchConfetti(wrapper);
+
   wrapper.innerHTML = `
     <div class="modal">
       <h2>${ic.celebrate(22)} You won!</h2>
@@ -71,15 +148,17 @@ export function showWinModal(props: WinModalProps): void {
 
   document.body.appendChild(wrapper);
 
+  const close = () => { stopConfetti(); wrapper.remove(); };
+
   wrapper.querySelector('#win-continue')?.addEventListener('click', () => {
-    wrapper.remove();
+    close();
     props.onContinue();
   });
   wrapper.querySelector('#win-share')?.addEventListener('click', () => {
     props.onShare?.();
   });
   wrapper.querySelector('#win-signup')?.addEventListener('click', () => {
-    wrapper.remove();
+    close();
     props.onSignUp?.();
   });
 }
