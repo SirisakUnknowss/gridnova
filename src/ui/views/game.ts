@@ -8,6 +8,9 @@ import { renderBoard } from '@ui/components/board';
 import { renderNumpad } from '@ui/components/numpad';
 import { formatTime } from '@lib/format';
 import { sfxPlace, sfxSelect, sfxError, sfxErase, sfxHint, sfxWin, sfxDailyWin } from '@lib/sound';
+import { showShareModal } from './share-modal';
+import { useStore } from '@state/store';
+import * as api from '@lib/api';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
@@ -80,9 +83,14 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       <div class="game-card">
         <div class="game-topbar">
           ${mode === 'daily'
-            ? `<div class="mode-pill no-click">
-                <span class="mode-dot" style="background:${dotColor}"></span>
-                <span>Daily Puzzle</span>
+            ? `<div style="display:flex;align-items:center;gap:8px;">
+                <div class="mode-pill no-click">
+                  <span class="mode-dot" style="background:${dotColor}"></span>
+                  <span>Daily Puzzle</span>
+                </div>
+                <button class="topbar-icon-btn" id="game-share-btn" title="Invite friends" style="color:var(--brand-primary);">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                </button>
                </div>`
             : `<button class="mode-pill" id="mode-pill-btn">
                 <span class="mode-dot" style="background:${dotColor}"></span>
@@ -386,6 +394,34 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     boardOverlay.classList.remove('open');
     if (!gameWon) timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
   }
+
+  root.querySelector('#game-share-btn')?.addEventListener('click', async () => {
+    const state = useStore.getState();
+    const uid = state.user?.id;
+    let referralCode = '';
+    try { if (uid) referralCode = await api.getReferralCode(uid); } catch { /* ignore */ }
+    const profile = state.profile;
+    const displayName = profile?.display_name || profile?.username || undefined;
+
+    showShareModal({
+      invite: {
+        date: props.date ?? new Date().toISOString().slice(0, 10),
+        difficulty,
+        referralCode: referralCode || undefined,
+        displayName,
+      },
+      profile: uid && profile ? {
+        displayName: displayName ?? 'Player',
+        avatarUrl: profile.avatar_url,
+        avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
+        level: state.level,
+        bestStreak: state.currentStreak,
+        longestStreak: state.longestStreak,
+        coins: state.coins,
+        referralCode: referralCode || 'GRIDNOVA',
+      } : undefined,
+    });
+  });
 
   root.querySelector('#menu-btn')?.addEventListener('click', openMenu);
   root.querySelector('#overlay-resume')?.addEventListener('click', closeMenu);

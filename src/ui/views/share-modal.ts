@@ -1,19 +1,21 @@
-// Share Modal — preview + share/download for Win / Profile / Recap cards
-import { renderWinCard, renderProfileCard, renderRecapCard } from '@lib/share/index';
-import type { WinCardData, ProfileCardData, RecapCardData } from '@lib/share/index';
+// Share Modal — preview + share/download for Win / Profile / Recap / Invite cards
+import { renderWinCard, renderProfileCard, renderRecapCard, renderInviteCard } from '@lib/share/index';
+import type { WinCardData, ProfileCardData, RecapCardData, InviteCardData } from '@lib/share/index';
 import { track } from '@lib/analytics';
 
 export interface ShareModalProps {
   win?: WinCardData;
   profile?: ProfileCardData;
   recap?: RecapCardData;
+  invite?: InviteCardData;
   onClose?: () => void;
   onToast?: (msg: string) => void;
 }
 
-type CardType = 'win' | 'profile' | 'recap';
+type CardType = 'win' | 'profile' | 'recap' | 'invite';
 
 const LABELS: Record<CardType, string> = {
+  invite: '📣 Invite',
   win: '🏆 Result',
   profile: '👤 Profile',
   recap: '📅 Recap',
@@ -24,6 +26,7 @@ export function showShareModal(props: ShareModalProps): void {
   if (existing) existing.remove();
 
   const available: CardType[] = [];
+  if (props.invite) available.push('invite');
   if (props.win) available.push('win');
   if (props.profile) available.push('profile');
   if (props.recap) available.push('recap');
@@ -74,6 +77,7 @@ export function showShareModal(props: ShareModalProps): void {
     activeBlob = null;
 
     let blob: Blob | null = null;
+    if (type === 'invite' && props.invite) blob = await renderInviteCard(props.invite);
     if (type === 'win' && props.win) blob = await renderWinCard(props.win);
     if (type === 'profile' && props.profile) blob = await renderProfileCard(props.profile);
     if (type === 'recap' && props.recap) blob = await renderRecapCard(props.recap);
