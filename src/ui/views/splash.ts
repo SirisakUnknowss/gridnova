@@ -36,7 +36,7 @@ export function mountSplash(root: HTMLElement): { unmount: () => Promise<void> }
           <text x="153" y="168" fill="#1a1a2e" class="n n7">1</text>
         </g>
       </svg>
-      <div class="splash-title">Sudoku <span>Daily</span></div>
+      <div class="splash-title">Grid<span>Nova</span></div>
       <div class="splash-dots" aria-hidden="true">
         <span></span><span></span><span></span>
       </div>
