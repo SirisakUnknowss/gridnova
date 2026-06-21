@@ -735,11 +735,21 @@ h3 { font-size: 18px; }
   font-size: 16px; color: white; margin-bottom: 4px;
 }
 .daily-card-v2-date { font-size: 12px; opacity: 0.8; }
+.daily-card-v2-actions {
+  display: flex; gap: 8px; margin-top: 4px;
+}
 .daily-card-v2-btn {
-  width: 100%; background: white; color: var(--brand-primary);
+  flex: 1; background: white; color: var(--brand-primary);
   min-height: 44px; border-radius: var(--radius-full);
 }
 .daily-card-v2-btn:hover { background: #f0ecff; }
+.daily-card-v2-lb {
+  flex: 0 0 auto; min-height: 44px; border-radius: var(--radius-full);
+  display: flex; align-items: center; gap: 5px; padding: 0 16px;
+  background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3);
+  font-size: 13px;
+}
+.daily-card-v2-lb:hover { background: rgba(255,255,255,0.25); }
 
 /* Practice grid v2 — 2×2 */
 .home-section-label {

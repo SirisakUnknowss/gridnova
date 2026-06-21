@@ -105,10 +105,10 @@ async function loadUserData(): Promise<void> {
 // =====================================================================
 // Shared callbacks for the bottom nav — same in every view
 const navCb = {
-  onHome:        () => showHome(),
-  onLeaderboard: () => showLeaderboard(),
-  onShop:        () => showShop(),
-  onProfile:     () => showProfile(),
+  onHome:         () => showHome(),
+  onAchievements: () => showAchievements(),
+  onShop:         () => showShop(),
+  onProfile:      () => showProfile(),
 };
 
 function showHome() {
@@ -117,6 +117,7 @@ function showHome() {
     onPlayDaily: playDaily,
     onPlayPractice: (level) => playPractice(level as Difficulty),
     onAuthAction: openAuthAction,
+    onLeaderboard: showLeaderboard,
     nav: navCb,
   });
   currentUnmount = view.unmount;
@@ -145,7 +146,7 @@ function showProfile() {
   const view = mountProfileView(root, {
     onBack: showHome,
     onOpenStats: showStats,
-    onOpenAchievements: showAchievements,
+    onOpenAchievements: () => showAchievements(true),
     onOpenRecap: showRecap,
     onOpenLedger: showLedger,
     onSignOut: () => {
@@ -165,9 +166,9 @@ function showProfile() {
   currentUnmount = view.unmount;
 }
 
-function showAchievements() {
+function showAchievements(fromProfile = false) {
   clearView();
-  const view = mountAchievementsView(root, { onBack: showProfile, nav: navCb });
+  const view = mountAchievementsView(root, { onBack: fromProfile ? showProfile : showHome, nav: navCb });
   currentUnmount = view.unmount;
 }
 

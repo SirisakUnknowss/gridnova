@@ -115,9 +115,9 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
         Scroll to my rank
       </button>
     </section>
-    ${bottomNavHTML('leaderboard')}
+    ${bottomNavHTML('home')}
   `;
-  wireBottomNav(root, props.nav, 'leaderboard');
+  wireBottomNav(root, props.nav, 'home');
 
   const listEl   = root.querySelector<HTMLElement>('#lb-list')!;
   const metaEl   = root.querySelector<HTMLElement>('#lb-meta')!;
