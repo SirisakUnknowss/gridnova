@@ -61,10 +61,12 @@ export async function submitPracticeScore(payload: SubmitPracticePayload) {
 
 // === Quests ===
 export async function getDailyQuests(date: string) {
+  await supabase.rpc('seed_daily_quests', { p_date: date });
   const { data, error } = await supabase
     .from('user_daily_quests')
     .select('*')
-    .eq('date', date);
+    .eq('date', date)
+    .order('quest_id');
   if (error) throw error;
   return data ?? [];
 }
