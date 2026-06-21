@@ -3,6 +3,7 @@
 // =====================================================================
 import { useStore } from '@state/store';
 import * as api from '@lib/api';
+import { showShareModal } from './share-modal';
 import { escapeHtml, formatNumber } from '@lib/format';
 import { track } from '@lib/analytics';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
@@ -71,7 +72,12 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             Save progress
           </button>
-        ` : `<div style="font-size:12px;color:var(--app-text-secondary);margin-top:4px;">${escapeHtml(user?.email ?? '')}</div>`}
+        ` : `
+          <div style="font-size:12px;color:var(--app-text-secondary);margin-top:4px;">${escapeHtml(user?.email ?? '')}</div>
+          <button class="btn btn--secondary btn--small" id="prof-share-card" style="margin-top:10px;">
+            📤 Share Profile
+          </button>
+        `}
       </div>
 
       <div class="profile-stats">
@@ -313,6 +319,39 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
   root.querySelector('#prof-ledger')?.addEventListener('click', props.onOpenLedger);
   root.querySelector('#prof-signout')?.addEventListener('click', props.onSignOut);
   root.querySelector('#prof-upgrade')?.addEventListener('click', props.onUpgradeAccount);
+
+  root.querySelector('#prof-share-card')?.addEventListener('click', async () => {
+    const st = useStore.getState();
+    const uid = st.user?.id;
+    let referralCode = '';
+    try { if (uid) referralCode = await api.getReferralCode(uid); } catch { /* ignore */ }
+
+    let recapData;
+    if (uid) {
+      try {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth() + 1;
+        const recap = await api.getMonthlyRecap(uid, y, m);
+        recapData = { ...recap, year: y, month: m, displayName: profile.display_name || profile.username };
+      } catch { /* ignore */ }
+    }
+
+    showShareModal({
+      profile: {
+        displayName: profile.display_name || profile.username || 'Player',
+        avatarUrl: profile.avatar_url,
+        avatarEmoji: (st.equipped.avatar?.emoji as string) || '👤',
+        level: st.level,
+        bestStreak: st.currentStreak,
+        longestStreak: st.longestStreak,
+        coins: st.coins,
+        referralCode: referralCode || 'GRIDNOVA',
+      },
+      recap: recapData,
+      onToast: props.onToast,
+    });
+  });
 
   return { unmount() { /* no listeners to clean */ } };
 }

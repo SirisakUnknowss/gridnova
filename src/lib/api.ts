@@ -137,6 +137,69 @@ export async function uploadAvatar(file: File): Promise<string> {
   return publicUrl;
 }
 
+// === Share Cards ===
+
+export interface MonthlyRecap {
+  daysPlayed: number;
+  totalDays: number;
+  bestScore: number;
+  longestStreak: number;
+  wins: number;
+}
+
+export async function getMonthlyRecap(userId: string, year: number, month: number): Promise<MonthlyRecap> {
+  const from = `${year}-${String(month).padStart(2, '0')}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const to = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+  const { data, error } = await supabase
+    .from('daily_leaderboard')
+    .select('date, score')
+    .eq('user_id', userId)
+    .gte('date', from)
+    .lte('date', to);
+  if (error) throw error;
+
+  const rows = (data ?? []) as Array<{ date: string; score: number }>;
+  const daysSet = new Set(rows.map(r => r.date));
+  const bestScore = rows.length ? Math.max(...rows.map(r => r.score ?? 0)) : 0;
+
+  // Longest streak within the month
+  const sortedDates = Array.from(daysSet).sort();
+  let longest = 0, current = 0;
+  for (let i = 0; i < sortedDates.length; i++) {
+    if (i === 0) { current = 1; continue; }
+    const prev = new Date(sortedDates[i - 1] + 'T00:00:00Z');
+    const cur = new Date(sortedDates[i] + 'T00:00:00Z');
+    const diff = (cur.getTime() - prev.getTime()) / 86400000;
+    current = diff === 1 ? current + 1 : 1;
+    if (current > longest) longest = current;
+  }
+  if (current > longest) longest = current;
+
+  return {
+    daysPlayed: daysSet.size,
+    totalDays: lastDay,
+    bestScore,
+    longestStreak: longest,
+    wins: rows.length,
+  };
+}
+
+export async function getReferralCode(userId: string): Promise<string> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('referral_code')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as { referral_code?: string } | null)?.referral_code ?? '';
+}
+
+export async function claimReferral(refCode: string): Promise<void> {
+  await supabase.functions.invoke('claim-referral', { body: { ref_code: refCode } });
+}
+
 // === Shop ===
 export async function getShopItem(id: string) {
   const { data, error } = await supabase.from('shop_items').select('*').eq('id', id).maybeSingle();
