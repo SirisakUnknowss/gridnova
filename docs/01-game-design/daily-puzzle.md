@@ -191,7 +191,7 @@ finalScore = max(100, baseScore - timePenalty - mistakePenalty - hintPenalty + n
 หลังจบ daily puzzle ให้ share ได้:
 
 ```
-🧩 Gridnova #2026-05-23
+Gridnova #2026-05-23
 ⏱ 7:42 · ❌ 0 · 💡 0
 🏆 Rank #142 / 8,432
 

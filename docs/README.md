@@ -1,4 +1,4 @@
-# 🧩 Gridnova — Documentation Hub
+# Gridnova — Documentation Hub
 
 > เอกสารกลางสำหรับโปรเจ็กต์ Gridnova — เกม Sudoku แบบ retention-focused พร้อม daily quest, leaderboard, และ customization
 

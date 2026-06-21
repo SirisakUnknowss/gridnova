@@ -165,7 +165,7 @@ export function showWinModal(props: WinModalProps): void {
 
 export function buildShareText(result: GameResult, date?: string, rank?: number, total?: number): string {
   const lines = [
-    `🧩 Gridnova${date ? ' #' + date : ''}`,
+    `GridNova${date ? ' #' + date : ''}`,
     `⏱ ${formatTime(result.timeSeconds)} · ❌ ${result.mistakes} · 💡 ${result.hintsUsed}`,
   ];
   if (rank && total) lines.push(`🏆 Rank #${rank} / ${total}`);

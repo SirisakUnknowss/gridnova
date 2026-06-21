@@ -1,4 +1,4 @@
-# 🧩 Gridnova
+# Gridnova
 
 > Sudoku ที่คนเปิดเล่นทุกวัน — Daily puzzle + Global leaderboard + Customization
 

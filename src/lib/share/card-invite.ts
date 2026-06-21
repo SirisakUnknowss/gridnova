@@ -81,7 +81,7 @@ export async function renderInviteCard(data: InviteCardData): Promise<Blob | nul
   // Headline
   ctx.font = '700 30px "Inter", system-ui, sans-serif';
   ctx.fillStyle = '#ffffff';
-  ctx.fillText("Can you solve today's Sudoku? 🧩", W / 2, 88);
+  ctx.fillText("Can you solve today's Sudoku?", W / 2, 88);
 
   // Date
   ctx.font = '400 14px "Inter", system-ui, sans-serif';

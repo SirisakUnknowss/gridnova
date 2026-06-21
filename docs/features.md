@@ -15,7 +15,7 @@
 
 | Type | Trigger | ข้อความ |
 |---|---|---|
-| **Daily reminder** | cron 09:00 ทุกวัน (ถ้ายังไม่เล่น) | "🧩 Daily puzzle รอคุณอยู่!" |
+| **Daily reminder** | cron 09:00 ทุกวัน (ถ้ายังไม่เล่น) | " Daily puzzle รอคุณอยู่!" |
 | **Streak warning** | cron 21:00 (streak > 3 + ยังไม่เล่นวันนี้) | "🔥 Streak 7 วันจะหายคืนนี้!" |
 | **Achievement unlock** | หลัง submit score | "🏆 Achievement unlocked!" |
 | **Streak milestone** | ครบ 7 / 30 / 100 วัน | "🔥 30 days streak! You're on fire!" |
