@@ -133,9 +133,9 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       <div class="shop-tabs" id="ach-tabs"></div>
       <div class="ach-grid" id="ach-grid"></div>
     </section>
-    ${bottomNavHTML('profile')}
+    ${bottomNavHTML('achievements')}
   `;
-  wireBottomNav(root, props.nav, 'profile');
+  wireBottomNav(root, props.nav, 'achievements');
 
   const gridEl = root.querySelector<HTMLElement>('#ach-grid')!;
   const tabsEl = root.querySelector<HTMLElement>('#ach-tabs')!;
