@@ -13,8 +13,8 @@ const VAPID_SUBJECT = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@gridnova.ap
 const VAPID_PUBLIC  = Deno.env.get('VAPID_PUBLIC_KEY') ?? '';
 const VAPID_PRIVATE = Deno.env.get('VAPID_PRIVATE_KEY') ?? '';
 
-// ── 100 daily reminder messages ────────────────────────────────────────
-const MESSAGES: { title: string; body: string }[] = [
+// ── Messages for members (streak, leaderboard, coins) ─────────────────
+const MEMBER_MESSAGES: { title: string; body: string }[] = [
   { title: '🧩 GridNova Daily', body: 'วันนี้ยังไม่ได้เล่นนะ! มาแก้โจทย์กันซักตา' },
   { title: '🧩 GridNova Daily', body: 'Puzzle วันนี้รอคุณอยู่ อย่าให้ streak หายนะ!' },
   { title: '🎯 มาเล่นกัน!', body: 'คนอื่นเขาเล่นกันหมดแล้ว คุณจะยอมแพ้เหรอ?' },
@@ -120,6 +120,35 @@ const MESSAGES: { title: string; body: string }[] = [
   { title: '🔥 Ignite your brain', body: 'จุดไฟสมองด้วย GridNova puzzle วันนี้!' },
 ];
 
+// ── Messages for guests (no streak/coins/rank references) ──────────────
+const GUEST_MESSAGES: { title: string; body: string }[] = [
+  { title: '🧩 GridNova Daily', body: 'Puzzle ใหม่มาแล้ว! มาลองดูว่าวันนี้ยากแค่ไหน' },
+  { title: '🧠 ลับสมองกัน', body: 'Sudoku วันละตาช่วยให้สมองแล็บดีขึ้นนะ!' },
+  { title: '🎯 Daily Puzzle', body: 'ความท้าทายใหม่ของวันนี้มาแล้ว — พร้อมไหม?' },
+  { title: '🧩 มาเล่นกัน!', body: 'แค่ไม่กี่นาทีก็จบได้ มาลองดูกัน!' },
+  { title: '💡 ฝึกสมองวันนี้', body: 'Puzzle รอคุณอยู่ มาแก้โจทย์กันซักตา!' },
+  { title: '🧩 GridNova Daily', body: 'เริ่มวันด้วย Sudoku — ดีกว่า scroll social แน่นอน!' },
+  { title: '🎮 Game time!', body: 'หยุดพักจากงานแป๊บนึง มาเล่น GridNova กัน' },
+  { title: '🧩 Daily Puzzle', body: 'วันนี้ difficulty อะไรนะ? ไปเช็คกัน!' },
+  { title: '⚡ Quick challenge', body: 'Puzzle วันนี้รอให้คุณมาพิชิตอยู่!' },
+  { title: '🌅 Good morning!', body: 'เริ่มวันใหม่กับ GridNova — puzzle รอคุณอยู่!' },
+  { title: '🧩 GridNova Daily', body: 'ลับสมองด้วย Sudoku วันละตา ทำได้ทุกวัน!' },
+  { title: '🔢 Numbers calling', body: 'ตัวเลขกำลังเรียกหาคุณอยู่ มาเลย!' },
+  { title: '🧩 Daily Puzzle', body: 'Puzzle ใหม่ทุกวัน ความสนุกไม่มีวันซ้ำ!' },
+  { title: '💪 Challenge yourself', body: 'Puzzle วันนี้ท้าให้คุณลองดู!' },
+  { title: '🧩 GridNova Daily', body: 'สมัครบัญชีฟรี แล้วบันทึกคะแนนของคุณไว้ได้เลย!' },
+  { title: '🌟 Join the community', body: 'คนเล่น GridNova วันนี้มีเยอะมาก มาร่วมด้วยกัน!' },
+  { title: '🧩 Daily Puzzle', body: 'คุณ solve ได้ — ผมเชื่อ มาเลย!' },
+  { title: '🎯 Solve it!', body: 'ทุกเลขมีที่ของมัน คุณจะหาเจอไหม?' },
+  { title: '🧩 GridNova Daily', body: 'Challenge ตัวเองวันละตา ดีกว่า scroll ไปเรื่อยๆ!' },
+  { title: '🔥 Brain workout', body: 'Gym สำหรับสมอง — GridNova Daily Puzzle!' },
+  { title: '🧩 GridNova Daily', body: 'สมัครฟรี เล่นทุกวัน ติด leaderboard ได้เลย!' },
+  { title: '🎮 Let\'s go!', body: 'Puzzle รอ — มาเลย!' },
+  { title: '🧩 Daily Sudoku', body: 'Sudoku = therapy วันนี้มา therapy กัน!' },
+  { title: '💡 Aha moment', body: 'ความรู้สึกตอน solve ได้ไม่มีอะไรเทียบ!' },
+  { title: '🧩 GridNova Daily', body: 'วันนี้มีโอกาสแค่ครั้งเดียว อย่าพลาด!' },
+];
+
 // ── Seeded random (deterministic per user per day) ─────────────────────
 function seededRandom(seed: string): number {
   let hash = 0;
@@ -130,10 +159,11 @@ function seededRandom(seed: string): number {
   return Math.abs(hash) / 2147483647;
 }
 
-function pickMessage(userId: string, date: string) {
+function pickMessage(userId: string, date: string, isGuest: boolean) {
+  const pool = isGuest ? GUEST_MESSAGES : MEMBER_MESSAGES;
   const seed = `${userId}:${date}`;
-  const idx = Math.floor(seededRandom(seed) * MESSAGES.length);
-  return MESSAGES[idx];
+  const idx = Math.floor(seededRandom(seed) * pool.length);
+  return pool[idx];
 }
 
 // ── VAPID JWT builder ──────────────────────────────────────────────────
@@ -181,9 +211,10 @@ Deno.serve(async (req) => {
 
   const today = new Date().toISOString().slice(0, 10);
 
+  // Join push_tokens with profiles to know guest vs member
   const { data: tokens, error } = await supabase
     .from('push_tokens')
-    .select('user_id, token, p256dh, auth, platform')
+    .select('user_id, token, p256dh, auth, platform, profiles!inner(is_anonymous)')
     .eq('platform', 'web');
 
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -203,7 +234,8 @@ Deno.serve(async (req) => {
 
   let sent = 0;
   await Promise.all(toNotify.map(async (t) => {
-    const msg = pickMessage(t.user_id, today);
+    const isGuest = t.profiles?.is_anonymous === true;
+    const msg = pickMessage(t.user_id, today, isGuest);
     const ok = await sendWebPush(t, {
       title: msg.title,
       body: msg.body,
