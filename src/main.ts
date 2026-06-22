@@ -635,9 +635,16 @@ async function boot() {
   })();
 
   // Heartbeat every 30s — keeps "online now" count accurate
+  // Also re-records visit if the user left the tab open past midnight
+  let lastVisitDate = new Date().toISOString().slice(0, 10);
   const heartbeatInterval = setInterval(async () => {
     const u = useStore.getState().user;
     const isGuest = !u || !!u.is_anonymous;
+    const today = new Date().toISOString().slice(0, 10);
+    if (today !== lastVisitDate) {
+      lastVisitDate = today;
+      await trackVisit(isGuest);
+    }
     await heartbeat(isGuest, isGuest ? undefined : u?.id);
     await refreshVisitorStats();
   }, 30_000);
