@@ -63,9 +63,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const noteMask: Set<number>[][] = Array.from({ length: 9 }, () =>
     Array.from({ length: 9 }, () => new Set<number>()));
 
+  const PAID_HINT_COSTS = [50, 75, 100];
   let selected: { r: number; c: number } | null = null;
   let mistakes = 0;
   let hintsLeft = 3;
+  let paidHintsUsed = 0;
   let noteMode = false;
   const moves: Move[] = [];
   const history: HistoryEntry[] = [];
@@ -217,6 +219,17 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       </div>
       <a href="https://www.facebook.com/10Hands" target="_blank" rel="noopener noreferrer" class="game-footer">Developed by Unknowss</a>
     </section>
+
+    <div class="coin-hint-overlay" id="coin-hint-overlay" style="display:none;">
+      <div class="coin-hint-dialog">
+        <div class="coin-hint-title">Buy a Hint?</div>
+        <div class="coin-hint-body" id="coin-hint-body"></div>
+        <div class="coin-hint-actions">
+          <button class="coin-hint-btn coin-hint-btn--cancel" id="coin-hint-cancel">Cancel</button>
+          <button class="coin-hint-btn coin-hint-btn--confirm" id="coin-hint-confirm">Buy</button>
+        </div>
+      </div>
+    </div>
   `;
 
   const boardEl    = root.querySelector('#board') as HTMLElement;
@@ -394,14 +407,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     rerender();
   }
 
-  function useHint() {
-    if (hintsLeft <= 0 || gameWon) return;
+  function applyHint() {
     const candidates: { r: number; c: number }[] = [];
-    for (let r = 0; r < 9; r++) {
-      for (let c = 0; c < 9; c++) {
+    for (let r = 0; r < 9; r++)
+      for (let c = 0; c < 9; c++)
         if (!givenMask[r][c] && userBoard[r][c] !== solution[r][c]) candidates.push({ r, c });
-      }
-    }
     if (candidates.length === 0) return;
 
     let target = candidates[0];
@@ -415,9 +425,6 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     userBoard[target.r][target.c] = solution[target.r][target.c];
     noteMask[target.r][target.c].clear();
     hintMask[target.r][target.c] = true;
-    hintsLeft--;
-    hintCountEl.textContent = String(hintsLeft);
-    if (hintsLeft <= 0) hintBtn.disabled = true;
     sfxHint();
     selected = target;
     moves.push({ r: target.r, c: target.c, n: solution[target.r][target.c], t: elapsedMs(), isHint: true });
@@ -426,6 +433,83 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     syncUndoRedo();
     rerender();
     checkWin();
+  }
+
+  function updateHintButton() {
+    if (hintsLeft > 0) {
+      hintCountEl.textContent = String(hintsLeft);
+      hintBtn.disabled = false;
+      hintBtn.title = '';
+    } else if (mode !== 'daily' && paidHintsUsed < 3) {
+      const cost = PAID_HINT_COSTS[paidHintsUsed];
+      const coins = useStore.getState().coins ?? 0;
+      hintCountEl.textContent = `🪙${cost}`;
+      hintBtn.disabled = coins < cost;
+      hintBtn.title = coins < cost ? 'Not enough coins' : `Buy hint for ${cost} coins`;
+    } else {
+      hintCountEl.textContent = '0';
+      hintBtn.disabled = true;
+    }
+  }
+
+  function useHint() {
+    if (gameWon) return;
+
+    if (hintsLeft > 0) {
+      hintsLeft--;
+      applyHint();
+      updateHintButton();
+      return;
+    }
+
+    // Daily mode — no coin hints
+    if (mode === 'daily') return;
+    // All paid hints used
+    if (paidHintsUsed >= 3) return;
+
+    const cost = PAID_HINT_COSTS[paidHintsUsed];
+    const coins = useStore.getState().coins ?? 0;
+    if (coins < cost) return;
+
+    // Show confirmation popup
+    const overlay = root.querySelector('#coin-hint-overlay') as HTMLElement;
+    const body = root.querySelector('#coin-hint-body') as HTMLElement;
+    body.textContent = `Use ${cost} coins for a hint? (You have ${coins} coins)`;
+    overlay.style.display = 'flex';
+
+    const onConfirm = async () => {
+      overlay.style.display = 'none';
+      try {
+        const result = await api.spendCoins(cost, 'hint_purchase', { mode, difficulty, hint_index: paidHintsUsed });
+        if (!result.ok) {
+          // Insufficient coins or other failure — just update button state
+          updateHintButton();
+          return;
+        }
+        // Update store coins
+        if (result.balance !== undefined) {
+          useStore.setState({ coins: result.balance });
+        }
+        paidHintsUsed++;
+        applyHint();
+        updateHintButton();
+      } catch {
+        // Network failure — silently ignore, don't give hint
+      }
+    };
+
+    const cancelBtn = root.querySelector('#coin-hint-cancel') as HTMLButtonElement;
+    const confirmBtn = root.querySelector('#coin-hint-confirm') as HTMLButtonElement;
+
+    const cleanup = () => {
+      cancelBtn.removeEventListener('click', onCancel);
+      confirmBtn.removeEventListener('click', handleConfirm);
+    };
+    const onCancel = () => { overlay.style.display = 'none'; cleanup(); };
+    const handleConfirm = () => { cleanup(); void onConfirm(); };
+
+    cancelBtn.addEventListener('click', onCancel);
+    confirmBtn.addEventListener('click', handleConfirm);
   }
 
   function checkWin() {
@@ -554,8 +638,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   // Sync UI state that depends on restored values
   renderHearts(mistakes);
-  hintCountEl.textContent = String(hintsLeft);
-  if (hintsLeft <= 0) hintBtn.disabled = true;
+  updateHintButton();
 
   rerender();
   syncUndoRedo();

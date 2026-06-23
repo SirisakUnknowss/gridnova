@@ -76,6 +76,19 @@ export async function claimQuestReward(date: string, questId: string) {
 }
 
 // === Wallet / Progression ===
+export async function spendCoins(amount: number, reason: string, metadata?: Record<string, unknown>): Promise<{ ok: boolean; balance?: number; reason?: string }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data, error } = await supabase.rpc('spend_coins', {
+    p_user_id: user.id,
+    p_amount: amount,
+    p_reason: reason,
+    p_metadata: metadata ?? {},
+  });
+  if (error) throw error;
+  return data as { ok: boolean; balance?: number; reason?: string };
+}
+
 export async function getWallet() {
   const { data, error } = await supabase
     .from('user_wallet')
