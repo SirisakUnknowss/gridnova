@@ -43,6 +43,7 @@ import { type GameInProgress } from './lib/local-db';
 // Show update banner when a new service worker takes control
 if ('serviceWorker' in navigator) {
   let refreshing = false;
+
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (refreshing) return;
     refreshing = true;
@@ -54,6 +55,13 @@ if ('serviceWorker' in navigator) {
     `;
     document.body.appendChild(banner);
     banner.querySelector('#update-reload-btn')?.addEventListener('click', () => window.location.reload());
+  });
+
+  // Force SW to check for updates every time user opens the app (critical for PWA on home screen)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      navigator.serviceWorker.ready.then(reg => reg.update()).catch(() => {});
+    }
   });
 }
 
