@@ -218,18 +218,18 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         <div id="numpad" class="numpad"></div>
       </div>
       <a href="https://www.facebook.com/10Hands" target="_blank" rel="noopener noreferrer" class="game-footer">Developed by Unknowss</a>
-    </section>
 
-    <div class="coin-hint-overlay" id="coin-hint-overlay" style="display:none;">
-      <div class="coin-hint-dialog">
-        <div class="coin-hint-title">Buy a Hint?</div>
-        <div class="coin-hint-body" id="coin-hint-body"></div>
-        <div class="coin-hint-actions">
-          <button class="coin-hint-btn coin-hint-btn--cancel" id="coin-hint-cancel">Cancel</button>
-          <button class="coin-hint-btn coin-hint-btn--confirm" id="coin-hint-confirm">Buy</button>
+      <div class="coin-hint-overlay" id="coin-hint-overlay" style="display:none;">
+        <div class="coin-hint-dialog">
+          <div class="coin-hint-title">Buy a Hint?</div>
+          <div class="coin-hint-body" id="coin-hint-body"></div>
+          <div class="coin-hint-actions">
+            <button class="coin-hint-btn coin-hint-btn--cancel" id="coin-hint-cancel">Cancel</button>
+            <button class="coin-hint-btn coin-hint-btn--confirm" id="coin-hint-confirm">Buy</button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   `;
 
   const boardEl    = root.querySelector('#board') as HTMLElement;
