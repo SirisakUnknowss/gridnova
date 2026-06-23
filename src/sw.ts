@@ -10,6 +10,11 @@ declare const self: ServiceWorkerGlobalScope;
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
 
+// Take control of all clients immediately when activated
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
 // ── Push Notification Handler ───────────────────────────────────────
 self.addEventListener('push', (event) => {
   if (!event.data) return;
