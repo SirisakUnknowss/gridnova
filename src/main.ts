@@ -40,6 +40,23 @@ import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, 
 import { useVisitorStore } from './state/visitor-store';
 import { type GameInProgress } from './lib/local-db';
 
+// Show update banner when a new service worker takes control
+if ('serviceWorker' in navigator) {
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    const banner = document.createElement('div');
+    banner.className = 'update-banner';
+    banner.innerHTML = `
+      <span>New version available!</span>
+      <button class="btn btn--primary btn--small" id="update-reload-btn">Update now</button>
+    `;
+    document.body.appendChild(banner);
+    banner.querySelector('#update-reload-btn')?.addEventListener('click', () => window.location.reload());
+  });
+}
+
 const root = document.getElementById('app')!;
 let currentUnmount: (() => void) | null = null;
 
