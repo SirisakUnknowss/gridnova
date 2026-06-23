@@ -6,6 +6,7 @@ import { hasConflict } from '@engine/validator';
 
 export interface BoardRenderOptions {
   userBoard: Board;
+  solution: Board;
   givenMask: boolean[][];
   hintMask: boolean[][];
   noteMask: Set<number>[][];
@@ -22,7 +23,7 @@ export function renderBoard(container: HTMLElement, opts: BoardRenderOptions): v
   container.innerHTML = '';
   container.className = 'board';
 
-  const { userBoard, givenMask, hintMask, noteMask, selected, settings, onCellClick } = opts;
+  const { userBoard, solution, givenMask, hintMask, noteMask, selected, settings, onCellClick } = opts;
   const selVal = selected ? userBoard[selected.r][selected.c] : 0;
 
   for (let r = 0; r < 9; r++) {
@@ -74,7 +75,7 @@ export function renderBoard(container: HTMLElement, opts: BoardRenderOptions): v
       if (
         settings.showConflict &&
         v !== 0 && !givenMask[r][c] && !hintMask[r][c] &&
-        hasConflict(userBoard, r, c)
+        (v !== solution[r][c] || hasConflict(userBoard, r, c))
       ) cell.classList.add('conflict');
 
       cell.addEventListener('click', () => onCellClick(r, c));

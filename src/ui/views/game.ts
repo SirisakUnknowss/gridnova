@@ -87,22 +87,28 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // Restore saved state if resuming
   if (props.resume) {
     const r = props.resume;
-    // Restore board
-    r.user_board.forEach((v, i) => {
-      const row = Math.floor(i / 9), col = i % 9;
-      if (!givenMask[row][col]) userBoard[row][col] = v;
-    });
-    // Restore hint cells
-    r.hint_cells.forEach(i => { hintMask[Math.floor(i / 9)][i % 9] = true; });
-    // Restore notes
-    (r as GameInProgress & { notes?: number[][] }).notes?.forEach((bits, i) => {
-      bits.forEach(n => noteMask[Math.floor(i / 9)][i % 9].add(n));
-    });
-    mistakes = r.mistakes;
-    hintsLeft = r.hints_left;
-    moves.push(...(r.moves as Move[]));
-    // Set pausedMs so elapsedSeconds() returns r.elapsed_seconds immediately on resume
-    pausedMs = Date.now() - startTime - r.elapsed_seconds * 1000;
+    try {
+      // Restore board
+      r.user_board.forEach((v, i) => {
+        const row = Math.floor(i / 9), col = i % 9;
+        if (!givenMask[row][col]) userBoard[row][col] = v;
+      });
+      // Restore hint cells
+      r.hint_cells.forEach(i => { hintMask[Math.floor(i / 9)][i % 9] = true; });
+      // Restore notes
+      (r as GameInProgress & { notes?: number[][] }).notes?.forEach((bits, i) => {
+        bits.forEach(n => noteMask[Math.floor(i / 9)][i % 9].add(n));
+      });
+      mistakes = Math.max(0, Math.min(r.mistakes ?? 0, 2));
+      hintsLeft = Math.max(0, Math.min(r.hints_left ?? 3, 3));
+      moves.push(...(r.moves as Move[]));
+      const savedElapsed = r.elapsed_seconds ?? 0;
+      // Set pausedMs so elapsedSeconds() returns savedElapsed immediately on resume
+      pausedMs = Date.now() - startTime - savedElapsed * 1000;
+    } catch {
+      // Corrupted save — start fresh (board/masks already initialized as-new)
+      mistakes = 0; hintsLeft = 3;
+    }
   }
 
   const settings = { highlightSame: true, showConflict: true, highlightRelated: true };
@@ -273,7 +279,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   }
 
   function rerender() {
-    renderBoard(boardEl, { userBoard, givenMask, hintMask, noteMask, selected, settings, onCellClick });
+    renderBoard(boardEl, { userBoard, solution, givenMask, hintMask, noteMask, selected, settings, onCellClick });
     renderNumpad(numpadEl, { userBoard, solution, onNumber: handleNumber });
   }
 
@@ -545,6 +551,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   // Autosave every 30s so users can return and continue
   autosaveHandle = window.setInterval(saveProgress, 30_000);
+
+  // Sync UI state that depends on restored values
+  renderHearts(mistakes);
+  hintCountEl.textContent = String(hintsLeft);
+  if (hintsLeft <= 0) hintBtn.disabled = true;
 
   rerender();
   syncUndoRedo();
