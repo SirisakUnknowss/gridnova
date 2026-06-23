@@ -11,6 +11,7 @@ import { sfxPlace, sfxSelect, sfxError, sfxErase, sfxHint, sfxWin, sfxDailyWin }
 import { showShareModal } from './share-modal';
 import { useStore } from '@state/store';
 import * as api from '@lib/api';
+import { saveGame, deleteGame, type GameInProgress } from '@lib/local-db';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
@@ -19,6 +20,7 @@ export interface GameViewProps {
   solution: Board;
   date?: string;
   stage?: number;
+  resume?: GameInProgress;
   onWin: (result: GameResult) => void;
   onExit: () => void;
   onNewGame?: () => void;
@@ -69,9 +71,39 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const history: HistoryEntry[] = [];
   const future: HistoryEntry[] = [];
   const startedAt = new Date().toISOString();
+  // pausedMs accumulates total paused duration so elapsedSeconds() stays frozen while paused
+  let pausedMs = 0;
+  let pauseStart: number | null = null;
   const startTime = Date.now();
   let timerHandle: number | null = null;
+  let autosaveHandle: number | null = null;
   let gameWon = false;
+
+  // Unique key for this game session (used for save/load)
+  const gameId = mode === 'daily'
+    ? `daily-${props.date ?? new Date().toISOString().slice(0, 10)}`
+    : `practice-${difficulty}-${props.stage ?? 0}`;
+
+  // Restore saved state if resuming
+  if (props.resume) {
+    const r = props.resume;
+    // Restore board
+    r.user_board.forEach((v, i) => {
+      const row = Math.floor(i / 9), col = i % 9;
+      if (!givenMask[row][col]) userBoard[row][col] = v;
+    });
+    // Restore hint cells
+    r.hint_cells.forEach(i => { hintMask[Math.floor(i / 9)][i % 9] = true; });
+    // Restore notes
+    (r as GameInProgress & { notes?: number[][] }).notes?.forEach((bits, i) => {
+      bits.forEach(n => noteMask[Math.floor(i / 9)][i % 9].add(n));
+    });
+    mistakes = r.mistakes;
+    hintsLeft = r.hints_left;
+    moves.push(...(r.moves as Move[]));
+    // Set pausedMs so elapsedSeconds() returns r.elapsed_seconds immediately on resume
+    pausedMs = Date.now() - startTime - r.elapsed_seconds * 1000;
+  }
 
   const settings = { highlightSame: true, showConflict: true, highlightRelated: true };
   const dotColor = DIFF_COLOR[difficulty] ?? '#6c5ce7';
@@ -200,7 +232,39 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const notesBadge = root.querySelector('#notes-badge') as HTMLElement;
 
   function elapsedSeconds(): number {
-    return Math.floor((Date.now() - startTime) / 1000);
+    return Math.floor((elapsedMs() - pausedMs) / 1000);
+  }
+
+  function elapsedMs(): number {
+    return elapsedMs() - pausedMs;
+  }
+
+  function saveProgress() {
+    if (gameWon) return;
+    const notes: number[][] = [];
+    for (let r = 0; r < 9; r++)
+      for (let c = 0; c < 9; c++)
+        notes.push(Array.from(noteMask[r][c]));
+    const hint_cells: number[] = [];
+    for (let r = 0; r < 9; r++)
+      for (let c = 0; c < 9; c++)
+        if (hintMask[r][c]) hint_cells.push(r * 9 + c);
+    void saveGame({
+      game_id: gameId,
+      mode,
+      date: props.date,
+      level: difficulty,
+      stage: props.stage,
+      puzzle: puzzle.flat().join(''),
+      user_board: userBoard.flat(),
+      hint_cells,
+      notes,
+      moves: moves as Array<{ r: number; c: number; n: number; t: number }>,
+      started_at: new Date(startTime).getTime(),
+      elapsed_seconds: elapsedSeconds(),
+      mistakes,
+      hints_left: hintsLeft,
+    } as GameInProgress & { notes: number[][] });
   }
 
   function syncUndoRedo() {
@@ -256,7 +320,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         history.push({ r, c, prevDigit, nextDigit: n, prevNotes, nextNotes: [], mistakesDelta });
         future.length = 0;
         syncUndoRedo();
-        moves.push({ r, c, n, t: Date.now() - startTime });
+        moves.push({ r, c, n, t: elapsedMs() });
         rerender();
         triggerGameOver();
         return;
@@ -275,7 +339,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     history.push({ r, c, prevDigit, nextDigit: n, prevNotes, nextNotes: [], mistakesDelta });
     future.length = 0;
     syncUndoRedo();
-    moves.push({ r, c, n, t: Date.now() - startTime });
+    moves.push({ r, c, n, t: elapsedMs() });
     rerender();
     checkWin();
   }
@@ -350,7 +414,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (hintsLeft <= 0) hintBtn.disabled = true;
     sfxHint();
     selected = target;
-    moves.push({ r: target.r, c: target.c, n: solution[target.r][target.c], t: Date.now() - startTime, isHint: true });
+    moves.push({ r: target.r, c: target.c, n: solution[target.r][target.c], t: elapsedMs(), isHint: true });
     history.length = 0;
     future.length = 0;
     syncUndoRedo();
@@ -362,6 +426,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (!boardsEqual(userBoard, solution)) return;
     gameWon = true;
     if (timerHandle) clearInterval(timerHandle);
+    if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
+    void deleteGame(gameId);
 
     const timeSeconds = elapsedSeconds();
     const hintsUsed = 3 - hintsLeft;
@@ -378,6 +444,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   function triggerGameOver() {
     gameWon = true;
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+    if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
+    void deleteGame(gameId);
     const overlay = root.querySelector('#gameover-overlay') as HTMLElement;
     overlay.classList.add('open');
   }
@@ -387,10 +455,13 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   function openMenu() {
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+    pauseStart = Date.now();
+    saveProgress();
     boardOverlay.classList.add('open');
   }
 
   function closeMenu() {
+    if (pauseStart !== null) { pausedMs += Date.now() - pauseStart; pauseStart = null; }
     boardOverlay.classList.remove('open');
     if (!gameWon) timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
   }
@@ -431,6 +502,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   });
   root.querySelector('#overlay-leave')?.addEventListener('click', () => {
     if (timerHandle) clearInterval(timerHandle);
+    if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
+    saveProgress();
     props.onExit();
   });
   root.querySelector('#gameover-new')?.addEventListener('click', () => {
@@ -470,12 +543,16 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     timerEl.textContent = formatTime(elapsedSeconds());
   }, 500);
 
+  // Autosave every 30s so users can return and continue
+  autosaveHandle = window.setInterval(saveProgress, 30_000);
+
   rerender();
   syncUndoRedo();
 
   return {
     unmount() {
       if (timerHandle) clearInterval(timerHandle);
+      if (autosaveHandle) clearInterval(autosaveHandle);
       document.removeEventListener('keydown', onKey);
     },
   };

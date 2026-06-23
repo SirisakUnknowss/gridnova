@@ -38,6 +38,7 @@ import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
 import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
+import { type GameInProgress } from './lib/local-db';
 
 const root = document.getElementById('app')!;
 let currentUnmount: (() => void) | null = null;
@@ -111,6 +112,67 @@ const navCb = {
   onProfile:      () => showProfile(),
 };
 
+function continueSavedGame(saved: GameInProgress) {
+  if (saved.mode === 'daily' && saved.date) {
+    void playDailyResume(saved);
+  } else if (saved.mode === 'practice' && saved.level) {
+    playPracticeResume(saved);
+  }
+}
+
+async function playDailyResume(saved: GameInProgress) {
+  const date = saved.date!;
+  let puzzleData: { puzzle: number[][]; solution: number[][]; difficulty: import('./engine/types').Difficulty };
+  try {
+    const resp = await api.getDailyPuzzle(date);
+    if (resp) {
+      puzzleData = {
+        puzzle: (resp.puzzle as string).split('').map(Number).reduce((acc: number[][], v, i) => {
+          if (i % 9 === 0) acc.push([]); acc[acc.length - 1].push(v); return acc;
+        }, []),
+        solution: (resp.solution as string).split('').map(Number).reduce((acc: number[][], v, i) => {
+          if (i % 9 === 0) acc.push([]); acc[acc.length - 1].push(v); return acc;
+        }, []),
+        difficulty: resp.difficulty as import('./engine/types').Difficulty,
+      };
+    } else throw new Error('no puzzle');
+  } catch {
+    puzzleData = generateDailyPuzzle(date);
+  }
+  clearView();
+  const view = mountGameView(root, {
+    mode: 'daily',
+    difficulty: puzzleData.difficulty,
+    puzzle: puzzleData.puzzle as import('./engine/types').Board,
+    solution: puzzleData.solution as import('./engine/types').Board,
+    date,
+    resume: saved,
+    onWin: (result) => handleWin(result, date),
+    onExit: showHome,
+  });
+  currentUnmount = view.unmount;
+}
+
+function playPracticeResume(saved: GameInProgress) {
+  const level = saved.level as Difficulty;
+  const stage = saved.stage ?? 1;
+  const seed = `practice:${level}:${stage}`;
+  const puzzleData = generatePuzzle({ difficulty: level, seed });
+  clearView();
+  const view = mountGameView(root, {
+    mode: 'practice',
+    difficulty: level,
+    puzzle: puzzleData.puzzle,
+    solution: puzzleData.solution,
+    stage,
+    resume: saved,
+    onWin: (result) => handleWin(result),
+    onExit: showHome,
+    onNewGame: () => void playPractice(level),
+  });
+  currentUnmount = view.unmount;
+}
+
 function showHome() {
   clearView();
   const view = mountHomeView(root, {
@@ -118,6 +180,7 @@ function showHome() {
     onPlayPractice: (level) => playPractice(level as Difficulty),
     onAuthAction: openAuthAction,
     onLeaderboard: showLeaderboard,
+    onContinue: continueSavedGame,
     nav: navCb,
   });
   currentUnmount = view.unmount;
