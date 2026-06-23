@@ -237,12 +237,12 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const notesBtn   = root.querySelector('#notes-btn') as HTMLButtonElement;
   const notesBadge = root.querySelector('#notes-badge') as HTMLElement;
 
-  function elapsedSeconds(): number {
-    return Math.floor((elapsedMs() - pausedMs) / 1000);
+  function elapsedMs(): number {
+    return Date.now() - startTime - pausedMs;
   }
 
-  function elapsedMs(): number {
-    return elapsedMs() - pausedMs;
+  function elapsedSeconds(): number {
+    return Math.floor(elapsedMs() / 1000);
   }
 
   function saveProgress() {
