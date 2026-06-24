@@ -213,7 +213,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
 
         return `
           <div class="ach-row ${isUnlocked ? 'unlocked' : 'locked'} ${rarity.cls}${isNew ? ' new-unlock' : ''}">
-            <div class="ach-row-ic" style="background:${isUnlocked ? `color-mix(in srgb,${rarity.color} 14%,#fff)` : '#f0eef8'};${!isUnlocked ? 'filter:grayscale(1);opacity:.55' : ''}">${escapeHtml(icon)}</div>
+            <div class="ach-row-ic${isUnlocked ? '' : ' ach-row-ic--locked'}">${icon}</div>
             <div class="ach-row-body">
               <div class="ach-row-name">${escapeHtml(d.name)}</div>
               <div class="ach-row-desc">${escapeHtml(d.description)}</div>
