@@ -1475,13 +1475,14 @@ h3 { font-size: 18px; }
 /* ===== Achievements (new design) ===== */
 .view--ach { gap: 14px; padding-top: 0; }
 
-/* sticky header (topbar + filter) */
+/* sticky header (topbar + summary + filter) — inside .view */
 .ach-sticky {
   position: sticky; top: 0; z-index: 20;
+  width: 100%;
   background: var(--app-bg, #f4f1fb);
-  padding: 12px 16px 0;
-  display: flex; flex-direction: column; gap: 10px;
-  box-shadow: 0 1px 0 rgba(108,92,231,.08);
+  padding-top: 12px;
+  display: flex; flex-direction: column; gap: 12px;
+  padding-bottom: 4px;
 }
 
 /* topbar */

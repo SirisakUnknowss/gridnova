@@ -108,21 +108,21 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   };
 
   root.innerHTML = `
-    <div class="ach-sticky">
-      <div class="ach-topbar">
-        <button class="ach-back" id="ach-back" aria-label="Back">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <h1 class="ach-title">
-          <svg class="ach-title-ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="9" r="5.2"/><path d="M9 13.5 7.5 21l4.5-2.5L16.5 21 15 13.5"/></svg>
-          Achievements
-        </h1>
-        <div style="width:40px;flex:none"></div>
-      </div>
-      <div id="ach-summary"></div>
-      <div class="ach-filter" id="ach-filter"></div>
-    </div>
     <section class="view view--ach">
+      <div class="ach-sticky">
+        <div class="ach-topbar">
+          <button class="ach-back" id="ach-back" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <h1 class="ach-title">
+            <svg class="ach-title-ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="9" r="5.2"/><path d="M9 13.5 7.5 21l4.5-2.5L16.5 21 15 13.5"/></svg>
+            Achievements
+          </h1>
+          <div style="width:40px;flex:none"></div>
+        </div>
+        <div id="ach-summary"></div>
+        <div class="ach-filter" id="ach-filter"></div>
+      </div>
       <div id="ach-body" style="width:100%"></div>
     </section>
     ${bottomNavHTML('achievements')}
