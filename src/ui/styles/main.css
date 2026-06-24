@@ -358,10 +358,9 @@ h3 { font-size: 18px; }
 .board {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
   width: 100%;
   max-width: 100%;
-  height: auto;
-  max-height: 100%;
   aspect-ratio: 1;
   border: 2px solid #b8a9f5;
   border-radius: var(--radius-lg);
@@ -379,6 +378,7 @@ h3 { font-size: 18px; }
   border-right: 1px solid #b8a9f5;
   border-bottom: 1px solid #b8a9f5;
   position: relative;
+  min-width: 0; min-height: 0;
 }
 .cell.given { font-weight: 400; color: var(--cell-text); background: var(--board-cell-given, var(--cell-bg-given)); }
 .cell.user  { color: var(--cell-text-user); font-weight: 400; background: var(--board-cell-bg, var(--cell-bg)); }
