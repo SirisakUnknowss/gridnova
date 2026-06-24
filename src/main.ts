@@ -19,7 +19,6 @@ import { showAuthModal } from './ui/views/auth-modal';
 import { mountLeaderboardView } from './ui/views/leaderboard';
 import { hasCompletedOnboarding, showOnboarding } from './ui/views/onboarding';
 import { renderDailyQuests } from './ui/views/quests';
-import { mountShopView } from './ui/views/shop';
 import { mountProfileView } from './ui/views/profile';
 import { mountAchievementsView } from './ui/views/achievements';
 import { mountStatsView } from './ui/views/stats';
@@ -126,7 +125,6 @@ async function loadUserData(): Promise<void> {
 const navCb = {
   onHome:         () => showHome(),
   onAchievements: () => showAchievements(),
-  onShop:         () => showShop(),
   onProfile:      () => showProfile(),
 };
 
@@ -213,12 +211,6 @@ function showHome() {
 function showLeaderboard() {
   clearView();
   const view = mountLeaderboardView(root, { onBack: showHome, nav: navCb });
-  currentUnmount = view.unmount;
-}
-
-function showShop() {
-  clearView();
-  const view = mountShopView(root, { onBack: showHome, onToast: toast, nav: navCb });
   currentUnmount = view.unmount;
 }
 

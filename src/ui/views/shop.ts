@@ -104,9 +104,9 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
 
       <div class="shop-grid" id="shop-grid"></div>
     </section>
-    ${bottomNavHTML('shop')}
+    ${bottomNavHTML('home')}
   `;
-  wireBottomNav(root, props.nav, 'shop');
+  wireBottomNav(root, props.nav, 'home');
 
   const gridEl = root.querySelector<HTMLElement>('#shop-grid')!;
 
