@@ -10,6 +10,11 @@ declare const self: ServiceWorkerGlobalScope;
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
 
+// Skip waiting so the new SW activates immediately on install
+self.addEventListener('install', (event) => {
+  event.waitUntil(self.skipWaiting());
+});
+
 // Take control of all clients immediately when activated
 self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
