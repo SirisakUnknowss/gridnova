@@ -1473,8 +1473,7 @@ h3 { font-size: 18px; }
 .avatar-cell.selected { border-color: var(--brand-primary); background: #ede9fe; }
 
 /* ===== Achievements (new design) ===== */
-.view--ach { display: flex; flex-direction: column; overflow: hidden; }
-.ach-scroll { flex: 1; overflow-y: auto; padding: 16px 16px 24px; display: flex; flex-direction: column; gap: 14px; }
+.view--ach { gap: 14px; }
 
 /* topbar */
 .ach-topbar { display: flex; align-items: center; gap: 12px; min-height: 44px; position: relative; }
