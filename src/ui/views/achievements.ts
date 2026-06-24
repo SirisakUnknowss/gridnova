@@ -1,12 +1,11 @@
 // =====================================================================
-// Achievements view — grid of locked/unlocked achievements
+// Achievements view — grouped list with progress summary
 // =====================================================================
 import * as api from '@lib/api';
 import { supabase } from '@lib/supabase';
 import { useStore } from '@state/store';
 import { escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
-import { ic } from '@ui/icons';
 
 interface AchievementDef {
   id: string;
@@ -26,30 +25,24 @@ interface UserAchievement {
   unlocked_at: string;
 }
 
-const TIER_COLOR: Record<string, string> = {
-  bronze: '#cd7f32',
-  silver: '#c0c0c0',
-  gold: '#ffd700',
-  platinum: '#e5e4e2',
-  diamond: '#b9f2ff',
+// Map DB category → display label + emoji
+const CATEGORY_META: Record<string, { label: string; emoji: string }> = {
+  play_volume:  { label: 'Puzzle',   emoji: '🧩' },
+  daily:        { label: 'Daily',    emoji: '📅' },
+  skill:        { label: 'Mastery',  emoji: '💎' },
+  leaderboard:  { label: 'Social',   emoji: '🏆' },
+  progression:  { label: 'Streak',   emoji: '🔥' },
+  special:      { label: 'Special',  emoji: '✨' },
 };
 
-const CATEGORY_LABEL: Record<string, () => string> = {
-  play_volume:  () => `${ic.gamepad(13)} Volume`,
-  daily:        () => `${ic.daily(13)} Daily`,
-  skill:        () => `${ic.target(13)} Skill`,
-  leaderboard:  () => `${ic.trophy(13)} Ranks`,
-  progression:  () => `${ic.star(13)} Levels`,
-  special:      () => `${ic.sparkle(13)} Special`,
+// Map tier → rarity class + stripe color
+const TIER_RARITY: Record<string, { cls: string; color: string }> = {
+  bronze:   { cls: 'common',  color: '#10b981' },
+  silver:   { cls: 'rare',    color: '#8b7bf0' },
+  gold:     { cls: 'epic',    color: '#f5a623' },
+  platinum: { cls: 'rare',    color: '#8b7bf0' },
+  diamond:  { cls: 'epic',    color: '#f5a623' },
 };
-function categoryLabel(c: string): string {
-  return CATEGORY_LABEL[c]?.() ?? c.replace(/_/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
-}
-
-export interface AchievementsProps {
-  onBack: () => void;
-  nav: BottomNavCallbacks;
-}
 
 interface ProgressInputs {
   gameCount: number;
@@ -61,44 +54,31 @@ interface ProgressInputs {
   themesOwned: number;
 }
 
-// Compute partial progress toward countable achievements.
-// Returns { progress, target } or null if not progress-trackable client-side.
 function computeProgress(id: string, i: ProgressInputs): { progress: number; target: number } | null {
   const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
-    // play_volume
-    ACH_PLAY_10:        ['gameCount',    10],
-    ACH_PLAY_50:        ['gameCount',    50],
-    ACH_PLAY_100:       ['gameCount',   100],
-    ACH_PLAY_500:       ['gameCount',   500],
-    ACH_PLAY_1000:      ['gameCount',  1000],
-    ACH_PLAY_5000:      ['gameCount',  5000],
-
-    // daily volume
-    ACH_DAILY_10:       ['dailyCount',   10],
-    ACH_DAILY_50:       ['dailyCount',   50],
-
-    // streak
-    ACH_STREAK_3:       ['currentStreak',   3],
-    ACH_STREAK_7:       ['currentStreak',   7],
-    ACH_STREAK_14:      ['currentStreak',  14],
-    ACH_STREAK_30:      ['currentStreak',  30],
-    ACH_STREAK_60:      ['currentStreak',  60],
-    ACH_STREAK_100:     ['currentStreak', 100],
-    ACH_STREAK_365:     ['currentStreak', 365],
-
-    // skill (perfect runs)
-    ACH_PERFECT_5:      ['perfectCount',   5],
-    ACH_PERFECT_25:     ['perfectCount',  25],
-
-    // level
-    ACH_LEVEL_10:       ['level',  10],
-    ACH_LEVEL_25:       ['level',  25],
-    ACH_LEVEL_50:       ['level',  50],
-    ACH_LEVEL_100:      ['level', 100],
-
-    // special
-    ACH_RICH:           ['coins',         10000],
-    ACH_THEME_COLLECT:  ['themesOwned',       5],
+    ACH_PLAY_10:       ['gameCount',       10],
+    ACH_PLAY_50:       ['gameCount',       50],
+    ACH_PLAY_100:      ['gameCount',      100],
+    ACH_PLAY_500:      ['gameCount',      500],
+    ACH_PLAY_1000:     ['gameCount',     1000],
+    ACH_PLAY_5000:     ['gameCount',     5000],
+    ACH_DAILY_10:      ['dailyCount',      10],
+    ACH_DAILY_50:      ['dailyCount',      50],
+    ACH_STREAK_3:      ['currentStreak',    3],
+    ACH_STREAK_7:      ['currentStreak',    7],
+    ACH_STREAK_14:     ['currentStreak',   14],
+    ACH_STREAK_30:     ['currentStreak',   30],
+    ACH_STREAK_60:     ['currentStreak',   60],
+    ACH_STREAK_100:    ['currentStreak',  100],
+    ACH_STREAK_365:    ['currentStreak',  365],
+    ACH_PERFECT_5:     ['perfectCount',     5],
+    ACH_PERFECT_25:    ['perfectCount',    25],
+    ACH_LEVEL_10:      ['level',           10],
+    ACH_LEVEL_25:      ['level',           25],
+    ACH_LEVEL_50:      ['level',           50],
+    ACH_LEVEL_100:     ['level',          100],
+    ACH_RICH:          ['coins',        10000],
+    ACH_THEME_COLLECT: ['themesOwned',      5],
   };
   const entry = COUNTERS[id];
   if (!entry) return null;
@@ -107,107 +87,171 @@ function computeProgress(id: string, i: ProgressInputs): { progress: number; tar
   return { progress, target };
 }
 
+const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
+const SVG_LOCK  = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+const SVG_COIN  = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6" fill="rgba(255,255,255,.4)"/></svg>`;
+
+export interface AchievementsProps {
+  onBack: () => void;
+  nav: BottomNavCallbacks;
+}
+
 export function mountAchievementsView(root: HTMLElement, props: AchievementsProps): { unmount: () => void } {
   let defs: AchievementDef[] = [];
   let unlocked: Set<string> = new Set();
+  let newlyUnlocked: Set<string> = new Set();
   let loading = true;
-  let errorMsg: string | null = null;
-  let activeCategory: string = 'all';
+  let activeCategory = 'all';
   let progressInputs: ProgressInputs = {
-    gameCount: 0,
-    dailyCount: 0,
-    perfectCount: 0,
-    currentStreak: 0,
-    level: 1,
-    coins: 0,
-    themesOwned: 0,
+    gameCount: 0, dailyCount: 0, perfectCount: 0,
+    currentStreak: 0, level: 1, coins: 0, themesOwned: 0,
   };
 
   root.innerHTML = `
-    <section class="view">
-      <div class="top-bar">
-        <button class="icon-btn" id="ach-back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <h2 style="margin:0;font-size:16px;color:var(--app-text);">${ic.trophy(16)} Achievements</h2>
-        <span class="stat-pill" id="ach-count">0/0</span>
+    <section class="view view--ach">
+      <div class="ach-scroll" id="ach-scroll">
+        <div class="ach-topbar">
+          <button class="ach-back" id="ach-back" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <h1 class="ach-title">
+            <svg class="ach-title-ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="9" r="5.2"/><path d="M9 13.5 7.5 21l4.5-2.5L16.5 21 15 13.5"/></svg>
+            Achievements
+          </h1>
+        </div>
+        <div id="ach-summary"></div>
+        <div class="ach-filter" id="ach-filter"></div>
+        <div id="ach-body"></div>
       </div>
-      <div class="shop-tabs" id="ach-tabs"></div>
-      <div class="ach-grid" id="ach-grid"></div>
     </section>
     ${bottomNavHTML('achievements')}
   `;
   wireBottomNav(root, props.nav, 'achievements');
 
-  const gridEl = root.querySelector<HTMLElement>('#ach-grid')!;
-  const tabsEl = root.querySelector<HTMLElement>('#ach-tabs')!;
-  const countEl = root.querySelector<HTMLElement>('#ach-count')!;
+  const summaryEl = root.querySelector<HTMLElement>('#ach-summary')!;
+  const filterEl  = root.querySelector<HTMLElement>('#ach-filter')!;
+  const bodyEl    = root.querySelector<HTMLElement>('#ach-body')!;
 
-  function render() {
-    if (loading) {
-      gridEl.innerHTML = `<div class="shop-loading">Loading achievements…</div>`;
-      return;
-    }
-    if (errorMsg) {
-      gridEl.innerHTML = `<div class="lb-empty"><p>${ic.warning(16)} ${escapeHtml(errorMsg)}</p></div>`;
-      return;
-    }
-
-    const categories = Array.from(new Set(defs.map((d) => d.category)));
-    tabsEl.innerHTML = `
-      <button class="shop-tab${activeCategory === 'all' ? ' active' : ''}" data-cat="all">All</button>
-      ${categories.map((c) => `
-        <button class="shop-tab${activeCategory === c ? ' active' : ''}" data-cat="${escapeHtml(c)}">${categoryLabel(c)}</button>
-      `).join('')}
+  function renderSummary() {
+    const total = defs.length;
+    const done  = unlocked.size;
+    const pct   = total ? Math.round((done / total) * 100) : 0;
+    // SVG circle: r=28, circumference=175.9
+    const circ = 175.9;
+    const offset = circ - (circ * pct / 100);
+    summaryEl.innerHTML = `
+      <div class="ach-summary">
+        <div class="ach-sum-ring">
+          <svg viewBox="0 0 68 68" width="68" height="68">
+            <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
+            <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="7"
+              stroke-dasharray="${circ}" stroke-dashoffset="${offset.toFixed(1)}"
+              stroke-linecap="round" transform="rotate(-90 34 34)"/>
+          </svg>
+          <div class="ach-sum-center">
+            <div class="ach-sum-pct">${done}</div>
+            <div class="ach-sum-sub">/ ${total}</div>
+          </div>
+        </div>
+        <div class="ach-sum-text">
+          <div class="ach-sum-title">${done} Unlocked</div>
+          <div class="ach-sum-desc">${total - done} more to go, keep playing!</div>
+          <div class="ach-sum-bar-wrap"><div class="ach-sum-bar" style="width:${pct}%"></div></div>
+        </div>
+      </div>
     `;
-    tabsEl.querySelectorAll<HTMLButtonElement>('.shop-tab').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        activeCategory = btn.dataset.cat!;
-        render();
-      });
+  }
+
+  function renderFilter() {
+    const categories = Array.from(new Set(defs.map((d) => d.category)));
+    filterEl.innerHTML = [
+      `<button class="ach-chip${activeCategory === 'all' ? ' on' : ''}" data-cat="all">All</button>`,
+      ...categories.map((c) => {
+        const m = CATEGORY_META[c] ?? { label: c, emoji: '📌' };
+        return `<button class="ach-chip${activeCategory === c ? ' on' : ''}" data-cat="${escapeHtml(c)}">${m.emoji} ${m.label}</button>`;
+      }),
+    ].join('');
+    filterEl.querySelectorAll<HTMLButtonElement>('.ach-chip').forEach((btn) => {
+      btn.addEventListener('click', () => { activeCategory = btn.dataset.cat!; render(); });
     });
+  }
+
+  function renderBody() {
+    if (loading) {
+      bodyEl.innerHTML = `<div class="ach-loading">Loading…</div>`;
+      return;
+    }
 
     const filtered = activeCategory === 'all'
       ? defs
       : defs.filter((d) => d.category === activeCategory);
     const visible = filtered.filter((d) => !d.hidden || unlocked.has(d.id));
 
-    countEl.textContent = `${unlocked.size}/${defs.length}`;
-
     if (!visible.length) {
-      gridEl.innerHTML = `<div class="lb-empty"><p>${ic.empty(20)} No achievements in this category.</p></div>`;
+      bodyEl.innerHTML = `<div class="ach-empty">No achievements here yet.</div>`;
       return;
     }
 
-    gridEl.innerHTML = visible.map((d) => {
-      const isUnlocked = unlocked.has(d.id);
-      const tier = d.tier ?? 'bronze';
-      const color = TIER_COLOR[tier] ?? '#cd7f32';
-      const icon = d.icon || (isUnlocked ? ic.trophy(28) : ic.lock(28));
-      const prog = !isUnlocked && computeProgress(d.id, progressInputs);
+    // Group by category
+    const groups: Record<string, AchievementDef[]> = {};
+    for (const d of visible) {
+      if (!groups[d.category]) groups[d.category] = [];
+      groups[d.category].push(d);
+    }
+
+    bodyEl.innerHTML = Object.entries(groups).map(([cat, items]) => {
+      const m = CATEGORY_META[cat] ?? { label: cat, emoji: '📌' };
+      const doneInGroup = items.filter((d) => unlocked.has(d.id)).length;
+      const allDone = doneInGroup === items.length;
+
+      const cards = items.map((d) => {
+        const isUnlocked = unlocked.has(d.id);
+        const isNew = newlyUnlocked.has(d.id);
+        const rarity = TIER_RARITY[d.tier ?? 'bronze'] ?? { cls: 'common', color: '#10b981' };
+        const prog = !isUnlocked ? computeProgress(d.id, progressInputs) : null;
+        const icon = d.icon || (isUnlocked ? '🏅' : '🔒');
+
+        return `
+          <div class="ach-row ${isUnlocked ? 'unlocked' : 'locked'} ${rarity.cls}${isNew ? ' new-unlock' : ''}">
+            <div class="ach-row-ic" style="background:${isUnlocked ? `color-mix(in srgb,${rarity.color} 14%,#fff)` : '#f0eef8'};${!isUnlocked ? 'filter:grayscale(1);opacity:.55' : ''}">${escapeHtml(icon)}</div>
+            <div class="ach-row-body">
+              <div class="ach-row-name">${escapeHtml(d.name)}</div>
+              <div class="ach-row-desc">${escapeHtml(d.description)}</div>
+              ${prog ? `
+                <div class="ach-row-prog">
+                  <div class="ach-row-prog-bar"><div class="ach-row-prog-fill" style="width:${Math.round((prog.progress / prog.target) * 100)}%"></div></div>
+                  <div class="ach-row-prog-label">${prog.progress} / ${prog.target}</div>
+                </div>
+              ` : ''}
+            </div>
+            <div class="ach-row-right">
+              ${isUnlocked
+                ? `<span class="ach-row-check">${SVG_CHECK}</span>`
+                : `<span class="ach-row-lock">${SVG_LOCK}</span>`}
+              ${d.reward_coin ? `<span class="ach-row-pts">${SVG_COIN}${d.reward_coin}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
       return `
-        <div class="ach-card${isUnlocked ? ' unlocked' : ' locked'}">
-          <div class="ach-icon" style="--tier-color:${color}">${icon}</div>
-          <div class="ach-name">${escapeHtml(d.name)}</div>
-          <div class="ach-desc">${escapeHtml(d.description)}</div>
-          ${prog ? `
-            <div class="quest-bar" style="width:100%;margin-top:4px;">
-              <div class="quest-bar-fill" style="width:${(prog.progress / prog.target) * 100}%"></div>
-            </div>
-            <div style="font-size:10px;opacity:0.8;">${prog.progress} / ${prog.target}</div>
-          ` : ''}
-          <div class="ach-tier" style="background:${color};color:#1a1a2e;">${escapeHtml(tier)}</div>
-          ${d.reward_coin || d.reward_xp ? `
-            <div class="ach-rewards">
-              ${d.reward_coin ? `<span>${ic.coin(12)} ${d.reward_coin}</span>` : ''}
-              ${d.reward_xp ? `<span>${ic.star(12)} ${d.reward_xp}</span>` : ''}
-            </div>
-          ` : ''}
+        <div class="ach-group-head">
+          <span class="ach-group-label">${m.emoji} ${m.label}</span>
+          <span class="ach-group-count${allDone ? ' done' : ''}">${doneInGroup} / ${items.length}</span>
         </div>
+        <div class="ach-list">${cards}</div>
       `;
     }).join('');
   }
 
+  function render() {
+    renderSummary();
+    renderFilter();
+    renderBody();
+  }
+
   async function load() {
-    loading = true; errorMsg = null; render();
+    loading = true; bodyEl.innerHTML = `<div class="ach-loading">Loading…</div>`;
     try {
       const state = useStore.getState();
       const userId = state.user?.id;
@@ -226,7 +270,11 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         api.getInventory().catch(() => []),
       ]);
       defs = (defList ?? []) as AchievementDef[];
-      unlocked = new Set(((userList ?? []) as UserAchievement[]).map((u) => u.achievement_id));
+      const userAchs = (userList ?? []) as UserAchievement[];
+      unlocked = new Set(userAchs.map((u) => u.achievement_id));
+      // Mark recently unlocked (last 24h) as "new"
+      const oneDayAgo = Date.now() - 86400_000;
+      newlyUnlocked = new Set(userAchs.filter((u) => new Date(u.unlocked_at).getTime() > oneDayAgo).map((u) => u.achievement_id));
       const ownedIds = ((inventory ?? []) as any[]).map((r) => r.item_id as string);
       progressInputs = {
         gameCount:     (history as any)?.count ?? 0,
@@ -239,16 +287,13 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       };
       loading = false;
       render();
-    } catch (err) {
+    } catch {
       loading = false;
-      errorMsg = (err as Error).message ?? 'Could not load achievements.';
-      render();
+      bodyEl.innerHTML = `<div class="ach-empty">Could not load achievements.</div>`;
     }
   }
 
   root.querySelector('#ach-back')?.addEventListener('click', props.onBack);
-
   void load();
-
-  return { unmount() { /* no-op */ } };
+  return { unmount() {} };
 }
