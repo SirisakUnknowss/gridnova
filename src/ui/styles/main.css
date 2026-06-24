@@ -1473,20 +1473,29 @@ h3 { font-size: 18px; }
 .avatar-cell.selected { border-color: var(--brand-primary); background: #ede9fe; }
 
 /* ===== Achievements (new design) ===== */
-.view--ach { gap: 14px; }
+.view--ach { gap: 14px; padding-top: 0; }
+
+/* sticky header (topbar + filter) */
+.ach-sticky {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--app-bg, #f4f1fb);
+  padding: 12px 16px 0;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 1px 0 rgba(108,92,231,.08);
+}
 
 /* topbar */
-.ach-topbar { display: flex; align-items: center; gap: 12px; min-height: 44px; position: relative; }
+.ach-topbar { display: flex; align-items: center; gap: 8px; min-height: 44px; }
 .ach-back {
   flex: none; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
-  background: var(--app-card); box-shadow: 0 2px 8px -4px rgba(70,55,140,.25), 0 0 0 1px rgba(108,92,231,.12);
+  background: #fff; box-shadow: 0 2px 8px -4px rgba(70,55,140,.25), 0 0 0 1px rgba(108,92,231,.12);
   display: grid; place-items: center; color: var(--app-text);
 }
 .ach-back svg { width: 20px; height: 20px; }
 .ach-title {
-  position: absolute; left: 50%; transform: translateX(-50%);
+  flex: 1; text-align: center;
   font-size: 18px; font-weight: 700; color: var(--app-text);
-  display: flex; align-items: center; gap: 8px; margin: 0;
+  display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0;
 }
 .ach-title-ic { width: 22px; height: 22px; color: var(--brand-primary); }
 
@@ -1512,7 +1521,11 @@ h3 { font-size: 18px; }
 .ach-sum-bar { height: 100%; border-radius: 999px; background: rgba(255,255,255,.9); transition: width .4s; }
 
 /* filter chips */
-.ach-filter { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 4px; scrollbar-width: none; }
+.ach-filter {
+  display: flex; gap: 8px; overflow-x: auto;
+  padding: 2px 0 12px; scrollbar-width: none;
+  width: 100%; box-sizing: border-box;
+}
 .ach-filter::-webkit-scrollbar { display: none; }
 .ach-chip {
   flex: none; border: none; cursor: pointer; border-radius: 999px; padding: 9px 16px;
