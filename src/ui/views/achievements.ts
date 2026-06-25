@@ -123,7 +123,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         <div id="ach-summary"></div>
         <div class="ach-filter" id="ach-filter"></div>
       </div>
-      <div id="ach-body" style="width:100%"></div>
+      <div id="ach-body" style="width:99%"></div>
     </section>
     ${bottomNavHTML('achievements')}
   `;
