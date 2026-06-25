@@ -13,8 +13,13 @@ Thai-speaking.
 
 **Live URLs**
 - Production: `https://gridnova.pages.dev` (branch: `main`)
-- Staging: `https://develop.gridnova.pages.dev` (branch: `develop`)
+- Staging: `https://staging.gridnova.pages.dev` (branch: `staging`)
 - Admin panel: `https://gridnova.pages.dev/admin/`
+
+**Deploy**: Cloudflare Pages is a Direct Upload project (NOT Git-connected).
+Deploys are automated by GitHub Actions `.github/workflows/deploy-web.yml`, which
+triggers on push to `main` (→ production) and `staging` (→ staging). Pushing to any
+other branch deploys nothing. Workflow: push to `staging`, verify, then merge to `main`.
 
 ---
 
