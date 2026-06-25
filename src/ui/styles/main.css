@@ -1454,6 +1454,21 @@ h3 { font-size: 18px; }
   margin: 8px 0 4px;
   letter-spacing: 0.04em;
 }
+.app-version-row {
+  align-self: stretch;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 10px 0 2px;
+  font-size: 11px;
+  color: var(--app-text-secondary);
+  opacity: 0.6;
+  letter-spacing: 0.04em;
+}
+.env-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 2px 7px; border-radius: var(--radius-full);
+  color: #fff; background: var(--color-warning);
+}
+.env-badge--staging { background: var(--color-warning); }
 
 .avatar-grid {
   margin-top: 16px;

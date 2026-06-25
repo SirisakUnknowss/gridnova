@@ -11,6 +11,7 @@ import { useVisitorStore } from '@state/visitor-store';
 import { getGuestDisplayId } from '@lib/api';
 import { ic } from '@ui/icons';
 import { listGames, type GameInProgress } from '@lib/local-db';
+import { APP_VERSION } from '@lib/version';
 
 export interface HomeViewProps {
   onPlayDaily: () => void;
@@ -171,6 +172,11 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
         <div id="quest-list" style="font-size:13px;color:var(--app-text-secondary);">
           ${isGuest ? '<span style="color:var(--brand-primary);cursor:pointer;" id="quest-signin">Sign in</span> to see daily quests.' : 'Loading…'}
         </div>
+      </div>
+
+      <div class="app-version-row">
+        ${import.meta.env.VITE_APP_ENV === 'staging' ? '<span class="env-badge env-badge--staging">STAGING</span>' : ''}
+        <span>v${APP_VERSION}</span>
       </div>
 
     </section>

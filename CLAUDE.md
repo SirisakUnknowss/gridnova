@@ -19,7 +19,45 @@ Thai-speaking.
 **Deploy**: Cloudflare Pages is a Direct Upload project (NOT Git-connected).
 Deploys are automated by GitHub Actions `.github/workflows/deploy-web.yml`, which
 triggers on push to `main` (→ production) and `staging` (→ staging). Pushing to any
-other branch deploys nothing. Workflow: push to `staging`, verify, then merge to `main`.
+other branch deploys nothing.
+
+---
+
+## 🚨 Deployment Policy (STRICT — read before every push)
+
+1. **Default target is ALWAYS `staging`.** When work is done, push to the `staging`
+   branch only. Never push to `main` and never merge `staging → main` on your own.
+2. **Production (`main`) is OFF-LIMITS** until the user explicitly says to deploy to
+   production. No exceptions, even for "small" or "urgent" fixes.
+3. **When the user authorizes a production deploy, STOP and confirm first.** Reply with:
+   - "กำลังจะอัปเดต production แล้วนะ" (explicit confirmation prompt)
+   - **Changes** — bullet list of what changed since the last prod release
+   - **Release notes** — user-facing summary (Thai)
+   - **Version bump** — the new version number (bump `version` in `package.json`)
+   Only proceed after the user confirms.
+4. **Version number must be bumped on every production release** and is shown in-app
+   (see `src/lib/version.ts` → `__APP_VERSION__` from `package.json`, rendered in the
+   profile view and the in-game/home screen). Keep `CHANGELOG.md` updated per release.
+
+---
+
+## Environments & Databases
+
+| Env | Branch | Web URL | Supabase project |
+|---|---|---|---|
+| Production | `main` | `gridnova.pages.dev` | `sudoku-daily` (`sqjllqilozhxbzvfjhra`) |
+| Staging | `staging` | `staging.gridnova.pages.dev` | ⚠️ **shares prod DB** (`sudoku-daily`) — not yet separated |
+
+⚠️ **Staging currently SHARES the production Supabase database.** A dedicated staging
+project is wanted but blocked by the Supabase free-tier limit (2 active projects per org,
+already full: `sudoku-daily` + `Vestly`). Separation is pending a Pro upgrade or freeing a
+slot. **Until then, be careful: staging writes hit production data.** Avoid destructive or
+seed operations from staging.
+
+When separated, the per-environment Supabase URL/anon key will come from **GitHub
+Environment secrets** (`staging` vs `production` environments), consumed by
+`deploy-web.yml`. Repo-level secrets are the production fallback; staging-scoped secrets
+override them for staging builds.
 
 ---
 
