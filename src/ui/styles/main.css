@@ -1478,7 +1478,7 @@ h3 { font-size: 18px; }
 /* sticky header (topbar + summary + filter) — inside .view */
 .ach-sticky {
   position: sticky; top: 0; z-index: 20;
-  width: 100%;
+  width: 100%; align-self: stretch;
   background: var(--app-bg, #f4f1fb);
   padding-top: 12px;
   display: flex; flex-direction: column; gap: 12px;
