@@ -60,6 +60,9 @@
   --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun", "Roboto", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
 
+  /* Sticky offset — matches body padding-top so sticky headers lock without visual jump */
+  --sticky-top: calc(var(--space-4) + env(safe-area-inset-top));
+
   /* Spacing */
   --space-1: 4px;
   --space-2: 8px;
