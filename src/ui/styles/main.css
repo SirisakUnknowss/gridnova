@@ -81,6 +81,7 @@ h3 { font-size: 18px; }
   position: sticky;
   top: 0;
   z-index: 25;
+  align-self: stretch;
   width: 100%;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -208,6 +209,7 @@ h3 { font-size: 18px; }
   position: sticky;
   top: 0;
   z-index: 25;
+  align-self: stretch;
   width: 100%;
   max-width: 520px;
   backdrop-filter: blur(20px);
@@ -1032,6 +1034,7 @@ h3 { font-size: 18px; }
   position: sticky;
   top: 54px;
   z-index: 24;
+  align-self: stretch;
   background: var(--app-bg);
   padding-top: 4px;
 }
@@ -1042,6 +1045,7 @@ h3 { font-size: 18px; }
   position: sticky;
   top: 110px;
   z-index: 23;
+  align-self: stretch;
   background: var(--app-bg);
   margin-bottom: 8px;
 }
@@ -1298,6 +1302,7 @@ h3 { font-size: 18px; }
   position: sticky;
   top: 52px;   /* just below sticky .header */
   z-index: 24;
+  align-self: stretch;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   background: transparent;
@@ -1329,6 +1334,7 @@ h3 { font-size: 18px; }
   position: sticky;
   top: 54px;
   z-index: 24;
+  align-self: stretch;
   background: var(--app-bg);
   display: flex; gap: 6px; flex-wrap: wrap;
   padding: 6px 0;
