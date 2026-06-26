@@ -1577,7 +1577,7 @@ h3 { font-size: 18px; }
 .ach-chip.on { background: var(--brand-primary); color: #fff; box-shadow: 0 8px 18px -10px rgba(108,92,231,.6); }
 
 /* group header */
-.ach-group-head { display: flex; align-items: center; gap: 10px; padding: 4px 2px 2px; }
+.ach-group-head { display: flex; align-items: center; gap: 10px; padding: 15px 5px 15px; }
 .ach-group-label { font-size: 16px; font-weight: 700; color: var(--app-text); }
 .ach-group-count {
   font-size: 12px; font-weight: 700; color: var(--app-text-secondary);
