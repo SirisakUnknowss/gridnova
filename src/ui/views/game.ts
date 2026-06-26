@@ -72,7 +72,6 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const moves: Move[] = [];
   const history: HistoryEntry[] = [];
   const future: HistoryEntry[] = [];
-  const startedAt = new Date().toISOString();
   // pausedMs accumulates total paused duration so elapsedSeconds() stays frozen while paused
   let pausedMs = 0;
   let pauseStart: number | null = null;
@@ -385,10 +384,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     future.push(entry);
     userBoard[entry.r][entry.c] = entry.prevDigit;
     noteMask[entry.r][entry.c] = new Set(entry.prevNotes);
-    if (entry.mistakesDelta > 0) {
-      mistakes = Math.max(0, mistakes - entry.mistakesDelta);
-      renderHearts(mistakes);
-    }
+    // Mistakes are permanent — undo restores the board but never refunds a lost
+    // heart, otherwise undo would create a no-lose exploit.
     syncUndoRedo();
     rerender();
   }
@@ -399,10 +396,6 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     history.push(entry);
     userBoard[entry.r][entry.c] = entry.nextDigit;
     noteMask[entry.r][entry.c] = new Set(entry.nextNotes);
-    if (entry.mistakesDelta > 0) {
-      mistakes += entry.mistakesDelta;
-      renderHearts(mistakes);
-    }
     syncUndoRedo();
     rerender();
   }
@@ -528,7 +521,13 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
     if (mode === 'daily') sfxDailyWin(); else sfxWin();
 
-    props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, startedAt, completedAt: new Date().toISOString() });
+    // Report started_at as an EFFECTIVE start (completedAt − actual play time) so the
+    // server's wall-clock check matches time_seconds. The raw mount-time start drifts
+    // from play time whenever the game was paused or resumed from a save, which used to
+    // trip the server TIME_MISMATCH guard and silently 403 every daily submission.
+    const completedAtMs = Date.now();
+    const effectiveStartedAt = new Date(completedAtMs - timeSeconds * 1000).toISOString();
+    props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
   }
 
   function triggerGameOver() {
