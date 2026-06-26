@@ -175,25 +175,25 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         </div>
 
         <div class="action-bar">
-          <button class="action-btn" id="undo-btn" disabled>
+          <button class="action-btn" id="undo-btn" title="Undo (Ctrl/⌘+Z)" disabled>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 7v6h6"/><path d="M3 13C5 8.3 9.1 5 14 5a9 9 0 0 1 0 18c-3.5 0-6.6-2-8.3-5"/>
             </svg>
             <span>Undo</span>
           </button>
-          <button class="action-btn" id="redo-btn" disabled>
+          <button class="action-btn" id="redo-btn" title="Redo (Ctrl/⌘+Y)" disabled>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 7v6h-6"/><path d="M21 13C19 8.3 14.9 5 10 5a9 9 0 0 0 0 18c3.5 0 6.6-2 8.3-5"/>
             </svg>
             <span>Redo</span>
           </button>
-          <button class="action-btn action-btn--erase" id="erase-btn">
+          <button class="action-btn action-btn--erase" id="erase-btn" title="Erase (Backspace)">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 20H7L3 16l13-13 5 5-2.5 2.5M6.5 17.5l5-5"/>
             </svg>
             <span>Erase</span>
           </button>
-          <button class="action-btn" id="notes-btn">
+          <button class="action-btn" id="notes-btn" title="Notes (N)">
             <div class="notes-btn-inner">
               <span class="notes-badge" id="notes-badge">OFF</span>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -202,7 +202,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
             </div>
             <span>Notes</span>
           </button>
-          <button class="action-btn" id="hint-btn">
+          <button class="action-btn" id="hint-btn" title="Hint (H)">
             <div class="hint-btn-inner">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
@@ -618,6 +618,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') eraseCell();
     else if (e.key === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); undoMove(); }
     else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); redoMove(); }
+    else if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); notesBtn.click(); }
+    else if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); hintBtn.click(); }
     else if (selected) {
       const { r, c } = selected;
       if      (e.key === 'ArrowUp')    { selected = { r: Math.max(0, r - 1), c }; rerender(); }

@@ -393,6 +393,17 @@ h3 { font-size: 18px; }
 .cell:nth-child(n+19):nth-child(-n+27),
 .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--border-thick); }
 
+/* Drop the per-cell hairline on the last column / last row so it doesn't double
+   up with the board's outer border (looked like an extra line at the edges). */
+.cell:nth-child(9n)   { border-right: none; }
+.cell:nth-child(n+73) { border-bottom: none; }
+
+/* Round the 4 corner cells to follow the board's radius. */
+.cell:nth-child(1)  { border-top-left-radius: var(--radius-lg); }
+.cell:nth-child(9)  { border-top-right-radius: var(--radius-lg); }
+.cell:nth-child(73) { border-bottom-left-radius: var(--radius-lg); }
+.cell:nth-child(81) { border-bottom-right-radius: var(--radius-lg); }
+
 /* Pencil notes inside a cell */
 .cell-notes {
   display: grid;
@@ -1051,25 +1062,25 @@ h3 { font-size: 18px; }
 }
 .lb-tab-sm {
   flex: 1;
-  background: transparent; border: none;
+  background: var(--app-card-bg); border: 1px solid var(--app-border);
   color: var(--app-text-secondary);
   padding: 7px;
   font-size: 12px; font-weight: 400;
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
-.lb-tab-sm.active { background: white; color: var(--brand-primary); }
+.lb-tab-sm.active { background: var(--brand-primary); border-color: var(--brand-primary); color: #fff; font-weight: 600; }
 
 .lb-tab {
   flex: 1;
-  background: transparent; border: none;
+  background: var(--app-card-bg); border: 1px solid var(--app-border);
   color: var(--app-text-secondary);
   padding: 10px;
   font-size: 14px; font-weight: 400;
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
-.lb-tab.active { background: white; color: var(--brand-primary); }
+.lb-tab.active { background: var(--brand-primary); border-color: var(--brand-primary); color: #fff; font-weight: 600; }
 
 /* Guest ID badge */
 .lb-guest-badge {
