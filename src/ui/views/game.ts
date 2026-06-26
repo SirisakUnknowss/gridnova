@@ -635,6 +635,26 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // Autosave every 30s so users can return and continue
   autosaveHandle = window.setInterval(saveProgress, 30_000);
 
+  // Pause the timer when the app/tab is hidden (minimised, backgrounded, switched
+  // away) and resume on return — otherwise the clock keeps running off-screen.
+  function onVisibilityChange() {
+    if (gameWon) return;
+    if (document.hidden) {
+      // Pause unless something else already paused us (e.g. the menu overlay).
+      if (pauseStart === null) {
+        if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+        pauseStart = Date.now();
+        saveProgress();
+      }
+    } else if (pauseStart !== null && !boardOverlay.classList.contains('open')) {
+      // Resume only when the pause came from being hidden, not from an open menu.
+      pausedMs += Date.now() - pauseStart;
+      pauseStart = null;
+      timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
+    }
+  }
+  document.addEventListener('visibilitychange', onVisibilityChange);
+
   // Sync UI state that depends on restored values
   renderHearts(mistakes);
   updateHintButton();
@@ -647,6 +667,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       if (timerHandle) clearInterval(timerHandle);
       if (autosaveHandle) clearInterval(autosaveHandle);
       document.removeEventListener('keydown', onKey);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     },
   };
 }
