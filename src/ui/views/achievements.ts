@@ -91,6 +91,31 @@ const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const SVG_LOCK  = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
 const SVG_COIN  = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6" fill="rgba(255,255,255,.4)"/></svg>`;
 
+// Let a horizontally-scrolling row be dragged with the mouse on desktop (touch
+// already scrolls natively). Suppresses the trailing click after a real drag so
+// it doesn't toggle a chip.
+function enableDragScroll(el: HTMLElement): void {
+  let down = false, startX = 0, startScroll = 0, moved = false;
+  el.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    down = true; moved = false;
+    startX = e.clientX; startScroll = el.scrollLeft;
+    el.classList.add('dragging');
+  });
+  el.addEventListener('pointermove', (e) => {
+    if (!down) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 3) moved = true;
+    el.scrollLeft = startScroll - dx;
+  });
+  const end = () => { down = false; el.classList.remove('dragging'); };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointerleave', end);
+  el.addEventListener('click', (e) => {
+    if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
+  }, true);
+}
+
 export interface AchievementsProps {
   onBack: () => void;
   nav: BottomNavCallbacks;
@@ -132,6 +157,8 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   const summaryEl = root.querySelector<HTMLElement>('#ach-summary')!;
   const filterEl  = root.querySelector<HTMLElement>('#ach-filter')!;
   const bodyEl    = root.querySelector<HTMLElement>('#ach-body')!;
+
+  enableDragScroll(filterEl);
 
   function renderSummary() {
     const total = defs.length;

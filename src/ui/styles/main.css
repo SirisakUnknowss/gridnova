@@ -1562,7 +1562,10 @@ h3 { font-size: 18px; }
   display: flex; gap: 8px; overflow-x: auto;
   padding: 2px 0 12px; scrollbar-width: none;
   width: 100%; box-sizing: border-box;
+  cursor: grab;
 }
+.ach-filter.dragging { cursor: grabbing; }
+.ach-filter.dragging .ach-chip { pointer-events: none; }
 .ach-filter::-webkit-scrollbar { display: none; }
 .ach-chip {
   flex: none; border: none; cursor: pointer; border-radius: 999px; padding: 9px 16px;

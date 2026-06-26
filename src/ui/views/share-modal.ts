@@ -71,6 +71,38 @@ export function showShareModal(props: ShareModalProps): void {
   const canvas = root.querySelector<HTMLCanvasElement>('#share-preview-canvas')!;
   const loading = root.querySelector<HTMLElement>('#share-preview-loading')!;
 
+  // Drag-to-dismiss on the Y axis (grab the handle or header). Pointer capture keeps
+  // move/up on the captured element, so no document listeners to clean up.
+  (function enableSheetDrag() {
+    const sheet  = root.querySelector<HTMLElement>('#share-sheet')!;
+    const grips  = root.querySelectorAll<HTMLElement>('.share-sheet-handle, .share-sheet-header');
+    let down = false, startY = 0, dy = 0;
+    const onDown = (e: PointerEvent) => {
+      if ((e.target as HTMLElement).closest('#share-close')) return;
+      down = true; startY = e.clientY; dy = 0;
+      sheet.style.transition = 'none';
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!down) return;
+      dy = Math.max(0, e.clientY - startY);
+      sheet.style.transform = `translateY(${dy}px)`;
+    };
+    const onUp = () => {
+      if (!down) return;
+      down = false;
+      sheet.style.transition = 'transform 0.25s ease';
+      if (dy > 120) { sheet.style.transform = 'translateY(100%)'; setTimeout(close, 200); }
+      else { sheet.style.transform = 'translateY(0)'; }
+    };
+    grips.forEach((el) => {
+      el.style.touchAction = 'none';
+      el.addEventListener('pointerdown', onDown);
+      el.addEventListener('pointermove', onMove);
+      el.addEventListener('pointerup', onUp);
+    });
+  })();
+
   async function renderCard(type: CardType) {
     loading.style.display = 'flex';
     canvas.style.opacity = '0.3';
