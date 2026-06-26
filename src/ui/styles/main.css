@@ -691,7 +691,7 @@ h3 { font-size: 18px; }
 }
 
 /* ===== Home view ===== */
-.view--home { gap: 8px; padding-top: 4px; }
+.view--home { gap: 8px; padding-top: calc(env(safe-area-inset-top) + 10px); }
 .view--home .card { margin-bottom: 0; }
 .view--home .quests-card { min-height: 70px; }
 
