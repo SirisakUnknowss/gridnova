@@ -116,7 +116,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
           </button>
           <h1 class="ach-title">
             <svg class="ach-title-ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="9" r="5.2"/><path d="M9 13.5 7.5 21l4.5-2.5L16.5 21 15 13.5"/></svg>
-            Achievements
+            Medals
           </h1>
           <div style="width:40px;flex:none"></div>
         </div>

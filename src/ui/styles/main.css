@@ -228,7 +228,9 @@ h3 { font-size: 18px; }
   color: var(--app-text);
   font-size: 16px;
   box-shadow: var(--app-card-shadow);
+  display: grid; place-items: center;
 }
+.icon-btn svg { display: block; }
 .icon-btn:hover { background: #f0ecff; }
 
 /* ===== Game card top-bar ===== */
@@ -1420,7 +1422,9 @@ h3 { font-size: 18px; }
   font-size: 14px;
   color: var(--app-text-secondary);
   border: none; border-radius: 50%;
+  display: grid; place-items: center;
 }
+.icon-btn--ghost svg { display: block; }
 .icon-btn--ghost:hover { background: #ede9fe; }
 
 .profile-stats {
