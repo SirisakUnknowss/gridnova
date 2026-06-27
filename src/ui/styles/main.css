@@ -307,6 +307,8 @@ h3 { font-size: 18px; }
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 0 14px;
 }
 .board-overlay {
   position: absolute;
@@ -1527,7 +1529,10 @@ h3 { font-size: 18px; }
   flex: none; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
   background: #fff; box-shadow: 0 2px 8px -4px rgba(70,55,140,.25), 0 0 0 1px rgba(108,92,231,.12);
   display: grid; place-items: center; color: var(--app-text);
+  transition: background var(--duration-fast);
 }
+.ach-back:hover { background: #f0ecff; }
+.ach-back:active { transform: scale(0.96); }
 .ach-back svg { width: 20px; height: 20px; }
 .ach-title {
   flex: 1; text-align: center;
@@ -1547,8 +1552,11 @@ h3 { font-size: 18px; }
   content: ""; position: absolute; right: -30px; top: -40px;
   width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none;
 }
-.ach-sum-ring { flex: none; width: 68px; height: 68px; position: relative; display: grid; place-items: center; }
-.ach-sum-center { text-align: center; position: relative; z-index: 1; }
+.ach-sum-ring { flex: none; width: 68px; height: 68px; position: relative; }
+.ach-sum-center {
+  position: absolute; inset: 0; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
 .ach-sum-pct { font-size: 18px; font-weight: 700; color: #fff; line-height: 1; }
 .ach-sum-sub { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.65); }
 .ach-sum-text { flex: 1; min-width: 0; }
