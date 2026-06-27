@@ -100,12 +100,13 @@ function enableDragScroll(el: HTMLElement): void {
     if (e.pointerType !== 'mouse') return;
     down = true; moved = false;
     startX = e.clientX; startScroll = el.scrollLeft;
-    el.classList.add('dragging');
   });
   el.addEventListener('pointermove', (e) => {
     if (!down) return;
     const dx = e.clientX - startX;
-    if (Math.abs(dx) > 3) moved = true;
+    // Only enter drag mode once past the threshold — adding .dragging on pointerdown
+    // set pointer-events:none on chips and swallowed plain clicks.
+    if (Math.abs(dx) > 3) { moved = true; el.classList.add('dragging'); }
     el.scrollLeft = startScroll - dx;
   });
   const end = () => { down = false; el.classList.remove('dragging'); };
