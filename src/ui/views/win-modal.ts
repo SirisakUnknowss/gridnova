@@ -102,8 +102,6 @@ export function showWinModal(props: WinModalProps): void {
   wrapper.id = 'win-modal-root';
   wrapper.className = 'modal-bg active';
 
-  const stopConfetti = launchConfetti(wrapper);
-
   wrapper.innerHTML = `
     <div class="modal">
       <h2>${ic.celebrate(22)} You won!</h2>
@@ -147,6 +145,10 @@ export function showWinModal(props: WinModalProps): void {
   `;
 
   document.body.appendChild(wrapper);
+
+  // Launch confetti AFTER the modal is in the DOM — calling it before setting
+  // innerHTML wiped the canvas immediately, so it never showed.
+  const stopConfetti = launchConfetti(wrapper);
 
   const close = () => { stopConfetti(); wrapper.remove(); };
 
