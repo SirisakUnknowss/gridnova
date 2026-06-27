@@ -106,7 +106,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
         <button class="profile-row" id="prof-ach">
           <span style="display:flex;align-items:center;gap:10px;">
             <svg class="row-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-            <span><span style="color:var(--app-text)">Achievements</span><br><small>Unlock badges</small></span>
+            <span><span style="color:var(--app-text)">Medals</span><br><small>Unlock badges</small></span>
           </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
