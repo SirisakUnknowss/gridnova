@@ -1,5 +1,5 @@
 // =====================================================================
-// Achievements view — grouped list with progress summary
+// Achievements view — tiered badge groups + special one-off achievements
 // =====================================================================
 import * as api from '@lib/api';
 import { supabase } from '@lib/supabase';
@@ -12,11 +12,10 @@ interface AchievementDef {
   name: string;
   description: string;
   tier: string;
-  category: string;
+  category: string;   // badge_group
+  badge_level: number; // 1-5 for tiered, 0 for special
   reward_coin: number;
   reward_xp: number;
-  hidden: boolean;
-  icon: string | null;
   sort_order: number;
 }
 
@@ -25,23 +24,24 @@ interface UserAchievement {
   unlocked_at: string;
 }
 
-// Map DB category → display label + emoji
-const CATEGORY_META: Record<string, { label: string; emoji: string }> = {
-  play_volume:  { label: 'Puzzle',   emoji: '🧩' },
-  daily:        { label: 'Daily',    emoji: '📅' },
-  skill:        { label: 'Mastery',  emoji: '💎' },
-  leaderboard:  { label: 'Social',   emoji: '🏆' },
-  progression:  { label: 'Streak',   emoji: '🔥' },
-  special:      { label: 'Special',  emoji: '✨' },
+const BADGE_GROUP_META: Record<string, { label: string; emoji: string }> = {
+  player:      { label: 'เล่นเกม',     emoji: '🎮' },
+  daily:       { label: 'Daily',       emoji: '📅' },
+  streak:      { label: 'Streak',      emoji: '🔥' },
+  flawless:    { label: 'ไม่ผิด',      emoji: '⭐' },
+  speedster:   { label: 'เล่นเร็ว',    emoji: '⚡' },
+  pure:        { label: 'ไม่ใช้ Hint', emoji: '🧠' },
+  leaderboard: { label: 'Leaderboard', emoji: '🏆' },
+  progression: { label: 'Level',       emoji: '📈' },
+  special:     { label: 'พิเศษ',       emoji: '✨' },
 };
 
-// Map tier → rarity class + stripe color
-const TIER_RARITY: Record<string, { cls: string; color: string }> = {
-  bronze:   { cls: 'common',  color: '#10b981' },
-  silver:   { cls: 'rare',    color: '#8b7bf0' },
-  gold:     { cls: 'epic',    color: '#f5a623' },
-  platinum: { cls: 'rare',    color: '#8b7bf0' },
-  diamond:  { cls: 'epic',    color: '#f5a623' },
+const TIER_COLOR: Record<string, string> = {
+  bronze:   '#cd7f32',
+  silver:   '#8b7bf0',
+  gold:     '#f5a623',
+  platinum: '#4fc3f7',
+  diamond:  '#e040fb',
 };
 
 interface ProgressInputs {
@@ -54,46 +54,49 @@ interface ProgressInputs {
   themesOwned: number;
 }
 
+// Only counter-based achievements get a client-side progress bar.
+// Speedster / pure / leaderboard require per-game queries — show description only.
+const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
+  ACH_PLAYER_L1:  ['gameCount',      1],
+  ACH_PLAYER_L2:  ['gameCount',     10],
+  ACH_PLAYER_L3:  ['gameCount',     50],
+  ACH_PLAYER_L4:  ['gameCount',    200],
+  ACH_PLAYER_L5:  ['gameCount',   1000],
+  ACH_DAILY_L1:   ['dailyCount',    1],
+  ACH_DAILY_L2:   ['dailyCount',   10],
+  ACH_DAILY_L3:   ['dailyCount',   30],
+  ACH_DAILY_L4:   ['dailyCount',  100],
+  ACH_DAILY_L5:   ['dailyCount',  365],
+  ACH_STREAK_L1:  ['currentStreak',  3],
+  ACH_STREAK_L2:  ['currentStreak',  7],
+  ACH_STREAK_L3:  ['currentStreak', 30],
+  ACH_STREAK_L4:  ['currentStreak',100],
+  ACH_STREAK_L5:  ['currentStreak',365],
+  ACH_FLAWLESS_L1:['perfectCount',   5],
+  ACH_FLAWLESS_L2:['perfectCount',  10],
+  ACH_FLAWLESS_L3:['perfectCount',  20],
+  ACH_FLAWLESS_L4:['perfectCount',  50],
+  ACH_FLAWLESS_L5:['perfectCount', 100],
+  ACH_PROG_L1:    ['level',   5],
+  ACH_PROG_L2:    ['level',  10],
+  ACH_PROG_L3:    ['level',  25],
+  ACH_PROG_L4:    ['level',  50],
+  ACH_PROG_L5:    ['level', 100],
+  ACH_RICH:       ['coins',  10000],
+  ACH_THEME_COLLECT:['themesOwned', 5],
+};
+
 function computeProgress(id: string, i: ProgressInputs): { progress: number; target: number } | null {
-  const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
-    ACH_PLAY_10:       ['gameCount',       10],
-    ACH_PLAY_50:       ['gameCount',       50],
-    ACH_PLAY_100:      ['gameCount',      100],
-    ACH_PLAY_500:      ['gameCount',      500],
-    ACH_PLAY_1000:     ['gameCount',     1000],
-    ACH_PLAY_5000:     ['gameCount',     5000],
-    ACH_DAILY_10:      ['dailyCount',      10],
-    ACH_DAILY_50:      ['dailyCount',      50],
-    ACH_STREAK_3:      ['currentStreak',    3],
-    ACH_STREAK_7:      ['currentStreak',    7],
-    ACH_STREAK_14:     ['currentStreak',   14],
-    ACH_STREAK_30:     ['currentStreak',   30],
-    ACH_STREAK_60:     ['currentStreak',   60],
-    ACH_STREAK_100:    ['currentStreak',  100],
-    ACH_STREAK_365:    ['currentStreak',  365],
-    ACH_PERFECT_5:     ['perfectCount',     5],
-    ACH_PERFECT_25:    ['perfectCount',    25],
-    ACH_LEVEL_10:      ['level',           10],
-    ACH_LEVEL_25:      ['level',           25],
-    ACH_LEVEL_50:      ['level',           50],
-    ACH_LEVEL_100:     ['level',          100],
-    ACH_RICH:          ['coins',        10000],
-    ACH_THEME_COLLECT: ['themesOwned',      5],
-  };
   const entry = COUNTERS[id];
   if (!entry) return null;
   const [field, target] = entry;
-  const progress = Math.min(i[field] as number, target);
-  return { progress, target };
+  return { progress: Math.min(i[field] as number, target), target };
 }
 
 const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
 const SVG_LOCK  = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
 const SVG_COIN  = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6" fill="rgba(255,255,255,.4)"/></svg>`;
 
-// Let a horizontally-scrolling row be dragged with the mouse on desktop (touch
-// already scrolls natively). Suppresses the trailing click after a real drag so
-// it doesn't toggle a chip.
 function enableDragScroll(el: HTMLElement): void {
   let down = false, startX = 0, startScroll = 0, moved = false;
   el.addEventListener('pointerdown', (e) => {
@@ -104,8 +107,6 @@ function enableDragScroll(el: HTMLElement): void {
   el.addEventListener('pointermove', (e) => {
     if (!down) return;
     const dx = e.clientX - startX;
-    // Only enter drag mode once past the threshold — adding .dragging on pointerdown
-    // set pointer-events:none on chips and swallowed plain clicks.
     if (Math.abs(dx) > 3) { moved = true; el.classList.add('dragging'); }
     el.scrollLeft = startScroll - dx;
   });
@@ -127,7 +128,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   let unlocked: Set<string> = new Set();
   let newlyUnlocked: Set<string> = new Set();
   let loading = true;
-  let activeCategory = 'all';
+  let activeGroup = 'all';
   let progressInputs: ProgressInputs = {
     gameCount: 0, dailyCount: 0, perfectCount: 0,
     currentStreak: 0, level: 1, coins: 0, themesOwned: 0,
@@ -165,8 +166,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     const total = defs.length;
     const done  = unlocked.size;
     const pct   = total ? Math.round((done / total) * 100) : 0;
-    // SVG circle: r=28, circumference=175.9
-    const circ = 175.9;
+    const circ  = 175.9;
     const offset = circ - (circ * pct / 100);
     summaryEl.innerHTML = `
       <div class="ach-summary">
@@ -192,17 +192,92 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   }
 
   function renderFilter() {
-    const categories = Array.from(new Set(defs.map((d) => d.category)));
+    const groups = Array.from(new Set(defs.map((d) => d.category)));
     filterEl.innerHTML = [
-      `<button class="ach-chip${activeCategory === 'all' ? ' on' : ''}" data-cat="all">All</button>`,
-      ...categories.map((c) => {
-        const m = CATEGORY_META[c] ?? { label: c, emoji: '📌' };
-        return `<button class="ach-chip${activeCategory === c ? ' on' : ''}" data-cat="${escapeHtml(c)}">${m.emoji} ${m.label}</button>`;
+      `<button class="ach-chip${activeGroup === 'all' ? ' on' : ''}" data-cat="all">All</button>`,
+      ...groups.map((g) => {
+        const m = BADGE_GROUP_META[g] ?? { label: g, emoji: '📌' };
+        return `<button class="ach-chip${activeGroup === g ? ' on' : ''}" data-cat="${escapeHtml(g)}">${m.emoji} ${m.label}</button>`;
       }),
     ].join('');
     filterEl.querySelectorAll<HTMLButtonElement>('.ach-chip').forEach((btn) => {
-      btn.addEventListener('click', () => { activeCategory = btn.dataset.cat!; render(); });
+      btn.addEventListener('click', () => { activeGroup = btn.dataset.cat!; render(); });
     });
+  }
+
+  function renderTieredBadge(tiered: AchievementDef[]): string {
+    const maxLevel = tiered.length;
+    const currentLevel = tiered.filter((d) => unlocked.has(d.id)).length; // last consecutive unlocked
+    const nextItem = tiered.find((d) => !unlocked.has(d.id));
+    const isNew = tiered.some((d) => newlyUnlocked.has(d.id));
+    const allDone = currentLevel === maxLevel;
+
+    const dots = tiered.map((d) => {
+      const on = unlocked.has(d.id);
+      const color = TIER_COLOR[d.tier] ?? '#888';
+      return `<span class="ach-dot${on ? ' on' : ''}" style="${on ? `background:${color};box-shadow:0 0 6px ${color}80` : ''}"></span>`;
+    }).join('');
+
+    let progressHtml = '';
+    if (nextItem) {
+      const prog = computeProgress(nextItem.id, progressInputs);
+      if (prog) {
+        const pct = Math.round((prog.progress / prog.target) * 100);
+        progressHtml = `
+          <div class="ach-row-prog" style="margin-top:6px">
+            <div class="ach-row-prog-bar"><div class="ach-row-prog-fill" style="width:${pct}%"></div></div>
+            <div class="ach-row-prog-label">${prog.progress} / ${prog.target}</div>
+          </div>`;
+      }
+    }
+
+    const lastUnlocked = currentLevel > 0 ? tiered[currentLevel - 1] : null;
+
+    return `
+      <div class="ach-badge-card${allDone ? ' all-done' : ''}${isNew ? ' new-unlock' : ''}">
+        <div class="ach-badge-dots">${dots}<span class="ach-badge-lvl">${currentLevel}/${maxLevel}</span></div>
+        ${lastUnlocked ? `
+          <div class="ach-badge-current">
+            <span class="ach-badge-check">${SVG_CHECK}</span>
+            <span class="ach-badge-cname">L${lastUnlocked.badge_level} ${escapeHtml(lastUnlocked.name)}</span>
+            <span class="ach-badge-coin">${SVG_COIN}${lastUnlocked.reward_coin}</span>
+          </div>` : ''}
+        ${nextItem ? `
+          <div class="ach-badge-next">
+            <span class="ach-badge-lock">${SVG_LOCK}</span>
+            <div class="ach-badge-next-body">
+              <div class="ach-badge-next-name">L${nextItem.badge_level} ${escapeHtml(nextItem.name)}</div>
+              <div class="ach-badge-next-desc">${escapeHtml(nextItem.description)}</div>
+              ${progressHtml}
+            </div>
+            <span class="ach-badge-coin next">${SVG_COIN}${nextItem.reward_coin}</span>
+          </div>` : `<div class="ach-badge-maxed">🏆 Max level!</div>`}
+      </div>
+    `;
+  }
+
+  function renderFlatCard(d: AchievementDef): string {
+    const isUnlocked = unlocked.has(d.id);
+    const isNew = newlyUnlocked.has(d.id);
+    const color = TIER_COLOR[d.tier] ?? '#888';
+    return `
+      <div class="ach-row ${isUnlocked ? 'unlocked' : 'locked'}${isNew ? ' new-unlock' : ''}">
+        <div class="ach-row-ic${isUnlocked ? '' : ' ach-row-ic--locked'}"
+             style="${isUnlocked ? `color:${color}` : ''}">
+          ${isUnlocked ? '🏅' : '🔒'}
+        </div>
+        <div class="ach-row-body">
+          <div class="ach-row-name">${escapeHtml(d.name)}</div>
+          <div class="ach-row-desc">${escapeHtml(d.description)}</div>
+        </div>
+        <div class="ach-row-right">
+          ${isUnlocked
+            ? `<span class="ach-row-check">${SVG_CHECK}</span>`
+            : `<span class="ach-row-lock">${SVG_LOCK}</span>`}
+          ${d.reward_coin ? `<span class="ach-row-pts">${SVG_COIN}${d.reward_coin}</span>` : ''}
+        </div>
+      </div>
+    `;
   }
 
   function renderBody() {
@@ -211,64 +286,40 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       return;
     }
 
-    const filtered = activeCategory === 'all'
+    const filtered = activeGroup === 'all'
       ? defs
-      : defs.filter((d) => d.category === activeCategory);
-    const visible = filtered.filter((d) => !d.hidden || unlocked.has(d.id));
+      : defs.filter((d) => d.category === activeGroup);
 
-    if (!visible.length) {
+    if (!filtered.length) {
       bodyEl.innerHTML = `<div class="ach-empty">No achievements here yet.</div>`;
       return;
     }
 
-    // Group by category
+    // Group by badge_group (category)
     const groups: Record<string, AchievementDef[]> = {};
-    for (const d of visible) {
+    for (const d of filtered) {
       if (!groups[d.category]) groups[d.category] = [];
       groups[d.category].push(d);
     }
 
-    bodyEl.innerHTML = Object.entries(groups).map(([cat, items]) => {
-      const m = CATEGORY_META[cat] ?? { label: cat, emoji: '📌' };
+    bodyEl.innerHTML = Object.entries(groups).map(([group, items]) => {
+      const meta = BADGE_GROUP_META[group] ?? { label: group, emoji: '📌' };
       const doneInGroup = items.filter((d) => unlocked.has(d.id)).length;
       const allDone = doneInGroup === items.length;
 
-      const cards = items.map((d) => {
-        const isUnlocked = unlocked.has(d.id);
-        const isNew = newlyUnlocked.has(d.id);
-        const rarity = TIER_RARITY[d.tier ?? 'bronze'] ?? { cls: 'common', color: '#10b981' };
-        const prog = !isUnlocked ? computeProgress(d.id, progressInputs) : null;
-        const icon = d.icon || (isUnlocked ? '🏅' : '🔒');
+      const tiered = items.filter((d) => d.badge_level > 0)
+                          .sort((a, b) => a.badge_level - b.badge_level);
+      const oneoff = items.filter((d) => d.badge_level === 0);
 
-        return `
-          <div class="ach-row ${isUnlocked ? 'unlocked' : 'locked'} ${rarity.cls}${isNew ? ' new-unlock' : ''}">
-            <div class="ach-row-ic${isUnlocked ? '' : ' ach-row-ic--locked'}">${icon}</div>
-            <div class="ach-row-body">
-              <div class="ach-row-name">${escapeHtml(d.name)}</div>
-              <div class="ach-row-desc">${escapeHtml(d.description)}</div>
-              ${prog ? `
-                <div class="ach-row-prog">
-                  <div class="ach-row-prog-bar"><div class="ach-row-prog-fill" style="width:${Math.round((prog.progress / prog.target) * 100)}%"></div></div>
-                  <div class="ach-row-prog-label">${prog.progress} / ${prog.target}</div>
-                </div>
-              ` : ''}
-            </div>
-            <div class="ach-row-right">
-              ${isUnlocked
-                ? `<span class="ach-row-check">${SVG_CHECK}</span>`
-                : `<span class="ach-row-lock">${SVG_LOCK}</span>`}
-              ${d.reward_coin ? `<span class="ach-row-pts">${SVG_COIN}${d.reward_coin}</span>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
+      const tieredHtml = tiered.length ? renderTieredBadge(tiered) : '';
+      const flatHtml = oneoff.map((d) => renderFlatCard(d)).join('');
 
       return `
         <div class="ach-group-head">
-          <span class="ach-group-label">${m.emoji} ${m.label}</span>
+          <span class="ach-group-label">${meta.emoji} ${meta.label}</span>
           <span class="ach-group-count${allDone ? ' done' : ''}">${doneInGroup} / ${items.length}</span>
         </div>
-        <div class="ach-list">${cards}</div>
+        <div class="ach-list">${tieredHtml}${flatHtml}</div>
       `;
     }).join('');
   }
@@ -301,9 +352,12 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       defs = (defList ?? []) as AchievementDef[];
       const userAchs = (userList ?? []) as UserAchievement[];
       unlocked = new Set(userAchs.map((u) => u.achievement_id));
-      // Mark recently unlocked (last 24h) as "new"
       const oneDayAgo = Date.now() - 86400_000;
-      newlyUnlocked = new Set(userAchs.filter((u) => new Date(u.unlocked_at).getTime() > oneDayAgo).map((u) => u.achievement_id));
+      newlyUnlocked = new Set(
+        userAchs
+          .filter((u) => new Date(u.unlocked_at).getTime() > oneDayAgo)
+          .map((u) => u.achievement_id),
+      );
       const ownedIds = ((inventory ?? []) as any[]).map((r) => r.item_id as string);
       progressInputs = {
         gameCount:     (history as any)?.count ?? 0,
