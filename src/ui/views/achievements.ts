@@ -13,7 +13,7 @@ interface AchievementDef {
   description: string;
   tier: string;
   category: string;   // badge_group
-  badge_level: number; // 1-5 for tiered, 0 for special
+  badge_level: number; // 1-10 for tiered, 0 for special
   reward_coin: number;
   reward_xp: number;
   sort_order: number;
@@ -33,6 +33,7 @@ const BADGE_GROUP_META: Record<string, { label: string; emoji: string }> = {
   pure:        { label: 'ไม่ใช้ Hint', emoji: '🧠' },
   leaderboard: { label: 'Leaderboard', emoji: '🏆' },
   progression: { label: 'Level',       emoji: '📈' },
+  quest:       { label: 'Quest',       emoji: '📋' },
   special:     { label: 'พิเศษ',       emoji: '✨' },
 };
 
@@ -52,38 +53,76 @@ interface ProgressInputs {
   level: number;
   coins: number;
   themesOwned: number;
+  questCount: number;
+  inventoryCount: number;
 }
 
-// Only counter-based achievements get a client-side progress bar.
-// Speedster / pure / leaderboard require per-game queries — show description only.
+// Counter-based achievements get a client-side progress bar.
+// Speedster / pure / leaderboard require per-game queries — description only.
 const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
-  ACH_PLAYER_L1:  ['gameCount',      1],
-  ACH_PLAYER_L2:  ['gameCount',     10],
-  ACH_PLAYER_L3:  ['gameCount',     50],
-  ACH_PLAYER_L4:  ['gameCount',    200],
-  ACH_PLAYER_L5:  ['gameCount',   1000],
-  ACH_DAILY_L1:   ['dailyCount',    1],
-  ACH_DAILY_L2:   ['dailyCount',   10],
-  ACH_DAILY_L3:   ['dailyCount',   30],
-  ACH_DAILY_L4:   ['dailyCount',  100],
-  ACH_DAILY_L5:   ['dailyCount',  365],
-  ACH_STREAK_L1:  ['currentStreak',  3],
-  ACH_STREAK_L2:  ['currentStreak',  7],
-  ACH_STREAK_L3:  ['currentStreak', 30],
-  ACH_STREAK_L4:  ['currentStreak',100],
-  ACH_STREAK_L5:  ['currentStreak',365],
-  ACH_FLAWLESS_L1:['perfectCount',   5],
-  ACH_FLAWLESS_L2:['perfectCount',  10],
-  ACH_FLAWLESS_L3:['perfectCount',  20],
-  ACH_FLAWLESS_L4:['perfectCount',  50],
-  ACH_FLAWLESS_L5:['perfectCount', 100],
-  ACH_PROG_L1:    ['level',   5],
-  ACH_PROG_L2:    ['level',  10],
-  ACH_PROG_L3:    ['level',  25],
-  ACH_PROG_L4:    ['level',  50],
-  ACH_PROG_L5:    ['level', 100],
-  ACH_RICH:       ['coins',  10000],
-  ACH_THEME_COLLECT:['themesOwned', 5],
+  ACH_PLAYER_L1:  ['gameCount',    1],
+  ACH_PLAYER_L2:  ['gameCount',    5],
+  ACH_PLAYER_L3:  ['gameCount',   10],
+  ACH_PLAYER_L4:  ['gameCount',   25],
+  ACH_PLAYER_L5:  ['gameCount',   50],
+  ACH_PLAYER_L6:  ['gameCount',  100],
+  ACH_PLAYER_L7:  ['gameCount',  200],
+  ACH_PLAYER_L8:  ['gameCount',  500],
+  ACH_PLAYER_L9:  ['gameCount', 1000],
+  ACH_PLAYER_L10: ['gameCount', 2000],
+  ACH_DAILY_L1:   ['dailyCount',   1],
+  ACH_DAILY_L2:   ['dailyCount',   5],
+  ACH_DAILY_L3:   ['dailyCount',  10],
+  ACH_DAILY_L4:   ['dailyCount',  20],
+  ACH_DAILY_L5:   ['dailyCount',  30],
+  ACH_DAILY_L6:   ['dailyCount',  50],
+  ACH_DAILY_L7:   ['dailyCount',  75],
+  ACH_DAILY_L8:   ['dailyCount', 100],
+  ACH_DAILY_L9:   ['dailyCount', 200],
+  ACH_DAILY_L10:  ['dailyCount', 365],
+  ACH_STREAK_L1:  ['currentStreak',   3],
+  ACH_STREAK_L2:  ['currentStreak',   5],
+  ACH_STREAK_L3:  ['currentStreak',   7],
+  ACH_STREAK_L4:  ['currentStreak',  14],
+  ACH_STREAK_L5:  ['currentStreak',  30],
+  ACH_STREAK_L6:  ['currentStreak',  60],
+  ACH_STREAK_L7:  ['currentStreak',  90],
+  ACH_STREAK_L8:  ['currentStreak', 180],
+  ACH_STREAK_L9:  ['currentStreak', 365],
+  ACH_STREAK_L10: ['currentStreak', 500],
+  ACH_FLAWLESS_L1:  ['perfectCount',   1],
+  ACH_FLAWLESS_L2:  ['perfectCount',   5],
+  ACH_FLAWLESS_L3:  ['perfectCount',  10],
+  ACH_FLAWLESS_L4:  ['perfectCount',  20],
+  ACH_FLAWLESS_L5:  ['perfectCount',  30],
+  ACH_FLAWLESS_L6:  ['perfectCount',  50],
+  ACH_FLAWLESS_L7:  ['perfectCount',  75],
+  ACH_FLAWLESS_L8:  ['perfectCount', 100],
+  ACH_FLAWLESS_L9:  ['perfectCount', 150],
+  ACH_FLAWLESS_L10: ['perfectCount', 200],
+  ACH_PROG_L1:  ['level',   3],
+  ACH_PROG_L2:  ['level',   5],
+  ACH_PROG_L3:  ['level',  10],
+  ACH_PROG_L4:  ['level',  20],
+  ACH_PROG_L5:  ['level',  30],
+  ACH_PROG_L6:  ['level',  40],
+  ACH_PROG_L7:  ['level',  50],
+  ACH_PROG_L8:  ['level',  60],
+  ACH_PROG_L9:  ['level',  75],
+  ACH_PROG_L10: ['level', 100],
+  ACH_QUEST_L1:  ['questCount',   1],
+  ACH_QUEST_L2:  ['questCount',   5],
+  ACH_QUEST_L3:  ['questCount',  10],
+  ACH_QUEST_L4:  ['questCount',  20],
+  ACH_QUEST_L5:  ['questCount',  30],
+  ACH_QUEST_L6:  ['questCount',  50],
+  ACH_QUEST_L7:  ['questCount',  75],
+  ACH_QUEST_L8:  ['questCount', 100],
+  ACH_QUEST_L9:  ['questCount', 150],
+  ACH_QUEST_L10: ['questCount', 200],
+  ACH_RICH:          ['coins',          10000],
+  ACH_THEME_COLLECT: ['themesOwned',        5],
+  ACH_SHOPAHOLIC:    ['inventoryCount',    10],
 };
 
 function computeProgress(id: string, i: ProgressInputs): { progress: number; target: number } | null {
@@ -132,6 +171,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   let progressInputs: ProgressInputs = {
     gameCount: 0, dailyCount: 0, perfectCount: 0,
     currentStreak: 0, level: 1, coins: 0, themesOwned: 0,
+    questCount: 0, inventoryCount: 0,
   };
 
   root.innerHTML = `
@@ -142,7 +182,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
           <h1 class="ach-title">
-            <svg class="ach-title-ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="9" r="5.2"/><path d="M9 13.5 7.5 21l4.5-2.5L16.5 21 15 13.5"/></svg>
+            <span class="ach-title-ic">🏅</span>
             Medals
           </h1>
           <div style="width:40px;flex:none"></div>
@@ -335,7 +375,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     try {
       const state = useStore.getState();
       const userId = state.user?.id;
-      const [defList, userList, history, daily, perfect, inventory] = await Promise.all([
+      const [defList, userList, history, daily, perfect, inventory, quests] = await Promise.all([
         api.getAchievementDefinitions(),
         api.getUserAchievements().catch(() => []),
         userId
@@ -348,6 +388,9 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
           ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mistakes', 0)
           : Promise.resolve({ count: 0 } as any),
         api.getInventory().catch(() => []),
+        userId
+          ? supabase.from('user_daily_quests').select('id', { count: 'exact', head: true }).eq('user_id', userId).not('claimed_at', 'is', null)
+          : Promise.resolve({ count: 0 } as any),
       ]);
       defs = (defList ?? []) as AchievementDef[];
       const userAchs = (userList ?? []) as UserAchievement[];
@@ -360,13 +403,15 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       );
       const ownedIds = ((inventory ?? []) as any[]).map((r) => r.item_id as string);
       progressInputs = {
-        gameCount:     (history as any)?.count ?? 0,
-        dailyCount:    (daily as any)?.count ?? 0,
-        perfectCount:  (perfect as any)?.count ?? 0,
-        currentStreak: state.currentStreak,
-        level:         state.level,
-        coins:         state.coins,
-        themesOwned:   ownedIds.filter((id) => id.startsWith('theme_')).length,
+        gameCount:      (history as any)?.count ?? 0,
+        dailyCount:     (daily as any)?.count ?? 0,
+        perfectCount:   (perfect as any)?.count ?? 0,
+        currentStreak:  state.currentStreak,
+        level:          state.level,
+        coins:          state.coins,
+        themesOwned:    ownedIds.filter((id) => id.startsWith('theme_')).length,
+        questCount:     (quests as any)?.count ?? 0,
+        inventoryCount: ownedIds.length,
       };
       loading = false;
       render();
