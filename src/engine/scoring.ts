@@ -20,7 +20,7 @@ export const BASE_SCORE: Record<Difficulty, number> = {
  */
 export function computeDailyScore(input: ScoreInput): ScoreResult {
   const base = BASE_SCORE[input.difficulty];
-  const timePenalty = Math.min(input.timeSeconds * 2, base * 0.4);
+  const timePenalty = input.timeSeconds * 2;
   const mistakePenalty = input.mistakes * 100;
   const hintPenalty = input.hintsUsed * 300;
   const noMistakeBonus = input.mistakes === 0 ? 500 : 0;

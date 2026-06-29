@@ -37,7 +37,7 @@ const BASE_XP: Record<string, number> = {
 
 function computeScore(diff: string, time: number, mistakes: number, hints: number): number {
   const base = BASE_SCORE[diff];
-  const timePenalty = Math.min(time * 2, base * 0.4);
+  const timePenalty = time * 2;
   const mistakePenalty = mistakes * 100;
   const hintPenalty = hints * 300;
   const noMistakeBonus = mistakes === 0 ? 500 : 0;
