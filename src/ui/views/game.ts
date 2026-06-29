@@ -83,7 +83,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // Unique key for this game session (used for save/load)
   const gameId = mode === 'daily'
     ? `daily-${props.date ?? new Date().toISOString().slice(0, 10)}`
-    : `practice-${difficulty}-${props.stage ?? 0}`;
+    : `practice-${difficulty}`;
 
   // Restore saved state if resuming
   if (props.resume) {

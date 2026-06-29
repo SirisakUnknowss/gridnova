@@ -37,7 +37,7 @@ import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
 import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
-import { type GameInProgress } from './lib/local-db';
+import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
 
 // Show update banner when a new service worker takes control
 if ('serviceWorker' in navigator) {
@@ -349,6 +349,13 @@ async function playDaily() {
 }
 
 async function playPractice(level: Difficulty) {
+  // Delete any stale saved games for this difficulty so the continue banner
+  // never shows a finished or abandoned game after starting fresh.
+  const stale = await listGames();
+  for (const g of stale.filter(g => g.mode === 'practice' && g.level === level)) {
+    await deleteGame(g.game_id);
+  }
+
   // For MVP, use a random seed; later use stage system
   const stage = Math.floor(Math.random() * 100) + 1;
   const seed = `practice:${level}:${stage}`;
