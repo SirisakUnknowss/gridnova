@@ -339,6 +339,16 @@
     </div>
 
     <hr class="section-divider">
+    <div class="section-title" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <span>🏆 Daily Leaderboard</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="date" id="lb-date-pick" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 12px;font-size:13px;outline:none;cursor:pointer;">
+        <button class="refresh-btn" id="lb-refresh-btn">⟳ โหลด</button>
+      </div>
+    </div>
+    <div id="lb-admin-wrap"><div class="skeleton" style="height:180px;border-radius:var(--radius);"></div></div>
+
+    <hr class="section-divider">
     <div class="section-title">🛍️ Shop Analytics</div>
 
     <!-- Shop KPI cards -->
@@ -1309,6 +1319,97 @@ async function adminGiveItem(userId) {
   else alert('เกิดข้อผิดพลาด');
 }
 
+// ── Daily Leaderboard (Admin) ─────────────────────────────────────────
+const BASE_SCORE = { easy:1000,'easy-medium':1500,medium:2000,'medium-hard':2800,hard:3500,'hard-expert':4200,expert:5000 };
+
+function calcBreakdown(difficulty, timeSeconds, mistakes, hintsUsed) {
+  const base = BASE_SCORE[difficulty] ?? 2000;
+  const timePenalty     = Math.min(timeSeconds * 2, base * 0.4);
+  const mistakePenalty  = mistakes * 100;
+  const hintPenalty     = hintsUsed * 300;
+  const noMistakeBonus  = mistakes === 0 ? 500 : 0;
+  const noHintBonus     = hintsUsed === 0 ? 300 : 0;
+  const total           = Math.max(100, Math.round(base - timePenalty - mistakePenalty - hintPenalty + noMistakeBonus + noHintBonus));
+  return { base, timePenalty, mistakePenalty, hintPenalty, noMistakeBonus, noHintBonus, total };
+}
+
+async function loadLeaderboard(date) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  const wrap = document.getElementById('lb-admin-wrap');
+  wrap.innerHTML = '<div class="skeleton" style="height:180px;border-radius:var(--radius);"></div>';
+
+  // Fetch leaderboard rows + join profiles + difficulty from daily_puzzles
+  const [lbRes, puzzleRes] = await Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/daily_leaderboard?date=eq.${date}&select=score,time_seconds,mistakes,hints_used,submitted_at,profiles(display_name,username)&order=score.desc,time_seconds.asc`, {
+      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` }
+    }),
+    fetch(`${SUPABASE_URL}/rest/v1/daily_puzzles?date=eq.${date}&select=difficulty`, {
+      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` }
+    }),
+  ]);
+
+  const rows       = lbRes.ok       ? await lbRes.json()   : [];
+  const puzzleData = puzzleRes.ok   ? await puzzleRes.json() : [];
+  const difficulty = puzzleData[0]?.difficulty ?? 'unknown';
+
+  renderLeaderboard(rows, difficulty, date);
+}
+
+function renderLeaderboard(rows, difficulty, date) {
+  const wrap = document.getElementById('lb-admin-wrap');
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="table-card"><div class="empty">ไม่มีข้อมูลสำหรับวันที่ ${date}</div></div>`;
+    return;
+  }
+  const diffClass = difficulty.startsWith('easy') ? 'easy' : difficulty.startsWith('hard') || difficulty === 'expert' ? 'hard' : 'medium';
+  wrap.innerHTML = `
+    <div class="table-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span class="diff-badge diff-${diffClass}">${difficulty}</span>
+        <span style="font-size:13px;color:var(--muted)">${date} · ${rows.length} ผู้เล่น</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr>
+            <th style="text-align:center;width:48px">#</th>
+            <th>ผู้เล่น</th>
+            <th style="text-align:right">Base</th>
+            <th style="text-align:right;color:#f87171">เวลา (−)</th>
+            <th style="text-align:right;color:#f87171">ผิด (−)</th>
+            <th style="text-align:right;color:#f87171">Hint (−)</th>
+            <th style="text-align:right;color:#10b981">ไม่ผิด (+)</th>
+            <th style="text-align:right;color:#10b981">ไม่ Hint (+)</th>
+            <th style="text-align:right;border-left:1px solid var(--border);padding-left:12px;font-size:13px;font-weight:800">Total</th>
+            <th style="text-align:right">เวลา</th>
+          </tr></thead>
+          <tbody>
+            ${rows.map((r, i) => {
+              const p = r.profiles || {};
+              const name = escapeHtml(p.display_name || p.username || 'Member');
+              const b = calcBreakdown(difficulty, r.time_seconds, r.mistakes, r.hints_used);
+              const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+              const isTop = i < 3;
+              return `<tr style="${isTop ? 'background:rgba(255,255,255,0.02)' : ''}">
+                <td style="text-align:center;font-weight:700;font-size:15px">${medal}</td>
+                <td><strong>${name}</strong><br><span style="color:var(--muted);font-size:11px">@${escapeHtml(p.username||'—')}</span></td>
+                <td style="text-align:right;color:var(--muted);font-size:13px">${b.base}</td>
+                <td style="text-align:right;color:#f87171;font-size:13px">−${b.timePenalty}</td>
+                <td style="text-align:right;color:${r.mistakes>0?'#f87171':'var(--muted)'};font-size:13px">${r.mistakes>0?`−${b.mistakePenalty}`:'—'}</td>
+                <td style="text-align:right;color:${r.hints_used>0?'#f87171':'var(--muted)'};font-size:13px">${r.hints_used>0?`−${b.hintPenalty}`:'—'}</td>
+                <td style="text-align:right;color:${b.noMistakeBonus>0?'#10b981':'var(--muted)'};font-size:13px">${b.noMistakeBonus>0?`+${b.noMistakeBonus}`:'—'}</td>
+                <td style="text-align:right;color:${b.noHintBonus>0?'#10b981':'var(--muted)'};font-size:13px">${b.noHintBonus>0?`+${b.noHintBonus}`:'—'}</td>
+                <td style="text-align:right;border-left:1px solid var(--border);padding-left:12px;font-weight:800;font-size:15px;color:${i===0?'#fbbf24':i<3?'var(--accent)':'var(--text)'}">${b.total}</td>
+                <td style="text-align:right;color:var(--muted);font-size:12px">${fmtTime(r.time_seconds)}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
 async function loadMembersData() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return;
@@ -1372,6 +1473,10 @@ async function loadData() {
   renderDiffChart(d.difficulty_breakdown);
   renderHourly(d.hourly_today);
   renderTable(d.difficulty_breakdown);
+
+  // Load leaderboard for selected date
+  const lbDate = document.getElementById('lb-date-pick').value;
+  void loadLeaderboard(lbDate);
 
   // Load lists + shop stats in parallel
   const [onlineList, memberList, shopStats] = await Promise.all([
@@ -1490,6 +1595,13 @@ async function boot() {
         alert('ไม่สามารถลบ Log ได้');
       }
     };
+
+    // Init leaderboard date picker to today (Bangkok time)
+    const todayBKK = new Date(Date.now() + 7*60*60*1000).toISOString().slice(0,10);
+    const lbPick = document.getElementById('lb-date-pick');
+    lbPick.value = todayBKK;
+    lbPick.onchange = () => loadLeaderboard(lbPick.value);
+    document.getElementById('lb-refresh-btn').onclick = () => loadLeaderboard(lbPick.value);
 
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
