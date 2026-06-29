@@ -258,6 +258,7 @@
     <div class="tab-container">
       <button class="tab-btn active" id="btn-tab-analytics">📊 Dashboard & Analytics</button>
       <button class="tab-btn" id="btn-tab-members">👥 Members</button>
+      <button class="tab-btn" id="btn-tab-leaderboard">🏆 Leaderboard</button>
       <button class="tab-btn" id="btn-tab-logs">📋 Log Monitor & Audit</button>
     </div>
 
@@ -337,16 +338,6 @@
         </div>
       </div>
     </div>
-
-    <hr class="section-divider">
-    <div class="section-title" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-      <span>🏆 Daily Leaderboard</span>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <input type="date" id="lb-date-pick" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 12px;font-size:13px;outline:none;cursor:pointer;">
-        <button class="refresh-btn" id="lb-refresh-btn">⟳ โหลด</button>
-      </div>
-    </div>
-    <div id="lb-admin-wrap"><div class="skeleton" style="height:180px;border-radius:var(--radius);"></div></div>
 
     <hr class="section-divider">
     <div class="section-title">🛍️ Shop Analytics</div>
@@ -479,6 +470,36 @@
         </div>
       </div>
     </div> <!-- end of panel-logs -->
+
+    <!-- Panel 4: Leaderboard -->
+    <div id="panel-leaderboard" style="display:none">
+      <!-- Filter bar -->
+      <div class="members-filter-bar" style="margin-bottom:20px;">
+        <div class="filter-group">
+          <span class="filter-label">วันที่:</span>
+          <input type="date" id="lb-date-pick" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 12px;font-size:13px;outline:none;cursor:pointer;">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">ด่วน:</span>
+          <button class="filter-btn" id="lb-btn-today">วันนี้</button>
+          <button class="filter-btn" id="lb-btn-yesterday">เมื่อวาน</button>
+          <button class="filter-btn" id="lb-btn-d2">2 วันก่อน</button>
+          <button class="filter-btn" id="lb-btn-d3">3 วันก่อน</button>
+        </div>
+        <button class="refresh-btn" id="lb-refresh-btn">⟳ โหลด</button>
+      </div>
+
+      <!-- KPI mini row -->
+      <div id="lb-kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+        <div class="kpi-mini"><div class="kv" id="lb-kpi-players">—</div><div class="kl">ผู้เล่น</div></div>
+        <div class="kpi-mini"><div class="kv" id="lb-kpi-top">—</div><div class="kl">คะแนนสูงสุด</div></div>
+        <div class="kpi-mini"><div class="kv" id="lb-kpi-avg">—</div><div class="kl">คะแนนเฉลี่ย</div></div>
+        <div class="kpi-mini"><div class="kv" id="lb-kpi-perfect">—</div><div class="kl">Perfect (ไม่ผิด+ไม่ hint)</div></div>
+      </div>
+
+      <!-- Main table -->
+      <div id="lb-admin-wrap"><div class="skeleton" style="height:240px;border-radius:var(--radius);"></div></div>
+    </div> <!-- end of panel-leaderboard -->
 
   </div> <!-- end of content -->
 </div> <!-- end of dashboard -->
@@ -1359,6 +1380,16 @@ async function loadLeaderboard(date) {
 
 function renderLeaderboard(rows, difficulty, date) {
   const wrap = document.getElementById('lb-admin-wrap');
+
+  // KPI
+  const perfect = rows.filter(r => r.mistakes === 0 && r.hints_used === 0).length;
+  const scores  = rows.map(r => calcBreakdown(difficulty, r.time_seconds, r.mistakes, r.hints_used).total);
+  const avgScore = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+  setEl('lb-kpi-players', rows.length);
+  setEl('lb-kpi-top',     scores[0] ?? '—');
+  setEl('lb-kpi-avg',     avgScore || '—');
+  setEl('lb-kpi-perfect', perfect);
+
   if (!rows.length) {
     wrap.innerHTML = `<div class="table-card"><div class="empty">ไม่มีข้อมูลสำหรับวันที่ ${date}</div></div>`;
     return;
@@ -1424,12 +1455,14 @@ async function loadMembersData() {
 
 function switchTab(tab) {
   currentTab = tab;
-  document.getElementById('btn-tab-analytics').classList.toggle('active', tab === 'analytics');
-  document.getElementById('btn-tab-members').classList.toggle('active',  tab === 'members');
-  document.getElementById('btn-tab-logs').classList.toggle('active',     tab === 'logs');
-  document.getElementById('panel-analytics').style.display = tab === 'analytics' ? 'block' : 'none';
-  document.getElementById('panel-members').style.display   = tab === 'members'   ? 'block' : 'none';
-  document.getElementById('panel-logs').style.display      = tab === 'logs'      ? 'block' : 'none';
+  document.getElementById('btn-tab-analytics').classList.toggle('active',    tab === 'analytics');
+  document.getElementById('btn-tab-members').classList.toggle('active',      tab === 'members');
+  document.getElementById('btn-tab-leaderboard').classList.toggle('active',  tab === 'leaderboard');
+  document.getElementById('btn-tab-logs').classList.toggle('active',         tab === 'logs');
+  document.getElementById('panel-analytics').style.display    = tab === 'analytics'    ? 'block' : 'none';
+  document.getElementById('panel-members').style.display      = tab === 'members'      ? 'block' : 'none';
+  document.getElementById('panel-leaderboard').style.display  = tab === 'leaderboard'  ? 'block' : 'none';
+  document.getElementById('panel-logs').style.display         = tab === 'logs'         ? 'block' : 'none';
 
   loadData();
 }
@@ -1441,6 +1474,14 @@ async function loadData() {
 
   if (currentTab === 'logs') {
     await loadLogsData();
+    const now = new Date();
+    setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
+    return;
+  }
+
+  if (currentTab === 'leaderboard') {
+    const lbDate = document.getElementById('lb-date-pick').value;
+    await loadLeaderboard(lbDate);
     const now = new Date();
     setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
     return;
@@ -1473,10 +1514,6 @@ async function loadData() {
   renderDiffChart(d.difficulty_breakdown);
   renderHourly(d.hourly_today);
   renderTable(d.difficulty_breakdown);
-
-  // Load leaderboard for selected date
-  const lbDate = document.getElementById('lb-date-pick').value;
-  void loadLeaderboard(lbDate);
 
   // Load lists + shop stats in parallel
   const [onlineList, memberList, shopStats] = await Promise.all([
@@ -1600,8 +1637,16 @@ async function boot() {
     const todayBKK = new Date(Date.now() + 7*60*60*1000).toISOString().slice(0,10);
     const lbPick = document.getElementById('lb-date-pick');
     lbPick.value = todayBKK;
+    const bkkDate = (offsetDays) => new Date(Date.now() + 7*60*60*1000 - offsetDays*86400000).toISOString().slice(0,10);
     lbPick.onchange = () => loadLeaderboard(lbPick.value);
-    document.getElementById('lb-refresh-btn').onclick = () => loadLeaderboard(lbPick.value);
+    document.getElementById('lb-refresh-btn').onclick   = () => loadLeaderboard(lbPick.value);
+    document.getElementById('lb-btn-today').onclick     = () => { lbPick.value = bkkDate(0); loadLeaderboard(lbPick.value); };
+    document.getElementById('lb-btn-yesterday').onclick = () => { lbPick.value = bkkDate(1); loadLeaderboard(lbPick.value); };
+    document.getElementById('lb-btn-d2').onclick        = () => { lbPick.value = bkkDate(2); loadLeaderboard(lbPick.value); };
+    document.getElementById('lb-btn-d3').onclick        = () => { lbPick.value = bkkDate(3); loadLeaderboard(lbPick.value); };
+
+    // Wire leaderboard tab
+    document.getElementById('btn-tab-leaderboard').onclick = () => switchTab('leaderboard');
 
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
