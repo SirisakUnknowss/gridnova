@@ -1361,21 +1361,13 @@ async function loadLeaderboard(date) {
   const wrap = document.getElementById('lb-admin-wrap');
   wrap.innerHTML = '<div class="skeleton" style="height:180px;border-radius:var(--radius);"></div>';
 
-  // Fetch leaderboard rows + join profiles + difficulty from daily_puzzles
-  const [lbRes, puzzleRes] = await Promise.all([
-    fetch(`${SUPABASE_URL}/rest/v1/daily_leaderboard?date=eq.${date}&select=score,time_seconds,mistakes,hints_used,submitted_at,profiles(display_name,username)&order=score.desc,time_seconds.asc`, {
-      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` }
-    }),
-    fetch(`${SUPABASE_URL}/rest/v1/daily_puzzles?date=eq.${date}&select=difficulty`, {
-      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.access_token}` }
-    }),
-  ]);
+  const result = await callRpcParam('get_admin_leaderboard', { p_date: date }, session.access_token);
+  if (!result || result.error) {
+    wrap.innerHTML = `<div class="table-card"><div class="empty">โหลดข้อมูลไม่ได้ (${result?.error?.message ?? 'unknown error'})</div></div>`;
+    return;
+  }
 
-  const rows       = lbRes.ok       ? await lbRes.json()   : [];
-  const puzzleData = puzzleRes.ok   ? await puzzleRes.json() : [];
-  const difficulty = puzzleData[0]?.difficulty ?? 'unknown';
-
-  renderLeaderboard(rows, difficulty, date);
+  renderLeaderboard(result.rows || [], result.difficulty, date);
 }
 
 function renderLeaderboard(rows, difficulty, date) {
