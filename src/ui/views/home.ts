@@ -151,7 +151,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
           <div class="ls-divider"></div>
           <div class="ls-block">
             <div class="ls-value"><span id="vs-today">${visitorStats.loaded ? fmtCount(visitorStats.today) : '—'}</span></div>
-            <div class="ls-label">today</div>
+            <div class="ls-label">visitors today</div>
             <div class="ls-sub">
               <span>${ic.guest(11)} <span id="vs-today-guests">${visitorStats.loaded ? fmtCount(visitorStats.today_guests) : '—'}</span></span>
               <span>${ic.member(11)} <span id="vs-today-members">${visitorStats.loaded ? fmtCount(visitorStats.today_members) : '—'}</span></span>
