@@ -12,8 +12,10 @@ interface AchievementDef {
   name: string;
   description: string;
   tier: string;
-  category: string;   // badge_group
-  badge_level: number; // 1-10 for tiered, 0 for special
+  category: string;    // badge_group
+  badge_level: number; // 1-5 (or 1-10 for legacy groups), 0 for special
+  badge_mission: number; // 1-5 for multi-mission groups, 1 for single-mission
+  mission_name: string | null;
   reward_coin: number;
   reward_xp: number;
   sort_order: number;
@@ -25,7 +27,8 @@ interface UserAchievement {
 }
 
 const BADGE_GROUP_META: Record<string, { label: string; emoji: string }> = {
-  player:      { label: 'เล่นเกม',     emoji: '🎮' },
+  play:        { label: 'เล่นเกม',     emoji: '🎮' },
+  player:      { label: 'เล่นเกม',     emoji: '🎮' }, // legacy fallback
   daily:       { label: 'Daily',       emoji: '📅' },
   streak:      { label: 'Streak',      emoji: '🔥' },
   flawless:    { label: 'ไม่ผิด',      emoji: '⭐' },
@@ -55,31 +58,80 @@ interface ProgressInputs {
   themesOwned: number;
   questCount: number;
   inventoryCount: number;
+  // Play missions
+  practiceCount: number;
+  easyCount: number;
+  hardCount: number;
+  expertCount: number;
+  // Daily missions
+  dailyEasyCount: number;
+  dailyHardCount: number;
+  dailyPerfectCount: number;
+  dailyNoHintCount: number;
 }
 
-// Counter-based achievements get a client-side progress bar.
-// Speedster / pure / leaderboard require per-game queries — description only.
 const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
-  ACH_PLAYER_L1:  ['gameCount',    1],
-  ACH_PLAYER_L2:  ['gameCount',    5],
-  ACH_PLAYER_L3:  ['gameCount',   10],
-  ACH_PLAYER_L4:  ['gameCount',   25],
-  ACH_PLAYER_L5:  ['gameCount',   50],
-  ACH_PLAYER_L6:  ['gameCount',  100],
-  ACH_PLAYER_L7:  ['gameCount',  200],
-  ACH_PLAYER_L8:  ['gameCount',  500],
-  ACH_PLAYER_L9:  ['gameCount', 1000],
-  ACH_PLAYER_L10: ['gameCount', 2000],
-  ACH_DAILY_L1:   ['dailyCount',   1],
-  ACH_DAILY_L2:   ['dailyCount',   5],
-  ACH_DAILY_L3:   ['dailyCount',  10],
-  ACH_DAILY_L4:   ['dailyCount',  20],
-  ACH_DAILY_L5:   ['dailyCount',  30],
-  ACH_DAILY_L6:   ['dailyCount',  50],
-  ACH_DAILY_L7:   ['dailyCount',  75],
-  ACH_DAILY_L8:   ['dailyCount', 100],
-  ACH_DAILY_L9:   ['dailyCount', 200],
-  ACH_DAILY_L10:  ['dailyCount', 365],
+  // Play M1: total games
+  ACH_PLAY_M1_L1: ['gameCount',    1],
+  ACH_PLAY_M1_L2: ['gameCount',   10],
+  ACH_PLAY_M1_L3: ['gameCount',   50],
+  ACH_PLAY_M1_L4: ['gameCount',  200],
+  ACH_PLAY_M1_L5: ['gameCount',  500],
+  // Play M2: practice
+  ACH_PLAY_M2_L1: ['practiceCount',    1],
+  ACH_PLAY_M2_L2: ['practiceCount',   10],
+  ACH_PLAY_M2_L3: ['practiceCount',   50],
+  ACH_PLAY_M2_L4: ['practiceCount',  200],
+  ACH_PLAY_M2_L5: ['practiceCount',  500],
+  // Play M3: easy
+  ACH_PLAY_M3_L1: ['easyCount',   1],
+  ACH_PLAY_M3_L2: ['easyCount',   5],
+  ACH_PLAY_M3_L3: ['easyCount',  20],
+  ACH_PLAY_M3_L4: ['easyCount', 100],
+  ACH_PLAY_M3_L5: ['easyCount', 300],
+  // Play M4: hard
+  ACH_PLAY_M4_L1: ['hardCount',   1],
+  ACH_PLAY_M4_L2: ['hardCount',   5],
+  ACH_PLAY_M4_L3: ['hardCount',  20],
+  ACH_PLAY_M4_L4: ['hardCount', 100],
+  ACH_PLAY_M4_L5: ['hardCount', 300],
+  // Play M5: expert
+  ACH_PLAY_M5_L1: ['expertCount',   1],
+  ACH_PLAY_M5_L2: ['expertCount',   5],
+  ACH_PLAY_M5_L3: ['expertCount',  20],
+  ACH_PLAY_M5_L4: ['expertCount', 100],
+  ACH_PLAY_M5_L5: ['expertCount', 300],
+  // Daily M1: total daily
+  ACH_DAILY_M1_L1: ['dailyCount',   1],
+  ACH_DAILY_M1_L2: ['dailyCount',  10],
+  ACH_DAILY_M1_L3: ['dailyCount',  30],
+  ACH_DAILY_M1_L4: ['dailyCount', 100],
+  ACH_DAILY_M1_L5: ['dailyCount', 365],
+  // Daily M2: daily easy
+  ACH_DAILY_M2_L1: ['dailyEasyCount',   1],
+  ACH_DAILY_M2_L2: ['dailyEasyCount',   5],
+  ACH_DAILY_M2_L3: ['dailyEasyCount',  20],
+  ACH_DAILY_M2_L4: ['dailyEasyCount',  50],
+  ACH_DAILY_M2_L5: ['dailyEasyCount', 200],
+  // Daily M3: daily hard
+  ACH_DAILY_M3_L1: ['dailyHardCount',   1],
+  ACH_DAILY_M3_L2: ['dailyHardCount',   5],
+  ACH_DAILY_M3_L3: ['dailyHardCount',  20],
+  ACH_DAILY_M3_L4: ['dailyHardCount',  50],
+  ACH_DAILY_M3_L5: ['dailyHardCount', 200],
+  // Daily M4: daily no mistakes
+  ACH_DAILY_M4_L1: ['dailyPerfectCount',   1],
+  ACH_DAILY_M4_L2: ['dailyPerfectCount',   5],
+  ACH_DAILY_M4_L3: ['dailyPerfectCount',  20],
+  ACH_DAILY_M4_L4: ['dailyPerfectCount',  50],
+  ACH_DAILY_M4_L5: ['dailyPerfectCount', 100],
+  // Daily M5: daily no hints
+  ACH_DAILY_M5_L1: ['dailyNoHintCount',   1],
+  ACH_DAILY_M5_L2: ['dailyNoHintCount',   5],
+  ACH_DAILY_M5_L3: ['dailyNoHintCount',  20],
+  ACH_DAILY_M5_L4: ['dailyNoHintCount',  50],
+  ACH_DAILY_M5_L5: ['dailyNoHintCount', 100],
+  // Legacy streak
   ACH_STREAK_L1:  ['currentStreak',   3],
   ACH_STREAK_L2:  ['currentStreak',   5],
   ACH_STREAK_L3:  ['currentStreak',   7],
@@ -90,6 +142,7 @@ const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   ACH_STREAK_L8:  ['currentStreak', 180],
   ACH_STREAK_L9:  ['currentStreak', 365],
   ACH_STREAK_L10: ['currentStreak', 500],
+  // Legacy flawless
   ACH_FLAWLESS_L1:  ['perfectCount',   1],
   ACH_FLAWLESS_L2:  ['perfectCount',   5],
   ACH_FLAWLESS_L3:  ['perfectCount',  10],
@@ -100,6 +153,7 @@ const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   ACH_FLAWLESS_L8:  ['perfectCount', 100],
   ACH_FLAWLESS_L9:  ['perfectCount', 150],
   ACH_FLAWLESS_L10: ['perfectCount', 200],
+  // Legacy progression
   ACH_PROG_L1:  ['level',   3],
   ACH_PROG_L2:  ['level',   5],
   ACH_PROG_L3:  ['level',  10],
@@ -110,6 +164,7 @@ const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   ACH_PROG_L8:  ['level',  60],
   ACH_PROG_L9:  ['level',  75],
   ACH_PROG_L10: ['level', 100],
+  // Legacy quest
   ACH_QUEST_L1:  ['questCount',   1],
   ACH_QUEST_L2:  ['questCount',   5],
   ACH_QUEST_L3:  ['questCount',  10],
@@ -120,6 +175,7 @@ const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   ACH_QUEST_L8:  ['questCount', 100],
   ACH_QUEST_L9:  ['questCount', 150],
   ACH_QUEST_L10: ['questCount', 200],
+  // Special
   ACH_RICH:          ['coins',          10000],
   ACH_THEME_COLLECT: ['themesOwned',        5],
   ACH_SHOPAHOLIC:    ['inventoryCount',    10],
@@ -172,6 +228,8 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     gameCount: 0, dailyCount: 0, perfectCount: 0,
     currentStreak: 0, level: 1, coins: 0, themesOwned: 0,
     questCount: 0, inventoryCount: 0,
+    practiceCount: 0, easyCount: 0, hardCount: 0, expertCount: 0,
+    dailyEasyCount: 0, dailyHardCount: 0, dailyPerfectCount: 0, dailyNoHintCount: 0,
   };
 
   root.innerHTML = `
@@ -245,9 +303,9 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     });
   }
 
-  function renderTieredBadge(tiered: AchievementDef[]): string {
+  function renderTieredBadge(tiered: AchievementDef[], missionLabel: string | null): string {
     const maxLevel = tiered.length;
-    const currentLevel = tiered.filter((d) => unlocked.has(d.id)).length; // last consecutive unlocked
+    const currentLevel = tiered.filter((d) => unlocked.has(d.id)).length;
     const nextItem = tiered.find((d) => !unlocked.has(d.id));
     const isNew = tiered.some((d) => newlyUnlocked.has(d.id));
     const allDone = currentLevel === maxLevel;
@@ -275,6 +333,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
 
     return `
       <div class="ach-badge-card${allDone ? ' all-done' : ''}${isNew ? ' new-unlock' : ''}">
+        ${missionLabel ? `<div class="ach-mission-label">${escapeHtml(missionLabel)}</div>` : ''}
         <div class="ach-badge-dots">${dots}<span class="ach-badge-lvl">${currentLevel}/${maxLevel}</span></div>
         ${lastUnlocked ? `
           <div class="ach-badge-current">
@@ -335,7 +394,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       return;
     }
 
-    // Group by badge_group (category)
+    // Group by category
     const groups: Record<string, AchievementDef[]> = {};
     for (const d of filtered) {
       if (!groups[d.category]) groups[d.category] = [];
@@ -348,10 +407,29 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       const allDone = doneInGroup === items.length;
 
       const tiered = items.filter((d) => d.badge_level > 0)
-                          .sort((a, b) => a.badge_level - b.badge_level);
+                          .sort((a, b) => {
+                            const mA = a.badge_mission ?? 1;
+                            const mB = b.badge_mission ?? 1;
+                            if (mA !== mB) return mA - mB;
+                            return a.badge_level - b.badge_level;
+                          });
       const oneoff = items.filter((d) => d.badge_level === 0);
 
-      const tieredHtml = tiered.length ? renderTieredBadge(tiered) : '';
+      // Group tiered items by badge_mission
+      const missionMap: Record<number, AchievementDef[]> = {};
+      for (const d of tiered) {
+        const m = d.badge_mission ?? 1;
+        if (!missionMap[m]) missionMap[m] = [];
+        missionMap[m].push(d);
+      }
+      const missions = Object.entries(missionMap).sort(([a], [b]) => Number(a) - Number(b));
+      const isMultiMission = missions.length > 1;
+
+      const tieredHtml = missions.map(([, mItems]) => {
+        const label = isMultiMission ? (mItems[0].mission_name ?? null) : null;
+        return renderTieredBadge(mItems, label);
+      }).join('');
+
       const flatHtml = oneoff.map((d) => renderFlatCard(d)).join('');
 
       return `
@@ -375,23 +453,33 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     try {
       const state = useStore.getState();
       const userId = state.user?.id;
-      const [defList, userList, history, daily, perfect, inventory, quests] = await Promise.all([
+      const P0 = Promise.resolve({ count: 0 } as any);
+
+      const [
+        defList, userList,
+        history, daily, perfect, inventory, quests,
+        practice, easyGames, hardGames, expertGames,
+        dailyEasy, dailyHard, dailyPerfect, dailyNoHint,
+      ] = await Promise.all([
         api.getAchievementDefinitions(),
         api.getUserAchievements().catch(() => []),
-        userId
-          ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId)
-          : Promise.resolve({ count: 0 } as any),
-        userId
-          ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily')
-          : Promise.resolve({ count: 0 } as any),
-        userId
-          ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mistakes', 0)
-          : Promise.resolve({ count: 0 } as any),
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId) : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily') : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mistakes', 0) : P0,
         api.getInventory().catch(() => []),
-        userId
-          ? supabase.from('user_daily_quests').select('id', { count: 'exact', head: true }).eq('user_id', userId).not('claimed_at', 'is', null)
-          : Promise.resolve({ count: 0 } as any),
+        userId ? supabase.from('user_daily_quests').select('id', { count: 'exact', head: true }).eq('user_id', userId).not('claimed_at', 'is', null) : P0,
+        // Play missions
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'practice') : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('level', 'easy') : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).in('level', ['hard', 'hard-expert']) : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('level', 'expert') : P0,
+        // Daily missions
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily').eq('level', 'easy') : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily').in('level', ['hard', 'hard-expert']) : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily').eq('mistakes', 0) : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily').eq('hints_used', 0) : P0,
       ]);
+
       defs = (defList ?? []) as AchievementDef[];
       const userAchs = (userList ?? []) as UserAchievement[];
       unlocked = new Set(userAchs.map((u) => u.achievement_id));
@@ -403,15 +491,23 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       );
       const ownedIds = ((inventory ?? []) as any[]).map((r) => r.item_id as string);
       progressInputs = {
-        gameCount:      (history as any)?.count ?? 0,
-        dailyCount:     (daily as any)?.count ?? 0,
-        perfectCount:   (perfect as any)?.count ?? 0,
-        currentStreak:  state.currentStreak,
-        level:          state.level,
-        coins:          state.coins,
-        themesOwned:    ownedIds.filter((id) => id.startsWith('theme_')).length,
-        questCount:     (quests as any)?.count ?? 0,
-        inventoryCount: ownedIds.length,
+        gameCount:        (history as any)?.count      ?? 0,
+        dailyCount:       (daily as any)?.count        ?? 0,
+        perfectCount:     (perfect as any)?.count      ?? 0,
+        currentStreak:    state.currentStreak,
+        level:            state.level,
+        coins:            state.coins,
+        themesOwned:      ownedIds.filter((id) => id.startsWith('theme_')).length,
+        questCount:       (quests as any)?.count       ?? 0,
+        inventoryCount:   ownedIds.length,
+        practiceCount:    (practice as any)?.count     ?? 0,
+        easyCount:        (easyGames as any)?.count    ?? 0,
+        hardCount:        (hardGames as any)?.count    ?? 0,
+        expertCount:      (expertGames as any)?.count  ?? 0,
+        dailyEasyCount:   (dailyEasy as any)?.count    ?? 0,
+        dailyHardCount:   (dailyHard as any)?.count    ?? 0,
+        dailyPerfectCount:(dailyPerfect as any)?.count ?? 0,
+        dailyNoHintCount: (dailyNoHint as any)?.count  ?? 0,
       };
       loading = false;
       render();

@@ -1646,6 +1646,16 @@ h3 { font-size: 18px; }
 .ach-row-pts svg { width: 12px; height: 12px; color: #f5a623; }
 .ach-loading, .ach-empty { text-align: center; padding: 40px 16px; color: var(--app-text-secondary); font-size: 14px; }
 
+/* mission label inside tiered badge card */
+.ach-mission-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--app-text-secondary);
+  opacity: .7;
+}
+
 /* tiered badge card */
 .ach-badge-card {
   background: var(--app-card); border-radius: 18px;
