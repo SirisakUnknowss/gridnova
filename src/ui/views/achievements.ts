@@ -53,6 +53,8 @@ interface ProgressInputs {
   dailyCount: number;
   perfectCount: number;
   currentStreak: number;
+  longestStreak: number;
+  distinctDays: number;
   level: number;
   coins: number;
   themesOwned: number;
@@ -68,6 +70,14 @@ interface ProgressInputs {
   dailyHardCount: number;
   dailyPerfectCount: number;
   dailyNoHintCount: number;
+  // Streak missions
+  maxPerfectRun: number;
+  maxPureRun: number;
+  // Flawless missions
+  perfectPractice: number;
+  perfectEasy: number;
+  perfectHard: number;
+  perfectExpert: number;
 }
 
 const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
@@ -131,28 +141,66 @@ const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   ACH_DAILY_M5_L3: ['dailyNoHintCount',  20],
   ACH_DAILY_M5_L4: ['dailyNoHintCount',  50],
   ACH_DAILY_M5_L5: ['dailyNoHintCount', 100],
-  // Legacy streak
-  ACH_STREAK_L1:  ['currentStreak',   3],
-  ACH_STREAK_L2:  ['currentStreak',   5],
-  ACH_STREAK_L3:  ['currentStreak',   7],
-  ACH_STREAK_L4:  ['currentStreak',  14],
-  ACH_STREAK_L5:  ['currentStreak',  30],
-  ACH_STREAK_L6:  ['currentStreak',  60],
-  ACH_STREAK_L7:  ['currentStreak',  90],
-  ACH_STREAK_L8:  ['currentStreak', 180],
-  ACH_STREAK_L9:  ['currentStreak', 365],
-  ACH_STREAK_L10: ['currentStreak', 500],
-  // Legacy flawless
-  ACH_FLAWLESS_L1:  ['perfectCount',   1],
-  ACH_FLAWLESS_L2:  ['perfectCount',   5],
-  ACH_FLAWLESS_L3:  ['perfectCount',  10],
-  ACH_FLAWLESS_L4:  ['perfectCount',  20],
-  ACH_FLAWLESS_L5:  ['perfectCount',  30],
-  ACH_FLAWLESS_L6:  ['perfectCount',  50],
-  ACH_FLAWLESS_L7:  ['perfectCount',  75],
-  ACH_FLAWLESS_L8:  ['perfectCount', 100],
-  ACH_FLAWLESS_L9:  ['perfectCount', 150],
-  ACH_FLAWLESS_L10: ['perfectCount', 200],
+  // Streak M1: current streak
+  ACH_STREAK_M1_L1: ['currentStreak',  3],
+  ACH_STREAK_M1_L2: ['currentStreak',  7],
+  ACH_STREAK_M1_L3: ['currentStreak', 14],
+  ACH_STREAK_M1_L4: ['currentStreak', 30],
+  ACH_STREAK_M1_L5: ['currentStreak', 60],
+  // Streak M2: longest streak
+  ACH_STREAK_M2_L1: ['longestStreak',   7],
+  ACH_STREAK_M2_L2: ['longestStreak',  14],
+  ACH_STREAK_M2_L3: ['longestStreak',  30],
+  ACH_STREAK_M2_L4: ['longestStreak', 100],
+  ACH_STREAK_M2_L5: ['longestStreak', 365],
+  // Streak M3: distinct days
+  ACH_STREAK_M3_L1: ['distinctDays',   7],
+  ACH_STREAK_M3_L2: ['distinctDays',  30],
+  ACH_STREAK_M3_L3: ['distinctDays',  90],
+  ACH_STREAK_M3_L4: ['distinctDays', 180],
+  ACH_STREAK_M3_L5: ['distinctDays', 365],
+  // Streak M4: max perfect run
+  ACH_STREAK_M4_L1: ['maxPerfectRun',  2],
+  ACH_STREAK_M4_L2: ['maxPerfectRun',  5],
+  ACH_STREAK_M4_L3: ['maxPerfectRun', 10],
+  ACH_STREAK_M4_L4: ['maxPerfectRun', 20],
+  ACH_STREAK_M4_L5: ['maxPerfectRun', 50],
+  // Streak M5: max pure run
+  ACH_STREAK_M5_L1: ['maxPureRun',  2],
+  ACH_STREAK_M5_L2: ['maxPureRun',  5],
+  ACH_STREAK_M5_L3: ['maxPureRun', 10],
+  ACH_STREAK_M5_L4: ['maxPureRun', 20],
+  ACH_STREAK_M5_L5: ['maxPureRun', 50],
+  // Flawless M1: total no-mistake wins
+  ACH_FLAWLESS_M1_L1: ['perfectCount',  1],
+  ACH_FLAWLESS_M1_L2: ['perfectCount',  5],
+  ACH_FLAWLESS_M1_L3: ['perfectCount', 10],
+  ACH_FLAWLESS_M1_L4: ['perfectCount', 20],
+  ACH_FLAWLESS_M1_L5: ['perfectCount', 50],
+  // Flawless M2: practice no-mistake
+  ACH_FLAWLESS_M2_L1: ['perfectPractice',  1],
+  ACH_FLAWLESS_M2_L2: ['perfectPractice',  5],
+  ACH_FLAWLESS_M2_L3: ['perfectPractice', 10],
+  ACH_FLAWLESS_M2_L4: ['perfectPractice', 20],
+  ACH_FLAWLESS_M2_L5: ['perfectPractice', 50],
+  // Flawless M3: easy no-mistake
+  ACH_FLAWLESS_M3_L1: ['perfectEasy',  1],
+  ACH_FLAWLESS_M3_L2: ['perfectEasy',  5],
+  ACH_FLAWLESS_M3_L3: ['perfectEasy', 10],
+  ACH_FLAWLESS_M3_L4: ['perfectEasy', 20],
+  ACH_FLAWLESS_M3_L5: ['perfectEasy', 50],
+  // Flawless M4: hard no-mistake
+  ACH_FLAWLESS_M4_L1: ['perfectHard',  1],
+  ACH_FLAWLESS_M4_L2: ['perfectHard',  3],
+  ACH_FLAWLESS_M4_L3: ['perfectHard',  5],
+  ACH_FLAWLESS_M4_L4: ['perfectHard', 10],
+  ACH_FLAWLESS_M4_L5: ['perfectHard', 20],
+  // Flawless M5: expert no-mistake
+  ACH_FLAWLESS_M5_L1: ['perfectExpert',  1],
+  ACH_FLAWLESS_M5_L2: ['perfectExpert',  3],
+  ACH_FLAWLESS_M5_L3: ['perfectExpert',  5],
+  ACH_FLAWLESS_M5_L4: ['perfectExpert', 10],
+  ACH_FLAWLESS_M5_L5: ['perfectExpert', 15],
   // Legacy progression
   ACH_PROG_L1:  ['level',   3],
   ACH_PROG_L2:  ['level',   5],
@@ -226,10 +274,13 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   let activeGroup = 'all';
   let progressInputs: ProgressInputs = {
     gameCount: 0, dailyCount: 0, perfectCount: 0,
-    currentStreak: 0, level: 1, coins: 0, themesOwned: 0,
+    currentStreak: 0, longestStreak: 0, distinctDays: 0,
+    level: 1, coins: 0, themesOwned: 0,
     questCount: 0, inventoryCount: 0,
     practiceCount: 0, easyCount: 0, hardCount: 0, expertCount: 0,
     dailyEasyCount: 0, dailyHardCount: 0, dailyPerfectCount: 0, dailyNoHintCount: 0,
+    maxPerfectRun: 0, maxPureRun: 0,
+    perfectPractice: 0, perfectEasy: 0, perfectHard: 0, perfectExpert: 0,
   };
 
   root.innerHTML = `
@@ -460,6 +511,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         history, daily, perfect, inventory, quests,
         practice, easyGames, hardGames, expertGames,
         dailyEasy, dailyHard, dailyPerfect, dailyNoHint,
+        streakStats, distinctDaysRes,
       ] = await Promise.all([
         api.getAchievementDefinitions(),
         api.getUserAchievements().catch(() => []),
@@ -478,6 +530,9 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily').in('level', ['hard', 'hard-expert']) : P0,
         userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily').eq('mistakes', 0) : P0,
         userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('mode', 'daily').eq('hints_used', 0) : P0,
+        // Streak/Flawless stats via RPC
+        userId ? supabase.rpc('get_game_streak_stats', { p_user_id: userId }).single() : Promise.resolve({ data: null }),
+        userId ? supabase.from('user_game_history').select('completed_at').eq('user_id', userId) : Promise.resolve({ data: [] }),
       ]);
 
       defs = (defList ?? []) as AchievementDef[];
@@ -490,11 +545,17 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
           .map((u) => u.achievement_id),
       );
       const ownedIds = ((inventory ?? []) as any[]).map((r) => r.item_id as string);
+      const statsData = (streakStats as any)?.data ?? {};
+      const distinctDays = new Set(
+        ((distinctDaysRes as any)?.data ?? []).map((r: any) => r.completed_at?.slice(0, 10))
+      ).size;
       progressInputs = {
         gameCount:        (history as any)?.count      ?? 0,
         dailyCount:       (daily as any)?.count        ?? 0,
         perfectCount:     (perfect as any)?.count      ?? 0,
         currentStreak:    state.currentStreak,
+        longestStreak:    state.longestStreak,
+        distinctDays,
         level:            state.level,
         coins:            state.coins,
         themesOwned:      ownedIds.filter((id) => id.startsWith('theme_')).length,
@@ -508,6 +569,12 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         dailyHardCount:   (dailyHard as any)?.count    ?? 0,
         dailyPerfectCount:(dailyPerfect as any)?.count ?? 0,
         dailyNoHintCount: (dailyNoHint as any)?.count  ?? 0,
+        maxPerfectRun:    statsData.max_perfect_run    ?? 0,
+        maxPureRun:       statsData.max_pure_run       ?? 0,
+        perfectPractice:  statsData.perfect_practice   ?? 0,
+        perfectEasy:      statsData.perfect_easy       ?? 0,
+        perfectHard:      statsData.perfect_hard       ?? 0,
+        perfectExpert:    statsData.perfect_expert     ?? 0,
       };
       loading = false;
       render();
