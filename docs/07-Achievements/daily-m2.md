@@ -1,0 +1,25 @@
+# 📅 Daily — M2: Daily Easy
+
+**Group:** daily | **Mission:** 2 | **ID prefix:** ACH_DAILY_M2
+
+## เงื่อนไข
+เล่น Daily puzzle ระดับ `easy` ให้ครบตามจำนวน
+
+## ระดับ
+
+| Level | Tier | เงื่อนไข | Coin | XP | Achievement ID |
+|---|---|---|---|---|---|
+| L1 | 🥉 Bronze | Daily Easy 1 ครั้ง | 50 | 100 | ACH_DAILY_M2_L1 |
+| L2 | 🥈 Silver | Daily Easy 5 ครั้ง | 150 | 300 | ACH_DAILY_M2_L2 |
+| L3 | 🥇 Gold | Daily Easy 20 ครั้ง | 400 | 800 | ACH_DAILY_M2_L3 |
+| L4 | 💠 Platinum | Daily Easy 50 ครั้ง | 1000 | 2000 | ACH_DAILY_M2_L4 |
+| L5 | 💎 Diamond | Daily Easy 200 ครั้ง | 3000 | 5000 | ACH_DAILY_M2_L5 |
+
+## SQL (check_and_grant_achievements)
+```sql
+SELECT COUNT(*) INTO v_daily_easy_count
+  FROM user_game_history WHERE user_id = p_user_id
+    AND mode = 'daily' AND level = 'easy'::difficulty_enum;
+```
+
+**Status:** ⏳ ยังไม่ได้ implement

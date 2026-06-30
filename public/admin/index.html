@@ -300,6 +300,11 @@
         <div class="value" id="c-games-total">—</div>
         <div class="sub"  id="c-games-total-sub">members / guests</div>
       </div>
+      <div class="stat-card yellow">
+        <div class="label">🪙 Coins in Circulation</div>
+        <div class="value" id="c-coins-held">—</div>
+        <div class="sub"  id="c-coins-ever-sub">หาได้รวมทั้งหมด —</div>
+      </div>
     </div>
 
     <div class="charts-grid">
@@ -615,6 +620,8 @@ function renderCards(d) {
   const gT = (d.games_members_total||0)+(d.games_guests_total||0);
   setEl('c-games-total',     fmt(gT));
   setEl('c-games-total-sub', `✉️ ${fmt(d.games_members_total)} · 👻 ${fmt(d.games_guests_total)}`);
+  setEl('c-coins-held',      fmt(d.coins_held));
+  setEl('c-coins-ever-sub',  `หาได้รวมทั้งหมด ${fmt(d.coins_ever)} 🪙`);
 }
 
 function renderTrend(data) {
