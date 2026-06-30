@@ -27,17 +27,17 @@ interface UserAchievement {
 }
 
 const BADGE_GROUP_META: Record<string, { label: string; emoji: string }> = {
-  play:        { label: 'เล่นเกม',     emoji: '🎮' },
-  player:      { label: 'เล่นเกม',     emoji: '🎮' }, // legacy fallback
+  play:        { label: 'Play',        emoji: '🎮' },
+  player:      { label: 'Play',        emoji: '🎮' }, // legacy fallback
   daily:       { label: 'Daily',       emoji: '📅' },
   streak:      { label: 'Streak',      emoji: '🔥' },
-  flawless:    { label: 'ไม่ผิด',      emoji: '⭐' },
-  speedster:   { label: 'เล่นเร็ว',    emoji: '⚡' },
-  pure:        { label: 'ไม่ใช้ Hint', emoji: '🧠' },
+  flawless:    { label: 'Flawless',    emoji: '⭐' },
+  speedster:   { label: 'Speedster',   emoji: '⚡' },
+  pure:        { label: 'Pure',        emoji: '🧠' },
   leaderboard: { label: 'Leaderboard', emoji: '🏆' },
   progression: { label: 'Level',       emoji: '📈' },
   quest:       { label: 'Quest',       emoji: '📋' },
-  special:     { label: 'พิเศษ',       emoji: '✨' },
+  special:     { label: 'Special',     emoji: '✨' },
 };
 
 const TIER_COLOR: Record<string, string> = {
@@ -78,6 +78,12 @@ interface ProgressInputs {
   perfectEasy: number;
   perfectHard: number;
   perfectExpert: number;
+  // Speedster best times (seconds, 999999 = no game played)
+  easyBest: number;
+  mediumBest: number;
+  hardBest: number;
+  hardExpertBest: number;
+  expertBest: number;
 }
 
 const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
@@ -223,16 +229,56 @@ const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   ACH_QUEST_L8:  ['questCount', 100],
   ACH_QUEST_L9:  ['questCount', 150],
   ACH_QUEST_L10: ['questCount', 200],
+  // Speedster (time in seconds — lower is better; progress bar shows best/target inverted)
+  ACH_SPEED_M1_L1: ['easyBest',  300],
+  ACH_SPEED_M1_L2: ['easyBest',  180],
+  ACH_SPEED_M1_L3: ['easyBest',  120],
+  ACH_SPEED_M1_L4: ['easyBest',   90],
+  ACH_SPEED_M1_L5: ['easyBest',   60],
+  ACH_SPEED_M2_L1: ['mediumBest', 480],
+  ACH_SPEED_M2_L2: ['mediumBest', 300],
+  ACH_SPEED_M2_L3: ['mediumBest', 180],
+  ACH_SPEED_M2_L4: ['mediumBest', 120],
+  ACH_SPEED_M2_L5: ['mediumBest',  90],
+  ACH_SPEED_M3_L1: ['hardBest',  900],
+  ACH_SPEED_M3_L2: ['hardBest',  600],
+  ACH_SPEED_M3_L3: ['hardBest',  420],
+  ACH_SPEED_M3_L4: ['hardBest',  300],
+  ACH_SPEED_M3_L5: ['hardBest',  180],
+  ACH_SPEED_M4_L1: ['hardExpertBest', 1200],
+  ACH_SPEED_M4_L2: ['hardExpertBest',  900],
+  ACH_SPEED_M4_L3: ['hardExpertBest',  600],
+  ACH_SPEED_M4_L4: ['hardExpertBest',  420],
+  ACH_SPEED_M4_L5: ['hardExpertBest',  300],
+  ACH_SPEED_M5_L1: ['expertBest', 1800],
+  ACH_SPEED_M5_L2: ['expertBest', 1500],
+  ACH_SPEED_M5_L3: ['expertBest', 1080],
+  ACH_SPEED_M5_L4: ['expertBest',  720],
+  ACH_SPEED_M5_L5: ['expertBest',  480],
   // Special
   ACH_RICH:          ['coins',          10000],
   ACH_THEME_COLLECT: ['themesOwned',        5],
   ACH_SHOPAHOLIC:    ['inventoryCount',    10],
 };
 
-function computeProgress(id: string, i: ProgressInputs): { progress: number; target: number } | null {
+const TIME_FIELDS = new Set<keyof ProgressInputs>(['easyBest', 'mediumBest', 'hardBest', 'hardExpertBest', 'expertBest']);
+
+function fmtTime(s: number): string {
+  if (s >= 999999) return '—';
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+}
+
+function computeProgress(id: string, i: ProgressInputs): { progress: number; target: number; isTime?: boolean; bestTime?: number; targetTime?: number } | null {
   const entry = COUNTERS[id];
   if (!entry) return null;
   const [field, target] = entry;
+  if (TIME_FIELDS.has(field)) {
+    const best = i[field] as number;
+    if (best >= 999999) return null;
+    return { progress: 0, target: 0, isTime: true, bestTime: best, targetTime: target };
+  }
   return { progress: Math.min(i[field] as number, target), target };
 }
 
@@ -281,6 +327,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     dailyEasyCount: 0, dailyHardCount: 0, dailyPerfectCount: 0, dailyNoHintCount: 0,
     maxPerfectRun: 0, maxPureRun: 0,
     perfectPractice: 0, perfectEasy: 0, perfectHard: 0, perfectExpert: 0,
+    easyBest: 999999, mediumBest: 999999, hardBest: 999999, hardExpertBest: 999999, expertBest: 999999,
   };
 
   root.innerHTML = `
@@ -371,12 +418,19 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     if (nextItem) {
       const prog = computeProgress(nextItem.id, progressInputs);
       if (prog) {
-        const pct = Math.round((prog.progress / prog.target) * 100);
-        progressHtml = `
-          <div class="ach-row-prog" style="margin-top:6px">
-            <div class="ach-row-prog-bar"><div class="ach-row-prog-fill" style="width:${pct}%"></div></div>
-            <div class="ach-row-prog-label">${prog.progress} / ${prog.target}</div>
-          </div>`;
+        if (prog.isTime) {
+          progressHtml = `
+            <div class="ach-row-prog" style="margin-top:6px">
+              <div class="ach-row-prog-label">Best: ${fmtTime(prog.bestTime!)} · Goal: ${fmtTime(prog.targetTime!)}</div>
+            </div>`;
+        } else {
+          const pct = Math.round((prog.progress / prog.target) * 100);
+          progressHtml = `
+            <div class="ach-row-prog" style="margin-top:6px">
+              <div class="ach-row-prog-bar"><div class="ach-row-prog-fill" style="width:${pct}%"></div></div>
+              <div class="ach-row-prog-label">${prog.progress} / ${prog.target}</div>
+            </div>`;
+        }
       }
     }
 
@@ -512,6 +566,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         practice, easyGames, hardGames, expertGames,
         dailyEasy, dailyHard, dailyPerfect, dailyNoHint,
         streakStats, distinctDaysRes,
+        bestEasy, bestMedium, bestHard, bestHardExpert, bestExpert,
       ] = await Promise.all([
         api.getAchievementDefinitions(),
         api.getUserAchievements().catch(() => []),
@@ -533,6 +588,12 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         // Streak/Flawless stats via RPC
         userId ? supabase.rpc('get_game_streak_stats', { p_user_id: userId }).single() : Promise.resolve({ data: null }),
         userId ? supabase.from('user_game_history').select('completed_at').eq('user_id', userId) : Promise.resolve({ data: [] }),
+        // Speedster best times
+        userId ? supabase.from('user_game_history').select('time_seconds').eq('user_id', userId).eq('level', 'easy').order('time_seconds').limit(1).maybeSingle() : Promise.resolve({ data: null }),
+        userId ? supabase.from('user_game_history').select('time_seconds').eq('user_id', userId).eq('level', 'medium').order('time_seconds').limit(1).maybeSingle() : Promise.resolve({ data: null }),
+        userId ? supabase.from('user_game_history').select('time_seconds').eq('user_id', userId).in('level', ['hard', 'hard-expert']).order('time_seconds').limit(1).maybeSingle() : Promise.resolve({ data: null }),
+        userId ? supabase.from('user_game_history').select('time_seconds').eq('user_id', userId).eq('level', 'hard-expert').order('time_seconds').limit(1).maybeSingle() : Promise.resolve({ data: null }),
+        userId ? supabase.from('user_game_history').select('time_seconds').eq('user_id', userId).eq('level', 'expert').order('time_seconds').limit(1).maybeSingle() : Promise.resolve({ data: null }),
       ]);
 
       defs = (defList ?? []) as AchievementDef[];
@@ -575,6 +636,11 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         perfectEasy:      statsData.perfect_easy       ?? 0,
         perfectHard:      statsData.perfect_hard       ?? 0,
         perfectExpert:    statsData.perfect_expert     ?? 0,
+        easyBest:        (bestEasy as any)?.data?.time_seconds        ?? 999999,
+        mediumBest:      (bestMedium as any)?.data?.time_seconds      ?? 999999,
+        hardBest:        (bestHard as any)?.data?.time_seconds        ?? 999999,
+        hardExpertBest:  (bestHardExpert as any)?.data?.time_seconds  ?? 999999,
+        expertBest:      (bestExpert as any)?.data?.time_seconds      ?? 999999,
       };
       loading = false;
       render();
