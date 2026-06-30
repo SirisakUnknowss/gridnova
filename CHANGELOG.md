@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.0.5 — 2026-06-30
+
+### Fixed
+- **Daily Score**: แก้บั๊ก submit daily score ค้าง (edge function timeout 504) — redeploy v9
+
+### Improved
+- **Medals**: ขยาย achievement เป็น 100 ข้อ (10 หมวด × 10 ระดับ)
+- **Admin Dashboard**: เพิ่ม KPI "Coins in Circulation" แสดงเหรียญรวมของ user ทั้งหมด
+
+## 1.0.4 — 2026-06-29
+
+### Fixed
+- **Daily Puzzle**: leaderboard and quests now update correctly after completing a daily puzzle (cron was calling wrong function — backfilled 30 days of missing puzzles).
+- **Practice in-progress**: finishing a game now clears the "continue" banner; starting a new practice game no longer loads stale saved state.
+
+### Improved
+- **Home**: "Visitors Today" label is now clearer (was "Today").
+- **Admin**: new Leaderboard tab with score breakdown (base → penalties → bonuses → total), date picker, and quick shortcuts.
+
 ## 1.0.3 — 2026-06-26
 
 ### Fixed
