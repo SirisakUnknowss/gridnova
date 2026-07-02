@@ -1,12 +1,15 @@
-// Restricts staging.gridnova.pages.dev to admin via a real login page + signed
-// session cookie (not the browser's native Basic Auth popup — that has no
-// expiry, no logout, and looks unprofessional). Credentials come from
-// Cloudflare Pages env vars STAGING_BASIC_USER / STAGING_BASIC_PASS
-// (set per "Preview" environment in the Pages dashboard, since staging is a
-// branch deploy). Production (main branch / custom domain) is untouched.
+// Restricts staging.gridnova.pages.dev to admin. Any request without a valid
+// session is redirected to /login (a dedicated page, not a browser Basic Auth
+// popup). On success a signed, HttpOnly session cookie is set and the user is
+// sent back to the page they originally requested. Credentials come from
+// Cloudflare Pages env vars STAGING_BASIC_USER / STAGING_BASIC_PASS (set per
+// "Preview" environment in the Pages dashboard, since staging is a branch
+// deploy). Production (main branch / custom domain) is untouched.
 
 const SESSION_COOKIE = 'staging_session';
 const SESSION_TTL_SECONDS = 60 * 60 * 12; // 12h
+const LOGIN_PATH = '/login';
+const LOGOUT_PATH = '/logout';
 
 async function hmac(secret, data) {
   const enc = new TextEncoder();
@@ -28,6 +31,12 @@ async function isValidSession(cookieValue, secret) {
   if ((await hmac(secret, expiryStr)) !== sig) return false;
   const expiry = Number(expiryStr);
   return Number.isFinite(expiry) && Date.now() < expiry;
+}
+
+function safeRedirectTarget(raw) {
+  // Only allow same-origin relative paths — never redirect off staging.
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/';
+  return raw;
 }
 
 function loginPage(hasError, redirectTo) {
@@ -67,7 +76,7 @@ function loginPage(hasError, redirectTo) {
 </style>
 </head>
 <body>
-  <form class="card" method="POST" action="/__staging_login">
+  <form class="card" method="POST" action="${LOGIN_PATH}">
     <h1>🔒 GridNova Staging</h1>
     <p class="sub">Admin access only</p>
     ${hasError ? '<div class="error">Username or password incorrect</div>' : ''}
@@ -97,47 +106,57 @@ export async function onRequest(context) {
     return new Response('Staging access is not configured yet.', { status: 503 });
   }
 
-  if (url.pathname === '/__staging_logout') {
+  if (url.pathname === LOGOUT_PATH) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: '/',
+        Location: LOGIN_PATH,
         'Set-Cookie': `${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`,
       },
     });
   }
 
-  if (request.method === 'POST' && url.pathname === '/__staging_login') {
-    const form = await request.formData();
-    const u = String(form.get('username') || '');
-    const p = String(form.get('password') || '');
-    const redirectTo = String(form.get('redirect') || '/');
+  const existingSession = getCookie(request, SESSION_COOKIE);
+  const alreadyLoggedIn = await isValidSession(existingSession, pass);
 
-    if (u === user && p === pass) {
-      const expiry = Date.now() + SESSION_TTL_SECONDS * 1000;
-      const sig = await hmac(pass, String(expiry));
-      return new Response(null, {
-        status: 302,
-        headers: {
-          Location: redirectTo,
-          'Set-Cookie': `${SESSION_COOKIE}=${expiry}.${sig}; Path=/; Max-Age=${SESSION_TTL_SECONDS}; HttpOnly; Secure; SameSite=Lax`,
-        },
+  if (url.pathname === LOGIN_PATH) {
+    if (request.method === 'POST') {
+      const form = await request.formData();
+      const u = String(form.get('username') || '');
+      const p = String(form.get('password') || '');
+      const redirectTo = safeRedirectTarget(String(form.get('redirect') || '/'));
+
+      if (u === user && p === pass) {
+        const expiry = Date.now() + SESSION_TTL_SECONDS * 1000;
+        const sig = await hmac(pass, String(expiry));
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: redirectTo,
+            'Set-Cookie': `${SESSION_COOKIE}=${expiry}.${sig}; Path=/; Max-Age=${SESSION_TTL_SECONDS}; HttpOnly; Secure; SameSite=Lax`,
+          },
+        });
+      }
+
+      return new Response(loginPage(true, redirectTo), {
+        status: 401,
+        headers: { 'content-type': 'text/html; charset=utf-8' },
       });
     }
 
-    return new Response(loginPage(true, redirectTo), {
-      status: 401,
+    // GET /login — already signed in? send them on. Otherwise show the form.
+    const redirectTo = safeRedirectTarget(url.searchParams.get('redirect') || '/');
+    if (alreadyLoggedIn) {
+      return Response.redirect(url.origin + redirectTo, 302);
+    }
+    return new Response(loginPage(false, redirectTo), {
+      status: 200,
       headers: { 'content-type': 'text/html; charset=utf-8' },
     });
   }
 
-  const session = getCookie(request, SESSION_COOKIE);
-  if (await isValidSession(session, pass)) {
-    return next();
-  }
+  if (alreadyLoggedIn) return next();
 
-  return new Response(loginPage(false, url.pathname + url.search), {
-    status: 401,
-    headers: { 'content-type': 'text/html; charset=utf-8' },
-  });
+  const dest = url.pathname + url.search;
+  return Response.redirect(`${url.origin}${LOGIN_PATH}?redirect=${encodeURIComponent(dest)}`, 302);
 }
