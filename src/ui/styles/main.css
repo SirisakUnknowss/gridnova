@@ -810,6 +810,66 @@ h3 { font-size: 18px; }
 }
 .daily-card-v2-lb:hover { background: rgba(255,255,255,0.25); }
 
+/* Play Mode entry card — purple gradient (Home) */
+.playmode-card-v2 {
+  width: 100%; background: linear-gradient(135deg, #6c5ce7, #764ba2);
+  border-radius: var(--radius-xl); padding: 18px;
+  color: white; display: flex; flex-direction: column; gap: 2px;
+}
+.playmode-card-v2-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+}
+.playmode-card-v2-title { font-size: 19px; font-weight: 700; }
+.playmode-card-v2-sub { font-size: 13px; opacity: 0.85; margin-bottom: 12px; }
+.playmode-card-v2-btn {
+  background: white; color: var(--brand-primary);
+  min-height: 44px; border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-weight: 700;
+}
+.playmode-card-v2-btn:hover { background: #f0ecff; }
+
+/* Shared row — Practice entry (Home) + Play Mode Hub list rows */
+.pm-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.pm-row {
+  width: 100%; background: var(--app-card-bg); border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg); padding: 14px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; text-align: left;
+  box-shadow: var(--app-card-shadow);
+  transition: background var(--duration-fast);
+}
+.pm-row:hover { background: #f8f7ff; }
+.pm-row--soon { cursor: default; opacity: 0.65; }
+.pm-row--soon:hover { background: var(--app-card-bg); }
+.pm-row-icon {
+  flex: none; width: 40px; height: 40px; border-radius: 12px;
+  background: #ede9fe; color: var(--brand-primary);
+  display: flex; align-items: center; justify-content: center;
+}
+.pm-row-icon--soon { background: #f0eef8; color: var(--app-text-secondary); }
+.pm-row-body { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pm-row-title { font-size: 14px; font-weight: 600; color: var(--app-text); }
+.pm-row-sub { font-size: 11.5px; color: var(--app-text-secondary); }
+.pm-row-chevron { flex: none; color: var(--app-text-secondary); display: flex; }
+.pm-row-ranks {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: #f0eef8; color: var(--brand-primary);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.pm-row-ranks:hover { background: #e4defb; }
+.pm-soon-badge {
+  flex: none; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  color: var(--app-text-secondary); background: #f0eef8;
+  padding: 4px 9px; border-radius: 999px;
+}
+
+/* Practice view (standalone page) */
+.view--practice, .view--play-mode { gap: 14px; padding-top: 0; }
+.practice-sub { width: 100%; font-size: 13px; color: var(--app-text-secondary); margin: 0; }
+
 /* Practice grid v2 — 2×2 */
 .home-section-label {
   width: 100%; font-size: 11px; font-weight: 400;

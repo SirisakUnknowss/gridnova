@@ -2,8 +2,7 @@
 // Home view — main hub
 // =====================================================================
 import { useStore } from '@state/store';
-import { todayUtc, formatNumber, formatTime } from '@lib/format';
-import { difficultyForDayOfWeek } from '@engine/generator';
+import { formatNumber, formatTime } from '@lib/format';
 import { levelProgress } from '@lib/level';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { isMuted, toggleMute } from '@lib/sound';
@@ -14,10 +13,9 @@ import { listGames, type GameInProgress } from '@lib/local-db';
 import { APP_VERSION } from '@lib/version';
 
 export interface HomeViewProps {
-  onPlayDaily: () => void;
-  onPlayPractice: (level: string) => void;
+  onEnterPlayMode: () => void;
+  onOpenPractice: () => void;
   onAuthAction: () => void;
-  onLeaderboard: () => void;
   onContinue: (saved: GameInProgress) => void;
   nav: BottomNavCallbacks;
 }
@@ -28,19 +26,8 @@ function fmtCount(n: number): string {
   return String(n);
 }
 
-const PRACTICE_META: Record<string, { label: string; sub: string; color: string }> = {
-  easy:   { label: 'Easy',   sub: 'Relaxed',  color: '#10b981' },
-  medium: { label: 'Medium', sub: 'Balanced', color: '#f59e0b' },
-  hard:   { label: 'Hard',   sub: 'Tricky',   color: '#ef4444' },
-  expert: { label: 'Expert', sub: 'Brutal',   color: '#6c5ce7' },
-};
-
 export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmount: () => void } {
   const state = useStore.getState();
-  const today = todayUtc();
-  const dow = new Date(today + 'T00:00:00Z').getUTCDay();
-  const todayDifficulty = difficultyForDayOfWeek(dow);
-
   const visitorStats = useVisitorStore.getState();
   const isAnonymous = !!state.user?.is_anonymous;
   const isGuest = !state.user || isAnonymous;
@@ -99,39 +86,23 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
       <!-- Continue game banner (filled dynamically) -->
       <div id="continue-banner" style="display:none"></div>
 
-      <!-- Daily Puzzle card -->
-      <div class="daily-card-v2">
-        <div class="daily-card-v2-head">
-          <div>
-            <div class="daily-card-v2-title">${ic.daily(18)} Daily Puzzle</div>
-            <div class="daily-card-v2-date">${today} · Ready to play!</div>
-          </div>
-          <span class="daily-difficulty">${todayDifficulty}</span>
-        </div>
-        <div class="daily-card-v2-actions">
-          <button class="btn daily-card-v2-btn" id="play-daily">${ic.play(16)} Play Daily</button>
-          <button class="btn btn--secondary daily-card-v2-lb" id="daily-lb">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
-            Ranks
-          </button>
-        </div>
+      <!-- Play Mode entry -->
+      <div class="playmode-card-v2">
+        <span class="playmode-card-v2-icon">${ic.gamepad(24)}</span>
+        <div class="playmode-card-v2-title">Play Mode</div>
+        <div class="playmode-card-v2-sub">เลือกโหมดที่อยากเล่น</div>
+        <button class="btn playmode-card-v2-btn" id="enter-play-mode">${ic.play(16)} Enter Play Mode</button>
       </div>
 
-      <!-- Practice -->
-      <div class="home-section-label">PRACTICE</div>
-      <div class="practice-grid-v2">
-        ${Object.entries(PRACTICE_META).map(([key, meta]) => `
-          <button class="practice-card-v2" data-practice="${key}">
-            <span class="practice-card-v2-icon" style="color:${meta.color}">
-              ${key === 'easy' ? ic.easy(22) : key === 'medium' ? ic.medium(22) : key === 'hard' ? ic.hard(22) : ic.expert(22)}
-            </span>
-            <div class="practice-card-v2-labels">
-              <span class="practice-card-v2-name">${meta.label}</span>
-              <span class="practice-card-v2-sub">${meta.sub}</span>
-            </div>
-          </button>
-        `).join('')}
-      </div>
+      <!-- Practice entry -->
+      <button class="pm-row" id="open-practice">
+        <span class="pm-row-icon">${ic.practice(22)}</span>
+        <div class="pm-row-body">
+          <span class="pm-row-title">Practice</span>
+          <span class="pm-row-sub">Choose your own difficulty</span>
+        </div>
+        <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
+      </button>
 
       <!-- Community -->
       <div class="card live-stats-card">
@@ -183,11 +154,8 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     ${bottomNavHTML('home')}
   `;
 
-  root.querySelector('#play-daily')?.addEventListener('click', props.onPlayDaily);
-  root.querySelector('#daily-lb')?.addEventListener('click', props.onLeaderboard);
-  root.querySelectorAll('[data-practice]').forEach(btn => {
-    btn.addEventListener('click', () => props.onPlayPractice((btn as HTMLElement).dataset.practice!));
-  });
+  root.querySelector('#enter-play-mode')?.addEventListener('click', props.onEnterPlayMode);
+  root.querySelector('#open-practice')?.addEventListener('click', props.onOpenPractice);
   wireBottomNav(root, props.nav, 'home');
   root.querySelector('#user-badge')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#save-progress')?.addEventListener('click', props.onAuthAction);

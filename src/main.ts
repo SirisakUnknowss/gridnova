@@ -11,6 +11,8 @@ import { generatePuzzle, generateDailyPuzzle } from './engine/generator';
 import type { Difficulty } from './engine/types';
 import { todayUtc } from './lib/format';
 import { mountHomeView } from './ui/views/home';
+import { mountPlayModeView } from './ui/views/play-mode';
+import { mountPracticeView } from './ui/views/practice';
 import { mountGameView, type GameResult } from './ui/views/game';
 import { showWinModal } from './ui/views/win-modal';
 import { showShareModal } from './ui/views/share-modal';
@@ -183,7 +185,7 @@ function playPracticeResume(saved: GameInProgress) {
     stage,
     resume: saved,
     onWin: (result) => handleWin(result),
-    onExit: showHome,
+    onExit: showPractice,
     onNewGame: () => void playPractice(level),
   });
   currentUnmount = view.unmount;
@@ -192,10 +194,9 @@ function playPracticeResume(saved: GameInProgress) {
 function showHome() {
   clearView();
   const view = mountHomeView(root, {
-    onPlayDaily: playDaily,
-    onPlayPractice: (level) => playPractice(level as Difficulty),
+    onEnterPlayMode: showPlayMode,
+    onOpenPractice: showPractice,
     onAuthAction: openAuthAction,
-    onLeaderboard: showLeaderboard,
     onContinue: continueSavedGame,
     nav: navCb,
   });
@@ -206,6 +207,27 @@ function showHome() {
   if (questList) {
     void renderDailyQuests(questList, { onToast: toast });
   }
+}
+
+function showPlayMode() {
+  clearView();
+  const view = mountPlayModeView(root, {
+    onBack: showHome,
+    onPlayDaily: playDaily,
+    onLeaderboard: showLeaderboard,
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function showPractice() {
+  clearView();
+  const view = mountPracticeView(root, {
+    onBack: showHome,
+    onPlayPractice: (level) => playPractice(level as Difficulty),
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
 }
 
 function showLeaderboard() {
@@ -370,7 +392,7 @@ async function playPractice(level: Difficulty) {
     solution: puzzleData.solution,
     stage,
     onWin: (result) => handleWin(result),
-    onExit: showHome,
+    onExit: showPractice,
     onNewGame: () => void playPractice(level),
   });
   currentUnmount = view.unmount;
