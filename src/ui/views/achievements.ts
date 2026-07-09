@@ -6,6 +6,8 @@ import { supabase } from '@lib/supabase';
 import { useStore } from '@state/store';
 import { escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
+import badgeIcon from '@images/badge.png';
+import trophyIcon from '@images/trophy-cup.png';
 
 interface AchievementDef {
   id: string;
@@ -26,7 +28,8 @@ interface UserAchievement {
   unlocked_at: string;
 }
 
-const BADGE_GROUP_META: Record<string, { label: string; emoji: string }> = {
+// icon: real PNG asset (preferred). emoji: temporary fallback until real art exists.
+const BADGE_GROUP_META: Record<string, { label: string; emoji: string; icon?: string }> = {
   play:        { label: 'Play',        emoji: '🎮' },
   player:      { label: 'Play',        emoji: '🎮' }, // legacy fallback
   daily:       { label: 'Daily',       emoji: '📅' },
@@ -34,11 +37,17 @@ const BADGE_GROUP_META: Record<string, { label: string; emoji: string }> = {
   flawless:    { label: 'Flawless',    emoji: '⭐' },
   speedster:   { label: 'Speedster',   emoji: '⚡' },
   pure:        { label: 'Pure',        emoji: '🧠' },
-  leaderboard: { label: 'Leaderboard', emoji: '🏆' },
+  leaderboard: { label: 'Leaderboard', emoji: '🏆', icon: trophyIcon },
   progression: { label: 'Level',       emoji: '📈' },
   quest:       { label: 'Quest',       emoji: '📋' },
-  special:     { label: 'Special',     emoji: '✨' },
+  special:     { label: 'Special',     emoji: '✨', icon: badgeIcon },
 };
+
+function groupIconHtml(meta: { label: string; emoji: string; icon?: string }): string {
+  return meta.icon
+    ? `<img src="${meta.icon}" alt="" class="ach-group-ic-img" />`
+    : `<span>${meta.emoji}</span>`;
+}
 
 const TIER_COLOR: Record<string, string> = {
   bronze:   '#cd7f32',
@@ -373,7 +382,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
           <h1 class="ach-title">
-            <span class="ach-title-ic">🏅</span>
+            <img src="${badgeIcon}" alt="" class="ach-title-ic-img" />
             Medals
           </h1>
           <div style="width:40px;flex:none"></div>
@@ -428,7 +437,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       `<button class="ach-chip${activeGroup === 'all' ? ' on' : ''}" data-cat="all">All</button>`,
       ...groups.map((g) => {
         const m = BADGE_GROUP_META[g] ?? { label: g, emoji: '📌' };
-        return `<button class="ach-chip${activeGroup === g ? ' on' : ''}" data-cat="${escapeHtml(g)}">${m.emoji} ${m.label}</button>`;
+        return `<button class="ach-chip${activeGroup === g ? ' on' : ''}" data-cat="${escapeHtml(g)}">${groupIconHtml(m)} ${m.label}</button>`;
       }),
     ].join('');
     filterEl.querySelectorAll<HTMLButtonElement>('.ach-chip').forEach((btn) => {
@@ -490,7 +499,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
               ${progressHtml}
             </div>
             <span class="ach-badge-coin next">${SVG_COIN}${nextItem.reward_coin}</span>
-          </div>` : `<div class="ach-badge-maxed">🏆 Max level!</div>`}
+          </div>` : `<div class="ach-badge-maxed"><img src="${trophyIcon}" alt="" class="ach-badge-maxed-ic" /> Max level!</div>`}
       </div>
     `;
   }
@@ -498,12 +507,10 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   function renderFlatCard(d: AchievementDef): string {
     const isUnlocked = unlocked.has(d.id);
     const isNew = newlyUnlocked.has(d.id);
-    const color = TIER_COLOR[d.tier] ?? '#888';
     return `
       <div class="ach-row ${isUnlocked ? 'unlocked' : 'locked'}${isNew ? ' new-unlock' : ''}">
-        <div class="ach-row-ic${isUnlocked ? '' : ' ach-row-ic--locked'}"
-             style="${isUnlocked ? `color:${color}` : ''}">
-          ${isUnlocked ? '🏅' : '🔒'}
+        <div class="ach-row-ic${isUnlocked ? '' : ' ach-row-ic--locked'}">
+          <img src="${badgeIcon}" alt="" class="ach-row-ic-img" />
         </div>
         <div class="ach-row-body">
           <div class="ach-row-name">${escapeHtml(d.name)}</div>
@@ -574,7 +581,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
 
       return `
         <div class="ach-group-head">
-          <span class="ach-group-label">${meta.emoji} ${meta.label}</span>
+          <span class="ach-group-label">${groupIconHtml(meta)} ${meta.label}</span>
           <span class="ach-group-count${allDone ? ' done' : ''}">${doneInGroup} / ${items.length}</span>
         </div>
         <div class="ach-list">${tieredHtml}${flatHtml}</div>
