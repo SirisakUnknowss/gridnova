@@ -1296,7 +1296,9 @@ h3 { font-size: 18px; }
   border-bottom: 1px solid var(--app-border);
 }
 .quest-row:last-child { border-bottom: none; }
-.quest-icon { font-size: 22px; text-align: center; }
+.quest-icon { font-size: 22px; text-align: center; width: 28px; flex: none; display: flex; align-items: center; justify-content: center; }
+.rank-badge-img { width: 26px; height: 26px; object-fit: contain; }
+.rank-badge-num { font-size: 13px; font-weight: 700; color: var(--app-text-secondary); }
 .quest-title { font-size: 14px; color: var(--app-text); margin-bottom: 6px; }
 .quest-bar {
   height: 6px;

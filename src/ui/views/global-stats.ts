@@ -5,6 +5,17 @@ import * as api from '@lib/api';
 import { formatTime, formatNumber, escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
+import rank1Icon from '@images/1st-prize.png';
+import rank2Icon from '@images/2nd-place.png';
+import rank3Icon from '@images/3rd-place.png';
+
+const RANK_ICONS = [rank1Icon, rank2Icon, rank3Icon];
+
+function rankBadgeHtml(i: number): string {
+  return RANK_ICONS[i]
+    ? `<img src="${RANK_ICONS[i]}" alt="" class="rank-badge-img" />`
+    : `<span class="rank-badge-num">${i + 1}</span>`;
+}
 
 export interface GlobalStatsProps {
   onBack: () => void;
@@ -84,7 +95,7 @@ export function mountGlobalStatsView(root: HTMLElement, props: GlobalStatsProps)
             ? '<p style="opacity:0.6;font-size:13px;">No records yet.</p>'
             : records.fastest.map((r: any, i: number) => `
               <div class="quest-row">
-                <div class="quest-icon" style="font-size:18px;">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]}</div>
+                <div class="quest-icon">${rankBadgeHtml(i)}</div>
                 <div class="quest-body">
                   <div class="quest-title">${playerName(r)}</div>
                   <div class="quest-meta"><span>${formatTime(r.time_seconds)}</span><span style="opacity:0.6;">${escapeHtml(r.level ?? '')}</span></div>
@@ -99,7 +110,7 @@ export function mountGlobalStatsView(root: HTMLElement, props: GlobalStatsProps)
             ? '<p style="opacity:0.6;font-size:13px;">No records yet.</p>'
             : records.highest.map((r: any, i: number) => `
               <div class="quest-row">
-                <div class="quest-icon" style="font-size:18px;">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]}</div>
+                <div class="quest-icon">${rankBadgeHtml(i)}</div>
                 <div class="quest-body">
                   <div class="quest-title">${playerName(r)}</div>
                   <div class="quest-meta"><span>${formatNumber(r.score)} pts</span><span style="opacity:0.6;">${escapeHtml(r.level ?? '')}</span></div>
