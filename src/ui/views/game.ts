@@ -24,6 +24,7 @@ export interface GameViewProps {
   onWin: (result: GameResult) => void;
   onExit: () => void;
   onNewGame?: () => void;
+  onLose?: () => void;
 }
 
 export interface GameResult {
@@ -537,6 +538,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     void deleteGame(gameId);
     const overlay = root.querySelector('#gameover-overlay') as HTMLElement;
     overlay.classList.add('open');
+    props.onLose?.();
   }
 
   // Hamburger menu overlay

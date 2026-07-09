@@ -89,6 +89,27 @@ export async function spendCoins(amount: number, reason: string, metadata?: Reco
   return data as { ok: boolean; balance?: number; reason?: string };
 }
 
+// === Random Mode ===
+export async function getRandomModeStats(): Promise<{ current_win_streak: number; longest_win_streak: number; total_played: number } | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data, error } = await supabase
+    .from('random_mode_stats')
+    .select('current_win_streak, longest_win_streak, total_played')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function recordRandomModeResult(won: boolean): Promise<{ current_win_streak: number; longest_win_streak: number; total_played: number } | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data, error } = await supabase.rpc('record_random_mode_result', { p_user_id: user.id, p_won: won });
+  if (error) throw error;
+  return data;
+}
+
 export async function getWallet() {
   const { data, error } = await supabase
     .from('user_wallet')

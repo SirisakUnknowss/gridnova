@@ -5,11 +5,13 @@ import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../compon
 import { ic } from '@ui/icons';
 import { todayUtc } from '@lib/format';
 import { difficultyForDayOfWeek } from '@engine/generator';
+import { getRandomModeStats } from '@lib/api';
 
 export interface PlayModeViewProps {
   onBack: () => void;
   onPlayDaily: () => void;
   onLeaderboard: () => void;
+  onPlayRandom: () => void;
   nav: BottomNavCallbacks;
 }
 
@@ -50,13 +52,14 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
           <span class="pm-soon-badge">Soon</span>
         </div>
 
-        <div class="pm-row pm-row--soon">
-          <span class="pm-row-icon pm-row-icon--soon">${ic.dice(22)}</span>
+        <div class="pm-row" id="pm-random">
+          <span class="pm-row-icon pm-row-icon--random">${ic.dice(22)}</span>
           <div class="pm-row-body">
             <span class="pm-row-title">Random Mode</span>
             <span class="pm-row-sub">One tap — random difficulty</span>
           </div>
-          <span class="pm-soon-badge">Soon</span>
+          <span class="pm-streak-badge" id="pm-random-streak" style="display:none">${ic.streak(13)} <span id="pm-random-streak-n">0</span></span>
+          <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
         </div>
       </div>
     </section>
@@ -69,7 +72,18 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
     e.stopPropagation();
     props.onLeaderboard();
   });
+  root.querySelector('#pm-random')?.addEventListener('click', props.onPlayRandom);
   wireBottomNav(root, props.nav, 'home');
+
+  void getRandomModeStats().then((stats) => {
+    if (!stats || stats.current_win_streak <= 0) return;
+    const badge = root.querySelector<HTMLElement>('#pm-random-streak');
+    const n = root.querySelector('#pm-random-streak-n');
+    if (badge && n) {
+      n.textContent = String(stats.current_win_streak);
+      badge.style.display = '';
+    }
+  }).catch(() => {});
 
   return { unmount() {} };
 }

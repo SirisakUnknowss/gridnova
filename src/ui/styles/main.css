@@ -865,6 +865,12 @@ h3 { font-size: 18px; }
   color: var(--app-text-secondary); background: #f0eef8;
   padding: 4px 9px; border-radius: 999px;
 }
+.pm-row-icon--random { background: #fff1e6; color: #f59e0b; }
+.pm-streak-badge {
+  flex: none; font-size: 12px; font-weight: 700; color: #f59e0b;
+  background: #fff1e6; padding: 4px 9px; border-radius: 999px;
+  display: flex; align-items: center; gap: 3px;
+}
 
 /* Practice view (standalone page) */
 .view--practice, .view--play-mode { gap: 14px; padding-top: 0; }

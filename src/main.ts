@@ -9,6 +9,7 @@ import { initAnalytics, track, identify, captureError, Events } from './lib/anal
 import { migrateFromV1, shouldMigrate } from './lib/migrate-v1';
 import { generatePuzzle, generateDailyPuzzle } from './engine/generator';
 import type { Difficulty } from './engine/types';
+import { DIFFICULTIES } from './engine/types';
 import { todayUtc } from './lib/format';
 import { mountHomeView } from './ui/views/home';
 import { mountPlayModeView } from './ui/views/play-mode';
@@ -215,6 +216,7 @@ function showPlayMode() {
     onBack: showHome,
     onPlayDaily: playDaily,
     onLeaderboard: showLeaderboard,
+    onPlayRandom: playRandom,
     nav: navCb,
   });
   currentUnmount = view.unmount;
@@ -394,6 +396,31 @@ async function playPractice(level: Difficulty) {
     onWin: (result) => handleWin(result),
     onExit: showPractice,
     onNewGame: () => void playPractice(level),
+  });
+  currentUnmount = view.unmount;
+}
+
+function playRandom() {
+  const level = DIFFICULTIES[Math.floor(Math.random() * DIFFICULTIES.length)];
+  const seed = `random:${Date.now()}:${Math.floor(Math.random() * 1_000_000)}`;
+  const puzzleData = generatePuzzle({ difficulty: level, seed });
+  track(Events.PRACTICE_STARTED, { level, mode: 'random' });
+
+  clearView();
+  const view = mountGameView(root, {
+    mode: 'practice',
+    difficulty: level,
+    puzzle: puzzleData.puzzle,
+    solution: puzzleData.solution,
+    onWin: (result) => {
+      handleWin(result);
+      void api.recordRandomModeResult(true).catch(() => {});
+    },
+    onLose: () => {
+      void api.recordRandomModeResult(false).catch(() => {});
+    },
+    onExit: showPlayMode,
+    onNewGame: () => playRandom(),
   });
   currentUnmount = view.unmount;
 }
