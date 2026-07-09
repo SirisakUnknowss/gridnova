@@ -84,6 +84,17 @@ interface ProgressInputs {
   hardBest: number;
   hardExpertBest: number;
   expertBest: number;
+  // Pure (no-hint by difficulty)
+  pureEasyCount: number;
+  pureMediumCount: number;
+  pureHardCount: number;
+  pureExpertCount: number;
+  // Leaderboard rank counts
+  lbTop100: number;
+  lbTop50: number;
+  lbTop10: number;
+  lbTop3: number;
+  lbTop1: number;
 }
 
 const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
@@ -207,6 +218,28 @@ const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   ACH_FLAWLESS_M5_L3: ['perfectExpert',  5],
   ACH_FLAWLESS_M5_L4: ['perfectExpert', 10],
   ACH_FLAWLESS_M5_L5: ['perfectExpert', 15],
+  // Legacy pure (no-hint by difficulty)
+  ACH_PURE_L1: ['pureEasyCount',    1],
+  ACH_PURE_L2: ['pureEasyCount',    5],
+  ACH_PURE_L3: ['pureMediumCount',  1],
+  ACH_PURE_L4: ['pureMediumCount',  5],
+  ACH_PURE_L5: ['pureHardCount',    1],
+  ACH_PURE_L6: ['pureHardCount',    5],
+  ACH_PURE_L7: ['pureExpertCount',  1],
+  ACH_PURE_L8: ['pureExpertCount',  3],
+  ACH_PURE_L9: ['pureExpertCount',  5],
+  // ACH_PURE_L10 is a one-shot boolean (expert, no hint, no mistake) — no count progress
+  // Legacy leaderboard
+  ACH_LB_L1:  ['lbTop100', 1],
+  ACH_LB_L2:  ['lbTop100', 5],
+  ACH_LB_L3:  ['lbTop50',  1],
+  ACH_LB_L4:  ['lbTop50',  3],
+  ACH_LB_L5:  ['lbTop10',  1],
+  ACH_LB_L6:  ['lbTop10',  3],
+  ACH_LB_L7:  ['lbTop3',   1],
+  ACH_LB_L8:  ['lbTop3',   3],
+  ACH_LB_L9:  ['lbTop1',   1],
+  ACH_LB_L10: ['lbTop1',   5],
   // Legacy progression
   ACH_PROG_L1:  ['level',   3],
   ACH_PROG_L2:  ['level',   5],
@@ -328,6 +361,8 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     maxPerfectRun: 0, maxPureRun: 0,
     perfectPractice: 0, perfectEasy: 0, perfectHard: 0, perfectExpert: 0,
     easyBest: 999999, mediumBest: 999999, hardBest: 999999, hardExpertBest: 999999, expertBest: 999999,
+    pureEasyCount: 0, pureMediumCount: 0, pureHardCount: 0, pureExpertCount: 0,
+    lbTop100: 0, lbTop50: 0, lbTop10: 0, lbTop3: 0, lbTop1: 0,
   };
 
   root.innerHTML = `
@@ -567,6 +602,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         dailyEasy, dailyHard, dailyPerfect, dailyNoHint,
         streakStats, distinctDaysRes,
         bestEasy, bestMedium, bestHard, bestHardExpert, bestExpert,
+        pureEasy, pureMedium, pureHard, pureExpert, lbStats,
       ] = await Promise.all([
         api.getAchievementDefinitions(),
         api.getUserAchievements().catch(() => []),
@@ -594,6 +630,13 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         userId ? supabase.from('user_game_history').select('time_seconds').eq('user_id', userId).in('level', ['hard', 'hard-expert']).order('time_seconds').limit(1).maybeSingle() : Promise.resolve({ data: null }),
         userId ? supabase.from('user_game_history').select('time_seconds').eq('user_id', userId).eq('level', 'hard-expert').order('time_seconds').limit(1).maybeSingle() : Promise.resolve({ data: null }),
         userId ? supabase.from('user_game_history').select('time_seconds').eq('user_id', userId).eq('level', 'expert').order('time_seconds').limit(1).maybeSingle() : Promise.resolve({ data: null }),
+        // Pure (no-hint) counts by difficulty
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('hints_used', 0).eq('level', 'easy') : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('hints_used', 0).eq('level', 'medium') : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('hints_used', 0).eq('level', 'hard') : P0,
+        userId ? supabase.from('user_game_history').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('hints_used', 0).eq('level', 'expert') : P0,
+        // Leaderboard rank stats via RPC
+        userId ? supabase.rpc('get_leaderboard_rank_stats', { p_user_id: userId }).single() : Promise.resolve({ data: null }),
       ]);
 
       defs = (defList ?? []) as AchievementDef[];
@@ -641,6 +684,15 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         hardBest:        (bestHard as any)?.data?.time_seconds        ?? 999999,
         hardExpertBest:  (bestHardExpert as any)?.data?.time_seconds  ?? 999999,
         expertBest:      (bestExpert as any)?.data?.time_seconds      ?? 999999,
+        pureEasyCount:   (pureEasy as any)?.count    ?? 0,
+        pureMediumCount: (pureMedium as any)?.count  ?? 0,
+        pureHardCount:   (pureHard as any)?.count    ?? 0,
+        pureExpertCount: (pureExpert as any)?.count  ?? 0,
+        lbTop100: (lbStats as any)?.data?.top100 ?? 0,
+        lbTop50:  (lbStats as any)?.data?.top50  ?? 0,
+        lbTop10:  (lbStats as any)?.data?.top10  ?? 0,
+        lbTop3:   (lbStats as any)?.data?.top3   ?? 0,
+        lbTop1:   (lbStats as any)?.data?.top1   ?? 0,
       };
       loading = false;
       render();
