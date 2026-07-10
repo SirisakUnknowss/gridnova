@@ -6,8 +6,17 @@ import { supabase } from '@lib/supabase';
 import { useStore } from '@state/store';
 import { escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
+import { ic } from '@ui/icons';
 import badgeIcon from '@images/badge.png';
 import trophyIcon from '@images/trophy-cup.png';
+import levelUpIcon from '@images/level-up.png';
+import questIcon from '@images/quest.png';
+import playIcon from '@images/play-medal.png';
+import dailyIcon from '@images/daily-medal.png';
+import streakIcon from '@images/streak-medal.png';
+import flawlessIcon from '@images/flawless-medal.png';
+import speedsterIcon from '@images/speedster-medal.png';
+import pureIcon from '@images/clean-solve.png';
 
 interface AchievementDef {
   id: string;
@@ -30,17 +39,17 @@ interface UserAchievement {
 
 // icon: real PNG asset (preferred). emoji: temporary fallback until real art exists.
 const BADGE_GROUP_META: Record<string, { label: string; emoji: string; icon?: string }> = {
-  play:        { label: 'Play',        emoji: '🎮' },
-  player:      { label: 'Play',        emoji: '🎮' }, // legacy fallback
-  daily:       { label: 'Daily',       emoji: '📅' },
-  streak:      { label: 'Streak',      emoji: '🔥' },
-  flawless:    { label: 'Flawless',    emoji: '⭐' },
-  speedster:   { label: 'Speedster',   emoji: '⚡' },
-  pure:        { label: 'Pure',        emoji: '🧠' },
+  play: { label: 'Play', emoji: '🎮', icon: playIcon },
+  player: { label: 'Play', emoji: '🎮', icon: playIcon }, // legacy fallback
+  daily: { label: 'Daily', emoji: '📅', icon: dailyIcon },
+  streak: { label: 'Streak', emoji: '🔥', icon: streakIcon },
+  flawless: { label: 'Flawless', emoji: '⭐', icon: flawlessIcon },
+  speedster: { label: 'Speedster', emoji: '⚡', icon: speedsterIcon },
+  pure: { label: 'Clean Solve', emoji: '🧠', icon: pureIcon },
   leaderboard: { label: 'Leaderboard', emoji: '🏆', icon: trophyIcon },
-  progression: { label: 'Level',       emoji: '📈' },
-  quest:       { label: 'Quest',       emoji: '📋' },
-  special:     { label: 'Special',     emoji: '✨', icon: badgeIcon },
+  progression: { label: 'Level', emoji: '📈', icon: levelUpIcon },
+  quest: { label: 'Quest', emoji: '📋', icon: questIcon },
+  special: { label: 'Special', emoji: '✨', icon: badgeIcon },
 };
 
 function groupIconHtml(meta: { label: string; emoji: string; icon?: string }): string {
@@ -50,11 +59,11 @@ function groupIconHtml(meta: { label: string; emoji: string; icon?: string }): s
 }
 
 const TIER_COLOR: Record<string, string> = {
-  bronze:   '#cd7f32',
-  silver:   '#8b7bf0',
-  gold:     '#f5a623',
+  bronze: '#cd7f32',
+  silver: '#8b7bf0',
+  gold: '#f5a623',
   platinum: '#4fc3f7',
-  diamond:  '#e040fb',
+  diamond: '#e040fb',
 };
 
 interface ProgressInputs {
@@ -108,213 +117,213 @@ interface ProgressInputs {
 
 const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   // Play M1: total games
-  ACH_PLAY_M1_L1: ['gameCount',    1],
-  ACH_PLAY_M1_L2: ['gameCount',   10],
-  ACH_PLAY_M1_L3: ['gameCount',   50],
-  ACH_PLAY_M1_L4: ['gameCount',  200],
-  ACH_PLAY_M1_L5: ['gameCount',  500],
+  ACH_PLAY_M1_L1: ['gameCount', 1],
+  ACH_PLAY_M1_L2: ['gameCount', 10],
+  ACH_PLAY_M1_L3: ['gameCount', 50],
+  ACH_PLAY_M1_L4: ['gameCount', 200],
+  ACH_PLAY_M1_L5: ['gameCount', 500],
   // Play M2: practice
-  ACH_PLAY_M2_L1: ['practiceCount',    1],
-  ACH_PLAY_M2_L2: ['practiceCount',   10],
-  ACH_PLAY_M2_L3: ['practiceCount',   50],
-  ACH_PLAY_M2_L4: ['practiceCount',  200],
-  ACH_PLAY_M2_L5: ['practiceCount',  500],
+  ACH_PLAY_M2_L1: ['practiceCount', 1],
+  ACH_PLAY_M2_L2: ['practiceCount', 10],
+  ACH_PLAY_M2_L3: ['practiceCount', 50],
+  ACH_PLAY_M2_L4: ['practiceCount', 200],
+  ACH_PLAY_M2_L5: ['practiceCount', 500],
   // Play M3: easy
-  ACH_PLAY_M3_L1: ['easyCount',   1],
-  ACH_PLAY_M3_L2: ['easyCount',   5],
-  ACH_PLAY_M3_L3: ['easyCount',  20],
+  ACH_PLAY_M3_L1: ['easyCount', 1],
+  ACH_PLAY_M3_L2: ['easyCount', 5],
+  ACH_PLAY_M3_L3: ['easyCount', 20],
   ACH_PLAY_M3_L4: ['easyCount', 100],
   ACH_PLAY_M3_L5: ['easyCount', 300],
   // Play M4: hard
-  ACH_PLAY_M4_L1: ['hardCount',   1],
-  ACH_PLAY_M4_L2: ['hardCount',   5],
-  ACH_PLAY_M4_L3: ['hardCount',  20],
+  ACH_PLAY_M4_L1: ['hardCount', 1],
+  ACH_PLAY_M4_L2: ['hardCount', 5],
+  ACH_PLAY_M4_L3: ['hardCount', 20],
   ACH_PLAY_M4_L4: ['hardCount', 100],
   ACH_PLAY_M4_L5: ['hardCount', 300],
   // Play M5: expert
-  ACH_PLAY_M5_L1: ['expertCount',   1],
-  ACH_PLAY_M5_L2: ['expertCount',   5],
-  ACH_PLAY_M5_L3: ['expertCount',  20],
+  ACH_PLAY_M5_L1: ['expertCount', 1],
+  ACH_PLAY_M5_L2: ['expertCount', 5],
+  ACH_PLAY_M5_L3: ['expertCount', 20],
   ACH_PLAY_M5_L4: ['expertCount', 100],
   ACH_PLAY_M5_L5: ['expertCount', 300],
   // Daily M1: total daily
-  ACH_DAILY_M1_L1: ['dailyCount',   1],
-  ACH_DAILY_M1_L2: ['dailyCount',  10],
-  ACH_DAILY_M1_L3: ['dailyCount',  30],
+  ACH_DAILY_M1_L1: ['dailyCount', 1],
+  ACH_DAILY_M1_L2: ['dailyCount', 10],
+  ACH_DAILY_M1_L3: ['dailyCount', 30],
   ACH_DAILY_M1_L4: ['dailyCount', 100],
   ACH_DAILY_M1_L5: ['dailyCount', 365],
   // Daily M2: daily easy
-  ACH_DAILY_M2_L1: ['dailyEasyCount',   1],
-  ACH_DAILY_M2_L2: ['dailyEasyCount',   5],
-  ACH_DAILY_M2_L3: ['dailyEasyCount',  20],
-  ACH_DAILY_M2_L4: ['dailyEasyCount',  50],
+  ACH_DAILY_M2_L1: ['dailyEasyCount', 1],
+  ACH_DAILY_M2_L2: ['dailyEasyCount', 5],
+  ACH_DAILY_M2_L3: ['dailyEasyCount', 20],
+  ACH_DAILY_M2_L4: ['dailyEasyCount', 50],
   ACH_DAILY_M2_L5: ['dailyEasyCount', 200],
   // Daily M3: daily hard
-  ACH_DAILY_M3_L1: ['dailyHardCount',   1],
-  ACH_DAILY_M3_L2: ['dailyHardCount',   5],
-  ACH_DAILY_M3_L3: ['dailyHardCount',  20],
-  ACH_DAILY_M3_L4: ['dailyHardCount',  50],
+  ACH_DAILY_M3_L1: ['dailyHardCount', 1],
+  ACH_DAILY_M3_L2: ['dailyHardCount', 5],
+  ACH_DAILY_M3_L3: ['dailyHardCount', 20],
+  ACH_DAILY_M3_L4: ['dailyHardCount', 50],
   ACH_DAILY_M3_L5: ['dailyHardCount', 200],
   // Daily M4: daily no mistakes
-  ACH_DAILY_M4_L1: ['dailyPerfectCount',   1],
-  ACH_DAILY_M4_L2: ['dailyPerfectCount',   5],
-  ACH_DAILY_M4_L3: ['dailyPerfectCount',  20],
-  ACH_DAILY_M4_L4: ['dailyPerfectCount',  50],
+  ACH_DAILY_M4_L1: ['dailyPerfectCount', 1],
+  ACH_DAILY_M4_L2: ['dailyPerfectCount', 5],
+  ACH_DAILY_M4_L3: ['dailyPerfectCount', 20],
+  ACH_DAILY_M4_L4: ['dailyPerfectCount', 50],
   ACH_DAILY_M4_L5: ['dailyPerfectCount', 100],
   // Daily M5: daily no hints
-  ACH_DAILY_M5_L1: ['dailyNoHintCount',   1],
-  ACH_DAILY_M5_L2: ['dailyNoHintCount',   5],
-  ACH_DAILY_M5_L3: ['dailyNoHintCount',  20],
-  ACH_DAILY_M5_L4: ['dailyNoHintCount',  50],
+  ACH_DAILY_M5_L1: ['dailyNoHintCount', 1],
+  ACH_DAILY_M5_L2: ['dailyNoHintCount', 5],
+  ACH_DAILY_M5_L3: ['dailyNoHintCount', 20],
+  ACH_DAILY_M5_L4: ['dailyNoHintCount', 50],
   ACH_DAILY_M5_L5: ['dailyNoHintCount', 100],
   // Streak M1: current streak
-  ACH_STREAK_M1_L1: ['currentStreak',  3],
-  ACH_STREAK_M1_L2: ['currentStreak',  7],
+  ACH_STREAK_M1_L1: ['currentStreak', 3],
+  ACH_STREAK_M1_L2: ['currentStreak', 7],
   ACH_STREAK_M1_L3: ['currentStreak', 14],
   ACH_STREAK_M1_L4: ['currentStreak', 30],
   ACH_STREAK_M1_L5: ['currentStreak', 60],
   // Streak M2: longest streak
-  ACH_STREAK_M2_L1: ['longestStreak',   7],
-  ACH_STREAK_M2_L2: ['longestStreak',  14],
-  ACH_STREAK_M2_L3: ['longestStreak',  30],
+  ACH_STREAK_M2_L1: ['longestStreak', 7],
+  ACH_STREAK_M2_L2: ['longestStreak', 14],
+  ACH_STREAK_M2_L3: ['longestStreak', 30],
   ACH_STREAK_M2_L4: ['longestStreak', 100],
   ACH_STREAK_M2_L5: ['longestStreak', 365],
   // Streak M3: distinct days
-  ACH_STREAK_M3_L1: ['distinctDays',   7],
-  ACH_STREAK_M3_L2: ['distinctDays',  30],
-  ACH_STREAK_M3_L3: ['distinctDays',  90],
+  ACH_STREAK_M3_L1: ['distinctDays', 7],
+  ACH_STREAK_M3_L2: ['distinctDays', 30],
+  ACH_STREAK_M3_L3: ['distinctDays', 90],
   ACH_STREAK_M3_L4: ['distinctDays', 180],
   ACH_STREAK_M3_L5: ['distinctDays', 365],
   // Streak M4: max perfect run
-  ACH_STREAK_M4_L1: ['maxPerfectRun',  2],
-  ACH_STREAK_M4_L2: ['maxPerfectRun',  5],
+  ACH_STREAK_M4_L1: ['maxPerfectRun', 2],
+  ACH_STREAK_M4_L2: ['maxPerfectRun', 5],
   ACH_STREAK_M4_L3: ['maxPerfectRun', 10],
   ACH_STREAK_M4_L4: ['maxPerfectRun', 20],
   ACH_STREAK_M4_L5: ['maxPerfectRun', 50],
   // Streak M5: max pure run
-  ACH_STREAK_M5_L1: ['maxPureRun',  2],
-  ACH_STREAK_M5_L2: ['maxPureRun',  5],
+  ACH_STREAK_M5_L1: ['maxPureRun', 2],
+  ACH_STREAK_M5_L2: ['maxPureRun', 5],
   ACH_STREAK_M5_L3: ['maxPureRun', 10],
   ACH_STREAK_M5_L4: ['maxPureRun', 20],
   ACH_STREAK_M5_L5: ['maxPureRun', 50],
   // Flawless M1: total no-mistake wins
-  ACH_FLAWLESS_M1_L1: ['perfectCount',  1],
-  ACH_FLAWLESS_M1_L2: ['perfectCount',  5],
+  ACH_FLAWLESS_M1_L1: ['perfectCount', 1],
+  ACH_FLAWLESS_M1_L2: ['perfectCount', 5],
   ACH_FLAWLESS_M1_L3: ['perfectCount', 10],
   ACH_FLAWLESS_M1_L4: ['perfectCount', 20],
   ACH_FLAWLESS_M1_L5: ['perfectCount', 50],
   // Flawless M2: practice no-mistake
-  ACH_FLAWLESS_M2_L1: ['perfectPractice',  1],
-  ACH_FLAWLESS_M2_L2: ['perfectPractice',  5],
+  ACH_FLAWLESS_M2_L1: ['perfectPractice', 1],
+  ACH_FLAWLESS_M2_L2: ['perfectPractice', 5],
   ACH_FLAWLESS_M2_L3: ['perfectPractice', 10],
   ACH_FLAWLESS_M2_L4: ['perfectPractice', 20],
   ACH_FLAWLESS_M2_L5: ['perfectPractice', 50],
   // Flawless M3: easy no-mistake
-  ACH_FLAWLESS_M3_L1: ['perfectEasy',  1],
-  ACH_FLAWLESS_M3_L2: ['perfectEasy',  5],
+  ACH_FLAWLESS_M3_L1: ['perfectEasy', 1],
+  ACH_FLAWLESS_M3_L2: ['perfectEasy', 5],
   ACH_FLAWLESS_M3_L3: ['perfectEasy', 10],
   ACH_FLAWLESS_M3_L4: ['perfectEasy', 20],
   ACH_FLAWLESS_M3_L5: ['perfectEasy', 50],
   // Flawless M4: hard no-mistake
-  ACH_FLAWLESS_M4_L1: ['perfectHard',  1],
-  ACH_FLAWLESS_M4_L2: ['perfectHard',  3],
-  ACH_FLAWLESS_M4_L3: ['perfectHard',  5],
+  ACH_FLAWLESS_M4_L1: ['perfectHard', 1],
+  ACH_FLAWLESS_M4_L2: ['perfectHard', 3],
+  ACH_FLAWLESS_M4_L3: ['perfectHard', 5],
   ACH_FLAWLESS_M4_L4: ['perfectHard', 10],
   ACH_FLAWLESS_M4_L5: ['perfectHard', 20],
   // Flawless M5: expert no-mistake
-  ACH_FLAWLESS_M5_L1: ['perfectExpert',  1],
-  ACH_FLAWLESS_M5_L2: ['perfectExpert',  3],
-  ACH_FLAWLESS_M5_L3: ['perfectExpert',  5],
+  ACH_FLAWLESS_M5_L1: ['perfectExpert', 1],
+  ACH_FLAWLESS_M5_L2: ['perfectExpert', 3],
+  ACH_FLAWLESS_M5_L3: ['perfectExpert', 5],
   ACH_FLAWLESS_M5_L4: ['perfectExpert', 10],
   ACH_FLAWLESS_M5_L5: ['perfectExpert', 15],
   // Pure M1: easy no-hint
-  ACH_PURE_M1_L1: ['pureEasyCount',  1],
-  ACH_PURE_M1_L2: ['pureEasyCount',  5],
+  ACH_PURE_M1_L1: ['pureEasyCount', 1],
+  ACH_PURE_M1_L2: ['pureEasyCount', 5],
   ACH_PURE_M1_L3: ['pureEasyCount', 10],
   ACH_PURE_M1_L4: ['pureEasyCount', 20],
   ACH_PURE_M1_L5: ['pureEasyCount', 50],
   // Pure M2: medium no-hint
-  ACH_PURE_M2_L1: ['pureMediumCount',  1],
-  ACH_PURE_M2_L2: ['pureMediumCount',  5],
+  ACH_PURE_M2_L1: ['pureMediumCount', 1],
+  ACH_PURE_M2_L2: ['pureMediumCount', 5],
   ACH_PURE_M2_L3: ['pureMediumCount', 10],
   ACH_PURE_M2_L4: ['pureMediumCount', 20],
   ACH_PURE_M2_L5: ['pureMediumCount', 50],
   // Pure M3: hard no-hint
-  ACH_PURE_M3_L1: ['pureHardCount',  1],
-  ACH_PURE_M3_L2: ['pureHardCount',  3],
-  ACH_PURE_M3_L3: ['pureHardCount',  5],
+  ACH_PURE_M3_L1: ['pureHardCount', 1],
+  ACH_PURE_M3_L2: ['pureHardCount', 3],
+  ACH_PURE_M3_L3: ['pureHardCount', 5],
   ACH_PURE_M3_L4: ['pureHardCount', 10],
   ACH_PURE_M3_L5: ['pureHardCount', 20],
   // Pure M4: expert no-hint
-  ACH_PURE_M4_L1: ['pureExpertCount',  1],
-  ACH_PURE_M4_L2: ['pureExpertCount',  3],
-  ACH_PURE_M4_L3: ['pureExpertCount',  5],
+  ACH_PURE_M4_L1: ['pureExpertCount', 1],
+  ACH_PURE_M4_L2: ['pureExpertCount', 3],
+  ACH_PURE_M4_L3: ['pureExpertCount', 5],
   ACH_PURE_M4_L4: ['pureExpertCount', 10],
   ACH_PURE_M4_L5: ['pureExpertCount', 15],
   // ACH_PURE_MASTER is a one-shot boolean (expert, no hint, no mistake) — no count progress, lives under "special"
   // Legacy leaderboard
-  ACH_LB_L1:  ['lbTop100', 1],
-  ACH_LB_L2:  ['lbTop100', 5],
-  ACH_LB_L3:  ['lbTop50',  1],
-  ACH_LB_L4:  ['lbTop50',  3],
-  ACH_LB_L5:  ['lbTop10',  1],
-  ACH_LB_L6:  ['lbTop10',  3],
-  ACH_LB_L7:  ['lbTop3',   1],
-  ACH_LB_L8:  ['lbTop3',   3],
-  ACH_LB_L9:  ['lbTop1',   1],
-  ACH_LB_L10: ['lbTop1',   5],
+  ACH_LB_L1: ['lbTop100', 1],
+  ACH_LB_L2: ['lbTop100', 5],
+  ACH_LB_L3: ['lbTop50', 1],
+  ACH_LB_L4: ['lbTop50', 3],
+  ACH_LB_L5: ['lbTop10', 1],
+  ACH_LB_L6: ['lbTop10', 3],
+  ACH_LB_L7: ['lbTop3', 1],
+  ACH_LB_L8: ['lbTop3', 3],
+  ACH_LB_L9: ['lbTop1', 1],
+  ACH_LB_L10: ['lbTop1', 5],
   // Legacy progression
-  ACH_PROG_L1:  ['level',   3],
-  ACH_PROG_L2:  ['level',   5],
-  ACH_PROG_L3:  ['level',  10],
-  ACH_PROG_L4:  ['level',  20],
-  ACH_PROG_L5:  ['level',  30],
-  ACH_PROG_L6:  ['level',  40],
-  ACH_PROG_L7:  ['level',  50],
-  ACH_PROG_L8:  ['level',  60],
-  ACH_PROG_L9:  ['level',  75],
+  ACH_PROG_L1: ['level', 3],
+  ACH_PROG_L2: ['level', 5],
+  ACH_PROG_L3: ['level', 10],
+  ACH_PROG_L4: ['level', 20],
+  ACH_PROG_L5: ['level', 30],
+  ACH_PROG_L6: ['level', 40],
+  ACH_PROG_L7: ['level', 50],
+  ACH_PROG_L8: ['level', 60],
+  ACH_PROG_L9: ['level', 75],
   ACH_PROG_L10: ['level', 100],
   // Legacy quest
-  ACH_QUEST_L1:  ['questCount',   1],
-  ACH_QUEST_L2:  ['questCount',   5],
-  ACH_QUEST_L3:  ['questCount',  10],
-  ACH_QUEST_L4:  ['questCount',  20],
-  ACH_QUEST_L5:  ['questCount',  30],
-  ACH_QUEST_L6:  ['questCount',  50],
-  ACH_QUEST_L7:  ['questCount',  75],
-  ACH_QUEST_L8:  ['questCount', 100],
-  ACH_QUEST_L9:  ['questCount', 150],
+  ACH_QUEST_L1: ['questCount', 1],
+  ACH_QUEST_L2: ['questCount', 5],
+  ACH_QUEST_L3: ['questCount', 10],
+  ACH_QUEST_L4: ['questCount', 20],
+  ACH_QUEST_L5: ['questCount', 30],
+  ACH_QUEST_L6: ['questCount', 50],
+  ACH_QUEST_L7: ['questCount', 75],
+  ACH_QUEST_L8: ['questCount', 100],
+  ACH_QUEST_L9: ['questCount', 150],
   ACH_QUEST_L10: ['questCount', 200],
   // Speedster (time in seconds — lower is better; progress bar shows best/target inverted)
-  ACH_SPEED_M1_L1: ['easyBest',  300],
-  ACH_SPEED_M1_L2: ['easyBest',  180],
-  ACH_SPEED_M1_L3: ['easyBest',  120],
-  ACH_SPEED_M1_L4: ['easyBest',   90],
-  ACH_SPEED_M1_L5: ['easyBest',   60],
+  ACH_SPEED_M1_L1: ['easyBest', 300],
+  ACH_SPEED_M1_L2: ['easyBest', 180],
+  ACH_SPEED_M1_L3: ['easyBest', 120],
+  ACH_SPEED_M1_L4: ['easyBest', 90],
+  ACH_SPEED_M1_L5: ['easyBest', 60],
   ACH_SPEED_M2_L1: ['mediumBest', 480],
   ACH_SPEED_M2_L2: ['mediumBest', 300],
   ACH_SPEED_M2_L3: ['mediumBest', 180],
   ACH_SPEED_M2_L4: ['mediumBest', 120],
-  ACH_SPEED_M2_L5: ['mediumBest',  90],
-  ACH_SPEED_M3_L1: ['hardBest',  900],
-  ACH_SPEED_M3_L2: ['hardBest',  600],
-  ACH_SPEED_M3_L3: ['hardBest',  420],
-  ACH_SPEED_M3_L4: ['hardBest',  300],
-  ACH_SPEED_M3_L5: ['hardBest',  180],
+  ACH_SPEED_M2_L5: ['mediumBest', 90],
+  ACH_SPEED_M3_L1: ['hardBest', 900],
+  ACH_SPEED_M3_L2: ['hardBest', 600],
+  ACH_SPEED_M3_L3: ['hardBest', 420],
+  ACH_SPEED_M3_L4: ['hardBest', 300],
+  ACH_SPEED_M3_L5: ['hardBest', 180],
   ACH_SPEED_M4_L1: ['hardExpertBest', 1200],
-  ACH_SPEED_M4_L2: ['hardExpertBest',  900],
-  ACH_SPEED_M4_L3: ['hardExpertBest',  600],
-  ACH_SPEED_M4_L4: ['hardExpertBest',  420],
-  ACH_SPEED_M4_L5: ['hardExpertBest',  300],
+  ACH_SPEED_M4_L2: ['hardExpertBest', 900],
+  ACH_SPEED_M4_L3: ['hardExpertBest', 600],
+  ACH_SPEED_M4_L4: ['hardExpertBest', 420],
+  ACH_SPEED_M4_L5: ['hardExpertBest', 300],
   ACH_SPEED_M5_L1: ['expertBest', 1800],
   ACH_SPEED_M5_L2: ['expertBest', 1500],
   ACH_SPEED_M5_L3: ['expertBest', 1080],
-  ACH_SPEED_M5_L4: ['expertBest',  720],
-  ACH_SPEED_M5_L5: ['expertBest',  480],
+  ACH_SPEED_M5_L4: ['expertBest', 720],
+  ACH_SPEED_M5_L5: ['expertBest', 480],
   // Special
-  ACH_RICH:          ['coins',          10000],
-  ACH_THEME_COLLECT: ['themesOwned',        5],
-  ACH_SHOPAHOLIC:    ['inventoryCount',    10],
+  ACH_RICH: ['coins', 10000],
+  ACH_THEME_COLLECT: ['themesOwned', 5],
+  ACH_SHOPAHOLIC: ['inventoryCount', 10],
 };
 
 const TIME_FIELDS = new Set<keyof ProgressInputs>(['easyBest', 'mediumBest', 'hardBest', 'hardExpertBest', 'expertBest']);
@@ -339,8 +348,8 @@ function computeProgress(id: string, i: ProgressInputs): { progress: number; tar
 }
 
 const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
-const SVG_LOCK  = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
-const SVG_COIN  = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6" fill="rgba(255,255,255,.4)"/></svg>`;
+const SVG_LOCK = ic.lock(16);
+const SVG_COIN = ic.coin(16);
 
 function enableDragScroll(el: HTMLElement): void {
   let down = false, startX = 0, startScroll = 0, moved = false;
@@ -395,10 +404,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
           <button class="ach-back" id="ach-back" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <h1 class="ach-title">
-            <img src="${badgeIcon}" alt="" class="ach-title-ic-img" />
-            Medals
-          </h1>
+          <h1 class="ach-title">${ic.badge(24)} Medals</h1>
           <div style="width:40px;flex:none"></div>
         </div>
         <div id="ach-summary"></div>
@@ -411,16 +417,16 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   wireBottomNav(root, props.nav, 'achievements');
 
   const summaryEl = root.querySelector<HTMLElement>('#ach-summary')!;
-  const filterEl  = root.querySelector<HTMLElement>('#ach-filter')!;
-  const bodyEl    = root.querySelector<HTMLElement>('#ach-body')!;
+  const filterEl = root.querySelector<HTMLElement>('#ach-filter')!;
+  const bodyEl = root.querySelector<HTMLElement>('#ach-body')!;
 
   enableDragScroll(filterEl);
 
   function renderSummary() {
     const total = defs.length;
-    const done  = unlocked.size;
-    const pct   = total ? Math.round((done / total) * 100) : 0;
-    const circ  = 175.9;
+    const done = unlocked.size;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    const circ = 175.9;
     const offset = circ - (circ * pct / 100);
     summaryEl.innerHTML = `
       <div class="ach-summary">
@@ -524,7 +530,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     return `
       <div class="ach-row ${isUnlocked ? 'unlocked' : 'locked'}${isNew ? ' new-unlock' : ''}">
         <div class="ach-row-ic${isUnlocked ? '' : ' ach-row-ic--locked'}">
-          <img src="${badgeIcon}" alt="" class="ach-row-ic-img" />
+          ${ic.badge(16)}
         </div>
         <div class="ach-row-body">
           <div class="ach-row-name">${escapeHtml(d.name)}</div>
@@ -532,8 +538,8 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         </div>
         <div class="ach-row-right">
           ${isUnlocked
-            ? `<span class="ach-row-check">${SVG_CHECK}</span>`
-            : `<span class="ach-row-lock">${SVG_LOCK}</span>`}
+        ? `<span class="ach-row-check">${SVG_CHECK}</span>`
+        : `<span class="ach-row-lock">${SVG_LOCK}</span>`}
           ${d.reward_coin ? `<span class="ach-row-pts">${SVG_COIN}${d.reward_coin}</span>` : ''}
         </div>
       </div>
@@ -568,12 +574,12 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
       const allDone = doneInGroup === items.length;
 
       const tiered = items.filter((d) => d.badge_level > 0)
-                          .sort((a, b) => {
-                            const mA = a.badge_mission ?? 1;
-                            const mB = b.badge_mission ?? 1;
-                            if (mA !== mB) return mA - mB;
-                            return a.badge_level - b.badge_level;
-                          });
+        .sort((a, b) => {
+          const mA = a.badge_mission ?? 1;
+          const mB = b.badge_mission ?? 1;
+          if (mA !== mB) return mA - mB;
+          return a.badge_level - b.badge_level;
+        });
       const oneoff = items.filter((d) => d.badge_level === 0);
 
       // Group tiered items by badge_mission
@@ -675,45 +681,45 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         ((distinctDaysRes as any)?.data ?? []).map((r: any) => r.completed_at?.slice(0, 10))
       ).size;
       progressInputs = {
-        gameCount:        (history as any)?.count      ?? 0,
-        dailyCount:       (daily as any)?.count        ?? 0,
-        perfectCount:     (perfect as any)?.count      ?? 0,
-        currentStreak:    state.currentStreak,
-        longestStreak:    state.longestStreak,
+        gameCount: (history as any)?.count ?? 0,
+        dailyCount: (daily as any)?.count ?? 0,
+        perfectCount: (perfect as any)?.count ?? 0,
+        currentStreak: state.currentStreak,
+        longestStreak: state.longestStreak,
         distinctDays,
-        level:            state.level,
-        coins:            state.coins,
-        themesOwned:      ownedIds.filter((id) => id.startsWith('theme_')).length,
-        questCount:       (quests as any)?.count       ?? 0,
-        inventoryCount:   ownedIds.length,
-        practiceCount:    (practice as any)?.count     ?? 0,
-        easyCount:        (easyGames as any)?.count    ?? 0,
-        hardCount:        (hardGames as any)?.count    ?? 0,
-        expertCount:      (expertGames as any)?.count  ?? 0,
-        dailyEasyCount:   (dailyEasy as any)?.count    ?? 0,
-        dailyHardCount:   (dailyHard as any)?.count    ?? 0,
-        dailyPerfectCount:(dailyPerfect as any)?.count ?? 0,
-        dailyNoHintCount: (dailyNoHint as any)?.count  ?? 0,
-        maxPerfectRun:    statsData.max_perfect_run    ?? 0,
-        maxPureRun:       statsData.max_pure_run       ?? 0,
-        perfectPractice:  statsData.perfect_practice   ?? 0,
-        perfectEasy:      statsData.perfect_easy       ?? 0,
-        perfectHard:      statsData.perfect_hard       ?? 0,
-        perfectExpert:    statsData.perfect_expert     ?? 0,
-        easyBest:        (bestEasy as any)?.data?.time_seconds        ?? 999999,
-        mediumBest:      (bestMedium as any)?.data?.time_seconds      ?? 999999,
-        hardBest:        (bestHard as any)?.data?.time_seconds        ?? 999999,
-        hardExpertBest:  (bestHardExpert as any)?.data?.time_seconds  ?? 999999,
-        expertBest:      (bestExpert as any)?.data?.time_seconds      ?? 999999,
-        pureEasyCount:   (pureEasy as any)?.count    ?? 0,
-        pureMediumCount: (pureMedium as any)?.count  ?? 0,
-        pureHardCount:   (pureHard as any)?.count    ?? 0,
-        pureExpertCount: (pureExpert as any)?.count  ?? 0,
+        level: state.level,
+        coins: state.coins,
+        themesOwned: ownedIds.filter((id) => id.startsWith('theme_')).length,
+        questCount: (quests as any)?.count ?? 0,
+        inventoryCount: ownedIds.length,
+        practiceCount: (practice as any)?.count ?? 0,
+        easyCount: (easyGames as any)?.count ?? 0,
+        hardCount: (hardGames as any)?.count ?? 0,
+        expertCount: (expertGames as any)?.count ?? 0,
+        dailyEasyCount: (dailyEasy as any)?.count ?? 0,
+        dailyHardCount: (dailyHard as any)?.count ?? 0,
+        dailyPerfectCount: (dailyPerfect as any)?.count ?? 0,
+        dailyNoHintCount: (dailyNoHint as any)?.count ?? 0,
+        maxPerfectRun: statsData.max_perfect_run ?? 0,
+        maxPureRun: statsData.max_pure_run ?? 0,
+        perfectPractice: statsData.perfect_practice ?? 0,
+        perfectEasy: statsData.perfect_easy ?? 0,
+        perfectHard: statsData.perfect_hard ?? 0,
+        perfectExpert: statsData.perfect_expert ?? 0,
+        easyBest: (bestEasy as any)?.data?.time_seconds ?? 999999,
+        mediumBest: (bestMedium as any)?.data?.time_seconds ?? 999999,
+        hardBest: (bestHard as any)?.data?.time_seconds ?? 999999,
+        hardExpertBest: (bestHardExpert as any)?.data?.time_seconds ?? 999999,
+        expertBest: (bestExpert as any)?.data?.time_seconds ?? 999999,
+        pureEasyCount: (pureEasy as any)?.count ?? 0,
+        pureMediumCount: (pureMedium as any)?.count ?? 0,
+        pureHardCount: (pureHard as any)?.count ?? 0,
+        pureExpertCount: (pureExpert as any)?.count ?? 0,
         lbTop100: (lbStats as any)?.data?.top100 ?? 0,
-        lbTop50:  (lbStats as any)?.data?.top50  ?? 0,
-        lbTop10:  (lbStats as any)?.data?.top10  ?? 0,
-        lbTop3:   (lbStats as any)?.data?.top3   ?? 0,
-        lbTop1:   (lbStats as any)?.data?.top1   ?? 0,
+        lbTop50: (lbStats as any)?.data?.top50 ?? 0,
+        lbTop10: (lbStats as any)?.data?.top10 ?? 0,
+        lbTop3: (lbStats as any)?.data?.top3 ?? 0,
+        lbTop1: (lbStats as any)?.data?.top1 ?? 0,
       };
       loading = false;
       render();
@@ -725,5 +731,5 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
 
   root.querySelector('#ach-back')?.addEventListener('click', props.onBack);
   void load();
-  return { unmount() {} };
+  return { unmount() { } };
 }

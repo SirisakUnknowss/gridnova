@@ -14,10 +14,10 @@ export interface PracticeViewProps {
 }
 
 const PRACTICE_META: Record<string, { label: string; sub: string; color: string }> = {
-  easy:   { label: 'Easy',   sub: 'Relaxed',  color: '#10b981' },
+  easy: { label: 'Easy', sub: 'Relaxed', color: '#10b981' },
   medium: { label: 'Medium', sub: 'Balanced', color: '#f59e0b' },
-  hard:   { label: 'Hard',   sub: 'Tricky',   color: '#ef4444' },
-  expert: { label: 'Expert', sub: 'Brutal',   color: '#6c5ce7' },
+  hard: { label: 'Hard', sub: 'Tricky', color: '#ef4444' },
+  expert: { label: 'Expert', sub: 'Brutal', color: '#6c5ce7' },
 };
 
 export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): { unmount: () => void } {
@@ -33,7 +33,7 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
         </div>
       </div>
 
-      <div id="practice-continue-banner" style="display:none"></div>
+      <div id="practice-continue-banner" style="display:none; width: 100%"></div>
 
       <p class="practice-sub">Choose your own difficulty — play as many times as you like.</p>
 
@@ -80,5 +80,5 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
     });
   });
 
-  return { unmount() {} };
+  return { unmount() { } };
 }

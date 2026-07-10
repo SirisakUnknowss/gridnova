@@ -20,7 +20,7 @@ export interface HomeViewProps {
 
 function fmtCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
 }
 
@@ -86,7 +86,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
         <span class="playmode-card-v2-icon">${ic.gamepad(24)}</span>
         <div class="playmode-card-v2-title">Play Mode</div>
         <div class="playmode-card-v2-sub">เลือกโหมดที่อยากเล่น</div>
-        <button class="btn playmode-card-v2-btn" id="enter-play-mode">${ic.play(16)} Enter Play Mode</button>
+        <button class="btn playmode-card-v2-btn" id="enter-play-mode">Enter Play Mode</button>
       </div>
 
       <!-- Practice entry -->
@@ -162,5 +162,5 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     btn.title = nowMuted ? 'Unmute' : 'Mute';
   });
 
-  return { unmount() {} };
+  return { unmount() { } };
 }

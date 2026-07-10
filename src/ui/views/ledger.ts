@@ -22,17 +22,17 @@ export interface LedgerProps {
 }
 
 const REASON_LABEL: Record<string, string> = {
-  signup_bonus:        'Welcome bonus',
-  daily_complete:      'Daily puzzle',
-  practice_complete:   'Practice complete',
-  purchase_item:       'Item purchased',
-  hint_used:           'Hint used',
-  level_up_bonus:      'Level up reward',
-  streak_bonus:        'Streak bonus',
-  achievement_reward:  'Achievement reward',
-  xp_reward:           'XP reward',
-  refund:              'Refund',
-  admin_grant:         'Admin grant',
+  signup_bonus: 'Welcome bonus',
+  daily_complete: 'Daily puzzle',
+  practice_complete: 'Practice complete',
+  purchase_item: 'Item purchased',
+  hint_used: 'Hint used',
+  level_up_bonus: 'Level up reward',
+  streak_bonus: 'Streak bonus',
+  achievement_reward: 'Achievement reward',
+  xp_reward: 'XP reward',
+  refund: 'Refund',
+  admin_grant: 'Admin grant',
 };
 
 function reasonLabel(reason: string): string {
@@ -51,7 +51,7 @@ export function mountLedgerView(root: HTMLElement, props: LedgerProps): { unmoun
     <section class="view">
       <div class="top-bar">
         <button class="icon-btn" id="ledger-back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <h2 style="margin:0;">${ic.coin(16)} Coin Ledger</h2>
+        <h2 style="margin:0;">${ic.coin(24)} Coin Ledger</h2>
         <span style="width:38px;"></span>
       </div>
       <div id="ledger-body" class="stats-body">
@@ -100,9 +100,9 @@ export function mountLedgerView(root: HTMLElement, props: LedgerProps): { unmoun
           <h3>Last 100 transactions</h3>
           <div class="ledger-list">
             ${txs.map((t) => {
-              const sign = t.amount > 0 ? '+' : '';
-              const color = t.amount > 0 ? '#a5d6a7' : '#ffab91';
-              return `
+        const sign = t.amount > 0 ? '+' : '';
+        const color = t.amount > 0 ? '#a5d6a7' : '#ffab91';
+        return `
                 <div class="ledger-row">
                   <div class="ledger-reason">
                     <strong>${escapeHtml(reasonLabel(t.reason))}</strong>
@@ -111,7 +111,7 @@ export function mountLedgerView(root: HTMLElement, props: LedgerProps): { unmoun
                   <div class="ledger-amount" style="color:${color};">${sign}${t.amount.toLocaleString()}</div>
                 </div>
               `;
-            }).join('')}
+      }).join('')}
           </div>
           <p style="opacity:0.65;font-size:11px;margin-top:10px;">Showing the 100 most recent transactions.</p>
         </div>

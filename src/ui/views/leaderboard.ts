@@ -7,9 +7,9 @@ import * as api from '@lib/api';
 import { formatTime, todayUtc, escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
-import img1st    from '@images/1st-prize.png';
-import img2nd    from '@images/2nd-place.png';
-import img3rd    from '@images/3rd-place.png';
+import img1st from '@images/1st-prize.png';
+import img2nd from '@images/2nd-place.png';
+import img3rd from '@images/3rd-place.png';
 import imgTrophy from '@images/trophy-2.png';
 
 export interface LeaderboardProps {
@@ -82,19 +82,15 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>Leaderboard
+          ${ic.trophy(13)} Leaderboard
         </h2>
         <span style="width:38px;"></span>
       </div>
 
       <!-- Main tabs: Members | Guests -->
       <div class="lb-tabs lb-tabs--main">
-        <button class="lb-tab active" data-main="members">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Members
-        </button>
-        <button class="lb-tab" data-main="guests">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/></svg>Guests
-        </button>
+        <button class="lb-tab active" data-main="members">Members</button>
+        <button class="lb-tab" data-main="guests">Guests</button>
       </div>
 
       <!-- Date sub-tabs -->
@@ -119,8 +115,8 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
   `;
   wireBottomNav(root, props.nav, 'home');
 
-  const listEl   = root.querySelector<HTMLElement>('#lb-list')!;
-  const metaEl   = root.querySelector<HTMLElement>('#lb-meta')!;
+  const listEl = root.querySelector<HTMLElement>('#lb-list')!;
+  const metaEl = root.querySelector<HTMLElement>('#lb-meta')!;
   const scrollBtn = root.querySelector<HTMLButtonElement>('#lb-scroll')!;
   const dateTabs = root.querySelector<HTMLElement>('#lb-date-tabs')!;
   const guestBadge = root.querySelector<HTMLElement>('#lb-guest-badge')!;
@@ -176,7 +172,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
     `;
     listEl.innerHTML = memberRows.map((r) => {
       const isMe = r.user_id === currentUserId;
-      const name  = escapeHtml(r.display_name || r.username || 'Player');
+      const name = escapeHtml(r.display_name || r.username || 'Player');
       const rankBadge = rankBadgeHtml(r.rank);
       const avatarHtml = r.custom_avatar_url
         ? `<img src="${escapeHtml(r.custom_avatar_url)}" class="lb-avatar-img" referrerpolicy="no-referrer" alt="">`
@@ -299,7 +295,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
       );
 
       // Show/hide date sub-tabs and guest badge
-      dateTabs.hidden  = mainTab === 'guests';
+      dateTabs.hidden = mainTab === 'guests';
       guestBadge.hidden = mainTab === 'members';
 
       void load();

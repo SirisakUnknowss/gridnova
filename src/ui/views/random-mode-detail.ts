@@ -54,7 +54,7 @@ export function mountRandomModeDetailView(root: HTMLElement, props: RandomModeDe
         <span>Bonus coins every 5-win streak — the longer you go, the more you earn.</span>
       </div>
 
-      <button class="btn pm-detail-btn-primary pm-random-cta" id="rm-play">${ic.play(16)} Play Random</button>
+      <button class="btn pm-detail-btn-primary pm-random-cta" id="rm-play">Play Random</button>
     `;
     root.querySelector('#rm-play')?.addEventListener('click', props.onPlayRandom);
   }
@@ -82,7 +82,7 @@ export function mountRandomModeDetailView(root: HTMLElement, props: RandomModeDe
 
       <div class="pm-detail-actions">
         <button class="btn btn--secondary pm-detail-btn-secondary" id="rm-leaderboard">${ic.trophy(15)} View Leaderboard</button>
-        <button class="btn pm-detail-btn-primary pm-random-cta" id="rm-play">${ic.play(16)} Play Random</button>
+        <button class="btn pm-detail-btn-primary pm-random-cta" id="rm-play">Play Random</button>
       </div>
     `;
     root.querySelector('#rm-play')?.addEventListener('click', props.onPlayRandom);
@@ -97,5 +97,5 @@ export function mountRandomModeDetailView(root: HTMLElement, props: RandomModeDe
     }
   }).catch(() => renderEmptyState());
 
-  return { unmount() {} };
+  return { unmount() { } };
 }

@@ -69,7 +69,7 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
         </div>
       </div>
 
-      <button class="btn pm-detail-btn-primary" id="dd-play" style="width:100%">${ic.play(16)} Play</button>
+      <button class="btn pm-detail-btn-primary" id="dd-play" style="width:100%">Play</button>
 
       <div class="dd-lb-head">
         <span class="dd-lb-title">${ic.trophy(15)} Leaderboard Today</span>
@@ -101,7 +101,7 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
   void api.getMyDailyRank(today).then((rank) => {
     const rankEl = root.querySelector('#dd-rank');
     if (rankEl && rank) rankEl.textContent = `#${rank.rank} / ${rank.total_players}`;
-  }).catch(() => {});
+  }).catch(() => { });
 
   // Embedded leaderboard (top 10 today)
   const lbList = root.querySelector<HTMLElement>('#dd-lb-list')!;
@@ -139,7 +139,7 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
       return;
     }
     savedGame = saved;
-    playBtn.innerHTML = `${ic.play(16)} Continue`;
+    playBtn.innerHTML = `Continue`;
   });
 
   return { unmount() { window.clearInterval(countdownHandle); } };

@@ -24,9 +24,9 @@ export interface ProfileProps {
 }
 
 const DEFAULT_AVATARS = [
-  '👤','🧑','👩','👨','🧒','👵','👴',
-  '🦸','🧙','🥷','🤖','👻','🐱','🦊',
-  '🐼','🐯','🦁','🐸','🐧','🦉','🐙',
+  '👤', '🧑', '👩', '👨', '🧒', '👵', '👴',
+  '🦸', '🧙', '🥷', '🤖', '👻', '🐱', '🦊',
+  '🐼', '🐯', '🦁', '🐸', '🐧', '🦉', '🐙',
 ];
 
 export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmount: () => void } {
@@ -98,28 +98,28 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
       <div class="card">
         <button class="profile-row" id="prof-stats">
           <span style="display:flex;align-items:center;gap:10px;">
-            <svg class="row-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            ${ic.stats(16)}
             <span><span style="color:var(--app-text)">Stats</span><br><small>Detailed game history</small></span>
           </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="profile-row" id="prof-ach">
           <span style="display:flex;align-items:center;gap:10px;">
-            <svg class="row-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+            ${ic.badge(16)}
             <span><span style="color:var(--app-text)">Medals</span><br><small>Unlock badges</small></span>
           </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="profile-row" id="prof-recap">
           <span style="display:flex;align-items:center;gap:10px;">
-            <svg class="row-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ${ic.daily(16)}
             <span><span style="color:var(--app-text)">Weekly Recap</span><br><small>This week's highlights</small></span>
           </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="profile-row" id="prof-ledger">
           <span style="display:flex;align-items:center;gap:10px;">
-            <svg class="row-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
+            ${ic.coin(16)}
             <span><span style="color:var(--app-text)">Coin Ledger</span><br><small>Earned and spent</small></span>
           </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -233,7 +233,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
     fileInput.addEventListener('change', async () => {
       if (!fileInput.files || fileInput.files.length === 0) return;
       const file = fileInput.files[0];
-      
+
       if (!file.type.startsWith('image/')) {
         props.onToast('Please select an image file');
         return;
@@ -276,7 +276,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
       const newAvatar = { emoji };
       useStore.getState().setEquipped({ avatar: newAvatar });
       track('avatar_changed', { emoji });
-      
+
       try {
         if (!isGuest) {
           await api.updateProfile({ avatar_url: null });
