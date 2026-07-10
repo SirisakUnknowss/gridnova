@@ -898,6 +898,15 @@ h3 { font-size: 18px; }
 .pm-detail-btn-primary { flex: 1; min-height: 46px; background: var(--brand-primary); color: #fff; }
 .pm-detail-btn-primary:hover { background: #5b4ed0; }
 
+/* Daily detail — inline leaderboard */
+.dd-lb-head { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.dd-lb-title { font-size: 14px; font-weight: 700; color: var(--app-text); display: flex; align-items: center; gap: 6px; }
+.dd-lb-more {
+  width: 100%; background: none; border: none; color: var(--brand-primary);
+  font-size: 12.5px; font-weight: 600; text-align: center; padding: 6px 0; cursor: pointer;
+}
+.dd-lb-more:hover { text-decoration: underline; }
+
 /* Shared vertical stack for mode-detail body content (empty state / streak state) */
 .pm-detail-body {
   width: 100%; display: flex; flex-direction: column; align-items: center;

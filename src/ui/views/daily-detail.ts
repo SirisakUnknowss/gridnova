@@ -1,12 +1,13 @@
 // =====================================================================
-// Daily Puzzle detail — info, rank today, Play/Continue, view leaderboard
+// Daily Puzzle detail — info, rank today, Play/Continue, leaderboard inline
 // =====================================================================
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
-import { todayUtc } from '@lib/format';
+import { todayUtc, formatTime, escapeHtml } from '@lib/format';
 import { difficultyForDayOfWeek } from '@engine/generator';
-import { getMyDailyRank } from '@lib/api';
-import { listGames, type GameInProgress } from '@lib/local-db';
+import * as api from '@lib/api';
+import { useStore } from '@state/store';
+import { listGames, deleteGame, type GameInProgress } from '@lib/local-db';
 
 export interface DailyDetailProps {
   onBack: () => void;
@@ -34,6 +35,7 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
   const today = todayUtc();
   const dow = new Date(today + 'T00:00:00Z').getUTCDay();
   const todayDifficulty = difficultyForDayOfWeek(dow);
+  const currentUserId = useStore.getState().user?.id ?? null;
   let savedGame: GameInProgress | null = null;
 
   root.innerHTML = `
@@ -67,16 +69,19 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
         </div>
       </div>
 
-      <div class="pm-detail-actions">
-        <button class="btn btn--secondary pm-detail-btn-secondary" id="dd-leaderboard">${ic.trophy(15)} View Leaderboard</button>
-        <button class="btn pm-detail-btn-primary" id="dd-play">${ic.play(16)} Play</button>
+      <button class="btn pm-detail-btn-primary" id="dd-play" style="width:100%">${ic.play(16)} Play</button>
+
+      <div class="dd-lb-head">
+        <span class="dd-lb-title">${ic.trophy(15)} Leaderboard Today</span>
       </div>
+      <div id="dd-lb-list"><div class="ach-loading">Loading…</div></div>
+      <button class="dd-lb-more" id="dd-lb-more">See full leaderboard →</button>
     </section>
     ${bottomNavHTML('home')}
   `;
 
   root.querySelector('#dd-back')?.addEventListener('click', props.onBack);
-  root.querySelector('#dd-leaderboard')?.addEventListener('click', props.onLeaderboard);
+  root.querySelector('#dd-lb-more')?.addEventListener('click', props.onLeaderboard);
 
   const playBtn = root.querySelector<HTMLButtonElement>('#dd-play')!;
   playBtn.addEventListener('click', () => {
@@ -93,18 +98,48 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
   const countdownHandle = window.setInterval(tick, 1000);
 
   // Rank today (best-effort)
-  void getMyDailyRank(today).then((rank) => {
+  void api.getMyDailyRank(today).then((rank) => {
     const rankEl = root.querySelector('#dd-rank');
     if (rankEl && rank) rankEl.textContent = `#${rank.rank} / ${rank.total_players}`;
   }).catch(() => {});
 
-  // Check for a resumable daily save
-  void listGames().then((games) => {
-    const saved = games.find((g) => g.mode === 'daily' && g.date === today);
-    if (saved) {
-      savedGame = saved;
-      playBtn.innerHTML = `${ic.play(16)} Continue`;
+  // Embedded leaderboard (top 10 today)
+  const lbList = root.querySelector<HTMLElement>('#dd-lb-list')!;
+  void api.getLeaderboard(today, 10).then((rows) => {
+    if (!rows || rows.length === 0) {
+      lbList.innerHTML = `<div class="ach-empty">No scores yet — be the first!</div>`;
+      return;
     }
+    lbList.innerHTML = `<div class="pm-list">${rows.map((r: any) => {
+      const isMe = r.user_id === currentUserId;
+      const name = escapeHtml(r.display_name || r.username || 'Player');
+      return `
+        <div class="pm-row" style="cursor:default">
+          <span class="pm-row-rank">#${r.rank}</span>
+          <div class="pm-row-body">
+            <span class="pm-row-title">${name}${isMe ? ' <span class="lb-you">you</span>' : ''}</span>
+            <span class="pm-row-sub">${formatTime(r.time_seconds)}</span>
+          </div>
+          <span class="pm-streak-badge" style="color:var(--brand-primary);background:#ede9fe">${r.score.toLocaleString()}</span>
+        </div>
+      `;
+    }).join('')}</div>`;
+  }).catch(() => {
+    lbList.innerHTML = `<div class="ach-empty">Could not load leaderboard.</div>`;
+  });
+
+  // Check for a resumable daily save — only counts as "in progress" if the
+  // player actually made a move; a save with 0 moves is a phantom from
+  // opening then leaving immediately, so treat that as fresh instead.
+  void listGames().then(async (games) => {
+    const saved = games.find((g) => g.mode === 'daily' && g.date === today);
+    if (!saved) return;
+    if (!saved.moves || saved.moves.length === 0) {
+      await deleteGame(saved.game_id);
+      return;
+    }
+    savedGame = saved;
+    playBtn.innerHTML = `${ic.play(16)} Continue`;
   });
 
   return { unmount() { window.clearInterval(countdownHandle); } };
