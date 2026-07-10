@@ -32,6 +32,19 @@ export async function getMyRank(date: string) {
   return supabase.functions.invoke('get-my-rank', { body: { date } });
 }
 
+export async function getMyDailyRank(date: string): Promise<{ rank: number; total_players: number } | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data, error } = await supabase
+    .from('leaderboard_view')
+    .select('rank, total_players')
+    .eq('date', date)
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (error) throw error;
+  return data as { rank: number; total_players: number } | null;
+}
+
 // === Submit ===
 export interface SubmitDailyPayload {
   date: string;

@@ -53,6 +53,7 @@ export const ic = {
   lock:    (s?: number) => svg(`<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`, s),
   chevronRight: (s?: number) => svg(`<path d="m9 18 6-6-6-6"/>`, s),
   dice:    (s?: number) => svg(`<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 8h.01"/><path d="M16 16h.01"/><path d="M8 16h.01"/><path d="M16 8h.01"/><path d="M12 12h.01"/>`, s),
+  gift:    (s?: number) => svg(`<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8"/><path d="M16.5 8a2.5 2.5 0 0 0 0-5C13 3 12 8 12 8"/>`, s),
 
   // Sound
   soundOn:  (s?: number) => svg(`<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>`, s),

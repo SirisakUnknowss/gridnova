@@ -14,6 +14,9 @@ import { todayUtc } from './lib/format';
 import { mountHomeView } from './ui/views/home';
 import { mountPlayModeView } from './ui/views/play-mode';
 import { mountPracticeView } from './ui/views/practice';
+import { mountDailyDetailView } from './ui/views/daily-detail';
+import { mountRandomModeDetailView } from './ui/views/random-mode-detail';
+import { mountRandomLeaderboardView } from './ui/views/random-leaderboard';
 import { mountGameView, type GameResult } from './ui/views/game';
 import { showWinModal } from './ui/views/win-modal';
 import { showShareModal } from './ui/views/share-modal';
@@ -131,14 +134,6 @@ const navCb = {
   onProfile:      () => showProfile(),
 };
 
-function continueSavedGame(saved: GameInProgress) {
-  if (saved.mode === 'daily' && saved.date) {
-    void playDailyResume(saved);
-  } else if (saved.mode === 'practice' && saved.level) {
-    playPracticeResume(saved);
-  }
-}
-
 async function playDailyResume(saved: GameInProgress) {
   const date = saved.date!;
   let puzzleData: { puzzle: number[][]; solution: number[][]; difficulty: import('./engine/types').Difficulty };
@@ -167,7 +162,7 @@ async function playDailyResume(saved: GameInProgress) {
     date,
     resume: saved,
     onWin: (result) => handleWin(result, date),
-    onExit: showHome,
+    onExit: showDailyDetail,
   });
   currentUnmount = view.unmount;
 }
@@ -198,7 +193,6 @@ function showHome() {
     onEnterPlayMode: showPlayMode,
     onOpenPractice: showPractice,
     onAuthAction: openAuthAction,
-    onContinue: continueSavedGame,
     nav: navCb,
   });
   currentUnmount = view.unmount;
@@ -214,11 +208,39 @@ function showPlayMode() {
   clearView();
   const view = mountPlayModeView(root, {
     onBack: showHome,
-    onPlayDaily: playDaily,
-    onLeaderboard: showLeaderboard,
-    onPlayRandom: playRandom,
+    onOpenDaily: showDailyDetail,
+    onOpenRandom: showRandomDetail,
     nav: navCb,
   });
+  currentUnmount = view.unmount;
+}
+
+function showDailyDetail() {
+  clearView();
+  const view = mountDailyDetailView(root, {
+    onBack: showPlayMode,
+    onPlayDaily: playDaily,
+    onContinueDaily: (saved) => void playDailyResume(saved),
+    onLeaderboard: showLeaderboard,
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function showRandomDetail() {
+  clearView();
+  const view = mountRandomModeDetailView(root, {
+    onBack: showPlayMode,
+    onPlayRandom: playRandom,
+    onLeaderboard: showRandomLeaderboard,
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function showRandomLeaderboard() {
+  clearView();
+  const view = mountRandomLeaderboardView(root, { onBack: showRandomDetail, nav: navCb });
   currentUnmount = view.unmount;
 }
 
@@ -227,6 +249,7 @@ function showPractice() {
   const view = mountPracticeView(root, {
     onBack: showHome,
     onPlayPractice: (level) => playPractice(level as Difficulty),
+    onContinuePractice: (saved) => playPracticeResume(saved),
     nav: navCb,
   });
   currentUnmount = view.unmount;
@@ -367,7 +390,7 @@ async function playDaily() {
     solution: puzzleData.solution,
     date,
     onWin: (result) => handleWin(result, date),
-    onExit: showHome,
+    onExit: showDailyDetail,
   });
   currentUnmount = view.unmount;
 }
@@ -409,6 +432,7 @@ function playRandom() {
   clearView();
   const view = mountGameView(root, {
     mode: 'practice',
+    origin: 'random',
     difficulty: level,
     puzzle: puzzleData.puzzle,
     solution: puzzleData.solution,
@@ -419,7 +443,7 @@ function playRandom() {
     onLose: () => {
       void api.recordRandomModeResult(false).catch(() => {});
     },
-    onExit: showPlayMode,
+    onExit: showRandomDetail,
     onNewGame: () => playRandom(),
   });
   currentUnmount = view.unmount;

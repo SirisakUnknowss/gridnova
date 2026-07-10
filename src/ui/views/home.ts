@@ -2,21 +2,19 @@
 // Home view — main hub
 // =====================================================================
 import { useStore } from '@state/store';
-import { formatNumber, formatTime } from '@lib/format';
+import { formatNumber } from '@lib/format';
 import { levelProgress } from '@lib/level';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { isMuted, toggleMute } from '@lib/sound';
 import { useVisitorStore } from '@state/visitor-store';
 import { getGuestDisplayId } from '@lib/api';
 import { ic } from '@ui/icons';
-import { listGames, type GameInProgress } from '@lib/local-db';
 import { APP_VERSION } from '@lib/version';
 
 export interface HomeViewProps {
   onEnterPlayMode: () => void;
   onOpenPractice: () => void;
   onAuthAction: () => void;
-  onContinue: (saved: GameInProgress) => void;
   nav: BottomNavCallbacks;
 }
 
@@ -82,9 +80,6 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
           <button class="btn btn--primary btn--small" id="save-progress">Save progress</button>
         </div>
       ` : ''}
-
-      <!-- Continue game banner (filled dynamically) -->
-      <div id="continue-banner" style="display:none"></div>
 
       <!-- Play Mode entry -->
       <div class="playmode-card-v2">
@@ -165,29 +160,6 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     const btn = e.currentTarget as HTMLButtonElement;
     btn.innerHTML = nowMuted ? ic.soundOff(16) : ic.soundOn(16);
     btn.title = nowMuted ? 'Unmute' : 'Mute';
-  });
-
-  // Check for saved games and show continue banner
-  const continueBanner = root.querySelector<HTMLElement>('#continue-banner')!;
-  void listGames().then(games => {
-    if (games.length === 0) return;
-    // Prefer the most recently saved game
-    const saved = games.sort((a, b) => (b.elapsed_seconds ?? 0) - (a.elapsed_seconds ?? 0))[0];
-    const modeLabel = saved.mode === 'daily' ? `Daily (${saved.date ?? ''})` : `Practice · ${saved.level ?? ''}`;
-    const timeLabel = formatTime(saved.elapsed_seconds ?? 0);
-    continueBanner.style.display = 'block';
-    continueBanner.innerHTML = `
-      <div class="continue-banner">
-        <div class="continue-banner-info">
-          <span class="continue-banner-title">▶ Game in progress</span>
-          <span class="continue-banner-sub">${modeLabel} · ${timeLabel} elapsed</span>
-        </div>
-        <button class="btn btn--primary btn--small" id="continue-btn">Continue</button>
-      </div>
-    `;
-    continueBanner.querySelector('#continue-btn')?.addEventListener('click', () => {
-      props.onContinue(saved);
-    });
   });
 
   return { unmount() {} };

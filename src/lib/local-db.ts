@@ -85,6 +85,7 @@ export async function queueUpdate(item: QueueItem): Promise<void> {
 export interface GameInProgress {
   game_id: string;
   mode: 'daily' | 'practice';
+  origin?: 'random';
   date?: string;
   level?: string;
   stage?: number;

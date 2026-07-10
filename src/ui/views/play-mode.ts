@@ -9,9 +9,8 @@ import { getRandomModeStats } from '@lib/api';
 
 export interface PlayModeViewProps {
   onBack: () => void;
-  onPlayDaily: () => void;
-  onLeaderboard: () => void;
-  onPlayRandom: () => void;
+  onOpenDaily: () => void;
+  onOpenRandom: () => void;
   nav: BottomNavCallbacks;
 }
 
@@ -39,7 +38,6 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
             <span class="pm-row-title">Daily Puzzle</span>
             <span class="pm-row-sub">Today's difficulty: ${todayDifficulty} — 1 attempt/day</span>
           </div>
-          <button class="pm-row-ranks" id="pm-daily-ranks" aria-label="View leaderboard">${ic.trophy(16)}</button>
           <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
         </div>
 
@@ -67,12 +65,8 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
   `;
 
   root.querySelector('#pm-back')?.addEventListener('click', props.onBack);
-  root.querySelector('#pm-daily')?.addEventListener('click', props.onPlayDaily);
-  root.querySelector('#pm-daily-ranks')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    props.onLeaderboard();
-  });
-  root.querySelector('#pm-random')?.addEventListener('click', props.onPlayRandom);
+  root.querySelector('#pm-daily')?.addEventListener('click', props.onOpenDaily);
+  root.querySelector('#pm-random')?.addEventListener('click', props.onOpenRandom);
   wireBottomNav(root, props.nav, 'home');
 
   void getRandomModeStats().then((stats) => {

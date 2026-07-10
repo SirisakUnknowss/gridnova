@@ -3,10 +3,13 @@
 // =====================================================================
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
+import { formatTime } from '@lib/format';
+import { listGames, type GameInProgress } from '@lib/local-db';
 
 export interface PracticeViewProps {
   onBack: () => void;
   onPlayPractice: (level: string) => void;
+  onContinuePractice: (saved: GameInProgress) => void;
   nav: BottomNavCallbacks;
 }
 
@@ -29,6 +32,8 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
+
+      <div id="practice-continue-banner" style="display:none"></div>
 
       <p class="practice-sub">Choose your own difficulty — play as many times as you like.</p>
 
@@ -54,6 +59,26 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
     btn.addEventListener('click', () => props.onPlayPractice((btn as HTMLElement).dataset.practice!));
   });
   wireBottomNav(root, props.nav, 'home');
+
+  // Check for a resumable practice save (exclude Random Mode's saves)
+  const continueBanner = root.querySelector<HTMLElement>('#practice-continue-banner')!;
+  void listGames().then((games) => {
+    const saved = games.find((g) => g.mode === 'practice' && g.origin !== 'random');
+    if (!saved) return;
+    continueBanner.style.display = 'block';
+    continueBanner.innerHTML = `
+      <div class="continue-banner">
+        <div class="continue-banner-info">
+          <span class="continue-banner-title">▶ Game in progress</span>
+          <span class="continue-banner-sub">${saved.level ?? ''} · ${formatTime(saved.elapsed_seconds ?? 0)} elapsed</span>
+        </div>
+        <button class="btn btn--primary btn--small" id="practice-continue-btn">Continue</button>
+      </div>
+    `;
+    continueBanner.querySelector('#practice-continue-btn')?.addEventListener('click', () => {
+      props.onContinuePractice(saved);
+    });
+  });
 
   return { unmount() {} };
 }

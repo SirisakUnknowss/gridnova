@@ -15,6 +15,7 @@ import { saveGame, deleteGame, type GameInProgress } from '@lib/local-db';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
+  origin?: 'random';
   difficulty: Difficulty;
   puzzle: Board;
   solution: Board;
@@ -271,6 +272,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     void saveGame({
       game_id: gameId,
       mode,
+      origin: props.origin,
       date: props.date,
       level: difficulty,
       stage: props.stage,

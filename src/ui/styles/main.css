@@ -871,9 +871,69 @@ h3 { font-size: 18px; }
   background: #fff1e6; padding: 4px 9px; border-radius: 999px;
   display: flex; align-items: center; gap: 3px;
 }
+.pm-row-rank {
+  flex: none; width: 40px; height: 40px; border-radius: 12px; background: #ede9fe;
+  color: var(--brand-primary); font-weight: 700; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
 
 /* Practice view (standalone page) */
 .view--practice, .view--play-mode { gap: 14px; padding-top: 0; }
+
+/* Mode detail screens (Daily / Random) */
+.pm-detail-head {
+  width: 100%; display: flex; align-items: center; gap: 14px;
+  background: var(--app-card-bg); border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--app-card-shadow);
+}
+.pm-detail-icon {
+  flex: none; width: 44px; height: 44px; border-radius: 12px;
+  background: #ede9fe; color: var(--brand-primary);
+  display: flex; align-items: center; justify-content: center;
+}
+.pm-detail-title { font-size: 17px; font-weight: 700; color: var(--app-text); }
+.pm-detail-sub { font-size: 12.5px; color: var(--app-text-secondary); margin-top: 2px; }
+.pm-detail-actions { width: 100%; display: flex; gap: 10px; }
+.pm-detail-btn-secondary { flex: 1; min-height: 46px; }
+.pm-detail-btn-primary { flex: 1; min-height: 46px; background: var(--brand-primary); color: #fff; }
+.pm-detail-btn-primary:hover { background: #5b4ed0; }
+
+/* Random Mode empty state */
+.rm-empty-icon {
+  width: 88px; height: 88px; margin: 12px auto 0; border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #fff; font-size: 36px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.rm-empty-title { width: 100%; text-align: center; font-size: 18px; font-weight: 700; color: var(--app-text); }
+.rm-empty-sub { width: 100%; text-align: center; font-size: 13px; color: var(--app-text-secondary); margin: -8px 0 4px; }
+.pm-tip-row {
+  width: 100%; display: flex; align-items: flex-start; gap: 10px;
+  background: var(--app-card-bg); border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg); padding: 12px 14px; box-shadow: var(--app-card-shadow);
+  font-size: 12.5px; color: var(--app-text-secondary); line-height: 1.4;
+}
+.pm-tip-icon { flex: none; color: var(--brand-primary); margin-top: 1px; }
+.pm-tip-row--warning { background: #fff7ed; border-color: #fed7aa; }
+.pm-tip-row--warning .pm-tip-icon { color: #ea580c; }
+.pm-random-cta { background: #f59e0b !important; }
+.pm-random-cta:hover { background: #d98708 !important; }
+
+/* Random Mode streak state */
+.rm-streak-card {
+  width: 100%; background: var(--app-card-bg); border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--app-card-shadow);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.rm-streak-left { display: flex; align-items: center; gap: 12px; }
+.rm-streak-icon {
+  width: 40px; height: 40px; border-radius: 12px; background: #fff1e6; color: #f59e0b;
+  display: flex; align-items: center; justify-content: center;
+}
+.rm-streak-num { font-size: 26px; font-weight: 800; color: var(--app-text); line-height: 1; }
+.rm-streak-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--app-text-secondary); margin-top: 2px; }
+.rm-streak-best { text-align: right; }
+.rm-streak-best-num { font-size: 18px; font-weight: 700; color: var(--app-text); }
 .practice-sub { width: 100%; font-size: 13px; color: var(--app-text-secondary); margin: 0; }
 
 /* Practice grid v2 — 2×2 */
