@@ -3491,6 +3491,8 @@ h3 {
 .ach-dot.on {
   width: 14px;
   height: 14px;
+  background: var(--brand-primary);
+  box-shadow: 0 0 6px rgba(108, 92, 231, .5);
 }
 
 .ach-badge-lvl {

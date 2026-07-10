@@ -58,13 +58,6 @@ function groupIconHtml(meta: { label: string; emoji: string; icon?: string }): s
     : `<span>${meta.emoji}</span>`;
 }
 
-const TIER_COLOR: Record<string, string> = {
-  bronze: '#cd7f32',
-  silver: '#8b7bf0',
-  gold: '#f5a623',
-  platinum: '#4fc3f7',
-  diamond: '#e040fb',
-};
 
 interface ProgressInputs {
   gameCount: number;
@@ -474,8 +467,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
 
     const dots = tiered.map((d) => {
       const on = unlocked.has(d.id);
-      const color = TIER_COLOR[d.tier] ?? '#888';
-      return `<span class="ach-dot${on ? ' on' : ''}" style="${on ? `background:${color};box-shadow:0 0 6px ${color}80` : ''}"></span>`;
+      return `<span class="ach-dot${on ? ' on' : ''}"></span>`;
     }).join('');
 
     let progressHtml = '';
