@@ -17,6 +17,21 @@ import streakIcon from '@images/streak-medal.png';
 import flawlessIcon from '@images/flawless-medal.png';
 import speedsterIcon from '@images/speedster-medal.png';
 import pureIcon from '@images/clean-solve.png';
+import bronzeLv1 from '@images/level/bronze-lv-1.png';
+import bronzeLv2 from '@images/level/bronze-lv-2.png';
+import bronzeLv3 from '@images/level/bronze-lv-3.png';
+import silverLv1 from '@images/level/silver-lv-1.png';
+import silverLv2 from '@images/level/silver-lv-2.png';
+import silverLv3 from '@images/level/silver-lv-3.png';
+import goldLv1 from '@images/level/gold-lv-1.png';
+import goldLv2 from '@images/level/gold-lv-2.png';
+import goldLv3 from '@images/level/gold-lv-3.png';
+import maxLevelIcon from '@images/level/max-level.png';
+
+// 10-slot sequence for legacy flat groups (Leaderboard/Level/Quest, badge_level 1-10)
+const LEVEL_IMAGES_10 = [bronzeLv1, bronzeLv2, bronzeLv3, silverLv1, silverLv2, silverLv3, goldLv1, goldLv2, goldLv3, maxLevelIcon];
+// 5-slot sequence for mission-based groups (badge_level 1-5)
+const LEVEL_IMAGES_5 = [bronzeLv1, silverLv1, goldLv1, goldLv2, maxLevelIcon];
 
 interface AchievementDef {
   id: string;
@@ -465,9 +480,11 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     const isNew = tiered.some((d) => newlyUnlocked.has(d.id));
     const allDone = currentLevel === maxLevel;
 
-    const dots = tiered.map((d) => {
+    const levelImages = maxLevel > 5 ? LEVEL_IMAGES_10 : LEVEL_IMAGES_5;
+    const dots = tiered.map((d, i) => {
       const on = unlocked.has(d.id);
-      return `<span class="ach-dot${on ? ' on' : ''}"></span>`;
+      const src = levelImages[i] ?? levelImages[levelImages.length - 1];
+      return `<img src="${src}" class="ach-dot${on ? ' on' : ''}" alt="" />`;
     }).join('');
 
     let progressHtml = '';

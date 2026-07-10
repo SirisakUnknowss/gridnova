@@ -3480,19 +3480,18 @@ h3 {
 }
 
 .ach-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(108, 92, 231, .12);
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
   flex: none;
-  transition: background .2s;
+  filter: grayscale(1) opacity(.35);
+  transition: filter .2s;
 }
 
 .ach-dot.on {
-  width: 14px;
-  height: 14px;
-  background: var(--brand-primary);
-  box-shadow: 0 0 6px rgba(108, 92, 231, .5);
+  width: 20px;
+  height: 20px;
+  filter: none;
 }
 
 .ach-badge-lvl {
