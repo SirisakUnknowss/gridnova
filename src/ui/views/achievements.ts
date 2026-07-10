@@ -227,17 +227,31 @@ const COUNTERS: Record<string, [keyof ProgressInputs, number]> = {
   ACH_FLAWLESS_M5_L3: ['perfectExpert',  5],
   ACH_FLAWLESS_M5_L4: ['perfectExpert', 10],
   ACH_FLAWLESS_M5_L5: ['perfectExpert', 15],
-  // Legacy pure (no-hint by difficulty)
-  ACH_PURE_L1: ['pureEasyCount',    1],
-  ACH_PURE_L2: ['pureEasyCount',    5],
-  ACH_PURE_L3: ['pureMediumCount',  1],
-  ACH_PURE_L4: ['pureMediumCount',  5],
-  ACH_PURE_L5: ['pureHardCount',    1],
-  ACH_PURE_L6: ['pureHardCount',    5],
-  ACH_PURE_L7: ['pureExpertCount',  1],
-  ACH_PURE_L8: ['pureExpertCount',  3],
-  ACH_PURE_L9: ['pureExpertCount',  5],
-  // ACH_PURE_L10 is a one-shot boolean (expert, no hint, no mistake) — no count progress
+  // Pure M1: easy no-hint
+  ACH_PURE_M1_L1: ['pureEasyCount',  1],
+  ACH_PURE_M1_L2: ['pureEasyCount',  5],
+  ACH_PURE_M1_L3: ['pureEasyCount', 10],
+  ACH_PURE_M1_L4: ['pureEasyCount', 20],
+  ACH_PURE_M1_L5: ['pureEasyCount', 50],
+  // Pure M2: medium no-hint
+  ACH_PURE_M2_L1: ['pureMediumCount',  1],
+  ACH_PURE_M2_L2: ['pureMediumCount',  5],
+  ACH_PURE_M2_L3: ['pureMediumCount', 10],
+  ACH_PURE_M2_L4: ['pureMediumCount', 20],
+  ACH_PURE_M2_L5: ['pureMediumCount', 50],
+  // Pure M3: hard no-hint
+  ACH_PURE_M3_L1: ['pureHardCount',  1],
+  ACH_PURE_M3_L2: ['pureHardCount',  3],
+  ACH_PURE_M3_L3: ['pureHardCount',  5],
+  ACH_PURE_M3_L4: ['pureHardCount', 10],
+  ACH_PURE_M3_L5: ['pureHardCount', 20],
+  // Pure M4: expert no-hint
+  ACH_PURE_M4_L1: ['pureExpertCount',  1],
+  ACH_PURE_M4_L2: ['pureExpertCount',  3],
+  ACH_PURE_M4_L3: ['pureExpertCount',  5],
+  ACH_PURE_M4_L4: ['pureExpertCount', 10],
+  ACH_PURE_M4_L5: ['pureExpertCount', 15],
+  // ACH_PURE_MASTER is a one-shot boolean (expert, no hint, no mistake) — no count progress, lives under "special"
   // Legacy leaderboard
   ACH_LB_L1:  ['lbTop100', 1],
   ACH_LB_L2:  ['lbTop100', 5],
