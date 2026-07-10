@@ -898,15 +898,21 @@ h3 { font-size: 18px; }
 .pm-detail-btn-primary { flex: 1; min-height: 46px; background: var(--brand-primary); color: #fff; }
 .pm-detail-btn-primary:hover { background: #5b4ed0; }
 
+/* Shared vertical stack for mode-detail body content (empty state / streak state) */
+.pm-detail-body {
+  width: 100%; display: flex; flex-direction: column; align-items: center;
+  gap: 12px;
+}
+
 /* Random Mode empty state */
 .rm-empty-icon {
-  width: 88px; height: 88px; margin: 12px auto 0; border-radius: 50%;
+  width: 88px; height: 88px; margin-top: 8px; border-radius: 50%;
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   color: #fff; font-size: 36px; font-weight: 800;
   display: flex; align-items: center; justify-content: center;
 }
-.rm-empty-title { width: 100%; text-align: center; font-size: 18px; font-weight: 700; color: var(--app-text); }
-.rm-empty-sub { width: 100%; text-align: center; font-size: 13px; color: var(--app-text-secondary); margin: -8px 0 4px; }
+.rm-empty-title { width: 100%; text-align: center; font-size: 18px; font-weight: 700; color: var(--app-text); margin: 0; }
+.rm-empty-sub { width: 100%; text-align: center; font-size: 13px; color: var(--app-text-secondary); margin: -4px 0 0; }
 .pm-tip-row {
   width: 100%; display: flex; align-items: flex-start; gap: 10px;
   background: var(--app-card-bg); border: 1px solid var(--app-border);
@@ -918,6 +924,7 @@ h3 { font-size: 18px; }
 .pm-tip-row--warning .pm-tip-icon { color: #ea580c; }
 .pm-random-cta { background: #f59e0b !important; }
 .pm-random-cta:hover { background: #d98708 !important; }
+.pm-detail-body > .pm-random-cta { width: 100%; }
 
 /* Random Mode streak state */
 .rm-streak-card {

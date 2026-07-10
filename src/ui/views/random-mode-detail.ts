@@ -25,7 +25,7 @@ export function mountRandomModeDetailView(root: HTMLElement, props: RandomModeDe
         </div>
       </div>
 
-      <div id="rm-body"><div class="ach-loading">Loading…</div></div>
+      <div id="rm-body" class="pm-detail-body"><div class="ach-loading">Loading…</div></div>
     </section>
     ${bottomNavHTML('home')}
   `;
@@ -39,7 +39,7 @@ export function mountRandomModeDetailView(root: HTMLElement, props: RandomModeDe
     body.innerHTML = `
       <div class="rm-empty-icon">0</div>
       <div class="rm-empty-title">Start your streak</div>
-      <p class="rm-empty-sub">You haven't played this mode yet — win your first game to start a streak.</p>
+      <div class="rm-empty-sub">You haven't played this mode yet — win your first game to start a streak.</div>
 
       <div class="pm-tip-row">
         <span class="pm-tip-icon">${ic.target(18)}</span>
