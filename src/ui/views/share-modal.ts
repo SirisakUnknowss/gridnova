@@ -150,10 +150,23 @@ export function showShareModal(props: ShareModalProps): void {
   root.querySelector('#share-close')?.addEventListener('click', close);
   root.addEventListener('click', (e) => { if (e.target === root) close(); });
 
-  // Download
+  // Download — on mobile, a plain <a download> lands in Files/Downloads, not
+  // Photos/Gallery. Route through the Web Share sheet first (its "Save Image"
+  // option writes to Photos on iOS and to Gallery-equivalent apps on Android);
+  // only fall back to the anchor download where Web Share isn't available
+  // (desktop browsers).
   root.querySelector('#share-download')?.addEventListener('click', async () => {
     if (!activeBlob) return;
     track('share_download', { type: activeType });
+    const file = new File([activeBlob], `gridnova-${activeType}.png`, { type: 'image/png' });
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (err) {
+        if ((err as Error).name === 'AbortError') return;
+      }
+    }
     const url = URL.createObjectURL(activeBlob);
     const a = document.createElement('a');
     a.href = url;
