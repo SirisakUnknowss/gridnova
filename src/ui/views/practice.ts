@@ -63,7 +63,7 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
   // Check for a resumable practice save (exclude Random Mode's saves)
   const continueBanner = root.querySelector<HTMLElement>('#practice-continue-banner')!;
   void listGames().then((games) => {
-    const saved = games.find((g) => g.mode === 'practice' && g.origin !== 'random');
+    const saved = games.find((g) => g.mode === 'practice' && !g.origin);
     if (!saved) return;
     continueBanner.style.display = 'block';
     continueBanner.innerHTML = `

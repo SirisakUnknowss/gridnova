@@ -235,6 +235,29 @@ export async function getMonthlyRecap(userId: string, year: number, month: numbe
   };
 }
 
+export interface DailyCalendarEntry {
+  date: string;
+  score: number;
+  time_seconds: number;
+  mistakes: number;
+  hints_used: number;
+}
+
+export async function getMyDailyCalendar(userId: string, year: number, month: number): Promise<DailyCalendarEntry[]> {
+  const from = `${year}-${String(month).padStart(2, '0')}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const to = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+  const { data, error } = await supabase
+    .from('daily_leaderboard')
+    .select('date, score, time_seconds, mistakes, hints_used')
+    .eq('user_id', userId)
+    .gte('date', from)
+    .lte('date', to);
+  if (error) throw error;
+  return (data ?? []) as DailyCalendarEntry[];
+}
+
 export async function getReferralCode(userId: string): Promise<string> {
   const { data, error } = await supabase
     .from('profiles')

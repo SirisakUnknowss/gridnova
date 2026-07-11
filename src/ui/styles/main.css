@@ -1662,6 +1662,94 @@ h3 {
   text-decoration: underline;
 }
 
+/* Daily Recap calendar */
+.cal-streak-banner {
+  width: 100%; background: linear-gradient(135deg, #fff1e6, #ffe4cc);
+  border: 1px solid #fed7aa; border-radius: var(--radius-lg);
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.cal-streak-left { display: flex; align-items: center; gap: 12px; }
+.cal-streak-icon {
+  width: 38px; height: 38px; border-radius: 12px; background: rgba(245,158,11,.18); color: #ea580c;
+  display: flex; align-items: center; justify-content: center;
+}
+.cal-streak-num { font-size: 24px; font-weight: 800; color: var(--app-text); line-height: 1; }
+.cal-streak-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--app-text-secondary); margin-top: 2px; }
+.cal-streak-best { text-align: right; }
+.cal-streak-best-num { font-size: 17px; font-weight: 700; color: var(--app-text); }
+
+.cal-nav {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 4px;
+}
+.cal-nav-btn {
+  width: 34px; height: 34px; border-radius: 50%; border: none;
+  background: var(--app-card-bg); color: var(--app-text); box-shadow: var(--app-card-shadow);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.cal-nav-btn:hover { background: #f0ecff; }
+.cal-nav-btn:disabled { opacity: 0.35; cursor: default; }
+.cal-nav-btn:disabled:hover { background: var(--app-card-bg); }
+.cal-nav-label { font-size: 15px; font-weight: 700; color: var(--app-text); }
+
+.cal-summary {
+  width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.cal-stat {
+  background: var(--app-card-bg); border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg); padding: 10px; text-align: center; box-shadow: var(--app-card-shadow);
+}
+.cal-stat-num { font-size: 18px; font-weight: 800; }
+.cal-stat--solved .cal-stat-num { color: #10b981; }
+.cal-stat--mistakes .cal-stat-num { color: #f59e0b; }
+.cal-stat--missed .cal-stat-num { color: #ef4444; }
+.cal-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; color: var(--app-text-secondary); margin-top: 2px; }
+
+.cal-weekdays {
+  width: 100%; display: grid; grid-template-columns: repeat(7, 1fr);
+  font-size: 11px; color: var(--app-text-secondary); text-align: center;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+
+.cal-grid {
+  width: 100%; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+}
+.cal-cell {
+  aspect-ratio: 1; border-radius: 10px; border: none; background: transparent;
+  font-size: 13px; color: var(--app-text-secondary); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  position: relative; padding: 0;
+}
+.cal-cell-day { font-weight: 600; }
+.cal-cell-icon { font-size: 9px; line-height: 1; }
+.cal-cell--empty { cursor: default; }
+.cal-cell--upcoming { color: var(--app-text-secondary); opacity: 0.35; cursor: default; background: var(--app-card-bg); }
+.cal-cell--solved { background: rgba(16,185,129,.15); color: #059669; }
+.cal-cell--mistakes { background: rgba(245,158,11,.18); color: #b45309; }
+.cal-cell--missed { background: rgba(239,68,68,.14); color: #dc2626; }
+.cal-cell--today { box-shadow: 0 0 0 2px var(--brand-primary); }
+
+.cal-legend {
+  width: 100%; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+  font-size: 11.5px; color: var(--app-text-secondary); padding: 4px 0;
+}
+.cal-legend span { display: flex; align-items: center; gap: 5px; }
+.cal-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.cal-dot--solved { background: #10b981; }
+.cal-dot--mistakes { background: #f59e0b; }
+.cal-dot--missed { background: #ef4444; }
+.cal-dot--upcoming { background: #d1d5db; }
+
+.cal-sheet { max-height: 85vh; overflow-y: auto; }
+.cal-sheet-body { padding: 4px 20px 24px; }
+.cal-sheet-warning {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412;
+  border-radius: var(--radius-lg); padding: 12px 14px; font-size: 12.5px; line-height: 1.4;
+  margin-bottom: 14px;
+}
+.cal-review-board { max-width: 280px; margin: 0 auto; }
+
 /* Shared vertical stack for mode-detail body content (empty state / streak state) */
 .pm-detail-body {
   width: 100%;

@@ -30,6 +30,7 @@ import { mountAchievementsView } from './ui/views/achievements';
 import { mountStatsView } from './ui/views/stats';
 import { mountGlobalStatsView } from './ui/views/global-stats';
 import { mountRecapView } from './ui/views/recap';
+import { mountCalendarView } from './ui/views/calendar';
 import { mountLedgerView } from './ui/views/ledger';
 import { showLevelUpModal } from './ui/views/level-up';
 import { applyTheme, loadCachedThemeId } from './lib/themes';
@@ -222,6 +223,7 @@ function showDailyDetail() {
     onPlayDaily: playDaily,
     onContinueDaily: (saved) => void playDailyResume(saved),
     onLeaderboard: showLeaderboard,
+    onOpenCalendar: showCalendar,
     nav: navCb,
   });
   currentUnmount = view.unmount;
@@ -313,6 +315,34 @@ function showRecap() {
 function showLedger() {
   clearView();
   const view = mountLedgerView(root, { onBack: showProfile, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
+function showCalendar() {
+  clearView();
+  const view = mountCalendarView(root, {
+    onBack: showDailyDetail,
+    onPlayArchive: (date) => playArchive(date),
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function playArchive(date: string) {
+  const puzzleData = generateDailyPuzzle(date);
+  track(Events.PRACTICE_STARTED, { level: puzzleData.difficulty, mode: 'archive' });
+
+  clearView();
+  const view = mountGameView(root, {
+    mode: 'practice',
+    origin: 'archive',
+    difficulty: puzzleData.difficulty,
+    puzzle: puzzleData.puzzle,
+    solution: puzzleData.solution,
+    onWin: (result) => handleWin(result),
+    onExit: showCalendar,
+    onNewGame: () => playArchive(date),
+  });
   currentUnmount = view.unmount;
 }
 

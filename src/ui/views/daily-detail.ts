@@ -14,6 +14,7 @@ export interface DailyDetailProps {
   onPlayDaily: () => void;
   onContinueDaily: (saved: GameInProgress) => void;
   onLeaderboard: () => void;
+  onOpenCalendar: () => void;
   nav: BottomNavCallbacks;
 }
 
@@ -70,6 +71,7 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
       </div>
 
       <button class="btn pm-detail-btn-primary" id="dd-play" style="width:100%">Play</button>
+      <button class="btn btn--secondary" id="dd-calendar" style="width:100%">${ic.daily(15)} Daily Recap</button>
 
       <div class="dd-lb-head">
         <span class="dd-lb-title">${ic.trophy(15)} Leaderboard Today</span>
@@ -82,6 +84,7 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
 
   root.querySelector('#dd-back')?.addEventListener('click', props.onBack);
   root.querySelector('#dd-lb-more')?.addEventListener('click', props.onLeaderboard);
+  root.querySelector('#dd-calendar')?.addEventListener('click', props.onOpenCalendar);
 
   const playBtn = root.querySelector<HTMLButtonElement>('#dd-play')!;
   playBtn.addEventListener('click', () => {

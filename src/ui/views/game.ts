@@ -15,7 +15,7 @@ import { saveGame, deleteGame, type GameInProgress } from '@lib/local-db';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
-  origin?: 'random';
+  origin?: 'random' | 'archive';
   difficulty: Difficulty;
   puzzle: Board;
   solution: Board;
