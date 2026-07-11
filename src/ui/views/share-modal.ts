@@ -2,6 +2,8 @@
 import { renderWinCard, renderProfileCard, renderRecapCard, renderInviteCard } from '@lib/share/index';
 import type { WinCardData, ProfileCardData, RecapCardData, InviteCardData } from '@lib/share/index';
 import { track } from '@lib/analytics';
+import downloadIcon from '@images/download-icon.png';
+import shareIcon from '@images/share-icon.png';
 
 export interface ShareModalProps {
   win?: WinCardData;
@@ -60,8 +62,8 @@ export function showShareModal(props: ShareModalProps): void {
         <div class="share-preview-loading" id="share-preview-loading">Generating...</div>
       </div>
       <div class="share-actions">
-        <button class="btn btn--secondary" id="share-download">⬇️ Save Image</button>
-        <button class="btn" id="share-share">📤 Share</button>
+        <button class="btn btn--secondary" id="share-download"><img src="${downloadIcon}" class="share-btn-icon" alt="" /> Save Image</button>
+        <button class="btn" id="share-share"><img src="${shareIcon}" class="share-btn-icon" alt="" /> Share</button>
       </div>
     </div>
   `;

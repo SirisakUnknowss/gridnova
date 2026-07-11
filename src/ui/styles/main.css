@@ -4145,6 +4145,14 @@ body.bg-anim-aurora {
   transition: opacity 0.2s;
 }
 
+.share-btn-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  vertical-align: -2px;
+  margin-right: 2px;
+}
+
 .share-preview-loading {
   position: absolute;
   inset: 0;

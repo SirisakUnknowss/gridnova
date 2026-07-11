@@ -75,7 +75,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
         ` : `
           <div style="font-size:12px;color:var(--app-text-secondary);margin-top:4px;">${escapeHtml(user?.email ?? '')}</div>
           <button class="btn btn--secondary btn--small" id="prof-share-card" style="margin-top:10px;">
-            📤 Share Profile
+          ${ic.share(14)} Share Profile
           </button>
         `}
       </div>
