@@ -326,17 +326,6 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
     let referralCode = '';
     try { if (uid) referralCode = await api.getReferralCode(uid); } catch { /* ignore */ }
 
-    let recapData;
-    if (uid) {
-      try {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = now.getMonth() + 1;
-        const recap = await api.getMonthlyRecap(uid, y, m);
-        recapData = { ...recap, year: y, month: m, displayName: profile.display_name || profile.username };
-      } catch { /* ignore */ }
-    }
-
     showShareModal({
       profile: {
         displayName: profile.display_name || profile.username || 'Player',
@@ -348,7 +337,6 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
         coins: st.coins,
         referralCode: referralCode || 'GRIDNOVA',
       },
-      recap: recapData,
       onToast: props.onToast,
     });
   });
