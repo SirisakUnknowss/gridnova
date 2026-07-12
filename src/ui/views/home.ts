@@ -37,7 +37,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     : equippedEmoji
       ? `<span style="font-size:20px">${equippedEmoji}</span>`
       : isGuest ? ic.guest(20) : ic.member(20);
-  const lvl = levelProgress(state.xp);
+  const lvl = levelProgress(state.level, state.xp);
   const muted = isMuted();
   const guestId = getGuestDisplayId();
 

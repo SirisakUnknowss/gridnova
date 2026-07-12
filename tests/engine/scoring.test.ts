@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   computeDailyScore, computePracticeScore, computeDailyCoinReward,
-  xpForLevel, levelFromXp, BASE_SCORE,
+  BASE_SCORE,
 } from '@engine/scoring';
 
 describe('scoring', () => {
@@ -40,22 +40,6 @@ describe('scoring', () => {
       const plain = computeDailyCoinReward({ difficulty: 'medium', timeSeconds: 100, mistakes: 1, hintsUsed: 1 });
       const perfect = computeDailyCoinReward({ difficulty: 'medium', timeSeconds: 100, mistakes: 0, hintsUsed: 0 });
       expect(perfect).toBeGreaterThan(plain);
-    });
-  });
-
-  describe('xp / level', () => {
-    it('xpForLevel grows', () => {
-      expect(xpForLevel(5)).toBeGreaterThan(xpForLevel(1));
-      expect(xpForLevel(50)).toBeGreaterThan(xpForLevel(10));
-    });
-
-    it('levelFromXp at 0 is level 1', () => {
-      expect(levelFromXp(0).level).toBe(1);
-    });
-
-    it('levelFromXp accumulates correctly', () => {
-      const xp = xpForLevel(1) + xpForLevel(2) + 10;
-      expect(levelFromXp(xp).level).toBe(3);
     });
   });
 });

@@ -38,7 +38,7 @@ import { applyBackground, loadCachedBgId } from './lib/backgrounds';
 import { applyBoardColorFromItem } from './lib/board-colors';
 import { initPurchases, isPremiumEntitled } from './lib/purchases';
 import { setPremium } from './lib/premium';
-import { levelFromXp } from './lib/level';
+import { applyXpGain } from './lib/level';
 import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
@@ -490,24 +490,10 @@ async function handleWin(result: GameResult, date?: string) {
     ? computeDailyCoinReward(scoreInput)
     : computePracticeCoinReward(result.difficulty);
   const xp = computeXpReward(scoreInput, result.mode);
-
-  // Optimistic update
   const prevLevel = useStore.getState().level;
-  const newXp = useStore.getState().xp + xp;
-  const newLevel = levelFromXp(newXp);
-  useStore.setState({
-    coins: useStore.getState().coins + coins,
-    xp: newXp,
-    level: newLevel,
-  });
-  if (newLevel > prevLevel) {
-    // Show level-up modal after the win modal closes
-    setTimeout(() => {
-      sfxLevelUp();
-      showLevelUpModal({ newLevel, rewardCoins: 50 * (newLevel - prevLevel) });
-    }, 600);
-    track('level_up', { from: prevLevel, to: newLevel });
-  }
+
+  // Coins are a simple additive balance — safe to reflect immediately.
+  useStore.setState({ coins: useStore.getState().coins + coins });
 
   let rank: number | undefined;
   let totalPlayers: number | undefined;
@@ -522,7 +508,8 @@ async function handleWin(result: GameResult, date?: string) {
 
   try {
     if (isGuest) {
-      // Guest path — save to guest_game_history (no auth needed)
+      // Guest path — save to guest_game_history (no auth needed). There is no
+      // server-side XP/level for guests, so this is the only source of truth.
       await submitGuestScore({
         mode: result.mode,
         daily_date: date,
@@ -532,6 +519,10 @@ async function handleWin(result: GameResult, date?: string) {
         hints_used: result.hintsUsed,
         score: result.score,
       });
+      const state = useStore.getState();
+      const { level: newLevel, xp: newXp } = applyXpGain(state.level, state.xp, xp);
+      useStore.setState({ xp: newXp, level: newLevel });
+      maybeShowLevelUp(prevLevel, newLevel);
     } else if (result.mode === 'daily' && date) {
       // Signed-in member — submit to real leaderboard
       try {
@@ -549,6 +540,9 @@ async function handleWin(result: GameResult, date?: string) {
           totalPlayers = data.total_players;
         }
         await refreshStreakAndToast();
+        // grant_xp uses a different curve than any client-side formula —
+        // always trust the server's post-submit level, never guess locally.
+        maybeShowLevelUp(prevLevel, useStore.getState().level);
       } catch (err) {
         console.warn('Submit failed (offline?):', err);
       }
@@ -561,6 +555,11 @@ async function handleWin(result: GameResult, date?: string) {
           mistakes: result.mistakes,
           hints_used: result.hintsUsed,
         });
+        const prog = await api.getProgression();
+        if (prog) {
+          useStore.setState({ xp: Number(prog.xp ?? 0), level: prog.level ?? prevLevel });
+          maybeShowLevelUp(prevLevel, prog.level ?? prevLevel);
+        }
       } catch (err) {
         console.warn('Practice submit failed:', err);
       }
@@ -580,6 +579,15 @@ async function handleWin(result: GameResult, date?: string) {
     onShare: date ? () => shareResult(result, date, rank, totalPlayers) : undefined,
     onSignUp: isGuest ? () => showAuthModal({ mode: 'signup', onSuccess: showHome, onCancel: showHome }) : undefined,
   });
+}
+
+function maybeShowLevelUp(prevLevel: number, newLevel: number) {
+  if (newLevel <= prevLevel) return;
+  setTimeout(() => {
+    sfxLevelUp();
+    showLevelUpModal({ newLevel, rewardCoins: 50 * (newLevel - prevLevel) });
+  }, 600);
+  track('level_up', { from: prevLevel, to: newLevel });
 }
 
 const STREAK_MILESTONES = new Set([3, 7, 14, 30, 60, 100, 365]);

@@ -93,31 +93,5 @@ export function computeXpReward(input: ScoreInput, mode: 'daily' | 'practice'): 
   return xp;
 }
 
-/** XP required to reach next level */
-export function xpForLevel(level: number): number {
-  return Math.floor(100 * Math.pow(level, 1.6));
-}
-
-/** Total XP needed from level 1 to reach `level` */
-export function cumulativeXpForLevel(level: number): number {
-  let total = 0;
-  for (let i = 1; i < level; i++) total += xpForLevel(i);
-  return total;
-}
-
-/** Compute current level from total xp */
-export function levelFromXp(xp: number): { level: number; xpInLevel: number; xpToNext: number } {
-  let level = 1;
-  let remaining = xp;
-  while (level < 100) {
-    const needed = xpForLevel(level);
-    if (remaining < needed) break;
-    remaining -= needed;
-    level++;
-  }
-  return {
-    level,
-    xpInLevel: remaining,
-    xpToNext: level < 100 ? xpForLevel(level) : 0,
-  };
-}
+// Level/XP curve lives in @lib/level — it must match the server's grant_xp
+// Postgres function, so there is exactly one implementation, not two.
