@@ -322,26 +322,7 @@ function showCalendar() {
   clearView();
   const view = mountCalendarView(root, {
     onBack: showDailyDetail,
-    onPlayArchive: (date) => playArchive(date),
     nav: navCb,
-  });
-  currentUnmount = view.unmount;
-}
-
-function playArchive(date: string) {
-  const puzzleData = generateDailyPuzzle(date);
-  track(Events.PRACTICE_STARTED, { level: puzzleData.difficulty, mode: 'archive' });
-
-  clearView();
-  const view = mountGameView(root, {
-    mode: 'practice',
-    origin: 'archive',
-    difficulty: puzzleData.difficulty,
-    puzzle: puzzleData.puzzle,
-    solution: puzzleData.solution,
-    onWin: (result) => handleWin(result),
-    onExit: showCalendar,
-    onNewGame: () => playArchive(date),
   });
   currentUnmount = view.unmount;
 }

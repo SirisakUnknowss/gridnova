@@ -13,7 +13,6 @@ import type { Board } from '@engine/types';
 
 export interface CalendarProps {
   onBack: () => void;
-  onPlayArchive: (date: string) => void;
   nav: BottomNavCallbacks;
 }
 
@@ -169,9 +168,8 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
         <div class="cal-sheet-body">
           ${status === 'missed' ? `
             <div class="cal-sheet-warning">
-              ${ic.warning(16)} You can play this puzzle for practice, but it won't count toward your streak or leaderboard.
+              ${ic.warning(16)} This puzzle is over — Daily Puzzles can't be played after the day has passed.
             </div>
-            <button class="btn pm-detail-btn-primary" id="cal-sheet-play" style="width:100%">${ic.play(16)} Play This Puzzle</button>
           ` : `
             <div class="profile-stats">
               <div class="stat-tile"><div class="stat-label">Difficulty</div><div class="stat-value" style="text-transform:capitalize">${difficulty}</div></div>
@@ -189,11 +187,6 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
     const close = () => overlay.remove();
     overlay.querySelector('#cal-sheet-close')?.addEventListener('click', close);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-
-    overlay.querySelector('#cal-sheet-play')?.addEventListener('click', () => {
-      close();
-      props.onPlayArchive(dateStr);
-    });
 
     overlay.querySelector('#cal-sheet-review')?.addEventListener('click', (e) => {
       const btn = e.currentTarget as HTMLButtonElement;

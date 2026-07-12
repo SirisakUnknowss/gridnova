@@ -86,8 +86,11 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
   root.querySelector('#dd-lb-more')?.addEventListener('click', props.onLeaderboard);
   root.querySelector('#dd-calendar')?.addEventListener('click', props.onOpenCalendar);
 
+  let alreadyCompleted = false;
+
   const playBtn = root.querySelector<HTMLButtonElement>('#dd-play')!;
   playBtn.addEventListener('click', () => {
+    if (alreadyCompleted) return;
     if (savedGame) props.onContinueDaily(savedGame);
     else props.onPlayDaily();
   });
@@ -100,11 +103,29 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
   tick();
   const countdownHandle = window.setInterval(tick, 1000);
 
-  // Rank today (best-effort)
+  function markCompleted() {
+    alreadyCompleted = true;
+    playBtn.textContent = '✓ Completed today';
+    playBtn.disabled = true;
+    playBtn.classList.add('pm-detail-btn-primary--done');
+  }
+
+  // Daily Puzzle allows exactly one attempt per day — once a score is on
+  // the board, disable Play entirely instead of letting the client start a
+  // fresh attempt that would just fail (or worse, resubmit) server-side.
   void api.getMyDailyRank(today).then((rank) => {
     const rankEl = root.querySelector('#dd-rank');
     if (rankEl && rank) rankEl.textContent = `#${rank.rank} / ${rank.total_players}`;
+    if (rank) markCompleted();
   }).catch(() => { });
+
+  if (currentUserId === null) {
+    // Guest — completion lives in guest_game_history, not daily_leaderboard.
+    void api.getGuestLeaderboard(today).then((rows) => {
+      const mySessionId = api.getSessionId();
+      if (rows.some((r) => r.session_id === mySessionId)) markCompleted();
+    }).catch(() => { });
+  }
 
   // Embedded leaderboard (top 10 today)
   const lbList = root.querySelector<HTMLElement>('#dd-lb-list')!;
@@ -137,12 +158,12 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
   void listGames().then(async (games) => {
     const saved = games.find((g) => g.mode === 'daily' && g.date === today);
     if (!saved) return;
-    if (!saved.moves || saved.moves.length === 0) {
+    if (alreadyCompleted || !saved.moves || saved.moves.length === 0) {
       await deleteGame(saved.game_id);
       return;
     }
     savedGame = saved;
-    playBtn.innerHTML = `Continue`;
+    playBtn.textContent = 'Continue';
   });
 
   return { unmount() { window.clearInterval(countdownHandle); } };
