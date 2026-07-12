@@ -259,7 +259,7 @@ function showPractice() {
 
 function showLeaderboard() {
   clearView();
-  const view = mountLeaderboardView(root, { onBack: showHome, nav: navCb });
+  const view = mountLeaderboardView(root, { onBack: showDailyDetail, nav: navCb });
   currentUnmount = view.unmount;
 }
 
