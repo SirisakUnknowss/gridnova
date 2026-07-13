@@ -1,0 +1,3 @@
+-- Backfill: applied directly via Supabase MCP without a matching local file.
+-- Superseded by 20260629083304 / 20260629084722; final function body lives
+-- in the last of that chain. Placeholder only.
