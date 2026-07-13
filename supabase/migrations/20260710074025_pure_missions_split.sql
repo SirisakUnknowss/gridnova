@@ -1,0 +1,4 @@
+-- Backfill: applied directly via Supabase MCP without a matching local file.
+-- Split "pure" (no-hint) mission achievements by difficulty. Exact original
+-- SQL not recovered; already live on remote, so this is a documentation
+-- placeholder only.

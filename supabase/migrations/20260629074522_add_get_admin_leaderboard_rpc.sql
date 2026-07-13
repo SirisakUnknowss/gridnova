@@ -1,0 +1,4 @@
+-- Backfill: applied directly via Supabase MCP without a matching local file.
+-- Superseded by fixes in 20260629082021 / 20260629083304 / 20260629084722;
+-- final function body lives in the last of that chain. Placeholder only —
+-- keeps local migration history in sync with the remote-applied version.

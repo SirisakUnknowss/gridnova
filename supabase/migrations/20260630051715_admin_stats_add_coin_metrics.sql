@@ -1,0 +1,3 @@
+-- Backfill: applied directly via Supabase MCP without a matching local file.
+-- Added coin metrics to the admin stats RPC. Exact original SQL not
+-- recovered; already live on remote, so this is a documentation placeholder.
