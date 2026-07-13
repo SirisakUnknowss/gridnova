@@ -16,24 +16,32 @@ interface Quest {
   progress: number;
   reward_coin: number;
   reward_xp: number;
+  trigger_type: string | null;
+  description: string | null;
   completed_at: string | null;
   claimed_at: string | null;
 }
 
-const QUEST_META: Record<string, { icon: () => string; title: string }> = {
-  daily_complete: { icon: () => ic.daily(16), title: 'Complete today\'s daily puzzle' },
-  no_mistakes:    { icon: () => ic.target(16), title: 'Finish with 0 mistakes' },
-  no_hints:       { icon: () => ic.brain(16), title: 'Finish without using a hint' },
-  fast_finish:    { icon: () => ic.zap(16), title: 'Finish under target time' },
-  practice_streak:{ icon: () => ic.repeat(16), title: 'Complete 3 practice puzzles' },
+// Icon is chosen by what the quest measures (trigger_type), so any quest_id in
+// the catalog renders correctly without a per-id lookup.
+const TRIGGER_ICON: Record<string, () => string> = {
+  play_daily:       () => ic.daily(16),
+  play_any:         () => ic.gamepad(16),
+  play_practice:    () => ic.gamepad(16),
+  play_level:       () => ic.gamepad(16),
+  win_no_hint:      () => ic.brain(16),
+  win_no_mistake:   () => ic.target(16),
+  win_fast:         () => ic.zap(16),
+  leaderboard_rank: () => ic.trophy(16),
+  login:            () => ic.star(16),
 };
 
 function questTitle(q: Quest): string {
-  return QUEST_META[q.quest_id]?.title || q.quest_id.replace(/_/g, ' ');
+  return q.description || q.quest_id.replace(/_/g, ' ');
 }
 
 function questIcon(q: Quest): string {
-  return QUEST_META[q.quest_id]?.icon() ?? ic.star(16);
+  return (q.trigger_type && TRIGGER_ICON[q.trigger_type]?.()) || ic.star(16);
 }
 
 export interface RenderQuestsOptions {

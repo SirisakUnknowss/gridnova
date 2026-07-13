@@ -175,30 +175,6 @@ Deno.serve(async (req) => {
     p_user_id: user.id, p_date: payload.date,
   });
 
-  // Quest progress — update all daily quests triggered by completing the daily puzzle
-  const FAST_TARGET: Record<string, number> = {
-    'easy': 120, 'easy-medium': 180, 'medium': 240,
-    'medium-hard': 300, 'hard': 360, 'hard-expert': 420, 'expert': 480,
-  };
-  const now = new Date().toISOString();
-  const questUpdates: { quest_id: string; completed: boolean }[] = [
-    { quest_id: 'daily_complete', completed: true },
-    { quest_id: 'no_mistakes',    completed: mistakeCount === 0 },
-    { quest_id: 'no_hints',       completed: hintCount === 0 },
-    { quest_id: 'fast_finish',    completed: payload.time_seconds <= (FAST_TARGET[puzzle.difficulty] ?? 300) },
-  ];
-  await Promise.all(questUpdates.map(({ quest_id, completed }) =>
-    supabaseAdmin.from('user_daily_quests')
-      .update({
-        progress: completed ? 1 : 0,
-        completed_at: completed ? now : null,
-      })
-      .eq('user_id', user.id)
-      .eq('date', payload.date)
-      .eq('quest_id', quest_id)
-      .is('claimed_at', null)
-  ));
-
   // History log
   await supabaseAdmin.from('user_game_history').insert({
     user_id: user.id,
@@ -209,6 +185,13 @@ Deno.serve(async (req) => {
     time_seconds: payload.time_seconds,
     mistakes: mistakeCount,
     hints_used: hintCount,
+  });
+
+  // Quest progress — generic recompute from history + leaderboard standing.
+  // Runs after the history + leaderboard rows exist so counts include this game.
+  await supabaseAdmin.rpc('recompute_daily_quests', {
+    p_user_id: user.id,
+    p_date: payload.date,
   });
 
   // Check and grant achievements

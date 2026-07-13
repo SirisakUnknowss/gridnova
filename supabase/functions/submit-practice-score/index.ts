@@ -161,29 +161,12 @@ Deno.serve(async (req) => {
     p_amount: xpReward,
   });
 
-  // 5. Update practice_streak quest for today
+  // 5. Quest progress — generic recompute from today's game history.
   const today = new Date().toISOString().slice(0, 10);
-  const { count: practiceToday } = await supabaseAdmin
-    .from('user_game_history')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('mode', 'practice')
-    .gte('completed_at', `${today}T00:00:00.000Z`)
-    .lt('completed_at', `${today}T23:59:59.999Z`);
-
-  const practiceCount = practiceToday ?? 0;
-  const PRACTICE_TARGET = 3;
-  const practiceCompleted = practiceCount >= PRACTICE_TARGET;
-  const now = new Date().toISOString();
-  await supabaseAdmin.from('user_daily_quests')
-    .update({
-      progress: Math.min(practiceCount, PRACTICE_TARGET),
-      completed_at: practiceCompleted ? now : null,
-    })
-    .eq('user_id', user.id)
-    .eq('date', today)
-    .eq('quest_id', 'practice_streak')
-    .is('claimed_at', null);
+  await supabaseAdmin.rpc('recompute_daily_quests', {
+    p_user_id: user.id,
+    p_date: today,
+  });
 
   // Check and grant achievements
   const { data: newAchievements } = await supabaseAdmin.rpc('check_and_grant_achievements', {
