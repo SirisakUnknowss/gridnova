@@ -22,6 +22,10 @@ export function initAnalytics(): void {
       capture_pageview: true,
       capture_pageleave: true,
       persistence: 'localStorage',
+      disable_session_recording: false,
+      session_recording: {
+        maskAllInputs: true,
+      },
       loaded: () => { posthogReady = true; },
     });
     console.info('[Analytics] PostHog initialized');
@@ -64,6 +68,13 @@ export function resetUser(): void {
   if (SENTRY_DSN) Sentry.setUser(null);
 }
 
+// Connect a guest's pre-signup activity (tracked under session_id) to their
+// new member id, so the two halves of their timeline stay one person.
+export function aliasUser(userId: string, previousId: string): void {
+  if (!POSTHOG_KEY || !userId || !previousId || userId === previousId) return;
+  posthog.alias(userId, previousId);
+}
+
 // =====================================================================
 // Sentry API
 // =====================================================================
@@ -87,6 +98,7 @@ export const Events = {
   // Lifecycle
   APP_OPEN: 'app_open',
   APP_CLOSE: 'app_close',
+  VIEW_CHANGED: 'view_changed',
 
   // Auth
   SIGN_UP: 'sign_up',
@@ -102,6 +114,9 @@ export const Events = {
   // Practice
   PRACTICE_STARTED: 'practice_started',
   PRACTICE_COMPLETED: 'practice_completed',
+
+  // Game lifecycle
+  GAME_ABANDONED: 'game_abandoned',
 
   // Streak
   STREAK_MILESTONE: 'streak_milestone',

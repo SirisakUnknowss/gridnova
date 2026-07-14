@@ -1,0 +1,4 @@
+-- Backfill: applied directly via Supabase MCP without a matching local file.
+-- Small fix within the achievement_redesign work (coins column reference).
+-- Exact original SQL not recovered; already live on remote, so this is a
+-- documentation placeholder only — safe no-op.

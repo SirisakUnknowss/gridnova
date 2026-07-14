@@ -12,7 +12,7 @@ import { showShareModal } from './share-modal';
 import { useStore } from '@state/store';
 import * as api from '@lib/api';
 import { saveGame, deleteGame, type GameInProgress } from '@lib/local-db';
-import { track } from '@lib/analytics';
+import { track, Events } from '@lib/analytics';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
@@ -798,6 +798,17 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       if (autosaveHandle) clearInterval(autosaveHandle);
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      // Left the game without winning or losing → abandoned. Lets us compute
+      // start→finish completion rate (the biggest activation-funnel gap).
+      if (!gameWon) {
+        track(Events.GAME_ABANDONED, {
+          mode: props.origin === 'random' ? 'random' : mode,
+          difficulty,
+          time_seconds: elapsedSeconds(),
+          mistakes,
+          hints_used: 3 - hintsLeft,
+        });
+      }
     },
   };
 }
