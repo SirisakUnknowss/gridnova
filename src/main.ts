@@ -5,7 +5,7 @@ import './ui/styles/main.css';
 import { getCurrentUser, onAuthChange } from './lib/auth';
 import { useStore } from './state/store';
 import * as api from './lib/api';
-import { initAnalytics, track, identify, captureError, Events } from './lib/analytics';
+import { initAnalytics, track, identify, aliasUser, captureError, Events } from './lib/analytics';
 import { migrateFromV1, shouldMigrate } from './lib/migrate-v1';
 import { generatePuzzle, generateDailyPuzzle } from './engine/generator';
 import type { Difficulty } from './engine/types';
@@ -42,7 +42,7 @@ import { applyXpGain } from './lib/level';
 import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
-import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores } from './lib/api';
+import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, getSessionId } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
 import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
 
@@ -67,13 +67,14 @@ if ('serviceWorker' in navigator) {
 const root = document.getElementById('app')!;
 let currentUnmount: (() => void) | null = null;
 
-function clearView() {
+function clearView(view?: string) {
   if (currentUnmount) {
     currentUnmount();
     currentUnmount = null;
   }
   root.innerHTML = '';
   window.scrollTo(0, 0);
+  if (view) track(Events.VIEW_CHANGED, { view });
 }
 
 async function loadUserData(): Promise<void> {
@@ -154,7 +155,7 @@ async function playDailyResume(saved: GameInProgress) {
   } catch {
     puzzleData = generateDailyPuzzle(date);
   }
-  clearView();
+  clearView('game_daily');
   const view = mountGameView(root, {
     mode: 'daily',
     difficulty: puzzleData.difficulty,
@@ -173,7 +174,7 @@ function playPracticeResume(saved: GameInProgress) {
   const stage = saved.stage ?? 1;
   const seed = `practice:${level}:${stage}`;
   const puzzleData = generatePuzzle({ difficulty: level, seed });
-  clearView();
+  clearView('game_practice');
   const view = mountGameView(root, {
     mode: 'practice',
     difficulty: level,
@@ -189,7 +190,7 @@ function playPracticeResume(saved: GameInProgress) {
 }
 
 function showHome() {
-  clearView();
+  clearView('home');
   const view = mountHomeView(root, {
     onEnterPlayMode: showPlayMode,
     onOpenPractice: showPractice,
@@ -206,7 +207,7 @@ function showHome() {
 }
 
 function showPlayMode() {
-  clearView();
+  clearView('play_mode');
   const view = mountPlayModeView(root, {
     onBack: showHome,
     onOpenDaily: showDailyDetail,
@@ -217,7 +218,7 @@ function showPlayMode() {
 }
 
 function showDailyDetail() {
-  clearView();
+  clearView('daily_detail');
   const view = mountDailyDetailView(root, {
     onBack: showPlayMode,
     onPlayDaily: playDaily,
@@ -230,7 +231,7 @@ function showDailyDetail() {
 }
 
 function showRandomDetail() {
-  clearView();
+  clearView('random_detail');
   const view = mountRandomModeDetailView(root, {
     onBack: showPlayMode,
     onPlayRandom: playRandom,
@@ -241,13 +242,13 @@ function showRandomDetail() {
 }
 
 function showRandomLeaderboard() {
-  clearView();
+  clearView('random_leaderboard');
   const view = mountRandomLeaderboardView(root, { onBack: showRandomDetail, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showPractice() {
-  clearView();
+  clearView('practice');
   const view = mountPracticeView(root, {
     onBack: showHome,
     onPlayPractice: (level) => playPractice(level as Difficulty),
@@ -258,13 +259,13 @@ function showPractice() {
 }
 
 function showLeaderboard() {
-  clearView();
+  clearView('leaderboard');
   const view = mountLeaderboardView(root, { onBack: showDailyDetail, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showProfile() {
-  clearView();
+  clearView('profile');
   const view = mountProfileView(root, {
     onBack: showHome,
     onOpenStats: showStats,
@@ -289,37 +290,37 @@ function showProfile() {
 }
 
 function showAchievements(fromProfile = false) {
-  clearView();
+  clearView('achievements');
   const view = mountAchievementsView(root, { onBack: fromProfile ? showProfile : showHome, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showStats() {
-  clearView();
+  clearView('stats');
   const view = mountStatsView(root, { onBack: showProfile, nav: navCb, onGlobalStats: showGlobalStats });
   currentUnmount = view.unmount;
 }
 
 function showGlobalStats() {
-  clearView();
+  clearView('global_stats');
   const view = mountGlobalStatsView(root, { onBack: showStats, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showRecap() {
-  clearView();
+  clearView('recap');
   const view = mountRecapView(root, { onBack: showProfile, onToast: toast, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showLedger() {
-  clearView();
+  clearView('ledger');
   const view = mountLedgerView(root, { onBack: showProfile, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showCalendar() {
-  clearView();
+  clearView('calendar');
   const view = mountCalendarView(root, {
     onBack: showDailyDetail,
     nav: navCb,
@@ -393,7 +394,7 @@ async function playDaily() {
     puzzleData = local;
   }
 
-  clearView();
+  clearView('game_daily');
   const view = mountGameView(root, {
     mode: 'daily',
     difficulty: puzzleData.difficulty,
@@ -420,7 +421,7 @@ async function playPractice(level: Difficulty) {
   const puzzleData = generatePuzzle({ difficulty: level, seed });
   track(Events.PRACTICE_STARTED, { level, stage });
 
-  clearView();
+  clearView('game_practice');
   const view = mountGameView(root, {
     mode: 'practice',
     difficulty: level,
@@ -440,7 +441,7 @@ function playRandom() {
   const puzzleData = generatePuzzle({ difficulty: level, seed });
   track(Events.PRACTICE_STARTED, { level, mode: 'random' });
 
-  clearView();
+  clearView('game_random');
   const view = mountGameView(root, {
     mode: 'practice',
     origin: 'random',
@@ -771,6 +772,9 @@ async function boot() {
         // Migrate any local guest scores (handles Google OAuth redirect login)
         // migrateGuestScores() is idempotent — safe to call on every boot when user exists
         if (localStorage.getItem('sudoku_guest_display_id_v1')) {
+          // Connect their guest analytics timeline to this member id before it
+          // gets superseded by identify(user.id) above.
+          aliasUser(user.id, getSessionId());
           const migrated = await migrateGuestScores();
           if (migrated > 0) {
             console.info(`[Boot] Migrated ${migrated} guest score(s) from local session`);
@@ -778,7 +782,9 @@ async function boot() {
         }
         await loadUserData();
       } else {
-        // No existing session → run as guest (visitor tracking still works via anon key)
+        // No existing session → run as guest (visitor tracking still works via anon key).
+        // Identify by the stable session_id so guest retention/geo/device is visible.
+        identify(getSessionId(), { is_guest: true });
         useStore.setState({ profile: { display_name: 'Guest' }, coins: 100 });
       }
     } catch (err) {
