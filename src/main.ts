@@ -41,8 +41,19 @@ import { setPremium } from './lib/premium';
 import { applyXpGain } from './lib/level';
 import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
-import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
-import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores } from './lib/api';
+import {
+  computeDailyCoinReward,
+  computePracticeCoinReward,
+  computeXpReward,
+} from './engine/scoring';
+import {
+  trackVisit,
+  heartbeat,
+  leaveOnline,
+  getVisitorStats,
+  submitGuestScore,
+  migrateGuestScores,
+} from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
 import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
 
@@ -59,7 +70,7 @@ if ('serviceWorker' in navigator) {
   // Force SW to check for updates every time user opens the app (critical for PWA on home screen)
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-      navigator.serviceWorker.ready.then(reg => reg.update()).catch(() => {});
+      navigator.serviceWorker.ready.then((reg) => reg.update()).catch(() => {});
     }
   });
 }
@@ -81,18 +92,21 @@ async function loadUserData(): Promise<void> {
     const [wallet, progression, profile, equipped, inventory] = await Promise.all([
       api.getWallet(),
       api.getProgression(),
-      useStore.getState().user ? api.getProfile(useStore.getState().user!.id) : Promise.resolve(null),
+      useStore.getState().user
+        ? api.getProfile(useStore.getState().user!.id)
+        : Promise.resolve(null),
       api.getEquipped().catch(() => null),
       api.getInventory().catch(() => []),
     ]);
     const set = useStore.setState;
     if (wallet) set({ coins: wallet.coins });
-    if (progression) set({
-      xp: Number(progression.xp),
-      level: progression.level,
-      currentStreak: progression.current_streak,
-      longestStreak: progression.longest_streak ?? 0,
-    });
+    if (progression)
+      set({
+        xp: Number(progression.xp),
+        level: progression.level,
+        currentStreak: progression.current_streak,
+        longestStreak: progression.longest_streak ?? 0,
+      });
     if (profile) set({ profile });
     if (equipped) {
       useStore.getState().setEquipped({
@@ -104,7 +118,8 @@ async function loadUserData(): Promise<void> {
       if (equipped.theme_id) applyTheme(equipped.theme_id);
       if (equipped.background_id) applyBackground(equipped.background_id);
       if ((equipped as any).board_color_id) {
-        api.getShopItem((equipped as any).board_color_id)
+        api
+          .getShopItem((equipped as any).board_color_id)
           .then((item) => applyBoardColorFromItem(item))
           .catch(() => {});
       }
@@ -116,9 +131,9 @@ async function loadUserData(): Promise<void> {
     // Init RevenueCat and sync premium entitlement
     const userId = useStore.getState().user?.id;
     if (userId) {
-      initPurchases(userId).then(() =>
-        isPremiumEntitled().then((entitled) => setPremium(entitled))
-      ).catch(() => {});
+      initPurchases(userId)
+        .then(() => isPremiumEntitled().then((entitled) => setPremium(entitled)))
+        .catch(() => {});
     }
   } catch (err) {
     console.warn('Failed to load user data:', err);
@@ -130,24 +145,38 @@ async function loadUserData(): Promise<void> {
 // =====================================================================
 // Shared callbacks for the bottom nav — same in every view
 const navCb = {
-  onHome:         () => showHome(),
+  onHome: () => showHome(),
   onAchievements: () => showAchievements(),
-  onProfile:      () => showProfile(),
+  onProfile: () => showProfile(),
 };
 
 async function playDailyResume(saved: GameInProgress) {
   const date = saved.date!;
-  let puzzleData: { puzzle: number[][]; solution: number[][]; difficulty: import('./engine/types').Difficulty };
+  let puzzleData: {
+    puzzle: number[][];
+    solution: number[][];
+    difficulty: import('./engine/types').Difficulty;
+  };
   try {
     const resp = await api.getDailyPuzzle(date);
     if (resp) {
       puzzleData = {
-        puzzle: (resp.puzzle as string).split('').map(Number).reduce((acc: number[][], v, i) => {
-          if (i % 9 === 0) acc.push([]); acc[acc.length - 1].push(v); return acc;
-        }, []),
-        solution: (resp.solution as string).split('').map(Number).reduce((acc: number[][], v, i) => {
-          if (i % 9 === 0) acc.push([]); acc[acc.length - 1].push(v); return acc;
-        }, []),
+        puzzle: (resp.puzzle as string)
+          .split('')
+          .map(Number)
+          .reduce((acc: number[][], v, i) => {
+            if (i % 9 === 0) acc.push([]);
+            acc[acc.length - 1].push(v);
+            return acc;
+          }, []),
+        solution: (resp.solution as string)
+          .split('')
+          .map(Number)
+          .reduce((acc: number[][], v, i) => {
+            if (i % 9 === 0) acc.push([]);
+            acc[acc.length - 1].push(v);
+            return acc;
+          }, []),
         difficulty: resp.difficulty as import('./engine/types').Difficulty,
       };
     } else throw new Error('no puzzle');
@@ -273,8 +302,16 @@ function showProfile() {
     onOpenLedger: showLedger,
     onSignOut: () => {
       if (confirm('Sign out?')) {
+        track(Events.SIGN_OUT);
         void signOut().then(() => {
-          useStore.setState({ user: null, profile: null, coins: 0, xp: 0, level: 1, currentStreak: 0 });
+          useStore.setState({
+            user: null,
+            profile: null,
+            coins: 0,
+            xp: 0,
+            level: 1,
+            currentStreak: 0,
+          });
           applyBackground('bg_default');
           applyTheme('theme_classic');
           void boot();
@@ -290,13 +327,20 @@ function showProfile() {
 
 function showAchievements(fromProfile = false) {
   clearView();
-  const view = mountAchievementsView(root, { onBack: fromProfile ? showProfile : showHome, nav: navCb });
+  const view = mountAchievementsView(root, {
+    onBack: fromProfile ? showProfile : showHome,
+    nav: navCb,
+  });
   currentUnmount = view.unmount;
 }
 
 function showStats() {
   clearView();
-  const view = mountStatsView(root, { onBack: showProfile, nav: navCb, onGlobalStats: showGlobalStats });
+  const view = mountStatsView(root, {
+    onBack: showProfile,
+    nav: navCb,
+    onGlobalStats: showGlobalStats,
+  });
   currentUnmount = view.unmount;
 }
 
@@ -336,9 +380,10 @@ function openAuthAction() {
         const migrated = await migrateGuestScores();
         await loadUserData();
         showHome();
-        const msg = migrated > 0
-          ? `Progress saved! ${migrated} game${migrated > 1 ? 's' : ''} transferred to your account.`
-          : 'Progress saved! Sign in from any device to continue.';
+        const msg =
+          migrated > 0
+            ? `Progress saved! ${migrated} game${migrated > 1 ? 's' : ''} transferred to your account.`
+            : 'Progress saved! Sign in from any device to continue.';
         toast(msg, 3500);
       },
       onCancel: () => {},
@@ -352,11 +397,17 @@ function openAuthAction() {
         const migrated = await migrateGuestScores();
         await loadUserData();
         showHome();
-        if (migrated > 0) toast(`Welcome back! ${migrated} guest game${migrated > 1 ? 's' : ''} imported.`, 3500);
+        if (migrated > 0)
+          toast(`Welcome back! ${migrated} guest game${migrated > 1 ? 's' : ''} imported.`, 3500);
         // Claim referral if user arrived via invite link
         const pendingRef = localStorage.getItem('gridnova_ref');
         if (pendingRef) {
-          try { await api.claimReferral(pendingRef); } catch { /* ignore */ }
+          try {
+            await api.claimReferral(pendingRef);
+            track('referral_claimed', { code: pendingRef });
+          } catch {
+            /* ignore */
+          }
           localStorage.removeItem('gridnova_ref');
         }
       },
@@ -410,7 +461,7 @@ async function playPractice(level: Difficulty) {
   // Delete any stale saved games for this difficulty so the continue banner
   // never shows a finished or abandoned game after starting fresh.
   const stale = await listGames();
-  for (const g of stale.filter(g => g.mode === 'practice' && g.level === level)) {
+  for (const g of stale.filter((g) => g.mode === 'practice' && g.level === level)) {
     await deleteGame(g.game_id);
   }
 
@@ -486,9 +537,10 @@ async function handleWin(result: GameResult, date?: string) {
     mistakes: result.mistakes,
     hintsUsed: result.hintsUsed,
   };
-  const coins = result.mode === 'daily'
-    ? computeDailyCoinReward(scoreInput)
-    : computePracticeCoinReward(result.difficulty);
+  const coins =
+    result.mode === 'daily'
+      ? computeDailyCoinReward(scoreInput)
+      : computePracticeCoinReward(result.difficulty);
   const xp = computeXpReward(scoreInput, result.mode);
   const prevLevel = useStore.getState().level;
 
@@ -501,9 +553,7 @@ async function handleWin(result: GameResult, date?: string) {
   const isGuest = !useStore.getState().user || !!useStore.getState().user?.is_anonymous;
 
   const hideLoading = showLoadingOverlay(
-    result.mode === 'daily'
-      ? 'Submitting daily score...'
-      : 'Saving practice progress...'
+    result.mode === 'daily' ? 'Submitting daily score...' : 'Saving practice progress...',
   );
 
   try {
@@ -577,7 +627,9 @@ async function handleWin(result: GameResult, date?: string) {
     isGuest,
     onContinue: showHome,
     onShare: date ? () => shareResult(result, date, rank, totalPlayers) : undefined,
-    onSignUp: isGuest ? () => showAuthModal({ mode: 'signup', onSuccess: showHome, onCancel: showHome }) : undefined,
+    onSignUp: isGuest
+      ? () => showAuthModal({ mode: 'signup', onSuccess: showHome, onCancel: showHome })
+      : undefined,
   });
 }
 
@@ -629,7 +681,9 @@ async function shareResult(result: GameResult, date: string, rank?: number, tota
   let referralCode = '';
   try {
     if (userId) referralCode = await api.getReferralCode(userId);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   showShareModal({
     win: {
@@ -639,16 +693,19 @@ async function shareResult(result: GameResult, date: string, rank?: number, tota
       totalPlayers: total,
       streak: state.currentStreak,
     },
-    profile: profile && userId ? {
-      displayName: profile.display_name || profile.username || 'Player',
-      avatarUrl: profile.avatar_url,
-      avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
-      level: state.level,
-      bestStreak: state.currentStreak,
-      longestStreak: state.longestStreak,
-      coins: state.coins,
-      referralCode,
-    } : undefined,
+    profile:
+      profile && userId
+        ? {
+            displayName: profile.display_name || profile.username || 'Player',
+            avatarUrl: profile.avatar_url,
+            avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
+            level: state.level,
+            bestStreak: state.currentStreak,
+            longestStreak: state.longestStreak,
+            coins: state.coins,
+            referralCode,
+          }
+        : undefined,
     onToast: toast,
   });
 }
@@ -658,7 +715,7 @@ async function shareResult(result: GameResult, date: string, rank?: number, tota
 // =====================================================================
 function formatVisitorCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
 }
 
@@ -671,13 +728,13 @@ async function refreshVisitorStats() {
     const el = document.getElementById(id);
     if (el) el.textContent = formatVisitorCount(val);
   };
-  patch('vs-online',         stats.online);
-  patch('vs-online-guests',  stats.online_guests);
+  patch('vs-online', stats.online);
+  patch('vs-online-guests', stats.online_guests);
   patch('vs-online-members', stats.online_members);
-  patch('vs-today',          stats.today);
-  patch('vs-today-guests',   stats.today_guests);
-  patch('vs-today-members',  stats.today_members);
-  patch('vs-total',          stats.total);
+  patch('vs-today', stats.today);
+  patch('vs-today-guests', stats.today_guests);
+  patch('vs-today-members', stats.today_members);
+  patch('vs-total', stats.total);
 }
 
 // =====================================================================
@@ -731,7 +788,9 @@ async function boot() {
   const splash = mountSplash(root);
   const minSplashDuration = new Promise<void>((resolve) => setTimeout(resolve, 1800));
 
-  const hasSupabase = !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+  const hasSupabase = !!(
+    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY
+  );
 
   if (hasSupabase) {
     try {
@@ -829,7 +888,11 @@ async function boot() {
 
   // Show onboarding once per device (after home is mounted so it has a backdrop)
   if (!hasCompletedOnboarding()) {
-    showOnboarding({ onFinish: () => { /* user is on home; quest list will pick up name on next render */ showHome(); } });
+    showOnboarding({
+      onFinish: () => {
+        /* user is on home; quest list will pick up name on next render */ showHome();
+      },
+    });
   }
 }
 
