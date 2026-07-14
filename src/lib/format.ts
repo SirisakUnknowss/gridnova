@@ -13,11 +13,7 @@ export function formatNumber(n: number): string {
 }
 
 export function todayUtc(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  return new Date().toISOString().slice(0, 10);
 }
 
 export function escapeHtml(s: string): string {
