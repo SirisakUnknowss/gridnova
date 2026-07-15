@@ -1,9 +1,10 @@
 // =====================================================================
 // Tests for src/lib/level.ts — XP curve invariants
-// Must match supabase/migrations/20260101000004_functions.sql's grant_xp
+// Must match the server's grant_xp Postgres function (see migrations
+// *_flatten_level_curve.sql)
 // =====================================================================
 import { describe, it, expect } from 'vitest';
-import { xpForLevel, applyXpGain, levelProgress } from '../../src/lib/level';
+import { xpForLevel, applyXpGain, levelProgress, freeHintsForLevel } from '../../src/lib/level';
 
 describe('xpForLevel', () => {
   it('is monotonically increasing', () => {
@@ -11,10 +12,23 @@ describe('xpForLevel', () => {
       expect(xpForLevel(lvl + 1)).toBeGreaterThan(xpForLevel(lvl));
     }
   });
-  it('matches the server formula floor(100 * L^1.6)', () => {
-    expect(xpForLevel(1)).toBe(100);
-    expect(xpForLevel(2)).toBe(Math.floor(100 * Math.pow(2, 1.6)));
-    expect(xpForLevel(5)).toBe(Math.floor(100 * Math.pow(5, 1.6)));
+  it('matches the server formula floor(60 * L^1.2)', () => {
+    expect(xpForLevel(1)).toBe(60);
+    expect(xpForLevel(2)).toBe(Math.floor(60 * Math.pow(2, 1.2)));
+    expect(xpForLevel(5)).toBe(Math.floor(60 * Math.pow(5, 1.2)));
+  });
+});
+
+describe('freeHintsForLevel', () => {
+  it('is 3 at low levels', () => {
+    expect(freeHintsForLevel(1)).toBe(3);
+    expect(freeHintsForLevel(19)).toBe(3);
+  });
+  it('grants +1 every 20 levels, capped at +3', () => {
+    expect(freeHintsForLevel(20)).toBe(4);
+    expect(freeHintsForLevel(40)).toBe(5);
+    expect(freeHintsForLevel(60)).toBe(6);
+    expect(freeHintsForLevel(100)).toBe(6);
   });
 });
 

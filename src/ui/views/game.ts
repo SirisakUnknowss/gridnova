@@ -12,6 +12,7 @@ import { showShareModal } from './share-modal';
 import { useStore } from '@state/store';
 import * as api from '@lib/api';
 import { saveGame, deleteGame, type GameInProgress } from '@lib/local-db';
+import { freeHintsForLevel } from '@lib/level';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
@@ -66,9 +67,12 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     Array.from({ length: 9 }, () => new Set<number>()));
 
   const PAID_HINT_COSTS = [50, 75, 100];
+  // Daily has a global leaderboard, so free hints stay equal for everyone
+  // there. Practice/Random get a level perk: more free hints as you level up.
+  const FREE_HINTS = mode === 'daily' ? 3 : freeHintsForLevel(useStore.getState().level ?? 1);
   let selected: { r: number; c: number } | null = null;
   let mistakes = 0;
-  let hintsLeft = 3;
+  let hintsLeft = FREE_HINTS;
   let paidHintsUsed = 0;
   let noteMode = false;
   const moves: Move[] = [];
@@ -103,14 +107,14 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         bits.forEach(n => noteMask[Math.floor(i / 9)][i % 9].add(n));
       });
       mistakes = Math.max(0, Math.min(r.mistakes ?? 0, 2));
-      hintsLeft = Math.max(0, Math.min(r.hints_left ?? 3, 3));
+      hintsLeft = Math.max(0, Math.min(r.hints_left ?? FREE_HINTS, FREE_HINTS));
       moves.push(...(r.moves as Move[]));
       const savedElapsed = r.elapsed_seconds ?? 0;
       // Set pausedMs so elapsedSeconds() returns savedElapsed immediately on resume
       pausedMs = Date.now() - startTime - savedElapsed * 1000;
     } catch {
       // Corrupted save — start fresh (board/masks already initialized as-new)
-      mistakes = 0; hintsLeft = 3;
+      mistakes = 0; hintsLeft = FREE_HINTS;
     }
   }
 
@@ -516,7 +520,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     void deleteGame(gameId);
 
     const timeSeconds = elapsedSeconds();
-    const hintsUsed = 3 - hintsLeft;
+    const hintsUsed = FREE_HINTS - hintsLeft;
     const scoreInput = { difficulty, timeSeconds, mistakes, hintsUsed };
     const score = mode === 'daily'
       ? computeDailyScore(scoreInput).score
