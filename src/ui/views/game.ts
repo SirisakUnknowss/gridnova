@@ -42,12 +42,9 @@ export interface GameResult {
 }
 
 interface HistoryEntry {
-  r: number;
-  c: number;
-  prevDigit: number;
-  nextDigit: number;
-  prevNotes: number[];
-  nextNotes: number[];
+  r: number; c: number;
+  prevDigit: number; nextDigit: number;
+  prevNotes: number[]; nextNotes: number[];
   mistakesDelta: number;
 }
 
@@ -64,11 +61,10 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   // State
   const userBoard: Board = cloneBoard(puzzle);
-  const givenMask: boolean[][] = puzzle.map((row) => row.map((v) => v !== 0));
+  const givenMask: boolean[][] = puzzle.map(row => row.map(v => v !== 0));
   const hintMask: boolean[][] = Array.from({ length: 9 }, () => Array(9).fill(false));
   const noteMask: Set<number>[][] = Array.from({ length: 9 }, () =>
-    Array.from({ length: 9 }, () => new Set<number>()),
-  );
+    Array.from({ length: 9 }, () => new Set<number>()));
 
   const PAID_HINT_COSTS = [50, 75, 100];
   let selected: { r: number; c: number } | null = null;
@@ -88,10 +84,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   let gameWon = false;
 
   // Unique key for this game session (used for save/load)
-  const gameId =
-    mode === 'daily'
-      ? `daily-${props.date ?? new Date().toISOString().slice(0, 10)}`
-      : `practice-${difficulty}`;
+  const gameId = mode === 'daily'
+    ? `daily-${props.date ?? new Date().toISOString().slice(0, 10)}`
+    : `practice-${difficulty}`;
 
   // Restore saved state if resuming
   if (props.resume) {
@@ -99,17 +94,14 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     try {
       // Restore board
       r.user_board.forEach((v, i) => {
-        const row = Math.floor(i / 9),
-          col = i % 9;
+        const row = Math.floor(i / 9), col = i % 9;
         if (!givenMask[row][col]) userBoard[row][col] = v;
       });
       // Restore hint cells
-      r.hint_cells.forEach((i) => {
-        hintMask[Math.floor(i / 9)][i % 9] = true;
-      });
+      r.hint_cells.forEach(i => { hintMask[Math.floor(i / 9)][i % 9] = true; });
       // Restore notes
       (r as GameInProgress & { notes?: number[][] }).notes?.forEach((bits, i) => {
-        bits.forEach((n) => noteMask[Math.floor(i / 9)][i % 9].add(n));
+        bits.forEach(n => noteMask[Math.floor(i / 9)][i % 9].add(n));
       });
       mistakes = Math.max(0, Math.min(r.mistakes ?? 0, 2));
       hintsLeft = Math.max(0, Math.min(r.hints_left ?? 3, 3));
@@ -119,8 +111,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       pausedMs = Date.now() - startTime - savedElapsed * 1000;
     } catch {
       // Corrupted save — start fresh (board/masks already initialized as-new)
-      mistakes = 0;
-      hintsLeft = 3;
+      mistakes = 0; hintsLeft = 3;
     }
   }
 
@@ -133,9 +124,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     <section class="view view--game">
       <div class="game-card">
         <div class="game-topbar">
-          ${
-            mode === 'daily'
-              ? `<div style="display:flex;align-items:center;gap:8px;">
+          ${mode === 'daily'
+            ? `<div style="display:flex;align-items:center;gap:8px;">
                 <div class="mode-pill no-click">
                   <span class="mode-dot" style="background:${dotColor}"></span>
                   <span>Daily Puzzle</span>
@@ -144,7 +134,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 </button>
                </div>`
-              : `<button class="mode-pill" id="mode-pill-btn">
+            : `<button class="mode-pill" id="mode-pill-btn">
                 <span class="mode-dot" style="background:${dotColor}"></span>
                 <span id="mode-pill-label">${diffLabel}</span>
                </button>`
@@ -244,22 +234,22 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     </section>
   `;
 
-  const boardEl = root.querySelector('#board') as HTMLElement;
-  const numpadEl = root.querySelector('#numpad') as HTMLElement;
-  const timerEl = root.querySelector('#timer') as HTMLElement;
-  const heartsEl = root.querySelector('#hearts-display') as HTMLElement;
+  const boardEl    = root.querySelector('#board') as HTMLElement;
+  const numpadEl   = root.querySelector('#numpad') as HTMLElement;
+  const timerEl    = root.querySelector('#timer') as HTMLElement;
+  const heartsEl   = root.querySelector('#hearts-display') as HTMLElement;
 
   function renderHearts(count: number) {
     heartsEl.innerHTML = [0, 1, 2]
-      .map((i) => `<span class="heart${i < count ? ' heart--lost' : ''}">♥</span>`)
+      .map(i => `<span class="heart${i < count ? ' heart--lost' : ''}">♥</span>`)
       .join('');
   }
   const hintCountEl = root.querySelector('#hint-count') as HTMLElement;
-  const hintBtn = root.querySelector('#hint-btn') as HTMLButtonElement;
-  const undoBtn = root.querySelector('#undo-btn') as HTMLButtonElement;
-  const redoBtn = root.querySelector('#redo-btn') as HTMLButtonElement;
-  const eraseBtn = root.querySelector('#erase-btn') as HTMLButtonElement;
-  const notesBtn = root.querySelector('#notes-btn') as HTMLButtonElement;
+  const hintBtn    = root.querySelector('#hint-btn') as HTMLButtonElement;
+  const undoBtn    = root.querySelector('#undo-btn') as HTMLButtonElement;
+  const redoBtn    = root.querySelector('#redo-btn') as HTMLButtonElement;
+  const eraseBtn   = root.querySelector('#erase-btn') as HTMLButtonElement;
+  const notesBtn   = root.querySelector('#notes-btn') as HTMLButtonElement;
   const notesBadge = root.querySelector('#notes-badge') as HTMLElement;
 
   function elapsedMs(): number {
@@ -273,10 +263,13 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   function saveProgress() {
     if (gameWon) return;
     const notes: number[][] = [];
-    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) notes.push(Array.from(noteMask[r][c]));
+    for (let r = 0; r < 9; r++)
+      for (let c = 0; c < 9; c++)
+        notes.push(Array.from(noteMask[r][c]));
     const hint_cells: number[] = [];
     for (let r = 0; r < 9; r++)
-      for (let c = 0; c < 9; c++) if (hintMask[r][c]) hint_cells.push(r * 9 + c);
+      for (let c = 0; c < 9; c++)
+        if (hintMask[r][c]) hint_cells.push(r * 9 + c);
     void saveGame({
       game_id: gameId,
       mode,
@@ -302,16 +295,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   }
 
   function rerender() {
-    renderBoard(boardEl, {
-      userBoard,
-      solution,
-      givenMask,
-      hintMask,
-      noteMask,
-      selected,
-      settings,
-      onCellClick,
-    });
+    renderBoard(boardEl, { userBoard, solution, givenMask, hintMask, noteMask, selected, settings, onCellClick });
     renderNumpad(numpadEl, { userBoard, solution, onNumber: handleNumber });
   }
 
@@ -333,18 +317,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (noteMode) {
       const prevNotes = notesSnapshot(r, c);
       const set = noteMask[r][c];
-      if (set.has(n)) set.delete(n);
-      else set.add(n);
+      if (set.has(n)) set.delete(n); else set.add(n);
       const nextNotes = notesSnapshot(r, c);
-      history.push({
-        r,
-        c,
-        prevDigit: userBoard[r][c],
-        nextDigit: userBoard[r][c],
-        prevNotes,
-        nextNotes,
-        mistakesDelta: 0,
-      });
+      history.push({ r, c, prevDigit: userBoard[r][c], nextDigit: userBoard[r][c], prevNotes, nextNotes, mistakesDelta: 0 });
       future.length = 0;
       syncUndoRedo();
       rerender();
@@ -379,10 +354,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         noteMask[r][i].delete(n);
         noteMask[i][c].delete(n);
       }
-      const br = Math.floor(r / 3) * 3,
-        bc = Math.floor(c / 3) * 3;
-      for (let dr = 0; dr < 3; dr++)
-        for (let dc = 0; dc < 3; dc++) noteMask[br + dr][bc + dc].delete(n);
+      const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+      for (let dr = 0; dr < 3; dr++) for (let dc = 0; dc < 3; dc++) noteMask[br+dr][bc+dc].delete(n);
     }
 
     history.push({ r, c, prevDigit, nextDigit: n, prevNotes, nextNotes: [], mistakesDelta });
@@ -440,12 +413,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
     let target = candidates[0];
     if (selected) {
-      candidates.sort(
-        (a, b) =>
-          Math.abs(a.r - selected!.r) +
-          Math.abs(a.c - selected!.c) -
-          (Math.abs(b.r - selected!.r) + Math.abs(b.c - selected!.c)),
-      );
+      candidates.sort((a, b) =>
+        (Math.abs(a.r - selected!.r) + Math.abs(a.c - selected!.c)) -
+        (Math.abs(b.r - selected!.r) + Math.abs(b.c - selected!.c)));
       target = candidates[0];
     }
 
@@ -454,13 +424,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     hintMask[target.r][target.c] = true;
     sfxHint();
     selected = target;
-    moves.push({
-      r: target.r,
-      c: target.c,
-      n: solution[target.r][target.c],
-      t: elapsedMs(),
-      isHint: true,
-    });
+    moves.push({ r: target.r, c: target.c, n: solution[target.r][target.c], t: elapsedMs(), isHint: true });
     history.length = 0;
     future.length = 0;
     syncUndoRedo();
@@ -490,7 +454,6 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
     if (hintsLeft > 0) {
       hintsLeft--;
-      track('hint_used', { mode, difficulty, hint_type: 'free', hints_remaining: hintsLeft });
       applyHint();
       updateHintButton();
       return;
@@ -514,11 +477,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     const onConfirm = async () => {
       overlay.style.display = 'none';
       try {
-        const result = await api.spendCoins(cost, 'hint_purchase', {
-          mode,
-          difficulty,
-          hint_index: paidHintsUsed,
-        });
+        const result = await api.spendCoins(cost, 'hint_purchase', { mode, difficulty, hint_index: paidHintsUsed });
         if (!result.ok) {
           // Insufficient coins or other failure — just update button state
           updateHintButton();
@@ -528,7 +487,6 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         if (result.balance !== undefined) {
           useStore.setState({ coins: result.balance });
         }
-        track('paid_hint_purchased', { mode, difficulty, cost, hint_index: paidHintsUsed });
         paidHintsUsed++;
         applyHint();
         updateHintButton();
@@ -544,14 +502,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       cancelBtn.removeEventListener('click', onCancel);
       confirmBtn.removeEventListener('click', handleConfirm);
     };
-    const onCancel = () => {
-      overlay.style.display = 'none';
-      cleanup();
-    };
-    const handleConfirm = () => {
-      cleanup();
-      void onConfirm();
-    };
+    const onCancel = () => { overlay.style.display = 'none'; cleanup(); };
+    const handleConfirm = () => { cleanup(); void onConfirm(); };
 
     cancelBtn.addEventListener('click', onCancel);
     confirmBtn.addEventListener('click', handleConfirm);
@@ -561,20 +513,17 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (!boardsEqual(userBoard, solution)) return;
     gameWon = true;
     if (timerHandle) clearInterval(timerHandle);
-    if (autosaveHandle) {
-      clearInterval(autosaveHandle);
-      autosaveHandle = null;
-    }
+    if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
 
     const timeSeconds = elapsedSeconds();
     const hintsUsed = 3 - hintsLeft;
     const scoreInput = { difficulty, timeSeconds, mistakes, hintsUsed };
-    const score =
-      mode === 'daily' ? computeDailyScore(scoreInput).score : computePracticeScore(scoreInput);
+    const score = mode === 'daily'
+      ? computeDailyScore(scoreInput).score
+      : computePracticeScore(scoreInput);
 
-    if (mode === 'daily') sfxDailyWin();
-    else sfxWin();
+    if (mode === 'daily') sfxDailyWin(); else sfxWin();
 
     // Report started_at as an EFFECTIVE start (completedAt − actual play time) so the
     // server's wall-clock check matches time_seconds. The raw mount-time start drifts
@@ -582,36 +531,14 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     // trip the server TIME_MISMATCH guard and silently 403 every daily submission.
     const completedAtMs = Date.now();
     const effectiveStartedAt = new Date(completedAtMs - timeSeconds * 1000).toISOString();
-    props.onWin({
-      mode,
-      difficulty,
-      timeSeconds,
-      mistakes,
-      hintsUsed,
-      score,
-      moves,
-      startedAt: effectiveStartedAt,
-      completedAt: new Date(completedAtMs).toISOString(),
-    });
+    props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
   }
 
   function triggerGameOver() {
     gameWon = true;
-    if (timerHandle) {
-      clearInterval(timerHandle);
-      timerHandle = null;
-    }
-    if (autosaveHandle) {
-      clearInterval(autosaveHandle);
-      autosaveHandle = null;
-    }
+    if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+    if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
-    track('game_over', {
-      mode,
-      difficulty,
-      time_seconds: elapsedSeconds(),
-      hints_used: 3 - hintsLeft,
-    });
     const overlay = root.querySelector('#gameover-overlay') as HTMLElement;
     overlay.classList.add('open');
     props.onLose?.();
@@ -621,36 +548,23 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const boardOverlay = root.querySelector('#board-overlay') as HTMLElement;
 
   function openMenu() {
-    if (timerHandle) {
-      clearInterval(timerHandle);
-      timerHandle = null;
-    }
+    if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     pauseStart = Date.now();
     saveProgress();
     boardOverlay.classList.add('open');
   }
 
   function closeMenu() {
-    if (pauseStart !== null) {
-      pausedMs += Date.now() - pauseStart;
-      pauseStart = null;
-    }
+    if (pauseStart !== null) { pausedMs += Date.now() - pauseStart; pauseStart = null; }
     boardOverlay.classList.remove('open');
-    if (!gameWon)
-      timerHandle = window.setInterval(() => {
-        timerEl.textContent = formatTime(elapsedSeconds());
-      }, 500);
+    if (!gameWon) timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
   }
 
   root.querySelector('#game-share-btn')?.addEventListener('click', async () => {
     const state = useStore.getState();
     const uid = state.user?.id;
     let referralCode = '';
-    try {
-      if (uid) referralCode = await api.getReferralCode(uid);
-    } catch {
-      /* ignore */
-    }
+    try { if (uid) referralCode = await api.getReferralCode(uid); } catch { /* ignore */ }
     const profile = state.profile;
     const displayName = profile?.display_name || profile?.username || undefined;
 
@@ -661,19 +575,16 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         referralCode: referralCode || undefined,
         displayName,
       },
-      profile:
-        uid && profile
-          ? {
-              displayName: displayName ?? 'Player',
-              avatarUrl: profile.avatar_url,
-              avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
-              level: state.level,
-              bestStreak: state.currentStreak,
-              longestStreak: state.longestStreak,
-              coins: state.coins,
-              referralCode: referralCode || 'GRIDNOVA',
-            }
-          : undefined,
+      profile: uid && profile ? {
+        displayName: displayName ?? 'Player',
+        avatarUrl: profile.avatar_url,
+        avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
+        level: state.level,
+        bestStreak: state.currentStreak,
+        longestStreak: state.longestStreak,
+        coins: state.coins,
+        referralCode: referralCode || 'GRIDNOVA',
+      } : undefined,
     });
   });
 
@@ -681,28 +592,16 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   root.querySelector('#overlay-resume')?.addEventListener('click', closeMenu);
   root.querySelector('#overlay-new')?.addEventListener('click', () => {
     if (timerHandle) clearInterval(timerHandle);
-    if (props.onNewGame) props.onNewGame();
-    else props.onExit();
+    if (props.onNewGame) props.onNewGame(); else props.onExit();
   });
   root.querySelector('#overlay-leave')?.addEventListener('click', () => {
     if (timerHandle) clearInterval(timerHandle);
-    if (autosaveHandle) {
-      clearInterval(autosaveHandle);
-      autosaveHandle = null;
-    }
-    track('game_abandoned', {
-      mode,
-      difficulty,
-      time_seconds: elapsedSeconds(),
-      mistakes,
-      hints_used: 3 - hintsLeft,
-    });
+    if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     saveProgress();
     props.onExit();
   });
   root.querySelector('#gameover-new')?.addEventListener('click', () => {
-    if (props.onNewGame) props.onNewGame();
-    else props.onExit();
+    if (props.onNewGame) props.onNewGame(); else props.onExit();
   });
   root.querySelector('#gameover-leave')?.addEventListener('click', () => props.onExit());
 
@@ -722,33 +621,16 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (gameWon) return;
     if (e.key >= '1' && e.key <= '9') handleNumber(parseInt(e.key, 10));
     else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') eraseCell();
-    else if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      undoMove();
-    } else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      redoMove();
-    } else if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey) {
-      e.preventDefault();
-      notesBtn.click();
-    } else if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey) {
-      e.preventDefault();
-      hintBtn.click();
-    } else if (selected) {
+    else if (e.key === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); undoMove(); }
+    else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); redoMove(); }
+    else if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); notesBtn.click(); }
+    else if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); hintBtn.click(); }
+    else if (selected) {
       const { r, c } = selected;
-      if (e.key === 'ArrowUp') {
-        selected = { r: Math.max(0, r - 1), c };
-        rerender();
-      } else if (e.key === 'ArrowDown') {
-        selected = { r: Math.min(8, r + 1), c };
-        rerender();
-      } else if (e.key === 'ArrowLeft') {
-        selected = { r, c: Math.max(0, c - 1) };
-        rerender();
-      } else if (e.key === 'ArrowRight') {
-        selected = { r, c: Math.min(8, c + 1) };
-        rerender();
-      }
+      if      (e.key === 'ArrowUp')    { selected = { r: Math.max(0, r - 1), c }; rerender(); }
+      else if (e.key === 'ArrowDown')  { selected = { r: Math.min(8, r + 1), c }; rerender(); }
+      else if (e.key === 'ArrowLeft')  { selected = { r, c: Math.max(0, c - 1) }; rerender(); }
+      else if (e.key === 'ArrowRight') { selected = { r, c: Math.min(8, c + 1) }; rerender(); }
     }
   };
   document.addEventListener('keydown', onKey);
@@ -767,10 +649,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (document.hidden) {
       // Pause unless something else already paused us (e.g. the menu overlay).
       if (pauseStart === null) {
-        if (timerHandle) {
-          clearInterval(timerHandle);
-          timerHandle = null;
-        }
+        if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
         pauseStart = Date.now();
         saveProgress();
       }
@@ -778,9 +657,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       // Resume only when the pause came from being hidden, not from an open menu.
       pausedMs += Date.now() - pauseStart;
       pauseStart = null;
-      timerHandle = window.setInterval(() => {
-        timerEl.textContent = formatTime(elapsedSeconds());
-      }, 500);
+      timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
     }
   }
   document.addEventListener('visibilitychange', onVisibilityChange);
