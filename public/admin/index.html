@@ -305,6 +305,16 @@
         <div class="value" id="c-coins-held">—</div>
         <div class="sub"  id="c-coins-ever-sub">หาได้รวมทั้งหมด —</div>
       </div>
+      <div class="stat-card green">
+        <div class="label">⏱️ Avg. Duration Today</div>
+        <div class="value" id="c-avg-duration">—</div>
+        <div class="sub">last_seen − first visit</div>
+      </div>
+      <div class="stat-card pink">
+        <div class="label">🕹️ Played Today</div>
+        <div class="value" id="c-played-today">—</div>
+        <div class="sub" id="c-played-today-sub">visited / started a game</div>
+      </div>
     </div>
 
     <div class="charts-grid">
@@ -315,6 +325,17 @@
       <div class="chart-card">
         <h3>🎯 Difficulty Breakdown</h3>
         <div style="position:relative;height:220px"><canvas id="diff-chart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>🔻 Today's Funnel — where sessions actually go</h3>
+        <div style="position:relative;height:220px"><canvas id="funnel-chart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>🔁 D1 Retention (14 days) — % back the next day</h3>
+        <div style="position:relative;height:220px"><canvas id="retention-chart"></canvas></div>
       </div>
     </div>
 
@@ -517,6 +538,7 @@ const AUTO_REFRESH  = 60_000;
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let trendChart = null, diffChart = null, hourlyChart = null, shopCatChart = null;
+let funnelChart = null, retentionChart = null;
 
 let currentTab = 'analytics';
 let activeFilterLevel = 'all';
@@ -671,6 +693,41 @@ function renderHourly(data) {
   }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
     scales:{ x:{ticks:{color:'#94a3b8',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},
              y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}} } }
+  });
+}
+
+function renderFunnel(d) {
+  d = d || { total_sessions: 0, view_counts: [], played_sessions: 0, avg_duration_seconds: 0 };
+  setEl('c-avg-duration', fmtTime(d.avg_duration_seconds));
+  const total = d.total_sessions || 0;
+  const played = d.played_sessions || 0;
+  setEl('c-played-today', total ? `${played}/${total}` : '—');
+  setEl('c-played-today-sub', total ? `${Math.round((played/total)*100)}% เริ่มเล่นเกม` : 'visited / started a game');
+
+  const views = (d.view_counts || []).slice(0, 10);
+  const ctx = document.getElementById('funnel-chart').getContext('2d');
+  if (funnelChart) funnelChart.destroy();
+  funnelChart = new Chart(ctx, { type:'bar', data:{
+    labels: views.map(v=>v.view),
+    datasets:[{ label:'Sessions', data: views.map(v=>v.sessions), backgroundColor:'rgba(236,72,153,.7)', borderRadius:4, borderSkipped:false }]
+  }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+    scales:{ x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+             y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}} } }
+  });
+}
+
+function renderRetention(rows) {
+  rows = rows || [];
+  const labels = rows.map(r => r.date.slice(5));
+  const rates = rows.map(r => r.cohort_size ? Math.round((r.returned_next_day / r.cohort_size) * 100) : 0);
+  const ctx = document.getElementById('retention-chart').getContext('2d');
+  if (retentionChart) retentionChart.destroy();
+  retentionChart = new Chart(ctx, { type:'bar', data:{
+    labels,
+    datasets:[{ label:'D1 retention %', data: rates, backgroundColor:'rgba(16,185,129,.7)', borderRadius:4, borderSkipped:false }]
+  }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+    scales:{ x:{ticks:{color:'#94a3b8',font:{size:9},maxRotation:0},grid:{display:false}},
+             y:{ min:0, max:100, ticks:{color:'#94a3b8',font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'}} } }
   });
 }
 
@@ -1514,14 +1571,18 @@ async function loadData() {
   renderHourly(d.hourly_today);
   renderTable(d.difficulty_breakdown);
 
-  // Load lists + shop stats in parallel
-  const [onlineList, memberList, shopStats] = await Promise.all([
+  // Load lists + shop stats + funnel/retention in parallel
+  const [onlineList, memberList, shopStats, funnel, retention] = await Promise.all([
     callRpc('get_admin_online_list', session.access_token),
     callRpc('get_admin_member_list', session.access_token),
     callRpc('get_admin_shop_stats', session.access_token),
+    callRpc('get_admin_funnel', session.access_token),
+    callRpc('get_admin_retention', session.access_token),
   ]);
   renderOnlineList(onlineList);
   renderMemberList(memberList);
+  renderFunnel(funnel);
+  renderRetention(retention);
   if (shopStats && !shopStats.error) {
     renderShopStats(shopStats);
     renderShopTopItems(shopStats.top_items);

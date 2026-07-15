@@ -413,16 +413,38 @@ export async function trackVisit(isGuest: boolean): Promise<void> {
 /**
  * Heartbeat — call every 30s to stay "online".
  * Upserts into online_sessions; stale rows (>2min) = offline.
+ * Also touches visitor_sessions.last_seen so today's row can derive a
+ * session-duration estimate (last_seen − created_at) in the admin panel.
  */
 export async function heartbeat(isGuest: boolean, userId?: string): Promise<void> {
   try {
     const session_id = getSessionId();
-    await supabase
-      .from('online_sessions')
-      .upsert(
-        { session_id, last_seen: new Date().toISOString(), is_guest: isGuest, user_id: userId ?? null },
-        { onConflict: 'session_id' }
-      );
+    const now = new Date().toISOString();
+    await Promise.all([
+      supabase
+        .from('online_sessions')
+        .upsert(
+          { session_id, last_seen: now, is_guest: isGuest, user_id: userId ?? null },
+          { onConflict: 'session_id' }
+        ),
+      supabase
+        .from('visitor_sessions')
+        .update({ last_seen: now })
+        .eq('session_id', session_id)
+        .eq('visited_date', now.slice(0, 10)),
+    ]);
+  } catch { /* offline / demo mode */ }
+}
+
+/**
+ * Log an in-app navigation for the home-grown admin funnel (which views a
+ * session visits, whether it ever reaches a game). Best-effort, no-op on
+ * failure — never blocks navigation.
+ */
+export async function logView(view: string, userId?: string | null): Promise<void> {
+  try {
+    const session_id = getSessionId();
+    await supabase.from('session_views').insert({ session_id, user_id: userId ?? null, view });
   } catch { /* offline / demo mode */ }
 }
 

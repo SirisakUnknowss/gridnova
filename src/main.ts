@@ -42,7 +42,7 @@ import { applyXpGain } from './lib/level';
 import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
-import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, getSessionId } from './lib/api';
+import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, getSessionId, logView } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
 import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
 
@@ -74,7 +74,10 @@ function clearView(view?: string) {
   }
   root.innerHTML = '';
   window.scrollTo(0, 0);
-  if (view) track(Events.VIEW_CHANGED, { view });
+  if (view) {
+    track(Events.VIEW_CHANGED, { view });
+    void logView(view, useStore.getState().user?.id);
+  }
 }
 
 async function loadUserData(): Promise<void> {
