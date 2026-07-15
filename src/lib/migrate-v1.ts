@@ -3,7 +3,7 @@
 // See docs/04-current-state/migration-notes.md
 // =====================================================================
 import { supabase, hasSupabaseConfig } from './supabase';
-import { track, Events, captureError } from './analytics';
+import { captureError } from './analytics';
 import type { Difficulty } from '@engine/types';
 
 const V1_DB_KEY = 'sudoku_db_v1';
@@ -197,11 +197,6 @@ export async function migrateFromV1(): Promise<MigrationResult> {
     localStorage.setItem(MIGRATED_FLAG, 'true');
     localStorage.setItem('migrated_at', new Date().toISOString());
     // Keep v1 data as backup — user can clear later
-
-    track(Events.MIGRATION_V1, {
-      practice_count: practiceProgressCount,
-      history_count: historyCount,
-    });
 
     return {
       ran: true,

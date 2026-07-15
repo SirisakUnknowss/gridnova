@@ -5,7 +5,7 @@ import './ui/styles/main.css';
 import { getCurrentUser, onAuthChange } from './lib/auth';
 import { useStore } from './state/store';
 import * as api from './lib/api';
-import { initAnalytics, track, identify, aliasUser, captureError, Events } from './lib/analytics';
+import { initAnalytics, captureError } from './lib/analytics';
 import { migrateFromV1, shouldMigrate } from './lib/migrate-v1';
 import { generatePuzzle, generateDailyPuzzle } from './engine/generator';
 import type { Difficulty } from './engine/types';
@@ -42,7 +42,7 @@ import { applyXpGain } from './lib/level';
 import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
-import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, getSessionId, logView } from './lib/api';
+import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, logView } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
 import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
 
@@ -75,7 +75,6 @@ function clearView(view?: string) {
   root.innerHTML = '';
   window.scrollTo(0, 0);
   if (view) {
-    track(Events.VIEW_CHANGED, { view });
     void logView(view, useStore.getState().user?.id);
   }
 }
@@ -373,7 +372,6 @@ function openAuthAction() {
 
 async function playDaily() {
   const date = todayUtc();
-  track(Events.DAILY_PUZZLE_STARTED, { date });
   let puzzleData;
   // Try fetch from server; fallback to local generation
   try {
@@ -422,7 +420,6 @@ async function playPractice(level: Difficulty) {
   const stage = Math.floor(Math.random() * 100) + 1;
   const seed = `practice:${level}:${stage}`;
   const puzzleData = generatePuzzle({ difficulty: level, seed });
-  track(Events.PRACTICE_STARTED, { level, stage });
 
   clearView('game_practice');
   const view = mountGameView(root, {
@@ -442,7 +439,6 @@ function playRandom() {
   const level = DIFFICULTIES[Math.floor(Math.random() * DIFFICULTIES.length)];
   const seed = `random:${Date.now()}:${Math.floor(Math.random() * 1_000_000)}`;
   const puzzleData = generatePuzzle({ difficulty: level, seed });
-  track(Events.PRACTICE_STARTED, { level, mode: 'random' });
 
   clearView('game_random');
   const view = mountGameView(root, {
@@ -476,14 +472,6 @@ function showLoadingOverlay(text = 'Saving your score...'): () => void {
 }
 
 async function handleWin(result: GameResult, date?: string) {
-  const event = result.mode === 'daily' ? Events.DAILY_PUZZLE_COMPLETED : Events.PRACTICE_COMPLETED;
-  track(event, {
-    difficulty: result.difficulty,
-    time_seconds: result.timeSeconds,
-    mistakes: result.mistakes,
-    hints_used: result.hintsUsed,
-    score: result.score,
-  });
   const scoreInput = {
     difficulty: result.difficulty,
     timeSeconds: result.timeSeconds,
@@ -591,7 +579,6 @@ function maybeShowLevelUp(prevLevel: number, newLevel: number) {
     sfxLevelUp();
     showLevelUpModal({ newLevel, rewardCoins: 50 * (newLevel - prevLevel) });
   }, 600);
-  track('level_up', { from: prevLevel, to: newLevel });
 }
 
 const STREAK_MILESTONES = new Set([3, 7, 14, 30, 60, 100, 365]);
@@ -609,15 +596,12 @@ async function refreshStreakAndToast() {
     });
     if (newStreak > prevStreak) {
       if (STREAK_MILESTONES.has(newStreak)) {
-        track(Events.STREAK_MILESTONE, { streak: newStreak });
         sfxStreakMilestone();
         toast(`🔥 ${newStreak}-day streak! Keep it up!`, 4000);
       } else {
         sfxCoin();
         toast(`🔥 Streak saved — ${newStreak} day${newStreak === 1 ? '' : 's'}!`);
       }
-    } else if (newStreak < prevStreak && prevStreak > 0) {
-      track(Events.STREAK_LOST, { previous: prevStreak });
     }
   } catch (err) {
     console.warn('Streak refresh failed:', err);
@@ -625,7 +609,6 @@ async function refreshStreakAndToast() {
 }
 
 async function shareResult(result: GameResult, date: string, rank?: number, total?: number) {
-  track(Events.SHARE_RESULT, { date, rank });
   const state = useStore.getState();
   const profile = state.profile;
   const userId = state.user?.id;
@@ -728,7 +711,6 @@ async function boot() {
 
   // Init analytics first — safe even with empty keys
   initAnalytics();
-  track(Events.APP_OPEN);
 
   // Show animated splash immediately
   root.innerHTML = '';
@@ -741,7 +723,6 @@ async function boot() {
     try {
       onAuthChange((user) => {
         useStore.setState({ user });
-        if (user) identify(user.id);
       });
       // Use getCurrentUser() only — never auto-sign-in anonymously at boot.
       // signInAnonymously() on a project without anonymous auth enabled
@@ -764,7 +745,6 @@ async function boot() {
 
       if (user) {
         useStore.setState({ user });
-        identify(user.id);
         // Run v1 migration if applicable
         if (shouldMigrate()) {
           const result = await migrateFromV1();
@@ -775,9 +755,6 @@ async function boot() {
         // Migrate any local guest scores (handles Google OAuth redirect login)
         // migrateGuestScores() is idempotent — safe to call on every boot when user exists
         if (localStorage.getItem('sudoku_guest_display_id_v1')) {
-          // Connect their guest analytics timeline to this member id before it
-          // gets superseded by identify(user.id) above.
-          aliasUser(user.id, getSessionId());
           const migrated = await migrateGuestScores();
           if (migrated > 0) {
             console.info(`[Boot] Migrated ${migrated} guest score(s) from local session`);
@@ -785,9 +762,7 @@ async function boot() {
         }
         await loadUserData();
       } else {
-        // No existing session → run as guest (visitor tracking still works via anon key).
-        // Identify by the stable session_id so guest retention/geo/device is visible.
-        identify(getSessionId(), { is_guest: true });
+        // No existing session → run as guest (visitor tracking still works via anon key)
         useStore.setState({ profile: { display_name: 'Guest' }, coins: 100 });
       }
     } catch (err) {
