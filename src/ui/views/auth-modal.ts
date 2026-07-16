@@ -2,7 +2,6 @@
 // Auth modal — sign in / sign up / upgrade-from-anonymous
 // =====================================================================
 import { signIn, signUp, upgradeAnonymousToEmail, signInWithGoogle } from '@lib/auth';
-import { track, Events, identify } from '@lib/analytics';
 import { ic } from '@ui/icons';
 
 type Mode = 'signin' | 'signup' | 'upgrade';
@@ -152,21 +151,10 @@ export function showAuthModal(props: AuthModalProps): void {
         let result;
         if (mode === 'signin') {
           result = await signIn(email, password);
-          if (result.ok && result.user) {
-            track(Events.SIGN_IN, { method: 'email' });
-            identify(result.user.id);
-          }
         } else if (mode === 'signup') {
           result = await signUp(email, password);
-          if (result.ok && result.user) {
-            track(Events.SIGN_UP, { method: 'email' });
-            identify(result.user.id);
-          }
         } else {
           result = await upgradeAnonymousToEmail(email, password);
-          if (result.ok && result.user) {
-            track(Events.ANONYMOUS_UPGRADED, {});
-          }
         }
 
         if (!result.ok) {

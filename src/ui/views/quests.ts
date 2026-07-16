@@ -4,7 +4,6 @@
 import * as api from '@lib/api';
 import { useStore } from '@state/store';
 import { todayUtc, escapeHtml } from '@lib/format';
-import { track } from '@lib/analytics';
 import { sfxQuestClaim } from '@lib/sound';
 import { ic } from '@ui/icons';
 
@@ -108,7 +107,6 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
       try {
         const { error } = await api.claimQuestReward(todayUtc(), questId);
         if (error) throw error;
-        track('quest_claimed', { quest_id: questId });
         sfxQuestClaim();
         opts.onToast?.('Quest reward claimed!');
         // Optimistically refresh

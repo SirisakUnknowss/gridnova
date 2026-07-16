@@ -5,7 +5,6 @@ import { useStore } from '@state/store';
 import * as api from '@lib/api';
 import { showShareModal } from './share-modal';
 import { escapeHtml, formatNumber } from '@lib/format';
-import { track } from '@lib/analytics';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
@@ -275,7 +274,6 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
       avatarBtn.textContent = emoji;
       const newAvatar = { emoji };
       useStore.getState().setEquipped({ avatar: newAvatar });
-      track('avatar_changed', { emoji });
 
       try {
         if (!isGuest) {

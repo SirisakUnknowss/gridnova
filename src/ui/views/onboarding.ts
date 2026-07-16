@@ -3,7 +3,6 @@
 // =====================================================================
 import { supabase } from '@lib/supabase';
 import { useStore } from '@state/store';
-import { track } from '@lib/analytics';
 import { ic } from '@ui/icons';
 
 const ONBOARDED_KEY = 'sudoku_onboarded_v1';
@@ -32,14 +31,11 @@ export function showOnboarding(props: OnboardingProps): void {
 
   let step = 0;
   let nickname = '';
-  let notifChoice: 'accept' | 'skip' | null = null;
 
   const wrapper = document.createElement('div');
   wrapper.id = 'onb-root';
   wrapper.className = 'modal-bg active';
   document.body.appendChild(wrapper);
-
-  track('onboarding_started');
 
   const finish = async () => {
     markOnboarded();
@@ -55,7 +51,6 @@ export function showOnboarding(props: OnboardingProps): void {
         console.warn('Failed to save nickname:', err);
       }
     }
-    track('onboarding_completed', { steps: 4, notifications: notifChoice ?? 'skipped' });
     wrapper.remove();
     props.onFinish();
   };
@@ -141,7 +136,6 @@ export function showOnboarding(props: OnboardingProps): void {
     if (step === 2) {
       wrapper.querySelectorAll<HTMLButtonElement>('[data-notif]').forEach((btn) => {
         btn.addEventListener('click', () => {
-          notifChoice = btn.dataset.notif as 'accept' | 'skip';
           wrapper.querySelectorAll<HTMLButtonElement>('[data-notif]').forEach((b) => {
             b.classList.toggle('selected', b === btn);
           });

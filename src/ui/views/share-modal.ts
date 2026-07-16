@@ -1,7 +1,6 @@
 // Share Modal — preview + share/download for Win / Profile / Recap / Invite cards
 import { renderWinCard, renderProfileCard, renderRecapCard, renderInviteCard } from '@lib/share/index';
 import type { WinCardData, ProfileCardData, RecapCardData, InviteCardData } from '@lib/share/index';
-import { track } from '@lib/analytics';
 import downloadIcon from '@images/download-icon.png';
 import shareIcon from '@images/share-icon.png';
 
@@ -159,7 +158,6 @@ export function showShareModal(props: ShareModalProps): void {
   // (desktop browsers).
   root.querySelector('#share-download')?.addEventListener('click', async () => {
     if (!activeBlob) return;
-    track('share_download', { type: activeType });
     const file = new File([activeBlob], `gridnova-${activeType}.png`, { type: 'image/png' });
     if (navigator.canShare?.({ files: [file] })) {
       try {
@@ -180,7 +178,6 @@ export function showShareModal(props: ShareModalProps): void {
   // Share
   root.querySelector('#share-share')?.addEventListener('click', async () => {
     if (!activeBlob) return;
-    track('share_send', { type: activeType });
     const file = new File([activeBlob], `gridnova-${activeType}.png`, { type: 'image/png' });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {

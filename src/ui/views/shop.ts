@@ -4,7 +4,6 @@
 import * as api from '@lib/api';
 import { useStore } from '@state/store';
 import { escapeHtml, formatNumber } from '@lib/format';
-import { track } from '@lib/analytics';
 import { applyTheme, themePreview, THEMES } from '@lib/themes';
 import { applyBackground, BACKGROUNDS, bgPreviewIcon } from '@lib/backgrounds';
 import { applyBoardColorFromItem } from '@lib/board-colors';
@@ -233,7 +232,6 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
     try {
       const { error } = await api.purchaseItem(itemId);
       if (error) throw error;
-      track('item_purchased', { item_id: itemId, category: item.category, price: item.price_coin });
       // Optimistic: deduct coins + add to inventory (animated)
       const prevCoins = useStore.getState().coins;
       useStore.setState({ coins: Math.max(0, prevCoins - item.price_coin) });
@@ -262,7 +260,6 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
     try {
       const { error } = await api.equipItem(payload);
       if (error) throw error;
-      track('item_equipped', { item_id: itemId, category: item.category });
       useStore.getState().setEquipped(payload);
       if (item.category === 'theme' && THEMES[itemId]) { applyTheme(itemId); sfxThemeChange(); }
       if (item.category === 'background' && BACKGROUNDS[itemId]) applyBackground(itemId);

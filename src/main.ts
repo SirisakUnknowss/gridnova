@@ -5,7 +5,7 @@ import './ui/styles/main.css';
 import { getCurrentUser, onAuthChange } from './lib/auth';
 import { useStore } from './state/store';
 import * as api from './lib/api';
-import { initAnalytics, track, identify, captureError, Events } from './lib/analytics';
+import { initAnalytics, captureError } from './lib/analytics';
 import { migrateFromV1, shouldMigrate } from './lib/migrate-v1';
 import { generatePuzzle, generateDailyPuzzle } from './engine/generator';
 import type { Difficulty } from './engine/types';
@@ -42,7 +42,7 @@ import { applyXpGain } from './lib/level';
 import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
-import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores } from './lib/api';
+import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, logView } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
 import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
 
@@ -67,13 +67,16 @@ if ('serviceWorker' in navigator) {
 const root = document.getElementById('app')!;
 let currentUnmount: (() => void) | null = null;
 
-function clearView() {
+function clearView(view?: string) {
   if (currentUnmount) {
     currentUnmount();
     currentUnmount = null;
   }
   root.innerHTML = '';
   window.scrollTo(0, 0);
+  if (view) {
+    void logView(view, useStore.getState().user?.id);
+  }
 }
 
 async function loadUserData(): Promise<void> {
@@ -154,7 +157,7 @@ async function playDailyResume(saved: GameInProgress) {
   } catch {
     puzzleData = generateDailyPuzzle(date);
   }
-  clearView();
+  clearView('game_daily');
   const view = mountGameView(root, {
     mode: 'daily',
     difficulty: puzzleData.difficulty,
@@ -173,7 +176,7 @@ function playPracticeResume(saved: GameInProgress) {
   const stage = saved.stage ?? 1;
   const seed = `practice:${level}:${stage}`;
   const puzzleData = generatePuzzle({ difficulty: level, seed });
-  clearView();
+  clearView('game_practice');
   const view = mountGameView(root, {
     mode: 'practice',
     difficulty: level,
@@ -189,7 +192,7 @@ function playPracticeResume(saved: GameInProgress) {
 }
 
 function showHome() {
-  clearView();
+  clearView('home');
   const view = mountHomeView(root, {
     onEnterPlayMode: showPlayMode,
     onOpenPractice: showPractice,
@@ -206,7 +209,7 @@ function showHome() {
 }
 
 function showPlayMode() {
-  clearView();
+  clearView('play_mode');
   const view = mountPlayModeView(root, {
     onBack: showHome,
     onOpenDaily: showDailyDetail,
@@ -217,7 +220,7 @@ function showPlayMode() {
 }
 
 function showDailyDetail() {
-  clearView();
+  clearView('daily_detail');
   const view = mountDailyDetailView(root, {
     onBack: showPlayMode,
     onPlayDaily: playDaily,
@@ -230,7 +233,7 @@ function showDailyDetail() {
 }
 
 function showRandomDetail() {
-  clearView();
+  clearView('random_detail');
   const view = mountRandomModeDetailView(root, {
     onBack: showPlayMode,
     onPlayRandom: playRandom,
@@ -241,13 +244,13 @@ function showRandomDetail() {
 }
 
 function showRandomLeaderboard() {
-  clearView();
+  clearView('random_leaderboard');
   const view = mountRandomLeaderboardView(root, { onBack: showRandomDetail, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showPractice() {
-  clearView();
+  clearView('practice');
   const view = mountPracticeView(root, {
     onBack: showHome,
     onPlayPractice: (level) => playPractice(level as Difficulty),
@@ -258,13 +261,13 @@ function showPractice() {
 }
 
 function showLeaderboard() {
-  clearView();
+  clearView('leaderboard');
   const view = mountLeaderboardView(root, { onBack: showDailyDetail, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showProfile() {
-  clearView();
+  clearView('profile');
   const view = mountProfileView(root, {
     onBack: showHome,
     onOpenStats: showStats,
@@ -289,37 +292,37 @@ function showProfile() {
 }
 
 function showAchievements(fromProfile = false) {
-  clearView();
+  clearView('achievements');
   const view = mountAchievementsView(root, { onBack: fromProfile ? showProfile : showHome, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showStats() {
-  clearView();
+  clearView('stats');
   const view = mountStatsView(root, { onBack: showProfile, nav: navCb, onGlobalStats: showGlobalStats });
   currentUnmount = view.unmount;
 }
 
 function showGlobalStats() {
-  clearView();
+  clearView('global_stats');
   const view = mountGlobalStatsView(root, { onBack: showStats, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showRecap() {
-  clearView();
+  clearView('recap');
   const view = mountRecapView(root, { onBack: showProfile, onToast: toast, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showLedger() {
-  clearView();
+  clearView('ledger');
   const view = mountLedgerView(root, { onBack: showProfile, nav: navCb });
   currentUnmount = view.unmount;
 }
 
 function showCalendar() {
-  clearView();
+  clearView('calendar');
   const view = mountCalendarView(root, {
     onBack: showDailyDetail,
     nav: navCb,
@@ -369,7 +372,6 @@ function openAuthAction() {
 
 async function playDaily() {
   const date = todayUtc();
-  track(Events.DAILY_PUZZLE_STARTED, { date });
   let puzzleData;
   // Try fetch from server; fallback to local generation
   try {
@@ -393,7 +395,7 @@ async function playDaily() {
     puzzleData = local;
   }
 
-  clearView();
+  clearView('game_daily');
   const view = mountGameView(root, {
     mode: 'daily',
     difficulty: puzzleData.difficulty,
@@ -418,9 +420,8 @@ async function playPractice(level: Difficulty) {
   const stage = Math.floor(Math.random() * 100) + 1;
   const seed = `practice:${level}:${stage}`;
   const puzzleData = generatePuzzle({ difficulty: level, seed });
-  track(Events.PRACTICE_STARTED, { level, stage });
 
-  clearView();
+  clearView('game_practice');
   const view = mountGameView(root, {
     mode: 'practice',
     difficulty: level,
@@ -438,9 +439,8 @@ function playRandom() {
   const level = DIFFICULTIES[Math.floor(Math.random() * DIFFICULTIES.length)];
   const seed = `random:${Date.now()}:${Math.floor(Math.random() * 1_000_000)}`;
   const puzzleData = generatePuzzle({ difficulty: level, seed });
-  track(Events.PRACTICE_STARTED, { level, mode: 'random' });
 
-  clearView();
+  clearView('game_random');
   const view = mountGameView(root, {
     mode: 'practice',
     origin: 'random',
@@ -472,14 +472,6 @@ function showLoadingOverlay(text = 'Saving your score...'): () => void {
 }
 
 async function handleWin(result: GameResult, date?: string) {
-  const event = result.mode === 'daily' ? Events.DAILY_PUZZLE_COMPLETED : Events.PRACTICE_COMPLETED;
-  track(event, {
-    difficulty: result.difficulty,
-    time_seconds: result.timeSeconds,
-    mistakes: result.mistakes,
-    hints_used: result.hintsUsed,
-    score: result.score,
-  });
   const scoreInput = {
     difficulty: result.difficulty,
     timeSeconds: result.timeSeconds,
@@ -587,7 +579,6 @@ function maybeShowLevelUp(prevLevel: number, newLevel: number) {
     sfxLevelUp();
     showLevelUpModal({ newLevel, rewardCoins: 50 * (newLevel - prevLevel) });
   }, 600);
-  track('level_up', { from: prevLevel, to: newLevel });
 }
 
 const STREAK_MILESTONES = new Set([3, 7, 14, 30, 60, 100, 365]);
@@ -605,15 +596,12 @@ async function refreshStreakAndToast() {
     });
     if (newStreak > prevStreak) {
       if (STREAK_MILESTONES.has(newStreak)) {
-        track(Events.STREAK_MILESTONE, { streak: newStreak });
         sfxStreakMilestone();
         toast(`🔥 ${newStreak}-day streak! Keep it up!`, 4000);
       } else {
         sfxCoin();
         toast(`🔥 Streak saved — ${newStreak} day${newStreak === 1 ? '' : 's'}!`);
       }
-    } else if (newStreak < prevStreak && prevStreak > 0) {
-      track(Events.STREAK_LOST, { previous: prevStreak });
     }
   } catch (err) {
     console.warn('Streak refresh failed:', err);
@@ -621,7 +609,6 @@ async function refreshStreakAndToast() {
 }
 
 async function shareResult(result: GameResult, date: string, rank?: number, total?: number) {
-  track(Events.SHARE_RESULT, { date, rank });
   const state = useStore.getState();
   const profile = state.profile;
   const userId = state.user?.id;
@@ -724,7 +711,6 @@ async function boot() {
 
   // Init analytics first — safe even with empty keys
   initAnalytics();
-  track(Events.APP_OPEN);
 
   // Show animated splash immediately
   root.innerHTML = '';
@@ -737,7 +723,6 @@ async function boot() {
     try {
       onAuthChange((user) => {
         useStore.setState({ user });
-        if (user) identify(user.id);
       });
       // Use getCurrentUser() only — never auto-sign-in anonymously at boot.
       // signInAnonymously() on a project without anonymous auth enabled
@@ -760,7 +745,6 @@ async function boot() {
 
       if (user) {
         useStore.setState({ user });
-        identify(user.id);
         // Run v1 migration if applicable
         if (shouldMigrate()) {
           const result = await migrateFromV1();

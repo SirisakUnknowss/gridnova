@@ -4,7 +4,6 @@
 import { supabase } from '@lib/supabase';
 import { useStore } from '@state/store';
 import { formatTime, escapeHtml } from '@lib/format';
-import { track } from '@lib/analytics';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
 
@@ -123,7 +122,6 @@ export function mountRecapView(root: HTMLElement, props: RecapProps): { unmount:
       `;
 
       body.querySelector('#recap-share')?.addEventListener('click', async () => {
-        track('recap_shared');
         const text = buildShareText(r);
         if ((navigator as any).share) {
           try { await (navigator as any).share({ text }); return; } catch { /* fallback */ }

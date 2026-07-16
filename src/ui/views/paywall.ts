@@ -2,7 +2,6 @@
 // Paywall modal — RevenueCat-backed purchase flow
 // Falls back to "coming soon" UI when RC is not configured
 // =====================================================================
-import { track } from '@lib/analytics';
 import { getOfferings, purchasePackage, restorePurchases } from '@lib/purchases';
 import { setPremium } from '@lib/premium';
 
@@ -24,8 +23,6 @@ const PERKS = [
 export function showPaywall(props: PaywallProps): void {
   const existing = document.getElementById('paywall-root');
   if (existing) existing.remove();
-
-  track('paywall_shown', { source: props.source ?? 'unknown' });
 
   const wrapper = document.createElement('div');
   wrapper.id = 'paywall-root';
@@ -93,13 +90,11 @@ export function showPaywall(props: PaywallProps): void {
     errorEl.style.display = 'none';
     btn.disabled = true;
     btn.textContent = 'Processing…';
-    track('paywall_plan_clicked', { plan: pkgId });
 
     const result = await purchasePackage(pkgId);
 
     if (result.success) {
       setPremium(true);
-      track('purchase_success', { plan: pkgId });
       wrapper.remove();
       props.onPurchased?.();
       props.onClose();
@@ -119,7 +114,6 @@ export function showPaywall(props: PaywallProps): void {
     const hasPremium = await restorePurchases();
     if (hasPremium) {
       setPremium(true);
-      track('purchase_restored');
       wrapper.remove();
       props.onPurchased?.();
       props.onClose();

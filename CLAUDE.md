@@ -70,7 +70,8 @@ override them for staging builds.
 | Backend | Supabase (Auth, Postgres, Edge Functions) |
 | PWA | vite-plugin-pwa + Workbox (skipWaiting enabled) |
 | Hosting | Cloudflare Pages |
-| Analytics | PostHog + Sentry |
+| Analytics | Home-grown (`/admin` funnel + retention, no third-party) |
+| Error tracking | Sentry |
 | Payments | RevenueCat (purchases-js) |
 
 **No UI framework** — all DOM manipulation is vanilla TypeScript. Components return
