@@ -16,6 +16,7 @@ export interface ProfileProps {
   onOpenAchievements: () => void;
   onOpenRecap: () => void;
   onOpenLedger: () => void;
+  onOpenSettings: () => void;
   onSignOut: () => void;
   onUpgradeAccount: () => void;
   onToast: (msg: string) => void;
@@ -120,6 +121,13 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.coin(16)}
             <span><span style="color:var(--app-text)">Coin Ledger</span><br><small>Earned and spent</small></span>
+          </span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="profile-row" id="prof-settings">
+          <span style="display:flex;align-items:center;gap:10px;">
+            ${ic.puzzle(16)}
+            <span><span style="color:var(--app-text)">Settings</span><br><small>Game options, community, help</small></span>
           </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
@@ -315,6 +323,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
   root.querySelector('#prof-ach')?.addEventListener('click', props.onOpenAchievements);
   root.querySelector('#prof-recap')?.addEventListener('click', props.onOpenRecap);
   root.querySelector('#prof-ledger')?.addEventListener('click', props.onOpenLedger);
+  root.querySelector('#prof-settings')?.addEventListener('click', props.onOpenSettings);
   root.querySelector('#prof-signout')?.addEventListener('click', props.onSignOut);
   root.querySelector('#prof-upgrade')?.addEventListener('click', props.onUpgradeAccount);
 

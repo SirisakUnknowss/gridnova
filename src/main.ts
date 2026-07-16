@@ -32,6 +32,7 @@ import { mountGlobalStatsView } from './ui/views/global-stats';
 import { mountRecapView } from './ui/views/recap';
 import { mountCalendarView } from './ui/views/calendar';
 import { mountLedgerView } from './ui/views/ledger';
+import { mountSettingsView } from './ui/views/settings';
 import { showLevelUpModal } from './ui/views/level-up';
 import { applyTheme, loadCachedThemeId } from './lib/themes';
 import { applyBackground, loadCachedBgId } from './lib/backgrounds';
@@ -266,6 +267,17 @@ function showLeaderboard() {
   currentUnmount = view.unmount;
 }
 
+function handleSignOut() {
+  if (confirm('Sign out?')) {
+    void signOut().then(() => {
+      useStore.setState({ user: null, profile: null, coins: 0, xp: 0, level: 1, currentStreak: 0 });
+      applyBackground('bg_default');
+      applyTheme('theme_classic');
+      void boot();
+    });
+  }
+}
+
 function showProfile() {
   clearView('profile');
   const view = mountProfileView(root, {
@@ -274,18 +286,21 @@ function showProfile() {
     onOpenAchievements: () => showAchievements(true),
     onOpenRecap: showRecap,
     onOpenLedger: showLedger,
-    onSignOut: () => {
-      if (confirm('Sign out?')) {
-        void signOut().then(() => {
-          useStore.setState({ user: null, profile: null, coins: 0, xp: 0, level: 1, currentStreak: 0 });
-          applyBackground('bg_default');
-          applyTheme('theme_classic');
-          void boot();
-        });
-      }
-    },
+    onOpenSettings: showSettings,
+    onSignOut: handleSignOut,
     onUpgradeAccount: openAuthAction,
     onToast: toast,
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function showSettings() {
+  clearView('settings');
+  const view = mountSettingsView(root, {
+    onBack: showProfile,
+    onSignOut: handleSignOut,
+    onUpgradeAccount: openAuthAction,
     nav: navCb,
   });
   currentUnmount = view.unmount;
