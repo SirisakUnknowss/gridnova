@@ -7,6 +7,7 @@ import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
 import { isMuted, setMuted } from '@lib/sound';
 import { getBoardPrefs, setBoardPref, type BoardPrefs } from '@lib/prefs';
+import { showWhatsNew } from './whats-new';
 
 // Official community links — the canonical home for these across the app.
 export const COMMUNITY_LINKS = {
@@ -82,6 +83,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
 
       <div class="card">
         <h3>Help & About</h3>
+        ${linkRow('set-whatsnew', ic.sparkle(16), 'What’s New', 'ดูว่าเวอร์ชันล่าสุดอัปเดตอะไรบ้าง')}
         ${linkRow('set-help', ic.bell(16), 'Help & contact', 'Message us on the GridNova page')}
         <div class="profile-row" style="cursor:default;">
           <span style="display:flex;align-items:center;gap:10px;">
@@ -117,6 +119,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
   root.querySelector('#set-signin')?.addEventListener('click', props.onUpgradeAccount);
   root.querySelector('#set-fb-group')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.fbGroup, '_blank', 'noopener'));
   root.querySelector('#set-fb-page')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.fbPage, '_blank', 'noopener'));
+  root.querySelector('#set-whatsnew')?.addEventListener('click', () => showWhatsNew());
   root.querySelector('#set-help')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.fbPage, '_blank', 'noopener'));
 
   wireBottomNav(root, props.nav, 'profile');

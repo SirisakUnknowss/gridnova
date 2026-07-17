@@ -4301,3 +4301,74 @@ body.bg-anim-aurora {
 .toggle.on .toggle-knob {
   left: 21px;
 }
+
+/* === What's New modal === */
+.whatsnew-modal {
+  max-width: 460px;
+  text-align: left;
+}
+
+.whatsnew-scroll {
+  max-height: 55vh;
+  overflow-y: auto;
+  margin: 12px 0 4px;
+  padding-right: 4px;
+}
+
+.whatsnew-release {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.whatsnew-release:last-child {
+  border-bottom: none;
+}
+
+.whatsnew-ver {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.whatsnew-badge {
+  background: var(--brand-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.whatsnew-release:not(.latest) .whatsnew-badge {
+  background: var(--app-border);
+  color: var(--app-text-secondary);
+}
+
+.whatsnew-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--app-text);
+}
+
+.whatsnew-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.whatsnew-list li {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--app-text);
+}
+
+.whatsnew-ico {
+  flex-shrink: 0;
+}

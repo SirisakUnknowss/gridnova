@@ -33,6 +33,7 @@ import { mountRecapView } from './ui/views/recap';
 import { mountCalendarView } from './ui/views/calendar';
 import { mountLedgerView } from './ui/views/ledger';
 import { mountSettingsView } from './ui/views/settings';
+import { showWhatsNew, shouldAutoShowWhatsNew } from './ui/views/whats-new';
 import { showLevelUpModal } from './ui/views/level-up';
 import { applyTheme, loadCachedThemeId } from './lib/themes';
 import { applyBackground, loadCachedBgId } from './lib/backgrounds';
@@ -829,6 +830,10 @@ async function boot() {
   // Show onboarding once per device (after home is mounted so it has a backdrop)
   if (!hasCompletedOnboarding()) {
     showOnboarding({ onFinish: () => { /* user is on home; quest list will pick up name on next render */ showHome(); } });
+  } else if (shouldAutoShowWhatsNew()) {
+    // Returning player who just updated — surface what changed (important
+    // this release since coins/level were rebalanced under them).
+    showWhatsNew();
   }
 }
 
