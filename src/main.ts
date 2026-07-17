@@ -41,7 +41,7 @@ import { applyBoardColorFromItem } from './lib/board-colors';
 import { initPurchases, isPremiumEntitled } from './lib/purchases';
 import { setPremium } from './lib/premium';
 import { applyXpGain } from './lib/level';
-import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
+import { initSound, playBgMusic, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
 import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, logView } from './lib/api';
@@ -718,8 +718,11 @@ async function boot() {
   const cachedBg = loadCachedBgId();
   if (cachedBg) applyBackground(cachedBg);
 
-  // Init sound (loads mute preference)
+  // Init sound (loads mute + volume preferences), then start looping
+  // background music — autoplay policy is handled inside (retries on first
+  // user gesture if the browser blocks the initial play).
   initSound();
+  void playBgMusic();
 
   // Capture referral code from URL before any redirect
   const refCode = new URLSearchParams(window.location.search).get('ref');

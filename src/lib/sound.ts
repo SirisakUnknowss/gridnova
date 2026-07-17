@@ -6,10 +6,26 @@
 // =====================================================================
 
 const MUTE_KEY = 'sudoku_muted_v1';
+const SFX_VOL_KEY = 'sudoku_sfx_vol_v1';
+const BG_VOL_KEY = 'sudoku_bg_vol_v1';
+
+// Base scale keeps the synth sfx at the previous overall loudness when the
+// user's sfx volume is at 100%.
+const SFX_BASE = 0.35;
+const BG_URL = '/sounds/felt-loop-garden.mp3';
 
 let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let _muted = false;
+let _sfxVol = 1;   // 0..1 user preference
+let _bgVol = 0.45; // 0..1 user preference
+
+let bgAudio: HTMLAudioElement | null = null;
+let bgArmed = false; // a first-gesture autostart listener is attached
+
+function clamp01(v: number): number {
+  return Math.max(0, Math.min(1, v));
+}
 
 function getCtx(): AudioContext | null {
   if (_muted) return null;
@@ -17,7 +33,7 @@ function getCtx(): AudioContext | null {
     try {
       ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       masterGain = ctx.createGain();
-      masterGain.gain.value = 0.35;
+      masterGain.gain.value = SFX_BASE * _sfxVol;
       masterGain.connect(ctx.destination);
     } catch {
       return null;
@@ -25,6 +41,14 @@ function getCtx(): AudioContext | null {
   }
   if (ctx.state === 'suspended') ctx.resume();
   return ctx;
+}
+
+function applySfxGain(): void {
+  if (masterGain) masterGain.gain.value = _muted ? 0 : SFX_BASE * _sfxVol;
+}
+
+function applyBgVolume(): void {
+  if (bgAudio) bgAudio.volume = _muted ? 0 : _bgVol;
 }
 
 // ── helpers ────────────────────────────────────────────────────────
@@ -80,9 +104,15 @@ function noise(startAt = 0, dur = 0.07, vol = 0.15): void {
 
 // ── Public API ─────────────────────────────────────────────────────
 
-/** Load mute preference from localStorage */
+/** Load mute + volume preferences from localStorage */
 export function initSound(): void {
-  try { _muted = localStorage.getItem(MUTE_KEY) === '1'; } catch { /**/ }
+  try {
+    _muted = localStorage.getItem(MUTE_KEY) === '1';
+    const sfx = localStorage.getItem(SFX_VOL_KEY);
+    const bg = localStorage.getItem(BG_VOL_KEY);
+    if (sfx !== null) _sfxVol = clamp01(parseFloat(sfx));
+    if (bg !== null) _bgVol = clamp01(parseFloat(bg));
+  } catch { /**/ }
 }
 
 export function isMuted(): boolean { return _muted; }
@@ -90,12 +120,79 @@ export function isMuted(): boolean { return _muted; }
 export function setMuted(m: boolean): void {
   _muted = m;
   try { localStorage.setItem(MUTE_KEY, m ? '1' : '0'); } catch { /**/ }
-  if (masterGain) masterGain.gain.value = m ? 0 : 0.35;
+  applySfxGain();
+  applyBgVolume();
+  if (!m) void playBgMusic(); // resume music when unmuting
 }
 
 export function toggleMute(): boolean {
   setMuted(!_muted);
   return _muted;
+}
+
+// ── Volume controls ────────────────────────────────────────────────
+
+export function getSfxVolume(): number { return _sfxVol; }
+export function getBgVolume(): number { return _bgVol; }
+
+export function setSfxVolume(v: number): void {
+  _sfxVol = clamp01(v);
+  try { localStorage.setItem(SFX_VOL_KEY, String(_sfxVol)); } catch { /**/ }
+  if (_muted && _sfxVol > 0) setMuted(false); // dragging up implies "let me hear it"
+  else applySfxGain();
+}
+
+export function setBgVolume(v: number): void {
+  _bgVol = clamp01(v);
+  try { localStorage.setItem(BG_VOL_KEY, String(_bgVol)); } catch { /**/ }
+  if (_muted && _bgVol > 0) { setMuted(false); return; } // setMuted already starts music
+  applyBgVolume();
+  if (_bgVol > 0) void playBgMusic();
+}
+
+// ── Background music ───────────────────────────────────────────────
+
+function ensureBgAudio(): HTMLAudioElement | null {
+  if (bgAudio) return bgAudio;
+  try {
+    bgAudio = new Audio(BG_URL);
+    bgAudio.loop = true;
+    bgAudio.preload = 'auto';
+    bgAudio.volume = _muted ? 0 : _bgVol;
+  } catch {
+    return null;
+  }
+  return bgAudio;
+}
+
+/**
+ * Start looping background music. Browsers block audio until a user
+ * gesture, so if the first play() is rejected we arm a one-time listener
+ * that retries on the next tap/click/keypress.
+ */
+export async function playBgMusic(): Promise<void> {
+  if (_muted || _bgVol <= 0) return;
+  const el = ensureBgAudio();
+  if (!el) return;
+  el.volume = _bgVol;
+  try {
+    await el.play();
+  } catch {
+    if (bgArmed) return;
+    bgArmed = true;
+    const resume = () => {
+      bgArmed = false;
+      document.removeEventListener('pointerdown', resume);
+      document.removeEventListener('keydown', resume);
+      void playBgMusic();
+    };
+    document.addEventListener('pointerdown', resume, { once: true });
+    document.addEventListener('keydown', resume, { once: true });
+  }
+}
+
+export function stopBgMusic(): void {
+  if (bgAudio) { bgAudio.pause(); bgAudio.currentTime = 0; }
 }
 
 // ── Sounds ─────────────────────────────────────────────────────────

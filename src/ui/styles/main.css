@@ -4372,3 +4372,36 @@ body.bg-anim-aurora {
 .whatsnew-ico {
   flex-shrink: 0;
 }
+
+/* === Settings volume slider === */
+.vol-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--app-border);
+  outline: none;
+  cursor: pointer;
+}
+
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.vol-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}

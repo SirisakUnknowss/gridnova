@@ -5,7 +5,7 @@ import { useStore } from '@state/store';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
-import { isMuted, setMuted } from '@lib/sound';
+import { getBgVolume, setBgVolume, getSfxVolume, setSfxVolume, sfxNav } from '@lib/sound';
 import { getBoardPrefs, setBoardPref, type BoardPrefs } from '@lib/prefs';
 import { showWhatsNew } from './whats-new';
 
@@ -31,6 +31,19 @@ function toggleRow(id: string, label: string, sub: string, on: boolean): string 
       <button class="toggle${on ? ' on' : ''}" id="${id}" role="switch" aria-checked="${on}" aria-label="${label}">
         <span class="toggle-knob"></span>
       </button>
+    </div>
+  `;
+}
+
+function sliderRow(id: string, label: string, sub: string, value: number): string {
+  const pct = Math.round(value * 100);
+  return `
+    <div class="profile-row" style="cursor:default;flex-direction:column;align-items:stretch;gap:8px;">
+      <span style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span><span style="color:var(--app-text)">${label}</span><br><small>${sub}</small></span>
+        <small id="${id}-val" style="color:var(--brand-primary);font-weight:600;">${pct}%</small>
+      </span>
+      <input type="range" class="vol-slider" id="${id}" min="0" max="100" value="${pct}" aria-label="${label}">
     </div>
   `;
 }
@@ -61,8 +74,13 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
       </div>
 
       <div class="card">
-        <h3>Game</h3>
-        ${toggleRow('set-sound', 'Sound effects', 'Taps, wins, and rewards', !isMuted())}
+        <h3>Sound</h3>
+        ${sliderRow('set-bg-vol', 'Background music', 'Calm music while you play', getBgVolume())}
+        ${sliderRow('set-sfx-vol', 'Sound effects', 'Taps, wins, and rewards', getSfxVolume())}
+      </div>
+
+      <div class="card">
+        <h3>Board</h3>
         ${toggleRow('set-same', 'Highlight same numbers', 'Show all cells matching the selected digit', prefs.highlightSame)}
         ${toggleRow('set-related', 'Highlight row & column', 'Shade the selected cell’s row, column, and box', prefs.highlightRelated)}
         ${toggleRow('set-conflict', 'Show conflicts', 'Mark digits that break Sudoku rules', prefs.showConflict)}
@@ -107,7 +125,21 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
     });
   }
 
-  wireToggle('set-sound', () => !isMuted(), () => setMuted(!isMuted()));
+  function wireSlider(id: string, apply: (v: number) => void, sfxOnRelease = false) {
+    const el = root.querySelector<HTMLInputElement>(`#${id}`);
+    const valEl = root.querySelector<HTMLElement>(`#${id}-val`);
+    el?.addEventListener('input', () => {
+      const pct = Number(el.value);
+      apply(pct / 100);
+      if (valEl) valEl.textContent = `${pct}%`;
+    });
+    // A short blip on release lets the user hear the new sfx level.
+    if (sfxOnRelease) el?.addEventListener('change', () => sfxNav());
+  }
+
+  wireSlider('set-bg-vol', setBgVolume);
+  wireSlider('set-sfx-vol', setSfxVolume, true);
+
   const wireBoardPref = (id: string, key: keyof BoardPrefs) =>
     wireToggle(id, () => getBoardPrefs()[key], () => setBoardPref(key, !getBoardPrefs()[key]));
   wireBoardPref('set-same', 'highlightSame');
