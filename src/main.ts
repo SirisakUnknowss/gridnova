@@ -32,6 +32,12 @@ import { mountGlobalStatsView } from './ui/views/global-stats';
 import { mountRecapView } from './ui/views/recap';
 import { mountCalendarView } from './ui/views/calendar';
 import { mountLedgerView } from './ui/views/ledger';
+import { mountSettingsView } from './ui/views/settings';
+import { mountHowToPlayView } from './ui/views/how-to-play';
+import { mountContactSupportView } from './ui/views/contact-support';
+import { mountPrivacyPolicyView } from './ui/views/privacy-policy';
+import { mountTermsOfServiceView } from './ui/views/terms-of-service';
+import { showWhatsNew, shouldAutoShowWhatsNew } from './ui/views/whats-new';
 import { showLevelUpModal } from './ui/views/level-up';
 import { applyTheme, loadCachedThemeId } from './lib/themes';
 import { applyBackground, loadCachedBgId } from './lib/backgrounds';
@@ -39,7 +45,7 @@ import { applyBoardColorFromItem } from './lib/board-colors';
 import { initPurchases, isPremiumEntitled } from './lib/purchases';
 import { setPremium } from './lib/premium';
 import { applyXpGain } from './lib/level';
-import { initSound, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
+import { initSound, playBgMusic, sfxCoin, sfxStreakMilestone, sfxLevelUp } from './lib/sound';
 import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
 import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, logView } from './lib/api';
@@ -266,6 +272,17 @@ function showLeaderboard() {
   currentUnmount = view.unmount;
 }
 
+function handleSignOut() {
+  if (confirm('Sign out?')) {
+    void signOut().then(() => {
+      useStore.setState({ user: null, profile: null, coins: 0, xp: 0, level: 1, currentStreak: 0 });
+      applyBackground('bg_default');
+      applyTheme('theme_classic');
+      void boot();
+    });
+  }
+}
+
 function showProfile() {
   clearView('profile');
   const view = mountProfileView(root, {
@@ -274,20 +291,52 @@ function showProfile() {
     onOpenAchievements: () => showAchievements(true),
     onOpenRecap: showRecap,
     onOpenLedger: showLedger,
-    onSignOut: () => {
-      if (confirm('Sign out?')) {
-        void signOut().then(() => {
-          useStore.setState({ user: null, profile: null, coins: 0, xp: 0, level: 1, currentStreak: 0 });
-          applyBackground('bg_default');
-          applyTheme('theme_classic');
-          void boot();
-        });
-      }
-    },
+    onOpenSettings: showSettings,
+    onSignOut: handleSignOut,
     onUpgradeAccount: openAuthAction,
     onToast: toast,
     nav: navCb,
   });
+  currentUnmount = view.unmount;
+}
+
+function showSettings() {
+  clearView('settings');
+  const view = mountSettingsView(root, {
+    onBack: showProfile,
+    onSignOut: handleSignOut,
+    onUpgradeAccount: openAuthAction,
+    onOpenHowToPlay: showHowToPlay,
+    onOpenContactSupport: showContactSupport,
+    onOpenPrivacyPolicy: showPrivacyPolicy,
+    onOpenTermsOfService: showTermsOfService,
+    onToast: toast,
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function showHowToPlay() {
+  clearView('how_to_play');
+  const view = mountHowToPlayView(root, { onBack: showSettings, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
+function showContactSupport() {
+  clearView('contact_support');
+  const view = mountContactSupportView(root, { onBack: showSettings, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
+function showPrivacyPolicy() {
+  clearView('privacy_policy');
+  const view = mountPrivacyPolicyView(root, { onBack: showSettings, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
+function showTermsOfService() {
+  clearView('terms_of_service');
+  const view = mountTermsOfServiceView(root, { onBack: showSettings, nav: navCb });
   currentUnmount = view.unmount;
 }
 
@@ -702,8 +751,11 @@ async function boot() {
   const cachedBg = loadCachedBgId();
   if (cachedBg) applyBackground(cachedBg);
 
-  // Init sound (loads mute preference)
+  // Init sound (loads mute + volume preferences), then start looping
+  // background music — autoplay policy is handled inside (retries on first
+  // user gesture if the browser blocks the initial play).
   initSound();
+  void playBgMusic();
 
   // Capture referral code from URL before any redirect
   const refCode = new URLSearchParams(window.location.search).get('ref');
@@ -814,6 +866,10 @@ async function boot() {
   // Show onboarding once per device (after home is mounted so it has a backdrop)
   if (!hasCompletedOnboarding()) {
     showOnboarding({ onFinish: () => { /* user is on home; quest list will pick up name on next render */ showHome(); } });
+  } else if (shouldAutoShowWhatsNew()) {
+    // Returning player who just updated — surface what changed (important
+    // this release since coins/level were rebalanced under them).
+    showWhatsNew();
   }
 }
 

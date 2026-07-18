@@ -85,7 +85,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
       <div class="playmode-card-v2">
         <span class="playmode-card-v2-icon">${ic.gamepad(24)}</span>
         <div class="playmode-card-v2-title">Play Mode</div>
-        <div class="playmode-card-v2-sub">เลือกโหมดที่อยากเล่น</div>
+        <div class="playmode-card-v2-sub">Choose a mode to play</div>
         <button class="btn playmode-card-v2-btn" id="enter-play-mode">Enter Play Mode</button>
       </div>
 

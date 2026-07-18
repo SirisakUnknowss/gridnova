@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.5.0 — 2026-07-18
+
+### Added
+- **Settings page**: full redesign — grouped cards for Sound, Notifications, Board,
+  Official Community, Help & About, and Account
+- **Background music**: calm looping track, with independent volume sliders for
+  music and sound effects (each remembers its own on/off + level)
+- **Vibration**: real haptic feedback on cell input, toggleable in Settings
+- **Daily Puzzle Reminder**: push notifications wired to the UI for the first time
+  (the backend existed but was never exposed)
+- **Help & About pages**: How to Play, Contact Support, Privacy Policy, Terms of
+  Service — all new, real content
+- **What's New**: in-app release notes, auto-shown once after an update
+
+### Changed
+- App-wide font is now Fredoka (previously only used for game numbers/timer)
+- Game is English-only — all in-app text is now English (does not apply to dev
+  docs, the admin panel, or this changelog)
+
 ## 1.4.0 — 2026-07-16
 
 ### Changed

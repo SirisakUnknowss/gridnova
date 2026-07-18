@@ -1970,7 +1970,7 @@ h3 {
   background: #5b4ed0;
 }
 
-/* Game view — ใช้ background ของ body (dark gradient) */
+/* Game view — uses the body's background (dark gradient) */
 .view--game {
   position: fixed;
   inset: 0;
@@ -4267,4 +4267,305 @@ body.bg-anim-aurora {
 
 .share-actions .btn {
   flex: 1;
+}
+/* === Settings toggle switch === */
+.toggle {
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  border: none;
+  background: var(--app-border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.toggle .toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--app-card-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: left 0.2s ease;
+}
+
+.toggle.on {
+  background: var(--brand-primary);
+}
+
+.toggle.on .toggle-knob {
+  left: 21px;
+}
+
+/* === What's New modal === */
+.whatsnew-modal {
+  max-width: 460px;
+  text-align: left;
+}
+
+.whatsnew-scroll {
+  max-height: 55vh;
+  overflow-y: auto;
+  margin: 12px 0 4px;
+  padding-right: 4px;
+}
+
+.whatsnew-release {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.whatsnew-release:last-child {
+  border-bottom: none;
+}
+
+.whatsnew-ver {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.whatsnew-badge {
+  background: var(--brand-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.whatsnew-release:not(.latest) .whatsnew-badge {
+  background: var(--app-border);
+  color: var(--app-text-secondary);
+}
+
+.whatsnew-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--app-text);
+}
+
+.whatsnew-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.whatsnew-list li {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--app-text);
+}
+
+.whatsnew-ico {
+  flex-shrink: 0;
+}
+
+/* === Settings volume slider === */
+.vol-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--app-border);
+  outline: none;
+  cursor: pointer;
+}
+
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.vol-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+/* === Settings page — grouped rows === */
+.settings-group {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.settings-group-label {
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--app-section-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 var(--space-2);
+}
+
+.settings-card {
+  padding: 0 var(--space-4);
+  margin-bottom: 0;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--brand-primary);
+  background: rgba(108, 92, 231, 0.1);
+}
+
+.settings-ic svg {
+  width: 18px;
+  height: 18px;
+}
+
+.settings-txt {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-title {
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--app-text);
+}
+
+.settings-sub {
+  font-size: 12px;
+  color: var(--app-text-secondary);
+  margin-top: 1px;
+}
+
+.settings-chev {
+  color: var(--app-text-secondary);
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.settings-sub-row {
+  padding: 0 0 13px;
+  margin-top: -6px;
+}
+
+.settings-sub-row.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.settings-slider-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 48px;
+}
+
+.settings-slider-line .vol-slider {
+  flex: 1;
+}
+
+.settings-slider-val {
+  width: 34px;
+  text-align: right;
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--app-text);
+  flex-shrink: 0;
+}
+
+.settings-version {
+  text-align: center;
+  color: var(--app-text-secondary);
+  font-weight: 600;
+  font-size: 12px;
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.settings-version b {
+  color: var(--app-text);
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+}
+
+.settings-row.danger .settings-title { color: var(--color-error); }
+.settings-row.danger .settings-ic { color: var(--color-error); background: rgba(229, 57, 53, 0.1); }
+
+/* === Static content pages (How to Play, Privacy, Terms, Contact) === */
+.static-content {
+  max-width: 520px;
+  text-align: left;
+}
+
+.static-content h3 {
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--app-text);
+  margin: 18px 0 8px;
+}
+
+.static-content h3:first-child {
+  margin-top: 0;
+}
+
+.static-content p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--app-text);
+  margin-bottom: 4px;
+}
+
+.static-content ul {
+  padding-left: 20px;
+  margin: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.static-content li {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--app-text);
 }

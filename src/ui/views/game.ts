@@ -13,6 +13,7 @@ import { useStore } from '@state/store';
 import * as api from '@lib/api';
 import { saveGame, deleteGame, type GameInProgress } from '@lib/local-db';
 import { freeHintsForLevel } from '@lib/level';
+import { getBoardPrefs, vibrateTap } from '@lib/prefs';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
@@ -118,7 +119,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     }
   }
 
-  const settings = { highlightSame: true, showConflict: true, highlightRelated: true };
+  const settings = getBoardPrefs();
   const dotColor = DIFF_COLOR[difficulty] ?? '#6c5ce7';
   const diffLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1).replace('-', '-');
 
@@ -335,6 +336,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
     userBoard[r][c] = n;
     noteMask[r][c].clear();
+    vibrateTap();
 
     if (n !== solution[r][c]) {
       mistakes++;
