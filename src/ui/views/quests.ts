@@ -1,14 +1,16 @@
 // =====================================================================
-// Daily Quests renderer — drop-in for the #quest-list element on home
+// Quest renderers — drop-in for the #quest-list / #weekly-quest-list
+// elements on home. Daily and Weekly share the same generic engine
+// (trigger_type/progress/target/claimed_at), so one internal renderer
+// backs both public functions.
 // =====================================================================
 import * as api from '@lib/api';
 import { useStore } from '@state/store';
-import { todayUtc, escapeHtml } from '@lib/format';
+import { todayUtc, weekStartUtc, escapeHtml } from '@lib/format';
 import { sfxQuestClaim } from '@lib/sound';
 import { ic } from '@ui/icons';
 
 interface Quest {
-  date: string;
   quest_id: string;
   tier: number;
   target: number;
@@ -48,9 +50,15 @@ export interface RenderQuestsOptions {
   onToast?: (msg: string) => void;
 }
 
-export async function renderDailyQuests(container: HTMLElement, opts: RenderQuestsOptions = {}): Promise<void> {
+interface QuestKindConfig {
+  emptyMessage: string;
+  fetchQuests: () => Promise<Quest[]>;
+  claimQuest: (questId: string) => Promise<{ error?: unknown }>;
+}
+
+async function renderQuests(container: HTMLElement, opts: RenderQuestsOptions, cfg: QuestKindConfig): Promise<void> {
   if (!useStore.getState().user) {
-    container.innerHTML = `<p style="opacity:0.7;font-size:13px;">Sign in to see daily quests.</p>`;
+    container.innerHTML = `<p style="opacity:0.7;font-size:13px;">Sign in to see quests.</p>`;
     return;
   }
 
@@ -58,7 +66,7 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
 
   let quests: Quest[];
   try {
-    quests = (await api.getDailyQuests(todayUtc())) as Quest[];
+    quests = await cfg.fetchQuests();
   } catch (err) {
     container.innerHTML = `<p style="opacity:0.7;font-size:13px;">${ic.warning(13)} Could not load quests.</p>`;
     console.warn('Quest load failed:', err);
@@ -66,7 +74,7 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
   }
 
   if (!quests.length) {
-    container.innerHTML = `<p style="opacity:0.7;font-size:13px;">No quests yet — play today's daily to unlock them.</p>`;
+    container.innerHTML = `<p style="opacity:0.7;font-size:13px;">${cfg.emptyMessage}</p>`;
     return;
   }
 
@@ -105,12 +113,12 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
       btn.disabled = true;
       btn.textContent = '…';
       try {
-        const { error } = await api.claimQuestReward(todayUtc(), questId);
+        const { error } = await cfg.claimQuest(questId);
         if (error) throw error;
         sfxQuestClaim();
         opts.onToast?.('Quest reward claimed!');
         // Optimistically refresh
-        await renderDailyQuests(container, opts);
+        await renderQuests(container, opts, cfg);
       } catch (err) {
         console.warn('Claim failed:', err);
         opts.onToast?.('Could not claim — try again');
@@ -118,5 +126,21 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
         btn.textContent = 'Claim';
       }
     });
+  });
+}
+
+export async function renderDailyQuests(container: HTMLElement, opts: RenderQuestsOptions = {}): Promise<void> {
+  return renderQuests(container, opts, {
+    emptyMessage: 'No quests yet — play today\'s daily to unlock them.',
+    fetchQuests: () => api.getDailyQuests(todayUtc()) as Promise<Quest[]>,
+    claimQuest: (questId) => api.claimQuestReward(todayUtc(), questId),
+  });
+}
+
+export async function renderWeeklyQuests(container: HTMLElement, opts: RenderQuestsOptions = {}): Promise<void> {
+  return renderQuests(container, opts, {
+    emptyMessage: 'No weekly quests yet — play a game to unlock them.',
+    fetchQuests: () => api.getWeeklyQuests(weekStartUtc()) as Promise<Quest[]>,
+    claimQuest: (questId) => api.claimWeeklyQuestReward(weekStartUtc(), questId),
   });
 }

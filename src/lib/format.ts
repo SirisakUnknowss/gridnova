@@ -16,6 +16,15 @@ export function todayUtc(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+/** Monday (UTC) of the current week — the key weekly quests are stored under. */
+export function weekStartUtc(): string {
+  const d = new Date();
+  const dow = d.getUTCDay(); // 0=Sun..6=Sat
+  const diff = dow === 0 ? -6 : 1 - dow;
+  d.setUTCDate(d.getUTCDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
 export function escapeHtml(s: string): string {
   return String(s).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!),

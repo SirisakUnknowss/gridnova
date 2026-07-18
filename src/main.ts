@@ -24,7 +24,7 @@ import { mountSplash } from './ui/views/splash';
 import { showAuthModal } from './ui/views/auth-modal';
 import { mountLeaderboardView } from './ui/views/leaderboard';
 import { hasCompletedOnboarding, showOnboarding } from './ui/views/onboarding';
-import { renderDailyQuests } from './ui/views/quests';
+import { renderDailyQuests, renderWeeklyQuests } from './ui/views/quests';
 import { mountProfileView } from './ui/views/profile';
 import { mountAchievementsView } from './ui/views/achievements';
 import { mountStatsView } from './ui/views/stats';
@@ -211,6 +211,10 @@ function showHome() {
   const questList = document.getElementById('quest-list');
   if (questList) {
     void renderDailyQuests(questList, { onToast: toast });
+  }
+  const weeklyQuestList = document.getElementById('weekly-quest-list');
+  if (weeklyQuestList) {
+    void renderWeeklyQuests(weeklyQuestList, { onToast: toast });
   }
 }
 

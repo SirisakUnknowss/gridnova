@@ -15,6 +15,15 @@ interface Payload {
   client_version?: string;
 }
 
+// Monday (UTC) of the week containing the given YYYY-MM-DD date string.
+function weekStartUtc(dateStr: string): string {
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  const dow = d.getUTCDay(); // 0=Sun..6=Sat
+  const diff = dow === 0 ? -6 : 1 - dow;
+  d.setUTCDate(d.getUTCDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
 const MIN_TIME: Record<string, number> = {
   'easy': 45, 'easy-medium': 70, 'medium': 100,
   'medium-hard': 130, 'hard': 160, 'hard-expert': 200, 'expert': 240
@@ -192,6 +201,10 @@ Deno.serve(async (req) => {
   await supabaseAdmin.rpc('recompute_daily_quests', {
     p_user_id: user.id,
     p_date: payload.date,
+  });
+  await supabaseAdmin.rpc('recompute_weekly_quests', {
+    p_user_id: user.id,
+    p_week_start: weekStartUtc(payload.date),
   });
 
   // Check and grant achievements

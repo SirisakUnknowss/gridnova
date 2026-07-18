@@ -140,6 +140,14 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
         </div>
       </div>
 
+      <!-- Weekly Quests -->
+      <div class="card quests-card">
+        <h3>${ic.trophy(16)} Weekly Quests</h3>
+        <div id="weekly-quest-list" style="font-size:13px;color:var(--app-text-secondary);">
+          ${isGuest ? '<span style="color:var(--brand-primary);cursor:pointer;" id="weekly-quest-signin">Sign in</span> to see weekly quests.' : 'Loading…'}
+        </div>
+      </div>
+
       <div class="app-version-row">
         ${import.meta.env.VITE_APP_ENV === 'staging' ? '<span class="env-badge env-badge--staging">STAGING</span>' : ''}
         <span>v${APP_VERSION}</span>
@@ -155,6 +163,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   root.querySelector('#user-badge')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#save-progress')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#quest-signin')?.addEventListener('click', props.onAuthAction);
+  root.querySelector('#weekly-quest-signin')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#mute-btn')?.addEventListener('click', (e) => {
     const nowMuted = toggleMute();
     const btn = e.currentTarget as HTMLButtonElement;
