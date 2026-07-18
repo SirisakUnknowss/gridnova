@@ -34,3 +34,40 @@ export function setBoardPref<K extends keyof BoardPrefs>(key: K, value: BoardPre
     localStorage.setItem(KEY, JSON.stringify(prefs));
   } catch { /* private mode */ }
 }
+
+// ── Vibration (haptic feedback on cell input) ────────────────────────
+
+const VIBRATE_KEY = 'sudoku_vibrate_v1';
+
+export function isVibrateEnabled(): boolean {
+  try {
+    const raw = localStorage.getItem(VIBRATE_KEY);
+    return raw === null ? true : raw === '1';
+  } catch {
+    return true;
+  }
+}
+
+export function setVibrateEnabled(on: boolean): void {
+  try { localStorage.setItem(VIBRATE_KEY, on ? '1' : '0'); } catch { /* private mode */ }
+}
+
+/** Short haptic buzz on cell input — no-op if disabled or unsupported. */
+export function vibrateTap(): void {
+  if (!isVibrateEnabled()) return;
+  try { navigator.vibrate?.(10); } catch { /* unsupported */ }
+}
+
+// ── Daily puzzle reminder (push) — tracks user intent locally; actual
+// subscription state lives in the browser's Notification permission +
+// the push_tokens table (see src/lib/push.ts). ──────────────────────
+
+const PUSH_PREF_KEY = 'sudoku_push_enabled_v1';
+
+export function getPushPref(): boolean {
+  try { return localStorage.getItem(PUSH_PREF_KEY) === '1'; } catch { return false; }
+}
+
+export function setPushPref(on: boolean): void {
+  try { localStorage.setItem(PUSH_PREF_KEY, on ? '1' : '0'); } catch { /* private mode */ }
+}

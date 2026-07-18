@@ -4405,3 +4405,167 @@ body.bg-anim-aurora {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
+
+/* === Settings page — grouped rows === */
+.settings-group {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.settings-group-label {
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--app-section-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 var(--space-2);
+}
+
+.settings-card {
+  padding: 0 var(--space-4);
+  margin-bottom: 0;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--brand-primary);
+  background: rgba(108, 92, 231, 0.1);
+}
+
+.settings-ic svg {
+  width: 18px;
+  height: 18px;
+}
+
+.settings-txt {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-title {
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--app-text);
+}
+
+.settings-sub {
+  font-size: 12px;
+  color: var(--app-text-secondary);
+  margin-top: 1px;
+}
+
+.settings-chev {
+  color: var(--app-text-secondary);
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.settings-sub-row {
+  padding: 0 0 13px;
+  margin-top: -6px;
+}
+
+.settings-sub-row.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.settings-slider-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 48px;
+}
+
+.settings-slider-line .vol-slider {
+  flex: 1;
+}
+
+.settings-slider-val {
+  width: 34px;
+  text-align: right;
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--app-text);
+  flex-shrink: 0;
+}
+
+.settings-version {
+  text-align: center;
+  color: var(--app-text-secondary);
+  font-weight: 600;
+  font-size: 12px;
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.settings-version b {
+  color: var(--app-text);
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+}
+
+.settings-row.danger .settings-title { color: var(--color-error); }
+.settings-row.danger .settings-ic { color: var(--color-error); background: rgba(229, 57, 53, 0.1); }
+
+/* === Static content pages (How to Play, Privacy, Terms, Contact) === */
+.static-content {
+  max-width: 520px;
+  text-align: left;
+}
+
+.static-content h3 {
+  font-family: 'Fredoka', var(--font-base);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--app-text);
+  margin: 18px 0 8px;
+}
+
+.static-content h3:first-child {
+  margin-top: 0;
+}
+
+.static-content p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--app-text);
+  margin-bottom: 4px;
+}
+
+.static-content ul {
+  padding-left: 20px;
+  margin: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.static-content li {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--app-text);
+}

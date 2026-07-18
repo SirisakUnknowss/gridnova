@@ -33,6 +33,10 @@ import { mountRecapView } from './ui/views/recap';
 import { mountCalendarView } from './ui/views/calendar';
 import { mountLedgerView } from './ui/views/ledger';
 import { mountSettingsView } from './ui/views/settings';
+import { mountHowToPlayView } from './ui/views/how-to-play';
+import { mountContactSupportView } from './ui/views/contact-support';
+import { mountPrivacyPolicyView } from './ui/views/privacy-policy';
+import { mountTermsOfServiceView } from './ui/views/terms-of-service';
 import { showWhatsNew, shouldAutoShowWhatsNew } from './ui/views/whats-new';
 import { showLevelUpModal } from './ui/views/level-up';
 import { applyTheme, loadCachedThemeId } from './lib/themes';
@@ -302,8 +306,37 @@ function showSettings() {
     onBack: showProfile,
     onSignOut: handleSignOut,
     onUpgradeAccount: openAuthAction,
+    onOpenHowToPlay: showHowToPlay,
+    onOpenContactSupport: showContactSupport,
+    onOpenPrivacyPolicy: showPrivacyPolicy,
+    onOpenTermsOfService: showTermsOfService,
+    onToast: toast,
     nav: navCb,
   });
+  currentUnmount = view.unmount;
+}
+
+function showHowToPlay() {
+  clearView('how_to_play');
+  const view = mountHowToPlayView(root, { onBack: showSettings, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
+function showContactSupport() {
+  clearView('contact_support');
+  const view = mountContactSupportView(root, { onBack: showSettings, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
+function showPrivacyPolicy() {
+  clearView('privacy_policy');
+  const view = mountPrivacyPolicyView(root, { onBack: showSettings, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
+function showTermsOfService() {
+  clearView('terms_of_service');
+  const view = mountTermsOfServiceView(root, { onBack: showSettings, nav: navCb });
   currentUnmount = view.unmount;
 }
 
