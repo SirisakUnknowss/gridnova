@@ -30,10 +30,10 @@ export function showWhatsNew(): void {
   wrapper.innerHTML = `
     <div class="modal whatsnew-modal">
       <button class="modal-close" id="whatsnew-close" aria-label="Close">×</button>
-      <h2 style="margin:0 0 4px 0;">✨ มีอะไรใหม่</h2>
+      <h2 style="margin:0 0 4px 0;">✨ What’s New</h2>
       <div class="whatsnew-scroll">${body}</div>
       <div class="modal-buttons">
-        <button class="btn btn--primary" id="whatsnew-ok">เยี่ยม!</button>
+        <button class="btn btn--primary" id="whatsnew-ok">Awesome!</button>
       </div>
     </div>
   `;

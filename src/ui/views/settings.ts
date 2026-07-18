@@ -101,7 +101,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
 
       <div class="card">
         <h3>Help & About</h3>
-        ${linkRow('set-whatsnew', ic.sparkle(16), 'What’s New', 'ดูว่าเวอร์ชันล่าสุดอัปเดตอะไรบ้าง')}
+        ${linkRow('set-whatsnew', ic.sparkle(16), 'What’s New', 'See what changed in the latest update')}
         ${linkRow('set-help', ic.bell(16), 'Help & contact', 'Message us on the GridNova page')}
         <div class="profile-row" style="cursor:default;">
           <span style="display:flex;align-items:center;gap:10px;">

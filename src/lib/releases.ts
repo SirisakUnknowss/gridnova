@@ -1,5 +1,5 @@
 // =====================================================================
-// User-facing release notes ("What's New"). Curated Thai copy — this is
+// User-facing release notes ("What's New"). English copy — this is
 // the source of truth for the in-app What's New modal (src/ui/views/
 // whats-new.ts). Keep the newest release first. Developer-facing detail
 // lives in CHANGELOG.md; this is the friendly, player-facing version.
@@ -16,21 +16,21 @@ export const RELEASES: ReleaseNote[] = [
   {
     version: '1.4.0',
     date: '2026-07-16',
-    title: 'ปรับสมดุลเหรียญ & ระบบเลเวลใหม่',
+    title: 'Coin & Level Rebalance',
     changes: [
-      { icon: '🪙', text: 'ปรับสูตรรางวัลเหรียญ/XP ของเหรียญตราใหม่ทั้งหมด ให้สมดุลกับร้านค้ามากขึ้น — ยอดเหรียญและเลเวลของทุกบัญชีถูกคำนวณใหม่ตามสูตรนี้ (ถ้าเห็นตัวเลขเปลี่ยน ไม่ใช่บั๊กนะ เป็นการปรับสมดุลรอบใหญ่)' },
-      { icon: '📈', text: 'ไต่เลเวลได้เร็วขึ้นมาก จากเดิมที่ต้องใช้ XP มหาศาลกว่าจะถึงเลเวลสูงๆ' },
-      { icon: '🎁', text: 'เลเวลมีประโยชน์จริงแล้ว! โหมด Practice/Random ได้ hint ฟรีเพิ่มตามเลเวล (สูงสุด +3)' },
-      { icon: '⚙️', text: 'เพิ่มหน้า Settings — ตั้งค่าเกม, บัญชี, ลิงก์คอมมูนิตี้ทางการ และ What’s New' },
+      { icon: '🪙', text: 'Rebalanced coin/XP rewards for every medal to be more in line with the shop — every account\'s coins and level were recalculated under the new formula (if your numbers changed, that\'s not a bug, it\'s this rebalance)' },
+      { icon: '📈', text: 'Leveling up is much faster now, down from needing a huge amount of XP to reach higher levels' },
+      { icon: '🎁', text: 'Levels actually matter now! Practice/Random mode grants bonus free hints as you level up (up to +3)' },
+      { icon: '⚙️', text: 'Added a Settings page — game options, account, official community links, and What’s New' },
     ],
   },
   {
     version: '1.3.2',
     date: '2026-07-14',
-    title: 'แก้เควสรายวัน',
+    title: 'Daily Quest Fix',
     changes: [
-      { icon: '🗓️', text: 'แก้เวลารีเซ็ตเควสให้ตรงกันทั้งระบบ (เที่ยงคืน UTC = 07:00 น. ไทย) — เดิมเล่นช่วงตี 0 ถึง 7 โมงเช้าแล้วเควสอาจไม่นับ' },
-      { icon: '🎯', text: 'ปรับจำนวนเควสต่อวันจาก 6 เหลือ 5 ใบ' },
+      { icon: '🗓️', text: 'Fixed the quest reset time to be consistent system-wide (midnight UTC) — playing between midnight and 7am UTC could previously cause quests to not count' },
+      { icon: '🎯', text: 'Reduced the number of daily quests from 6 to 5' },
     ],
   },
 ];

@@ -1970,7 +1970,7 @@ h3 {
   background: #5b4ed0;
 }
 
-/* Game view — ใช้ background ของ body (dark gradient) */
+/* Game view — uses the body's background (dark gradient) */
 .view--game {
   position: fixed;
   inset: 0;

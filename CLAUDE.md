@@ -317,6 +317,9 @@ Canvas-based share images generated client-side. See `src/lib/share/`:
 5. **No `any` types unless unavoidable** — prefer proper typing.
 6. **Daily mode never gets coin hints** — this is an intentional design decision.
 7. **Bottom nav has exactly 4 tabs** — do not add or remove tabs without explicit instruction.
-8. **All user-facing text should support Thai** — avoid English-only error messages.
+8. **The game is English-only.** All in-app text (UI copy, error messages, What's New /
+   release notes shown in-app) must be in English — no Thai. This does not apply to
+   dev-facing docs (CHANGELOG.md, this file), the admin panel, or how you talk to the
+   user in chat.
 9. **Do not push to `main` directly** — use `develop` for staging first when in doubt.
 10. **Do not add comments explaining WHAT code does** — only comment WHY when non-obvious.
