@@ -4412,31 +4412,31 @@ body.bg-anim-aurora {
 }
 
 /* === Settings volume slider === */
+/* The pill background has to live on the track pseudo-element, not the
+   input itself — WebKit/Blink don't reliably paint the input's own
+   background as the track once appearance:none is set, so leaving the
+   pseudo-element transparent exposed the browser's thin native groove. */
 .vol-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--app-border);
+  height: 20px;
+  background: transparent;
   outline: none;
   cursor: pointer;
 }
 
-/* Without an explicit track style, WebKit/Blink paint their own native
-   groove under our custom background, showing as a thin double line
-   through the middle of the pill. */
 .vol-slider::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 3px;
-  background: transparent;
+  background: var(--app-border);
   border: none;
 }
 
 .vol-slider::-moz-range-track {
   height: 6px;
   border-radius: 3px;
-  background: transparent;
+  background: var(--app-border);
   border: none;
 }
 
