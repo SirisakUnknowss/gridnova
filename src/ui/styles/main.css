@@ -4491,11 +4491,6 @@ body.bg-anim-aurora {
   align-items: center;
   gap: 12px;
   padding: 13px 0;
-  border-bottom: 1px solid var(--app-border);
-}
-
-.settings-row:last-child {
-  border-bottom: none;
 }
 
 .settings-ic {
