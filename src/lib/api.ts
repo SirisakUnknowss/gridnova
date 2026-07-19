@@ -410,16 +410,19 @@ export function getGuestDisplayId(): string {
 
 /**
  * Record a visit for today + mark as guest or member.
- * Uses session_id from localStorage — no auth required.
+ * Uses session_id from localStorage — no auth required. userId is passed
+ * for members so get_visitor_stats() can dedupe by account instead of by
+ * browser/device session (one member open across 3 browsers is 1 member,
+ * not 3 — guests have no account to dedupe by, so session_id is all we get).
  */
-export async function trackVisit(isGuest: boolean): Promise<void> {
+export async function trackVisit(isGuest: boolean, userId?: string): Promise<void> {
   try {
     const session_id = getSessionId();
     const visited_date = new Date().toISOString().slice(0, 10);
     await supabase
       .from('visitor_sessions')
       .upsert(
-        { session_id, visited_date, is_guest: isGuest },
+        { session_id, visited_date, is_guest: isGuest, user_id: isGuest ? null : userId ?? null },
         { onConflict: 'session_id,visited_date' }
       );
   } catch { /* offline / demo mode */ }

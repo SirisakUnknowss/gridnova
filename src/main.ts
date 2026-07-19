@@ -857,7 +857,7 @@ async function boot() {
   void (async () => {
     const u = useStore.getState().user;
     const isGuest = !u || !!u.is_anonymous;
-    await trackVisit(isGuest);
+    await trackVisit(isGuest, isGuest ? undefined : u?.id);
     await heartbeat(isGuest, isGuest ? undefined : u?.id);
     await refreshVisitorStats();
   })();
@@ -871,7 +871,7 @@ async function boot() {
     const today = new Date().toISOString().slice(0, 10);
     if (today !== lastVisitDate) {
       lastVisitDate = today;
-      await trackVisit(isGuest);
+      await trackVisit(isGuest, isGuest ? undefined : u?.id);
     }
     await heartbeat(isGuest, isGuest ? undefined : u?.id);
     await refreshVisitorStats();
