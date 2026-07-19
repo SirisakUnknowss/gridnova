@@ -4117,6 +4117,8 @@ body.bg-anim-aurora {
   padding: 12px 20px;
   border-radius: var(--radius-md);
   z-index: 200;
+  text-align: center;
+  max-width: calc(100% - 32px);
   animation: slideUp 0.3s ease;
 }
 
@@ -4421,6 +4423,23 @@ body.bg-anim-aurora {
   cursor: pointer;
 }
 
+/* Without an explicit track style, WebKit/Blink paint their own native
+   groove under our custom background, showing as a thin double line
+   through the middle of the pill. */
+.vol-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+  border: none;
+}
+
+.vol-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+  border: none;
+}
+
 .vol-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -4604,4 +4623,49 @@ body.bg-anim-aurora {
   font-size: 14px;
   line-height: 1.5;
   color: var(--app-text);
+}
+
+/* ===== Orientation lock — portrait only on touch devices ===== */
+/* Sudoku's grid layout breaks in landscape on phones, so we block play
+   there instead of shipping a second layout. Gated to touch + coarse
+   pointer so desktop windows resized short/wide are unaffected. */
+.orientation-lock {
+  display: none;
+}
+
+@media (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  #app {
+    display: none;
+  }
+
+  .orientation-lock {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+    background: var(--brand-gradient, linear-gradient(135deg, #667eea, #764ba2));
+    color: #fff;
+    text-align: center;
+  }
+
+  .orientation-lock-icon {
+    animation: orientationRotateHint 1.8s ease-in-out infinite;
+  }
+
+  .orientation-lock-text {
+    font-family: 'Fredoka', var(--font-base);
+    font-size: 17px;
+    font-weight: 600;
+    max-width: 280px;
+  }
+}
+
+@keyframes orientationRotateHint {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
 }
