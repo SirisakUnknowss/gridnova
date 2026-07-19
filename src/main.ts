@@ -24,7 +24,7 @@ import { mountSplash } from './ui/views/splash';
 import { showAuthModal } from './ui/views/auth-modal';
 import { mountLeaderboardView } from './ui/views/leaderboard';
 import { hasCompletedOnboarding, showOnboarding } from './ui/views/onboarding';
-import { renderDailyQuests, renderWeeklyQuests } from './ui/views/quests';
+import { mountQuestsView } from './ui/views/quests';
 import { mountProfileView } from './ui/views/profile';
 import { mountAchievementsView } from './ui/views/achievements';
 import { mountStatsView } from './ui/views/stats';
@@ -202,20 +202,17 @@ function showHome() {
   const view = mountHomeView(root, {
     onEnterPlayMode: showPlayMode,
     onOpenPractice: showPractice,
+    onOpenQuests: showQuests,
     onAuthAction: openAuthAction,
     nav: navCb,
   });
   currentUnmount = view.unmount;
+}
 
-  // Render today's quests into the home card (best-effort, background)
-  const questList = document.getElementById('quest-list');
-  if (questList) {
-    void renderDailyQuests(questList, { onToast: toast });
-  }
-  const weeklyQuestList = document.getElementById('weekly-quest-list');
-  if (weeklyQuestList) {
-    void renderWeeklyQuests(weeklyQuestList, { onToast: toast });
-  }
+function showQuests() {
+  clearView('quests');
+  const view = mountQuestsView(root, { onBack: showHome, nav: navCb, onToast: toast });
+  currentUnmount = view.unmount;
 }
 
 function showPlayMode() {

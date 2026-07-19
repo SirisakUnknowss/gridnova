@@ -7,8 +7,9 @@
 import * as api from '@lib/api';
 import { useStore } from '@state/store';
 import { todayUtc, weekStartUtc, escapeHtml } from '@lib/format';
-import { sfxQuestClaim } from '@lib/sound';
+import { sfxQuestClaim, sfxNav } from '@lib/sound';
 import { ic } from '@ui/icons';
+import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 
 interface Quest {
   quest_id: string;
@@ -143,4 +144,65 @@ export async function renderWeeklyQuests(container: HTMLElement, opts: RenderQue
     fetchQuests: () => api.getWeeklyQuests(weekStartUtc()) as Promise<Quest[]>,
     claimQuest: (questId) => api.claimWeeklyQuestReward(weekStartUtc(), questId),
   });
+}
+
+// =====================================================================
+// Full Quests page — Daily / Weekly as swipeable-feel left/right tabs,
+// replacing the two stacked cards that used to live on home.
+// =====================================================================
+export interface QuestsPageProps {
+  onBack: () => void;
+  nav: BottomNavCallbacks;
+  onToast?: (msg: string) => void;
+}
+
+type QuestTab = 'daily' | 'weekly';
+
+export function mountQuestsView(root: HTMLElement, props: QuestsPageProps): { unmount: () => void } {
+  root.innerHTML = `
+    <section class="view view--ach">
+      <div class="ach-sticky">
+        <div class="ach-topbar">
+          <button class="ach-back" id="q-back" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <h1 class="ach-title">${ic.quests(20)} Quests</h1>
+          <div style="width:40px;flex:none"></div>
+        </div>
+        <div class="lb-tabs lb-tabs--main">
+          <button class="lb-tab active" data-tab="daily">Daily</button>
+          <button class="lb-tab" data-tab="weekly">Weekly</button>
+        </div>
+      </div>
+      <div id="q-body" style="width:99%"></div>
+    </section>
+    ${bottomNavHTML('home')}
+  `;
+
+  root.querySelector('#q-back')?.addEventListener('click', props.onBack);
+  wireBottomNav(root, props.nav, 'home');
+
+  const bodyEl = root.querySelector<HTMLElement>('#q-body')!;
+  const tabBtns = root.querySelectorAll<HTMLButtonElement>('[data-tab]');
+
+  function loadTab(tab: QuestTab) {
+    bodyEl.innerHTML = `<div class="ach-loading">Loading…</div>`;
+    const opts = { onToast: props.onToast };
+    if (tab === 'daily') void renderDailyQuests(bodyEl, opts);
+    else void renderWeeklyQuests(bodyEl, opts);
+  }
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab as QuestTab;
+      if (btn.classList.contains('active')) return;
+      sfxNav();
+      tabBtns.forEach((b) => b.classList.toggle('active', b === btn));
+      loadTab(tab);
+    });
+  });
+
+  loadTab('daily');
+
+  return { unmount() { } };
 }
