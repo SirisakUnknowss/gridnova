@@ -88,6 +88,21 @@ export async function claimQuestReward(date: string, questId: string) {
   return supabase.functions.invoke('claim-quest-reward', { body: { date, quest_id: questId } });
 }
 
+export async function getWeeklyQuests(weekStart: string) {
+  await supabase.rpc('seed_weekly_quests', { p_week_start: weekStart });
+  const { data, error } = await supabase
+    .from('user_weekly_quests')
+    .select('*')
+    .eq('week_start', weekStart)
+    .order('quest_id');
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function claimWeeklyQuestReward(weekStart: string, questId: string) {
+  return supabase.functions.invoke('claim-weekly-quest-reward', { body: { week_start: weekStart, quest_id: questId } });
+}
+
 // === Wallet / Progression ===
 export async function spendCoins(amount: number, reason: string, metadata?: Record<string, unknown>): Promise<{ ok: boolean; balance?: number; reason?: string }> {
   const { data: { user } } = await supabase.auth.getUser();

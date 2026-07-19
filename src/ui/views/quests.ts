@@ -1,14 +1,17 @@
 // =====================================================================
-// Daily Quests renderer — drop-in for the #quest-list element on home
+// Quest renderers — drop-in for the #quest-list / #weekly-quest-list
+// elements on home. Daily and Weekly share the same generic engine
+// (trigger_type/progress/target/claimed_at), so one internal renderer
+// backs both public functions.
 // =====================================================================
 import * as api from '@lib/api';
 import { useStore } from '@state/store';
-import { todayUtc, escapeHtml } from '@lib/format';
-import { sfxQuestClaim } from '@lib/sound';
+import { todayUtc, weekStartUtc, escapeHtml } from '@lib/format';
+import { sfxQuestClaim, sfxNav } from '@lib/sound';
 import { ic } from '@ui/icons';
+import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 
 interface Quest {
-  date: string;
   quest_id: string;
   tier: number;
   target: number;
@@ -48,9 +51,15 @@ export interface RenderQuestsOptions {
   onToast?: (msg: string) => void;
 }
 
-export async function renderDailyQuests(container: HTMLElement, opts: RenderQuestsOptions = {}): Promise<void> {
+interface QuestKindConfig {
+  emptyMessage: string;
+  fetchQuests: () => Promise<Quest[]>;
+  claimQuest: (questId: string) => Promise<{ error?: unknown }>;
+}
+
+async function renderQuests(container: HTMLElement, opts: RenderQuestsOptions, cfg: QuestKindConfig): Promise<void> {
   if (!useStore.getState().user) {
-    container.innerHTML = `<p style="opacity:0.7;font-size:13px;">Sign in to see daily quests.</p>`;
+    container.innerHTML = `<p style="opacity:0.7;font-size:13px;">Sign in to see quests.</p>`;
     return;
   }
 
@@ -58,7 +67,7 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
 
   let quests: Quest[];
   try {
-    quests = (await api.getDailyQuests(todayUtc())) as Quest[];
+    quests = await cfg.fetchQuests();
   } catch (err) {
     container.innerHTML = `<p style="opacity:0.7;font-size:13px;">${ic.warning(13)} Could not load quests.</p>`;
     console.warn('Quest load failed:', err);
@@ -66,7 +75,7 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
   }
 
   if (!quests.length) {
-    container.innerHTML = `<p style="opacity:0.7;font-size:13px;">No quests yet — play today's daily to unlock them.</p>`;
+    container.innerHTML = `<p style="opacity:0.7;font-size:13px;">${cfg.emptyMessage}</p>`;
     return;
   }
 
@@ -105,12 +114,12 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
       btn.disabled = true;
       btn.textContent = '…';
       try {
-        const { error } = await api.claimQuestReward(todayUtc(), questId);
+        const { error } = await cfg.claimQuest(questId);
         if (error) throw error;
         sfxQuestClaim();
         opts.onToast?.('Quest reward claimed!');
         // Optimistically refresh
-        await renderDailyQuests(container, opts);
+        await renderQuests(container, opts, cfg);
       } catch (err) {
         console.warn('Claim failed:', err);
         opts.onToast?.('Could not claim — try again');
@@ -119,4 +128,114 @@ export async function renderDailyQuests(container: HTMLElement, opts: RenderQues
       }
     });
   });
+}
+
+export async function renderDailyQuests(container: HTMLElement, opts: RenderQuestsOptions = {}): Promise<void> {
+  return renderQuests(container, opts, {
+    emptyMessage: 'No quests yet — play today\'s daily to unlock them.',
+    fetchQuests: () => api.getDailyQuests(todayUtc()) as Promise<Quest[]>,
+    claimQuest: (questId) => api.claimQuestReward(todayUtc(), questId),
+  });
+}
+
+export async function renderWeeklyQuests(container: HTMLElement, opts: RenderQuestsOptions = {}): Promise<void> {
+  return renderQuests(container, opts, {
+    emptyMessage: 'No weekly quests yet — play a game to unlock them.',
+    fetchQuests: () => api.getWeeklyQuests(weekStartUtc()) as Promise<Quest[]>,
+    claimQuest: (questId) => api.claimWeeklyQuestReward(weekStartUtc(), questId),
+  });
+}
+
+// =====================================================================
+// Home-row summary — "3/8 done today · 2 to claim" style progress, so
+// the Quests row on home hints at what's waiting without opening it.
+// =====================================================================
+export interface QuestsSummary {
+  total: number;
+  completed: number;
+  claimable: number;
+}
+
+function summarize(quests: Quest[]): QuestsSummary {
+  return {
+    total: quests.length,
+    completed: quests.filter((q) => q.completed_at).length,
+    claimable: quests.filter((q) => q.completed_at && !q.claimed_at).length,
+  };
+}
+
+export async function getQuestsSummary(): Promise<QuestsSummary | null> {
+  if (!useStore.getState().user) return null;
+  try {
+    const [daily, weekly] = await Promise.all([
+      api.getDailyQuests(todayUtc()) as Promise<Quest[]>,
+      api.getWeeklyQuests(weekStartUtc()) as Promise<Quest[]>,
+    ]);
+    const d = summarize(daily);
+    const w = summarize(weekly);
+    return { total: d.total + w.total, completed: d.completed + w.completed, claimable: d.claimable + w.claimable };
+  } catch {
+    return null;
+  }
+}
+
+// =====================================================================
+// Full Quests page — Daily / Weekly as swipeable-feel left/right tabs,
+// replacing the two stacked cards that used to live on home.
+// =====================================================================
+export interface QuestsPageProps {
+  onBack: () => void;
+  nav: BottomNavCallbacks;
+  onToast?: (msg: string) => void;
+}
+
+type QuestTab = 'daily' | 'weekly';
+
+export function mountQuestsView(root: HTMLElement, props: QuestsPageProps): { unmount: () => void } {
+  root.innerHTML = `
+    <section class="view view--ach">
+      <div class="ach-sticky">
+        <div class="ach-topbar">
+          <button class="ach-back" id="q-back" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <h1 class="ach-title">${ic.quests(20)} Quests</h1>
+          <div style="width:40px;flex:none"></div>
+        </div>
+        <div class="lb-tabs lb-tabs--main">
+          <button class="lb-tab active" data-tab="daily">Daily</button>
+          <button class="lb-tab" data-tab="weekly">Weekly</button>
+        </div>
+      </div>
+      <div id="q-body" style="width:99%"></div>
+    </section>
+    ${bottomNavHTML('home')}
+  `;
+
+  root.querySelector('#q-back')?.addEventListener('click', props.onBack);
+  wireBottomNav(root, props.nav, 'home');
+
+  const bodyEl = root.querySelector<HTMLElement>('#q-body')!;
+  const tabBtns = root.querySelectorAll<HTMLButtonElement>('[data-tab]');
+
+  function loadTab(tab: QuestTab) {
+    bodyEl.innerHTML = `<div class="ach-loading">Loading…</div>`;
+    const opts = { onToast: props.onToast };
+    if (tab === 'daily') void renderDailyQuests(bodyEl, opts);
+    else void renderWeeklyQuests(bodyEl, opts);
+  }
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab as QuestTab;
+      if (btn.classList.contains('active')) return;
+      sfxNav();
+      tabBtns.forEach((b) => b.classList.toggle('active', b === btn));
+      loadTab(tab);
+    });
+  });
+
+  loadTab('daily');
+
+  return { unmount() { } };
 }

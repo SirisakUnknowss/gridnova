@@ -14,6 +14,18 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '1.6.0',
+    date: '2026-07-19',
+    title: 'Weekly Quests & Continue',
+    changes: [
+      { icon: '🗓️', text: 'Weekly Quests — a new set of challenges alongside Daily Quests, resetting every Monday. Find both in one place: tap Quests on Home and switch between Daily/Weekly tabs' },
+      { icon: '💰', text: 'Continue — run out of hearts in Daily or Practice? Spend coins to keep going instead of starting over (not available in Random Mode, where losing resets your streak on purpose)' },
+      { icon: '📊', text: 'The Quests row on Home now shows your progress at a glance, plus a badge when you have rewards waiting to be claimed' },
+      { icon: '📱', text: 'Fixed the board layout breaking when playing in landscape on mobile — the app now asks you to rotate back to portrait' },
+      { icon: '🐛', text: 'Fixed a few smaller UI issues: toast notifications weren\'t centered, and the volume sliders in Settings had a stray line through them' },
+    ],
+  },
+  {
     version: '1.5.0',
     date: '2026-07-18',
     title: 'Settings Redesign & Background Music',

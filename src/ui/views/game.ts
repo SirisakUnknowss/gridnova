@@ -71,8 +71,27 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // Daily has a global leaderboard, so free hints stay equal for everyone
   // there. Practice/Random get a level perk: more free hints as you level up.
   const FREE_HINTS = mode === 'daily' ? 3 : freeHintsForLevel(useStore.getState().level ?? 1);
+
+  // Continue (buy back in after 3 mistakes) — not a hint, doesn't reveal
+  // answers, so it's fine for Daily unlike paid hints. Disabled for Random
+  // (origin='random'): "lose 1 = streak resets" is that mode's whole point.
+  const CONTINUES_ENABLED = mode === 'daily' || props.origin !== 'random';
+  const DAILY_CONTINUE_COSTS = [2500, 4000, 10000];
+  const PRACTICE_CONTINUE_BASE: Partial<Record<Difficulty, number>> = {
+    easy: 300, 'easy-medium': 450, medium: 600, 'medium-hard': 900,
+    hard: 1200, 'hard-expert': 1600, expert: 2000,
+  };
+  function continueCost(index: number): number {
+    if (mode === 'daily') return DAILY_CONTINUE_COSTS[index];
+    const base = PRACTICE_CONTINUE_BASE[difficulty] ?? 600;
+    const mult = [1, 1.6, 4][index] ?? 4;
+    return Math.round((base * mult) / 10) * 10;
+  }
+
   let selected: { r: number; c: number } | null = null;
-  let mistakes = 0;
+  let mistakes = 0;      // cumulative, true count — drives score penalty, never reset by a continue
+  let livesLost = 0;     // resets to 0 on continue — drives hearts display + game-over trigger
+  let continuesUsed = 0;
   let hintsLeft = FREE_HINTS;
   let paidHintsUsed = 0;
   let noteMode = false;
@@ -108,6 +127,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         bits.forEach(n => noteMask[Math.floor(i / 9)][i % 9].add(n));
       });
       mistakes = Math.max(0, Math.min(r.mistakes ?? 0, 2));
+      livesLost = mistakes; // no continues purchased yet this session
       hintsLeft = Math.max(0, Math.min(r.hints_left ?? FREE_HINTS, FREE_HINTS));
       moves.push(...(r.moves as Move[]));
       const savedElapsed = r.elapsed_seconds ?? 0;
@@ -115,7 +135,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       pausedMs = Date.now() - startTime - savedElapsed * 1000;
     } catch {
       // Corrupted save — start fresh (board/masks already initialized as-new)
-      mistakes = 0; hintsLeft = FREE_HINTS;
+      mistakes = 0; livesLost = 0; hintsLeft = FREE_HINTS;
     }
   }
 
@@ -235,6 +255,17 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
           </div>
         </div>
       </div>
+
+      <div class="coin-hint-overlay" id="continue-overlay" style="display:none;">
+        <div class="coin-hint-dialog">
+          <div class="coin-hint-title">Continue?</div>
+          <div class="coin-hint-body" id="continue-body"></div>
+          <div class="coin-hint-actions">
+            <button class="coin-hint-btn coin-hint-btn--cancel" id="continue-cancel">Give up</button>
+            <button class="coin-hint-btn coin-hint-btn--confirm" id="continue-confirm">Continue</button>
+          </div>
+        </div>
+      </div>
     </section>
   `;
 
@@ -340,10 +371,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
     if (n !== solution[r][c]) {
       mistakes++;
-      renderHearts(mistakes);
+      livesLost++;
+      renderHearts(livesLost);
       mistakesDelta = 1;
       sfxError();
-      if (mistakes >= 3) {
+      if (livesLost >= 3) {
         history.push({ r, c, prevDigit, nextDigit: n, prevNotes, nextNotes: [], mistakesDelta });
         future.length = 0;
         syncUndoRedo();
@@ -540,6 +572,14 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   }
 
   function triggerGameOver() {
+    if (CONTINUES_ENABLED && continuesUsed < 3) {
+      showContinuePrompt();
+      return;
+    }
+    endGame();
+  }
+
+  function endGame() {
     gameWon = true;
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
@@ -547,6 +587,52 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     const overlay = root.querySelector('#gameover-overlay') as HTMLElement;
     overlay.classList.add('open');
     props.onLose?.();
+  }
+
+  function showContinuePrompt() {
+    // Freeze the clock while the player decides — same accounting as the
+    // pause menu, so deliberation time never leaks into the final score.
+    if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+    pauseStart = Date.now();
+
+    const cost = continueCost(continuesUsed);
+    const coins = useStore.getState().coins ?? 0;
+    const overlay = root.querySelector('#continue-overlay') as HTMLElement;
+    const body = root.querySelector('#continue-body') as HTMLElement;
+    const confirmBtn = root.querySelector('#continue-confirm') as HTMLButtonElement;
+    const cancelBtn = root.querySelector('#continue-cancel') as HTMLButtonElement;
+    body.textContent = `Out of hearts! Continue for ${cost} coins? (You have ${coins} coins)`;
+    confirmBtn.disabled = coins < cost;
+    overlay.style.display = 'flex';
+
+    const resumeClock = () => {
+      if (pauseStart !== null) { pausedMs += Date.now() - pauseStart; pauseStart = null; }
+    };
+
+    const cleanup = () => {
+      cancelBtn.removeEventListener('click', onCancel);
+      confirmBtn.removeEventListener('click', handleConfirm);
+    };
+    const onCancel = () => { overlay.style.display = 'none'; cleanup(); endGame(); };
+    const onConfirm = async () => {
+      overlay.style.display = 'none';
+      try {
+        const result = await api.spendCoins(cost, 'continue_purchase', { mode, difficulty, continue_index: continuesUsed });
+        if (!result.ok) { endGame(); return; }
+        if (result.balance !== undefined) useStore.setState({ coins: result.balance });
+        continuesUsed++;
+        livesLost = 0;
+        renderHearts(0);
+        resumeClock();
+        timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
+      } catch {
+        endGame();
+      }
+    };
+    const handleConfirm = () => { cleanup(); void onConfirm(); };
+
+    cancelBtn.addEventListener('click', onCancel);
+    confirmBtn.addEventListener('click', handleConfirm);
   }
 
   // Hamburger menu overlay
@@ -668,7 +754,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   document.addEventListener('visibilitychange', onVisibilityChange);
 
   // Sync UI state that depends on restored values
-  renderHearts(mistakes);
+  renderHearts(livesLost);
   updateHintButton();
 
   rerender();

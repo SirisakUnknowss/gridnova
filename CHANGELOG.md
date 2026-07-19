@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.6.0 — 2026-07-19
+
+### Added
+- **Weekly Quests**: ระบบเควสรายสัปดาห์ใหม่ทั้งหมด (DB table, RPC seed/recompute, edge function `claim-weekly-quest-reward`) รีเซ็ตทุกวันจันทร์ 00:00 UTC
+- **Continue**: ซื้อต่อชีวิตด้วยเหรียญหลังพลาดครบ 3 ครั้ง ใช้ได้ทั้ง Daily และ Practice (ปิดใน Random Mode ตามดีไซน์ของโหมด)
+- หน้า Quests ใหม่ รวม Daily + Weekly เข้าด้วยกัน สลับดูด้วย tab แทนการ์ดแยกที่เคยเรียงต่อกันยาวบน Home
+- แถบ progress + badge "N to claim" บนปุ่ม Quests ที่ Home
+
+### Fixed
+- ล็อกไม่ให้เล่นแนวนอนบนมือถือ (แนวนอนทำ UI พัง) ด้วย overlay ขอให้หมุนกลับแนวตั้ง
+- Toast แจ้งเตือน text ชิดซ้าย แก้เป็นกึ่งกลาง
+- เส้นทับ slider เพลง/เอฟเฟกต์เสียงในหน้า Settings (เกิดจาก `.settings-row` border-bottom ทะลุขึ้นมา)
+- ปรับลดรางวัลเหรียญ/XP ของเควส (daily+weekly) ลง ~3.4x ให้สมดุลกับ achievement pool ที่ rebalance ไปก่อนหน้า
+
 ## 1.5.0 — 2026-07-18
 
 ### Added

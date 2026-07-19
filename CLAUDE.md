@@ -178,11 +178,31 @@ XP and coins are awarded after each completed game. Level is derived from cumula
 
 ## Hint System
 
-- **Free hints**: 3 per game (practice only).
-- **Paid hints**: up to 3 more, costs 50 / 75 / 100 coins each (popup confirmation before spend).
-- **Daily mode**: hints are tracked but coin purchase is disabled.
+- **Free hints**: 3 per game, all modes. Practice/Random get more as the player
+  levels up (`freeHintsForLevel()` in `src/lib/level.ts`, up to +3) — Daily stays
+  fixed at 3 since it has a global leaderboard and must stay equal for everyone.
+- **Paid hints**: up to 3 more (Practice/Random only), costs 50 / 75 / 100 coins
+  each (popup confirmation before spend).
+- **Daily mode**: hints are tracked but coin purchase is disabled — this reveals
+  answers, so it stays off the table for the competitive leaderboard mode.
 - Hints are revealed via `applyHint()` in `src/ui/views/game.ts`.
 - Coin spend calls `api.spendCoins()` → updates `useStore.setState({ coins: result.balance })`.
+
+## Continue System (buy back in after 3 mistakes)
+
+- Unlike hints, a continue doesn't reveal any answers — it just resets the
+  hearts (mistake count for game-over purposes) to 0 so the player can keep
+  playing. **Allowed in Daily** (not a hint, so the no-coin-hints rule doesn't
+  apply) and Practice — **not allowed in Random Mode**, since "lose 1 game =
+  streak resets" is that mode's entire design.
+- Up to 3 continues per game. Daily costs 2,500 / 4,000 / 10,000 coins.
+  Practice costs scale with difficulty (`PRACTICE_CONTINUE_BASE` in
+  `src/ui/views/game.ts`) at the same 1x / 1.6x / 4x ratio as Daily.
+- **Scoring integrity**: the mistake count used for scoring (`mistakes`) is
+  cumulative and never resets on a continue — only the hearts-display/
+  game-over counter (`livesLost`) resets. A continue lets you finish the
+  puzzle; it does not erase mistakes from your score or from what's sent to
+  the server, so it can't be used to buy a better Daily leaderboard rank.
 
 ---
 
@@ -315,7 +335,9 @@ Canvas-based share images generated client-side. See `src/lib/share/`:
 3. **No editing existing SQL migrations** — append only.
 4. **No `console.log` left in production code** — use Sentry for error tracking.
 5. **No `any` types unless unavoidable** — prefer proper typing.
-6. **Daily mode never gets coin hints** — this is an intentional design decision.
+6. **Daily mode never gets coin hints** — intentional, since hints reveal answers on
+   the competitive leaderboard mode. Coin *continues* (buy back in after 3 mistakes)
+   are a separate mechanic and are allowed in Daily — see Continue System above.
 7. **Bottom nav has exactly 4 tabs** — do not add or remove tabs without explicit instruction.
 8. **The game is English-only.** All in-app text (UI copy, error messages, What's New /
    release notes shown in-app) must be in English — no Thai. This does not apply to

@@ -1100,10 +1100,6 @@ h3 {
   margin-bottom: 0;
 }
 
-.view--home .quests-card {
-  min-height: 70px;
-}
-
 .home-header {
   width: 100%;
   display: flex;
@@ -1305,6 +1301,12 @@ h3 {
   color: #fff;
 }
 
+.coin-hint-btn--confirm:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--app-text-secondary);
+  cursor: not-allowed;
+}
+
 /* Daily card v2 — purple gradient */
 .daily-card-v2 {
   width: 100%;
@@ -1489,9 +1491,43 @@ h3 {
   color: var(--app-text);
 }
 
+.pm-row-title-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pm-row-claim-badge {
+  flex: none;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 999px;
+}
+
 .pm-row-sub {
   font-size: 11.5px;
   color: var(--app-text-secondary);
+}
+
+.pm-row-progress {
+  margin-top: 3px;
+  width: 100%;
+  max-width: 200px;
+  height: 4px;
+  background: var(--app-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pm-row-progress-fill {
+  height: 100%;
+  background: var(--brand-primary);
+  border-radius: 999px;
+  transition: width var(--duration-fast);
 }
 
 .pm-row-chevron {
@@ -4081,6 +4117,8 @@ body.bg-anim-aurora {
   padding: 12px 20px;
   border-radius: var(--radius-md);
   z-index: 200;
+  text-align: center;
+  max-width: calc(100% - 32px);
   animation: slideUp 0.3s ease;
 }
 
@@ -4374,15 +4412,32 @@ body.bg-anim-aurora {
 }
 
 /* === Settings volume slider === */
+/* The pill background has to live on the track pseudo-element, not the
+   input itself — WebKit/Blink don't reliably paint the input's own
+   background as the track once appearance:none is set, so leaving the
+   pseudo-element transparent exposed the browser's thin native groove. */
 .vol-slider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
+  height: 20px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+.vol-slider::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 3px;
   background: var(--app-border);
-  outline: none;
-  cursor: pointer;
+  border: none;
+}
+
+.vol-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--app-border);
+  border: none;
 }
 
 .vol-slider::-webkit-slider-thumb {
@@ -4436,11 +4491,6 @@ body.bg-anim-aurora {
   align-items: center;
   gap: 12px;
   padding: 13px 0;
-  border-bottom: 1px solid var(--app-border);
-}
-
-.settings-row:last-child {
-  border-bottom: none;
 }
 
 .settings-ic {
@@ -4568,4 +4618,49 @@ body.bg-anim-aurora {
   font-size: 14px;
   line-height: 1.5;
   color: var(--app-text);
+}
+
+/* ===== Orientation lock — portrait only on touch devices ===== */
+/* Sudoku's grid layout breaks in landscape on phones, so we block play
+   there instead of shipping a second layout. Gated to touch + coarse
+   pointer so desktop windows resized short/wide are unaffected. */
+.orientation-lock {
+  display: none;
+}
+
+@media (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  #app {
+    display: none;
+  }
+
+  .orientation-lock {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+    background: var(--brand-gradient, linear-gradient(135deg, #667eea, #764ba2));
+    color: #fff;
+    text-align: center;
+  }
+
+  .orientation-lock-icon {
+    animation: orientationRotateHint 1.8s ease-in-out infinite;
+  }
+
+  .orientation-lock-text {
+    font-family: 'Fredoka', var(--font-base);
+    font-size: 17px;
+    font-weight: 600;
+    max-width: 280px;
+  }
+}
+
+@keyframes orientationRotateHint {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
 }

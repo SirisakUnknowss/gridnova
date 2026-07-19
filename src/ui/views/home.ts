@@ -14,6 +14,7 @@ import { APP_VERSION } from '@lib/version';
 export interface HomeViewProps {
   onEnterPlayMode: () => void;
   onOpenPractice: () => void;
+  onOpenQuests: () => void;
   onAuthAction: () => void;
   nav: BottomNavCallbacks;
 }
@@ -132,13 +133,21 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
         </div>
       </div>
 
-      <!-- Quests -->
-      <div class="card quests-card">
-        <h3>${ic.quests(16)} Quests</h3>
-        <div id="quest-list" style="font-size:13px;color:var(--app-text-secondary);">
-          ${isGuest ? '<span style="color:var(--brand-primary);cursor:pointer;" id="quest-signin">Sign in</span> to see daily quests.' : 'Loading…'}
+      <!-- Quests entry -->
+      <button class="pm-row" id="open-quests">
+        <span class="pm-row-icon">${ic.quests(22)}</span>
+        <div class="pm-row-body">
+          <div class="pm-row-title-line">
+            <span class="pm-row-title">Quests</span>
+            <span class="pm-row-claim-badge" id="quests-claim-badge" style="display:none;"></span>
+          </div>
+          <span class="pm-row-sub" id="quests-sub">${isGuest ? 'Sign in to see daily & weekly quests' : 'Daily & weekly challenges'}</span>
+          <div class="pm-row-progress" id="quests-progress" style="display:none;">
+            <div class="pm-row-progress-fill" id="quests-progress-fill"></div>
+          </div>
         </div>
-      </div>
+        <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
+      </button>
 
       <div class="app-version-row">
         ${import.meta.env.VITE_APP_ENV === 'staging' ? '<span class="env-badge env-badge--staging">STAGING</span>' : ''}
@@ -151,10 +160,10 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
 
   root.querySelector('#enter-play-mode')?.addEventListener('click', props.onEnterPlayMode);
   root.querySelector('#open-practice')?.addEventListener('click', props.onOpenPractice);
+  root.querySelector('#open-quests')?.addEventListener('click', props.onOpenQuests);
   wireBottomNav(root, props.nav, 'home');
   root.querySelector('#user-badge')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#save-progress')?.addEventListener('click', props.onAuthAction);
-  root.querySelector('#quest-signin')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#mute-btn')?.addEventListener('click', (e) => {
     const nowMuted = toggleMute();
     const btn = e.currentTarget as HTMLButtonElement;
