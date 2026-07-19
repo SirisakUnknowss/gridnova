@@ -429,6 +429,19 @@ export async function trackVisit(isGuest: boolean, userId?: string): Promise<voi
 }
 
 /**
+ * Mark this session as a real, engaged visitor — call once after the
+ * player has made 3 real in-game moves (see game.ts). get_visitor_stats()
+ * only counts engaged sessions, so page loads that bounce immediately
+ * (or bots) don't inflate "Visitors Today".
+ */
+export async function recordVisitorAction(): Promise<void> {
+  try {
+    const session_id = getSessionId();
+    await supabase.rpc('record_visitor_action', { p_session_id: session_id });
+  } catch { /* offline / demo mode */ }
+}
+
+/**
  * Heartbeat — call every 30s to stay "online".
  * Upserts into online_sessions; stale rows (>2min) = offline.
  * Also touches visitor_sessions.last_seen so today's row can derive a

@@ -57,6 +57,10 @@ const DIFF_COLOR: Record<string, string> = {
   expert: '#a78bfa',
 };
 
+// Module-level (not per-game) — once this tab has proven it's a real
+// visitor (3+ moves in any game today), stop pinging record_visitor_action.
+let visitorEngaged = false;
+
 export function mountGameView(root: HTMLElement, props: GameViewProps): { unmount: () => void } {
   const { puzzle, solution, mode, difficulty } = props;
 
@@ -92,6 +96,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   let mistakes = 0;      // cumulative, true count — drives score penalty, never reset by a continue
   let livesLost = 0;     // resets to 0 on continue — drives hearts display + game-over trigger
   let continuesUsed = 0;
+  let movesForEngagement = 0; // counts up to 3 real digit placements, then reports the visitor as engaged
   let hintsLeft = FREE_HINTS;
   let paidHintsUsed = 0;
   let noteMode = false;
@@ -364,6 +369,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     const prevDigit = userBoard[r][c];
     const prevNotes = notesSnapshot(r, c);
     let mistakesDelta = 0;
+
+    if (!visitorEngaged && movesForEngagement < 3) {
+      movesForEngagement++;
+      if (movesForEngagement >= 3) { visitorEngaged = true; void api.recordVisitorAction(); }
+    }
 
     userBoard[r][c] = n;
     noteMask[r][c].clear();
