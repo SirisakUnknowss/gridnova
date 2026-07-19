@@ -147,6 +147,39 @@ export async function renderWeeklyQuests(container: HTMLElement, opts: RenderQue
 }
 
 // =====================================================================
+// Home-row summary — "3/8 done today · 2 to claim" style progress, so
+// the Quests row on home hints at what's waiting without opening it.
+// =====================================================================
+export interface QuestsSummary {
+  total: number;
+  completed: number;
+  claimable: number;
+}
+
+function summarize(quests: Quest[]): QuestsSummary {
+  return {
+    total: quests.length,
+    completed: quests.filter((q) => q.completed_at).length,
+    claimable: quests.filter((q) => q.completed_at && !q.claimed_at).length,
+  };
+}
+
+export async function getQuestsSummary(): Promise<QuestsSummary | null> {
+  if (!useStore.getState().user) return null;
+  try {
+    const [daily, weekly] = await Promise.all([
+      api.getDailyQuests(todayUtc()) as Promise<Quest[]>,
+      api.getWeeklyQuests(weekStartUtc()) as Promise<Quest[]>,
+    ]);
+    const d = summarize(daily);
+    const w = summarize(weekly);
+    return { total: d.total + w.total, completed: d.completed + w.completed, claimable: d.claimable + w.claimable };
+  } catch {
+    return null;
+  }
+}
+
+// =====================================================================
 // Full Quests page — Daily / Weekly as swipeable-feel left/right tabs,
 // replacing the two stacked cards that used to live on home.
 // =====================================================================

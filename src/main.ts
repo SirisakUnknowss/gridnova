@@ -24,7 +24,7 @@ import { mountSplash } from './ui/views/splash';
 import { showAuthModal } from './ui/views/auth-modal';
 import { mountLeaderboardView } from './ui/views/leaderboard';
 import { hasCompletedOnboarding, showOnboarding } from './ui/views/onboarding';
-import { mountQuestsView } from './ui/views/quests';
+import { mountQuestsView, getQuestsSummary } from './ui/views/quests';
 import { mountProfileView } from './ui/views/profile';
 import { mountAchievementsView } from './ui/views/achievements';
 import { mountStatsView } from './ui/views/stats';
@@ -207,6 +207,25 @@ function showHome() {
     nav: navCb,
   });
   currentUnmount = view.unmount;
+
+  // Best-effort: fill in the Quests row progress once loaded, so the
+  // row hints at what's waiting before the player taps into it.
+  void getQuestsSummary().then((summary) => {
+    if (!summary || summary.total === 0) return;
+    const subEl = document.getElementById('quests-sub');
+    const badgeEl = document.getElementById('quests-claim-badge');
+    const progressEl = document.getElementById('quests-progress');
+    const progressFillEl = document.getElementById('quests-progress-fill');
+    if (subEl) subEl.textContent = `${summary.completed}/${summary.total} done today`;
+    if (progressEl && progressFillEl) {
+      progressEl.style.display = 'block';
+      progressFillEl.style.width = `${Math.round((summary.completed / summary.total) * 100)}%`;
+    }
+    if (badgeEl && summary.claimable > 0) {
+      badgeEl.textContent = `${summary.claimable} to claim`;
+      badgeEl.style.display = 'inline-block';
+    }
+  });
 }
 
 function showQuests() {

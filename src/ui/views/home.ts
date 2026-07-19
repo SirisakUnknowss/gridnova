@@ -137,8 +137,14 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
       <button class="pm-row" id="open-quests">
         <span class="pm-row-icon">${ic.quests(22)}</span>
         <div class="pm-row-body">
-          <span class="pm-row-title">Quests</span>
-          <span class="pm-row-sub">${isGuest ? 'Sign in to see daily & weekly quests' : 'Daily & weekly challenges'}</span>
+          <div class="pm-row-title-line">
+            <span class="pm-row-title">Quests</span>
+            <span class="pm-row-claim-badge" id="quests-claim-badge" style="display:none;"></span>
+          </div>
+          <span class="pm-row-sub" id="quests-sub">${isGuest ? 'Sign in to see daily & weekly quests' : 'Daily & weekly challenges'}</span>
+          <div class="pm-row-progress" id="quests-progress" style="display:none;">
+            <div class="pm-row-progress-fill" id="quests-progress-fill"></div>
+          </div>
         </div>
         <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
       </button>
