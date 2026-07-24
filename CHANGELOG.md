@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.7.0 — 2026-07-24
+
+### Added
+- **SEO**: meta description, OG/Twitter card tags, JSON-LD structured data, `robots.txt`, `sitemap.xml` — เว็บไม่มี SEO surface มาก่อนเลย (title เปล่าๆ ไม่มี description/social preview)
+- **Profile**: เพิ่ม dropdown เลือกประเทศ (ไทยขึ้นก่อน) บันทึกทันทีตอนเลือก
+
+### Fixed
+- **Achievements**: "Globetrotter" (ตั้งค่าประเทศ) เข้าไม่ถึงมาตลอดเพราะไม่มี UI ให้ตั้งค่าเลย — แก้แล้วด้วย dropdown ด้านบน
+- **Achievements**: ซ่อน "Theme Collector" กับ "Shopaholic" ออกจากหน้า Medals ชั่วคราว เพราะต้องซื้อของในร้านค้าซึ่งยังไม่ได้เปิดใช้งาน (shop.ts มีอยู่ในโค้ดแต่ไม่ได้ผูกเข้า navigation เลย) — column `hidden` มีอยู่แล้วใน DB แต่ client ไม่เคยกรองตามนี้มาก่อน แก้ให้ respect แล้ว
+
 ## 1.6.0 — 2026-07-19
 
 ### Added

@@ -14,6 +14,14 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '1.7.0',
+    date: '2026-07-24',
+    title: 'Profile Country',
+    changes: [
+      { icon: '🌍', text: 'You can now set your country in your Profile — also unlocks the Globetrotter medal' },
+    ],
+  },
+  {
     version: '1.6.0',
     date: '2026-07-19',
     title: 'Weekly Quests & Continue',
