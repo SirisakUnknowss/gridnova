@@ -29,6 +29,17 @@ const DEFAULT_AVATARS = [
   '🐼', '🐯', '🦁', '🐸', '🐧', '🦉', '🐙',
 ];
 
+// Thailand first since that's the primary audience, then alphabetical.
+const COUNTRIES = [
+  'Thailand',
+  'Cambodia', 'Laos', 'Malaysia', 'Myanmar', 'Philippines', 'Singapore', 'Vietnam', 'Indonesia',
+  'Australia', 'Bangladesh', 'Brazil', 'Canada', 'China', 'Egypt', 'France', 'Germany',
+  'Hong Kong', 'India', 'Italy', 'Japan', 'Mexico', 'Netherlands', 'New Zealand', 'Nigeria',
+  'Pakistan', 'Poland', 'Russia', 'Saudi Arabia', 'South Africa', 'South Korea', 'Spain',
+  'Sweden', 'Switzerland', 'Taiwan', 'Turkey', 'Ukraine', 'United Arab Emirates',
+  'United Kingdom', 'United States', 'Other',
+];
+
 export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmount: () => void } {
   const state = useStore.getState();
   const user = state.user;
@@ -67,6 +78,12 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
           <div class="badge-tag">${isGuest ? 'GUEST' : 'MEMBER'}</div>
           ${!isGuest && isPremium() ? '<div class="badge-tag badge-tag--premium">✨ PREMIUM</div>' : ''}
         </div>
+        ${!isGuest ? `
+          <select id="prof-country" style="margin-top:8px;font-size:12px;color:var(--app-text-secondary);background:var(--app-card-bg);border:1px solid var(--app-border);border-radius:var(--radius-sm);padding:4px 8px;">
+            <option value="" ${!profile.country ? 'selected' : ''}>🌍 Set your country</option>
+            ${COUNTRIES.map(c => `<option value="${escapeHtml(c)}" ${profile.country === c ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}
+          </select>
+        ` : ''}
         ${isGuest ? `
           <button class="btn btn--primary btn--small" id="prof-upgrade" style="margin-top:10px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
@@ -297,6 +314,21 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
       }
       props.onToast('Avatar updated');
     });
+  });
+
+  root.querySelector('#prof-country')?.addEventListener('change', async (e) => {
+    const country = (e.currentTarget as HTMLSelectElement).value;
+    if (!country) return;
+    try {
+      await api.updateProfile({ country });
+      useStore.setState({
+        profile: { ...(useStore.getState().profile ?? {}), country },
+      });
+      props.onToast('Country updated');
+    } catch (err) {
+      props.onToast('Could not update country');
+      console.warn(err);
+    }
   });
 
   root.querySelector('#prof-edit-name')?.addEventListener('click', async () => {
