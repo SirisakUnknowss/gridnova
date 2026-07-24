@@ -324,7 +324,7 @@ export async function equipItem(payload: { theme_id?: string; background_id?: st
 
 // === Achievements ===
 export async function getAchievementDefinitions() {
-  const { data, error } = await supabase.from('achievements_definitions').select('*').order('sort_order');
+  const { data, error } = await supabase.from('achievements_definitions').select('*').eq('hidden', false).order('sort_order');
   if (error) throw error;
   return data ?? [];
 }
