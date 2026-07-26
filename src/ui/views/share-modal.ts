@@ -1,5 +1,5 @@
 // Share Modal — preview + share/download for Win / Profile / Recap / Invite cards
-import { renderWinCard, renderProfileCard, renderRecapCard, renderInviteCard } from '@lib/share/index';
+import { renderWinCard, renderProfileCard, renderRecapCard, renderInviteCard, buildResultText } from '@lib/share/index';
 import type { WinCardData, ProfileCardData, RecapCardData, InviteCardData } from '@lib/share/index';
 import downloadIcon from '@images/download-icon.png';
 import shareIcon from '@images/share-icon.png';
@@ -60,6 +60,12 @@ export function showShareModal(props: ShareModalProps): void {
         <canvas id="share-preview-canvas" class="share-preview-canvas"></canvas>
         <div class="share-preview-loading" id="share-preview-loading">Generating...</div>
       </div>
+      ${props.win ? `
+        <div class="share-text-block" id="share-text-block">
+          <pre class="share-text-preview" id="share-text-preview"></pre>
+          <button class="btn btn--secondary btn--small" id="share-copy-text">Copy result text</button>
+        </div>
+      ` : ''}
       <div class="share-actions">
         <button class="btn btn--secondary" id="share-download"><img src="${downloadIcon}" class="share-btn-icon" alt="" /> Save Image</button>
         <button class="btn" id="share-share"><img src="${shareIcon}" class="share-btn-icon" alt="" /> Share</button>
@@ -71,6 +77,28 @@ export function showShareModal(props: ShareModalProps): void {
 
   const canvas = root.querySelector<HTMLCanvasElement>('#share-preview-canvas')!;
   const loading = root.querySelector<HTMLElement>('#share-preview-loading')!;
+
+  // Spoiler-free text result — only meaningful for the win card, so it's
+  // hidden on the other tabs.
+  const resultText = props.win
+    ? buildResultText({ result: props.win.result, date: props.win.date, rank: props.win.rank })
+    : '';
+  const textBlock = root.querySelector<HTMLElement>('#share-text-block');
+  const textPreview = root.querySelector<HTMLElement>('#share-text-preview');
+  if (textPreview) textPreview.textContent = resultText;
+  function syncTextBlock() {
+    if (textBlock) textBlock.style.display = activeType === 'win' ? '' : 'none';
+  }
+  syncTextBlock();
+
+  root.querySelector('#share-copy-text')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(resultText);
+      props.onToast?.('Result copied — paste it anywhere');
+    } catch {
+      props.onToast?.('Could not copy');
+    }
+  });
 
   // Drag-to-dismiss on the Y axis (grab the handle or header). Pointer capture keeps
   // move/up on the captured element, so no document listeners to clean up.
@@ -139,6 +167,7 @@ export function showShareModal(props: ShareModalProps): void {
       root.querySelectorAll('.share-tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeType = btn.dataset.type as CardType;
+      syncTextBlock();
       renderCard(activeType);
     });
   });
@@ -178,17 +207,20 @@ export function showShareModal(props: ShareModalProps): void {
   // Share
   root.querySelector('#share-share')?.addEventListener('click', async () => {
     if (!activeBlob) return;
+    // On the win tab, share the spoiler-free result text — that's the part
+    // that travels and gets people curious. Elsewhere just the link.
+    const shareText = activeType === 'win' && resultText ? resultText : 'https://gridnova.pages.dev';
     const file = new File([activeBlob], `gridnova-${activeType}.png`, { type: 'image/png' });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], text: 'gridnova.pages.dev' });
+        await navigator.share({ files: [file], text: shareText });
         return;
       } catch (err) {
         if ((err as Error).name === 'AbortError') return;
       }
     }
     if (navigator.share) {
-      try { await navigator.share({ text: 'gridnova.pages.dev' }); return; } catch { /* ignore */ }
+      try { await navigator.share({ text: shareText }); return; } catch { /* ignore */ }
     }
     // Fallback: download
     const url = URL.createObjectURL(activeBlob);

@@ -40,6 +40,8 @@ export interface GameResult {
   moves: Move[];
   startedAt: string;
   completedAt: string;
+  /** Starting board (0 = blank). Used to render the spoiler-free share grid. */
+  puzzle: Board;
 }
 
 interface HistoryEntry {
@@ -578,7 +580,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     // trip the server TIME_MISMATCH guard and silently 403 every daily submission.
     const completedAtMs = Date.now();
     const effectiveStartedAt = new Date(completedAtMs - timeSeconds * 1000).toISOString();
-    props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
+    props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, puzzle, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
   }
 
   function triggerGameOver() {

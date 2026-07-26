@@ -1,4 +1,5 @@
 export { renderWinCard } from './card-win';
+export { buildResultText, dailyNumber } from './text-result';
 export { renderProfileCard } from './card-profile';
 export { renderRecapCard } from './card-recap';
 export { renderInviteCard } from './card-invite';
