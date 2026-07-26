@@ -242,6 +242,21 @@ export function sfxQuestClaim(): void {
   tone({ freq: 1100, wave: 'sine', startAt: 0.2, dur: 0.18, vol: 0.3 });
 }
 
+/** Row / column / box filled in — quick rising sparkle */
+export function sfxUnitComplete(): void {
+  [784, 988, 1175].forEach((f, i) => {
+    tone({ freq: f, wave: 'sine', startAt: i * 0.05, dur: 0.13, vol: 0.28, attack: 0.004 });
+  });
+}
+
+/** All nine of a digit placed — warm resolved chord, weightier than a unit */
+export function sfxNumberComplete(): void {
+  [523, 659, 784].forEach((f, i) => {
+    tone({ freq: f, wave: 'sine', startAt: i * 0.04, dur: 0.3, vol: 0.3, attack: 0.006, decay: 0.12 });
+  });
+  tone({ freq: 1046, wave: 'sine', startAt: 0.14, dur: 0.34, vol: 0.24, attack: 0.008 });
+}
+
 /** Hint reveal — sparkle */
 export function sfxHint(): void {
   [660, 784, 1046, 1318].forEach((f, i) => {

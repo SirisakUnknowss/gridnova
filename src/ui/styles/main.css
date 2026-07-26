@@ -623,10 +623,14 @@ h3 {
    render itself — renderBoard() rebuilds all 81 cells on every interaction,
    so a render-time class would replay across the whole board on every tap. */
 
-/* Scaling cells must sit above their neighbours or the grid clips them */
+/* Scaling cells must sit above their neighbours or the grid clips them.
+   pointer-events:none stops the enlarged cell from covering — and stealing
+   taps meant for — the neighbours it temporarily overlaps. */
 .cell-pop,
-.cell-ripple {
+.cell-ripple,
+.cell-num-done {
   z-index: 2;
+  pointer-events: none;
 }
 
 /* Correct digit lands */
@@ -656,7 +660,7 @@ h3 {
 
 /* Row / column / box completed, and the winning board sweep */
 .cell-ripple {
-  animation: cellRipple 420ms ease-out;
+  animation: cellRipple 380ms ease-out;
 }
 
 @keyframes cellRipple {
@@ -669,10 +673,39 @@ h3 {
   100% { transform: scale(1); box-shadow: inset 0 0 0 0 rgba(108, 92, 231, 0); }
 }
 
+/* All nine of a digit placed — amber, to read differently from the ripple */
+.cell-num-done {
+  animation: cellNumDone 420ms ease-out;
+}
+
+@keyframes cellNumDone {
+  0% { transform: scale(1); box-shadow: inset 0 0 0 0 rgba(245, 158, 11, 0); }
+  40% {
+    transform: scale(1.14);
+    box-shadow: inset 0 0 0 3px rgba(245, 158, 11, 0.65);
+    background: #fef3c7;
+  }
+  100% { transform: scale(1); box-shadow: inset 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* The numpad key that just retired */
+.numpad-done-pop {
+  animation: numpadDonePop 460ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes numpadDonePop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.22) rotate(-4deg); }
+  70% { transform: scale(0.96) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cell-pop,
   .cell-shake,
-  .cell-ripple {
+  .cell-ripple,
+  .cell-num-done,
+  .numpad-done-pop {
     animation: none;
   }
 }

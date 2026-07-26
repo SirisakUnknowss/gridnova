@@ -7,7 +7,7 @@ import { computeDailyScore, computePracticeScore } from '@engine/scoring';
 import { renderBoard } from '@ui/components/board';
 import { renderNumpad } from '@ui/components/numpad';
 import { formatTime } from '@lib/format';
-import { sfxPlace, sfxSelect, sfxError, sfxErase, sfxHint, sfxWin, sfxDailyWin } from '@lib/sound';
+import { sfxPlace, sfxSelect, sfxError, sfxErase, sfxHint, sfxWin, sfxDailyWin, sfxUnitComplete, sfxNumberComplete } from '@lib/sound';
 import { showShareModal } from './share-modal';
 import { useStore } from '@state/store';
 import * as api from '@lib/api';
@@ -376,8 +376,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
    * Cells light up in order of distance from the placed cell, so the wave
    * reads as spreading out from where you actually played.
    */
-  function rippleCompletedUnits(r: number, c: number) {
-    if (reduceMotion) return;
+  function rippleCompletedUnits(r: number, c: number): boolean {
     const units: [number, number][][] = [];
 
     const row: [number, number][] = Array.from({ length: 9 }, (_, i) => [r, i]);
@@ -394,16 +393,44 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     for (const unit of units) {
       for (const [ur, uc] of unit) {
         const dist = Math.max(Math.abs(ur - r), Math.abs(uc - c));
-        pulse(ur, uc, 'cell-ripple', dist * 45);
+        pulse(ur, uc, 'cell-ripple', dist * 30);
       }
     }
+    return units.length > 0;
+  }
+
+  /**
+   * All nine of a digit placed. Flashes every cell holding it plus the
+   * numpad key that just retired, in a warmer colour than the unit ripple
+   * so the two events don't read as the same thing.
+   */
+  function celebrateNumberComplete(n: number): boolean {
+    let placed = 0;
+    const cells: [number, number][] = [];
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (userBoard[r][c] === n && solution[r][c] === n) { placed++; cells.push([r, c]); }
+      }
+    }
+    if (placed !== 9) return false;
+
+    cells.forEach(([r, c], i) => pulse(r, c, 'cell-num-done', i * 30));
+
+    if (!reduceMotion) {
+      const key = numpadEl.children[n - 1] as HTMLElement | undefined;
+      if (key) {
+        key.classList.add('numpad-done-pop');
+        key.addEventListener('animationend', () => key.classList.remove('numpad-done-pop'), { once: true });
+      }
+    }
+    return true;
   }
 
   /** Diagonal wave across the whole board on the winning move. */
   function winWave() {
     if (reduceMotion) return;
     for (let r = 0; r < 9; r++) {
-      for (let c = 0; c < 9; c++) pulse(r, c, 'cell-ripple', (r + c) * 35);
+      for (let c = 0; c < 9; c++) pulse(r, c, 'cell-ripple', (r + c) * 28);
     }
   }
 
@@ -484,8 +511,14 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (mistakesDelta === 0) {
       pulse(r, c, 'cell-pop');
       // On the winning move, let winWave() own the whole board instead of
-      // stacking a unit ripple underneath it.
-      if (!boardsEqual(userBoard, solution)) rippleCompletedUnits(r, c);
+      // stacking these underneath it.
+      if (!boardsEqual(userBoard, solution)) {
+        const numberDone = celebrateNumberComplete(n);
+        const unitDone = rippleCompletedUnits(r, c);
+        // Finishing a digit is the bigger moment — don't play both stings.
+        if (numberDone) sfxNumberComplete();
+        else if (unitDone) sfxUnitComplete();
+      }
     } else {
       pulse(r, c, 'cell-shake');
     }
