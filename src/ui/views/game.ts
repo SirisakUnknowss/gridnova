@@ -341,6 +341,72 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     renderNumpad(numpadEl, { userBoard, solution, onNumber: handleNumber });
   }
 
+  // --- Board animations -------------------------------------------------
+  // renderBoard() throws away all 81 cells and rebuilds them on every
+  // rerender — including a plain cell tap — so an animation baked into the
+  // render would replay across the whole board on every interaction.
+  // These fire imperatively at the one cell that changed, after the
+  // rerender that created it.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let winTimeout: number | null = null;
+
+  function cellAt(r: number, c: number): HTMLElement | null {
+    return boardEl.children[r * 9 + c] as HTMLElement | undefined ?? null;
+  }
+
+  /** Play a one-shot animation class on a cell, cleaning up after itself. */
+  function pulse(r: number, c: number, cls: string, delayMs = 0) {
+    if (reduceMotion) return;
+    const el = cellAt(r, c);
+    if (!el) return;
+    if (delayMs) el.style.animationDelay = `${delayMs}ms`;
+    el.classList.add(cls);
+    el.addEventListener('animationend', () => {
+      el.classList.remove(cls);
+      el.style.animationDelay = '';
+    }, { once: true });
+  }
+
+  function unitSolved(cells: [number, number][]): boolean {
+    return cells.every(([r, c]) => userBoard[r][c] !== 0 && userBoard[r][c] === solution[r][c]);
+  }
+
+  /**
+   * Ripple every row / column / box that the move at (r,c) just completed.
+   * Cells light up in order of distance from the placed cell, so the wave
+   * reads as spreading out from where you actually played.
+   */
+  function rippleCompletedUnits(r: number, c: number) {
+    if (reduceMotion) return;
+    const units: [number, number][][] = [];
+
+    const row: [number, number][] = Array.from({ length: 9 }, (_, i) => [r, i]);
+    if (unitSolved(row)) units.push(row);
+
+    const col: [number, number][] = Array.from({ length: 9 }, (_, i) => [i, c]);
+    if (unitSolved(col)) units.push(col);
+
+    const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+    const box: [number, number][] = [];
+    for (let dr = 0; dr < 3; dr++) for (let dc = 0; dc < 3; dc++) box.push([br + dr, bc + dc]);
+    if (unitSolved(box)) units.push(box);
+
+    for (const unit of units) {
+      for (const [ur, uc] of unit) {
+        const dist = Math.max(Math.abs(ur - r), Math.abs(uc - c));
+        pulse(ur, uc, 'cell-ripple', dist * 45);
+      }
+    }
+  }
+
+  /** Diagonal wave across the whole board on the winning move. */
+  function winWave() {
+    if (reduceMotion) return;
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) pulse(r, c, 'cell-ripple', (r + c) * 35);
+    }
+  }
+
   function onCellClick(r: number, c: number) {
     selected = { r, c };
     sfxSelect();
@@ -412,6 +478,18 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     syncUndoRedo();
     moves.push({ r, c, n, t: elapsedMs() });
     rerender();
+
+    // Animate only after the rerender that rebuilt this cell — the element
+    // the animation lands on doesn't exist before it.
+    if (mistakesDelta === 0) {
+      pulse(r, c, 'cell-pop');
+      // On the winning move, let winWave() own the whole board instead of
+      // stacking a unit ripple underneath it.
+      if (!boardsEqual(userBoard, solution)) rippleCompletedUnits(r, c);
+    } else {
+      pulse(r, c, 'cell-shake');
+    }
+
     checkWin();
   }
 
@@ -580,7 +658,14 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     // trip the server TIME_MISMATCH guard and silently 403 every daily submission.
     const completedAtMs = Date.now();
     const effectiveStartedAt = new Date(completedAtMs - timeSeconds * 1000).toISOString();
-    props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, puzzle, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
+    const finish = () => props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, puzzle, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
+
+    // Let the board celebrate before the modal covers it. Timing data is
+    // already captured above, so the delay can't skew the score or trip the
+    // server's wall-clock check.
+    winWave();
+    if (reduceMotion) finish();
+    else winTimeout = window.setTimeout(finish, 800);
   }
 
   function triggerGameOver() {
@@ -776,6 +861,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     unmount() {
       if (timerHandle) clearInterval(timerHandle);
       if (autosaveHandle) clearInterval(autosaveHandle);
+      if (winTimeout) clearTimeout(winTimeout);
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     },
