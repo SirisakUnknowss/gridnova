@@ -1424,6 +1424,70 @@ h3 {
   background: #f0ecff;
 }
 
+/* Daily Puzzle hero (Home) */
+.daily-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.daily-hero-diff {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.daily-hero-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.daily-hero-stat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+}
+
+.daily-hero-stat-label {
+  font-size: 10.5px;
+  opacity: 0.8;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.daily-hero-stat-value {
+  font-family: 'Fredoka', var(--font-base);
+  font-size: 17px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.daily-hero-link {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  opacity: 0.9;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 2px;
+}
+
+.daily-hero-link:hover {
+  opacity: 1;
+}
+
 /* Shared row — Practice entry (Home) + Play Mode Hub list rows */
 .pm-list {
   width: 100%;

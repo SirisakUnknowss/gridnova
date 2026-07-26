@@ -203,6 +203,9 @@ function showHome() {
     onEnterPlayMode: showPlayMode,
     onOpenPractice: showPractice,
     onOpenQuests: showQuests,
+    onPlayDaily: playDaily,
+    onContinueDaily: (saved) => void playDailyResume(saved),
+    onOpenDailyDetail: () => { dailyDetailBack = showHome; showDailyDetail(); },
     onAuthAction: openAuthAction,
     nav: navCb,
   });
@@ -238,17 +241,23 @@ function showPlayMode() {
   clearView('play_mode');
   const view = mountPlayModeView(root, {
     onBack: showHome,
-    onOpenDaily: showDailyDetail,
+    onOpenDaily: () => { dailyDetailBack = showPlayMode; showDailyDetail(); },
     onOpenRandom: showRandomDetail,
     nav: navCb,
   });
   currentUnmount = view.unmount;
 }
 
+// Daily detail is reachable from Home and from Play Mode, so Back has to go
+// where the player actually came from. Tracked as state rather than a
+// parameter because showDailyDetail is wired straight into addEventListener
+// in several places and would receive the click Event as its first argument.
+let dailyDetailBack: () => void = showPlayMode;
+
 function showDailyDetail() {
   clearView('daily_detail');
   const view = mountDailyDetailView(root, {
-    onBack: showPlayMode,
+    onBack: () => dailyDetailBack(),
     onPlayDaily: playDaily,
     onContinueDaily: (saved) => void playDailyResume(saved),
     onLeaderboard: showLeaderboard,
