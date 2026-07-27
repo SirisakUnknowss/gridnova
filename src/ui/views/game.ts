@@ -7,7 +7,7 @@ import { computeDailyScore, computePracticeScore } from '@engine/scoring';
 import { renderBoard } from '@ui/components/board';
 import { renderNumpad } from '@ui/components/numpad';
 import { formatTime } from '@lib/format';
-import { sfxPlace, sfxSelect, sfxError, sfxErase, sfxHint, sfxWin, sfxDailyWin, sfxUnitComplete, sfxNumberComplete } from '@lib/sound';
+import { sfxPlace, sfxSelect, sfxError, sfxErase, sfxHint, sfxWin, sfxDailyWin, sfxUnitComplete, sfxNumberComplete, stopBgMusic, playBgMusic, getBgVolume } from '@lib/sound';
 import { showShareModal } from './share-modal';
 import { useStore } from '@state/store';
 import * as api from '@lib/api';
@@ -350,20 +350,28 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let winTimeout: number | null = null;
 
+  // Solving needs concentration — the background track stays off for the
+  // whole game and resumes on exit, unless it was switched off anyway.
+  stopBgMusic();
+
   function cellAt(r: number, c: number): HTMLElement | null {
     return boardEl.children[r * 9 + c] as HTMLElement | undefined ?? null;
   }
 
-  /** Play a one-shot animation class on a cell, cleaning up after itself. */
+  /**
+   * Play a one-shot animation class on a cell, cleaning up after itself.
+   * The stagger goes through a custom property because the cell and the
+   * digit inside it animate as a pair and both need the same delay.
+   */
   function pulse(r: number, c: number, cls: string, delayMs = 0) {
     if (reduceMotion) return;
     const el = cellAt(r, c);
     if (!el) return;
-    if (delayMs) el.style.animationDelay = `${delayMs}ms`;
+    if (delayMs) el.style.setProperty('--anim-delay', `${delayMs}ms`);
     el.classList.add(cls);
     el.addEventListener('animationend', () => {
       el.classList.remove(cls);
-      el.style.animationDelay = '';
+      el.style.removeProperty('--anim-delay');
     }, { once: true });
   }
 
@@ -895,6 +903,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       if (timerHandle) clearInterval(timerHandle);
       if (autosaveHandle) clearInterval(autosaveHandle);
       if (winTimeout) clearTimeout(winTimeout);
+      if (getBgVolume() > 0) void playBgMusic();
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     },

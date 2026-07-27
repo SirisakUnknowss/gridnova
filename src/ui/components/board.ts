@@ -86,14 +86,25 @@ export function renderBoard(container: HTMLElement, opts: BoardRenderOptions): v
       const notes = noteMask[r][c];
 
       // --- content
+      // The digit lives in its own span so animations can transform it
+      // without moving the cell: a transform on the cell itself changes its
+      // hit box, which is how the celebration animations used to swallow or
+      // steal taps from neighbouring cells.
       if (v !== 0) {
         if (cell.dataset.notes) delete cell.dataset.notes;
-        if (cell.textContent !== String(v)) cell.textContent = String(v);
+        let inner = cell.firstElementChild as HTMLElement | null;
+        if (!inner || !inner.classList.contains('cell-inner')) {
+          inner = document.createElement('span');
+          inner.className = 'cell-inner';
+          cell.replaceChildren(inner);
+        }
+        const text = String(v);
+        if (inner.textContent !== text) inner.textContent = text;
       } else if (notes.size > 0) {
         paintNotes(cell, notes);
       } else {
         if (cell.dataset.notes) delete cell.dataset.notes;
-        if (cell.textContent !== '') cell.replaceChildren();
+        if (cell.childNodes.length) cell.replaceChildren();
       }
 
       // --- state classes

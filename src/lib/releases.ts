@@ -23,6 +23,7 @@ export const RELEASES: ReleaseNote[] = [
       { icon: '🔢', text: 'Placing the last of a digit now lights up all nine of them and retires that key on the numpad' },
       { icon: '📋', text: 'New spoiler-free result you can copy and paste anywhere — it shows the shape of today\'s puzzle and your time without giving away a single answer' },
       { icon: '👆', text: 'Fixed taps landing on the wrong cell or digit — the board was rebuilding itself on every single press' },
+      { icon: '🔇', text: 'Background music now stays off while you\'re solving, and comes back when you leave the puzzle' },
     ],
   },
   {
