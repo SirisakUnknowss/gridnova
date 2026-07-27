@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.8.0 — 2026-07-26
+
+### Added
+- **Home**: ยก Daily Puzzle ขึ้นเป็น hero card (เลขโจทย์, ความยากวันนี้, อันดับตัวเอง, countdown ถึงเวลารีเซ็ต UTC) — เดิม leaderboard ซึ่งเป็นจุดขายเดียวที่ Sudoku.com ไม่มี ถูกฝังลึก 2 ชั้น ส่วน Play Mode ลดเป็นแถวรองคู่กับ Practice
+- **Share**: ผลลัพธ์แบบ text ไม่สปอยล์คำตอบ (Wordle-style) — ตารางบอกแค่ช่องที่โจทย์ให้มา ทุกคนที่เล่น Daily วันเดียวกันได้ตารางเหมือนกัน paste ลง LINE/FB ได้ตรงๆ ไม่ต้องอัปโหลดรูป
+- **Game**: animation บนกระดาน — pop ตอนใส่ถูก, shake ตอนผิด, ripple ไล่ออกจากช่องที่เล่นเมื่อแถว/คอลัมน์/บล็อกครบ, คลื่นทแยงทั้งกระดานตอนชนะ
+- **Game**: ใส่เลขครบ 9 ตัว → วาบสีเหลืองอำพันทุกช่องของเลขนั้น + ปุ่มบนแป้นเด้ง (คนละสีกับ ripple เพื่อไม่ให้อ่านเป็นเหตุการณ์เดียวกัน)
+- **Sound**: `sfxUnitComplete` + `sfxNumberComplete` — เดิม animation เงียบสนิท
+
+### Fixed
+- **Game**: กดแล้วไปโดนช่อง/เลขข้างๆ — `renderBoard` กับ `renderNumpad` ทำลาย DOM ทั้งหมดแล้วสร้างใหม่ทุกครั้งที่แตะ (81 ช่อง + 81 listener) บนมือถือ element ใต้นิ้วตอน touchstart หายไปก่อน click จะ resolve เปลี่ยนเป็น update in place + event delegation
+- **Game**: ช่องที่ scale ตอน animate (43.3px ทับเพื่อนบ้าน 38.1px) บังการกดของช่องข้างๆ — ใส่ `pointer-events: none` ตอน animate และลดเวลา animation ลง (~780ms → ~620ms)
+
 ## 1.7.0 — 2026-07-24
 
 ### Added
