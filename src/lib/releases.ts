@@ -26,14 +26,9 @@ export const RELEASES: ReleaseNote[] = [
       { icon: '🔇', text: 'Background music now stays off while you\'re solving, and comes back when you leave the puzzle' },
     ],
   },
-  {
-    version: '1.7.0',
-    date: '2026-07-24',
-    title: 'Profile Country',
-    changes: [
-      { icon: '🌍', text: 'You can now set your country in your Profile — also unlocks the Globetrotter medal' },
-    ],
-  },
+  // 1.7.0 is deliberately absent: its only entry announced the profile
+  // country picker, which has since been removed. Leaving it would send
+  // players looking for something that isn't there.
   {
     version: '1.6.0',
     date: '2026-07-19',
