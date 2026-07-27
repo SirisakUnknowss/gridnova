@@ -14,13 +14,21 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
-    version: '1.7.0',
-    date: '2026-07-24',
-    title: 'Profile Country',
+    version: '1.8.0',
+    date: '2026-07-26',
+    title: 'Daily Front & Centre',
     changes: [
-      { icon: '🌍', text: 'You can now set your country in your Profile — also unlocks the Globetrotter medal' },
+      { icon: '📅', text: 'Home now opens on the Daily Puzzle itself — today\'s difficulty, your rank, and a countdown to the reset, instead of a generic menu' },
+      { icon: '✨', text: 'The board reacts as you play: digits pop in, wrong ones shake, and completing a row, column or box sends a ripple out from your move' },
+      { icon: '🔢', text: 'Placing the last of a digit now lights up all nine of them and retires that key on the numpad' },
+      { icon: '📋', text: 'New spoiler-free result you can copy and paste anywhere — it shows the shape of today\'s puzzle and your time without giving away a single answer' },
+      { icon: '👆', text: 'Fixed taps landing on the wrong cell or digit — the board was rebuilding itself on every single press' },
+      { icon: '🔇', text: 'Background music now stays off while you\'re solving, and comes back when you leave the puzzle' },
     ],
   },
+  // 1.7.0 is deliberately absent: its only entry announced the profile
+  // country picker, which has since been removed. Leaving it would send
+  // players looking for something that isn't there.
   {
     version: '1.6.0',
     date: '2026-07-19',

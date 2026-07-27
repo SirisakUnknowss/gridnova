@@ -618,6 +618,136 @@ h3 {
   background: var(--cell-bg-same);
 }
 
+/* ===== Board feedback animations =====
+   Applied imperatively from game.ts after a rerender, never as part of the
+   render itself — renderBoard() would otherwise replay them board-wide.
+
+   Nothing here transforms .cell. A transform on the cell changes its hit
+   box: it overlaps its neighbours (a 1.18 scale measured 43.3px against a
+   neighbour's 38.1px) and steals their taps, and guarding that with
+   pointer-events:none instead swallowed taps outright, leaving the
+   selection on the previous cell so the next digit went into the wrong
+   square. Motion lives on .cell-inner (the digit); the cell only changes
+   colour, which costs no geometry. */
+
+.cell-inner {
+  display: inline-block;
+  will-change: transform;
+}
+
+.cell-pop,
+.cell-shake,
+.cell-ripple,
+.cell-num-done,
+.cell-pop .cell-inner,
+.cell-shake .cell-inner,
+.cell-ripple .cell-inner,
+.cell-num-done .cell-inner {
+  animation-delay: var(--anim-delay, 0ms);
+  animation-fill-mode: both;
+}
+
+/* Correct digit lands */
+.cell-pop .cell-inner {
+  animation-name: cellPop;
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cellPop {
+  0% { transform: scale(0.55); }
+  60% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+/* Wrong digit */
+.cell-shake .cell-inner {
+  animation-name: cellShake;
+  animation-duration: 320ms;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes cellShake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-4px); }
+  30% { transform: translateX(4px); }
+  45% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+  80% { transform: translateX(-1.5px); }
+}
+
+/* Row / column / box completed, and the winning board sweep */
+.cell-ripple {
+  animation-name: cellRippleBg;
+  animation-duration: 380ms;
+  animation-timing-function: ease-out;
+}
+
+.cell-ripple .cell-inner {
+  animation-name: cellRippleInner;
+  animation-duration: 380ms;
+  animation-timing-function: ease-out;
+}
+
+@keyframes cellRippleBg {
+  0%   { box-shadow: inset 0 0 0 0 rgba(108, 92, 231, 0); }
+  40%  { box-shadow: inset 0 0 0 3px rgba(108, 92, 231, 0.55); background: #ede9fe; }
+  100% { box-shadow: inset 0 0 0 0 rgba(108, 92, 231, 0); }
+}
+
+@keyframes cellRippleInner {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.2); }
+}
+
+/* All nine of a digit placed — amber, to read differently from the ripple */
+.cell-num-done {
+  animation-name: cellNumDoneBg;
+  animation-duration: 420ms;
+  animation-timing-function: ease-out;
+}
+
+.cell-num-done .cell-inner {
+  animation-name: cellNumDoneInner;
+  animation-duration: 420ms;
+  animation-timing-function: ease-out;
+}
+
+@keyframes cellNumDoneBg {
+  0%   { box-shadow: inset 0 0 0 0 rgba(245, 158, 11, 0); }
+  40%  { box-shadow: inset 0 0 0 3px rgba(245, 158, 11, 0.65); background: #fef3c7; }
+  100% { box-shadow: inset 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+@keyframes cellNumDoneInner {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.22); }
+}
+
+/* The numpad key that just retired */
+.numpad-done-pop {
+  animation: numpadDonePop 460ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes numpadDonePop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.22) rotate(-4deg); }
+  70% { transform: scale(0.96) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell-pop .cell-inner,
+  .cell-shake .cell-inner,
+  .cell-ripple,
+  .cell-ripple .cell-inner,
+  .cell-num-done,
+  .cell-num-done .cell-inner,
+  .numpad-done-pop {
+    animation: none;
+  }
+}
+
 .cell:nth-child(3n):not(:nth-child(9n)) {
   border-right: 2px solid var(--border-thick);
 }
@@ -1422,6 +1552,70 @@ h3 {
 
 .playmode-card-v2-btn:hover {
   background: #f0ecff;
+}
+
+/* Daily Puzzle hero (Home) */
+.daily-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.daily-hero-diff {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.daily-hero-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.daily-hero-stat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+}
+
+.daily-hero-stat-label {
+  font-size: 10.5px;
+  opacity: 0.8;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.daily-hero-stat-value {
+  font-family: 'Fredoka', var(--font-base);
+  font-size: 17px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.daily-hero-link {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  opacity: 0.9;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 2px;
+}
+
+.daily-hero-link:hover {
+  opacity: 1;
 }
 
 /* Shared row — Practice entry (Home) + Play Mode Hub list rows */
@@ -4305,6 +4499,32 @@ body.bg-anim-aurora {
 
 .share-actions .btn {
   flex: 1;
+}
+
+/* Spoiler-free text result (win tab only) */
+.share-text-block {
+  padding: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-text-preview {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  font-family: inherit;
+  font-size: 11px;
+  /* Emoji are ~square, so line-height 1 keeps the 9x9 block actually square */
+  line-height: 1;
+  text-align: center;
+  white-space: pre;
+  color: var(--app-text);
+  background: var(--app-card-bg);
+  border: 1px solid var(--app-border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
 }
 /* === Settings toggle switch === */
 .toggle {

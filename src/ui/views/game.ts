@@ -7,7 +7,7 @@ import { computeDailyScore, computePracticeScore } from '@engine/scoring';
 import { renderBoard } from '@ui/components/board';
 import { renderNumpad } from '@ui/components/numpad';
 import { formatTime } from '@lib/format';
-import { sfxPlace, sfxSelect, sfxError, sfxErase, sfxHint, sfxWin, sfxDailyWin } from '@lib/sound';
+import { sfxPlace, sfxSelect, sfxError, sfxErase, sfxHint, sfxWin, sfxDailyWin, sfxUnitComplete, sfxNumberComplete, stopBgMusic, playBgMusic, getBgVolume } from '@lib/sound';
 import { showShareModal } from './share-modal';
 import { useStore } from '@state/store';
 import * as api from '@lib/api';
@@ -40,6 +40,8 @@ export interface GameResult {
   moves: Move[];
   startedAt: string;
   completedAt: string;
+  /** Starting board (0 = blank). Used to render the spoiler-free share grid. */
+  puzzle: Board;
 }
 
 interface HistoryEntry {
@@ -339,6 +341,107 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     renderNumpad(numpadEl, { userBoard, solution, onNumber: handleNumber });
   }
 
+  // --- Board animations -------------------------------------------------
+  // renderBoard() throws away all 81 cells and rebuilds them on every
+  // rerender — including a plain cell tap — so an animation baked into the
+  // render would replay across the whole board on every interaction.
+  // These fire imperatively at the one cell that changed, after the
+  // rerender that created it.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let winTimeout: number | null = null;
+
+  // Solving needs concentration — the background track stays off for the
+  // whole game and resumes on exit, unless it was switched off anyway.
+  stopBgMusic();
+
+  function cellAt(r: number, c: number): HTMLElement | null {
+    return boardEl.children[r * 9 + c] as HTMLElement | undefined ?? null;
+  }
+
+  /**
+   * Play a one-shot animation class on a cell, cleaning up after itself.
+   * The stagger goes through a custom property because the cell and the
+   * digit inside it animate as a pair and both need the same delay.
+   */
+  function pulse(r: number, c: number, cls: string, delayMs = 0) {
+    if (reduceMotion) return;
+    const el = cellAt(r, c);
+    if (!el) return;
+    if (delayMs) el.style.setProperty('--anim-delay', `${delayMs}ms`);
+    el.classList.add(cls);
+    el.addEventListener('animationend', () => {
+      el.classList.remove(cls);
+      el.style.removeProperty('--anim-delay');
+    }, { once: true });
+  }
+
+  function unitSolved(cells: [number, number][]): boolean {
+    return cells.every(([r, c]) => userBoard[r][c] !== 0 && userBoard[r][c] === solution[r][c]);
+  }
+
+  /**
+   * Ripple every row / column / box that the move at (r,c) just completed.
+   * Cells light up in order of distance from the placed cell, so the wave
+   * reads as spreading out from where you actually played.
+   */
+  function rippleCompletedUnits(r: number, c: number): boolean {
+    const units: [number, number][][] = [];
+
+    const row: [number, number][] = Array.from({ length: 9 }, (_, i) => [r, i]);
+    if (unitSolved(row)) units.push(row);
+
+    const col: [number, number][] = Array.from({ length: 9 }, (_, i) => [i, c]);
+    if (unitSolved(col)) units.push(col);
+
+    const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+    const box: [number, number][] = [];
+    for (let dr = 0; dr < 3; dr++) for (let dc = 0; dc < 3; dc++) box.push([br + dr, bc + dc]);
+    if (unitSolved(box)) units.push(box);
+
+    for (const unit of units) {
+      for (const [ur, uc] of unit) {
+        const dist = Math.max(Math.abs(ur - r), Math.abs(uc - c));
+        pulse(ur, uc, 'cell-ripple', dist * 30);
+      }
+    }
+    return units.length > 0;
+  }
+
+  /**
+   * All nine of a digit placed. Flashes every cell holding it plus the
+   * numpad key that just retired, in a warmer colour than the unit ripple
+   * so the two events don't read as the same thing.
+   */
+  function celebrateNumberComplete(n: number): boolean {
+    let placed = 0;
+    const cells: [number, number][] = [];
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (userBoard[r][c] === n && solution[r][c] === n) { placed++; cells.push([r, c]); }
+      }
+    }
+    if (placed !== 9) return false;
+
+    cells.forEach(([r, c], i) => pulse(r, c, 'cell-num-done', i * 30));
+
+    if (!reduceMotion) {
+      const key = numpadEl.children[n - 1] as HTMLElement | undefined;
+      if (key) {
+        key.classList.add('numpad-done-pop');
+        key.addEventListener('animationend', () => key.classList.remove('numpad-done-pop'), { once: true });
+      }
+    }
+    return true;
+  }
+
+  /** Diagonal wave across the whole board on the winning move. */
+  function winWave() {
+    if (reduceMotion) return;
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) pulse(r, c, 'cell-ripple', (r + c) * 28);
+    }
+  }
+
   function onCellClick(r: number, c: number) {
     selected = { r, c };
     sfxSelect();
@@ -410,6 +513,24 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     syncUndoRedo();
     moves.push({ r, c, n, t: elapsedMs() });
     rerender();
+
+    // Animate only after the rerender that rebuilt this cell — the element
+    // the animation lands on doesn't exist before it.
+    if (mistakesDelta === 0) {
+      pulse(r, c, 'cell-pop');
+      // On the winning move, let winWave() own the whole board instead of
+      // stacking these underneath it.
+      if (!boardsEqual(userBoard, solution)) {
+        const numberDone = celebrateNumberComplete(n);
+        const unitDone = rippleCompletedUnits(r, c);
+        // Finishing a digit is the bigger moment — don't play both stings.
+        if (numberDone) sfxNumberComplete();
+        else if (unitDone) sfxUnitComplete();
+      }
+    } else {
+      pulse(r, c, 'cell-shake');
+    }
+
     checkWin();
   }
 
@@ -578,7 +699,14 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     // trip the server TIME_MISMATCH guard and silently 403 every daily submission.
     const completedAtMs = Date.now();
     const effectiveStartedAt = new Date(completedAtMs - timeSeconds * 1000).toISOString();
-    props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
+    const finish = () => props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, puzzle, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
+
+    // Let the board celebrate before the modal covers it. Timing data is
+    // already captured above, so the delay can't skew the score or trip the
+    // server's wall-clock check.
+    winWave();
+    if (reduceMotion) finish();
+    else winTimeout = window.setTimeout(finish, 800);
   }
 
   function triggerGameOver() {
@@ -774,6 +902,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     unmount() {
       if (timerHandle) clearInterval(timerHandle);
       if (autosaveHandle) clearInterval(autosaveHandle);
+      if (winTimeout) clearTimeout(winTimeout);
+      if (getBgVolume() > 0) void playBgMusic();
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     },

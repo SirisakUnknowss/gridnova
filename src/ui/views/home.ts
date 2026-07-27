@@ -2,12 +2,16 @@
 // Home view — main hub
 // =====================================================================
 import { useStore } from '@state/store';
-import { formatNumber } from '@lib/format';
+import { formatNumber, todayUtc } from '@lib/format';
 import { levelProgress } from '@lib/level';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { isMuted, toggleMute } from '@lib/sound';
 import { useVisitorStore } from '@state/visitor-store';
 import { getGuestDisplayId } from '@lib/api';
+import * as api from '@lib/api';
+import { difficultyForDayOfWeek } from '@engine/generator';
+import { dailyNumber } from '@lib/share/text-result';
+import { listGames, type GameInProgress } from '@lib/local-db';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
 
@@ -15,8 +19,25 @@ export interface HomeViewProps {
   onEnterPlayMode: () => void;
   onOpenPractice: () => void;
   onOpenQuests: () => void;
+  onPlayDaily: () => void;
+  onContinueDaily: (saved: GameInProgress) => void;
+  onOpenDailyDetail: () => void;
   onAuthAction: () => void;
   nav: BottomNavCallbacks;
+}
+
+function msUntilNextUtcMidnight(): number {
+  const now = new Date();
+  const next = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0);
+  return next - now.getTime();
+}
+
+function formatCountdown(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
 function fmtCount(n: number): string {
@@ -41,6 +62,9 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   const lvl = levelProgress(state.level, state.xp);
   const muted = isMuted();
   const guestId = getGuestDisplayId();
+  const today = todayUtc();
+  const dailyNo = dailyNumber(today);
+  const todayDifficulty = difficultyForDayOfWeek(new Date(today + 'T00:00:00Z').getUTCDay());
 
   root.innerHTML = `
     <section class="view view--home">
@@ -82,13 +106,39 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
         </div>
       ` : ''}
 
-      <!-- Play Mode entry -->
-      <div class="playmode-card-v2">
-        <span class="playmode-card-v2-icon">${ic.gamepad(24)}</span>
-        <div class="playmode-card-v2-title">Play Mode</div>
-        <div class="playmode-card-v2-sub">Choose a mode to play</div>
-        <button class="btn playmode-card-v2-btn" id="enter-play-mode">Enter Play Mode</button>
+      <!-- Daily Puzzle — the hero. Same puzzle for everyone, ranked. -->
+      <div class="playmode-card-v2 daily-hero">
+        <div class="daily-hero-top">
+          <span class="playmode-card-v2-icon">${ic.daily(24)}</span>
+          <span class="daily-hero-diff">${todayDifficulty}</span>
+        </div>
+        <div class="playmode-card-v2-title">Daily Puzzle${dailyNo > 0 ? ` #${dailyNo}` : ''}</div>
+        <div class="playmode-card-v2-sub">Everyone plays the same puzzle today</div>
+
+        <div class="daily-hero-stats">
+          <div class="daily-hero-stat">
+            <div class="daily-hero-stat-label">Your rank today</div>
+            <div class="daily-hero-stat-value" id="home-daily-rank">—</div>
+          </div>
+          <div class="daily-hero-stat">
+            <div class="daily-hero-stat-label">Resets in</div>
+            <div class="daily-hero-stat-value" id="home-daily-countdown">--:--:--</div>
+          </div>
+        </div>
+
+        <button class="btn playmode-card-v2-btn" id="home-daily-play">Play</button>
+        <button class="daily-hero-link" id="home-daily-more">${ic.trophy(13)} Leaderboard &amp; recap</button>
       </div>
+
+      <!-- Other modes -->
+      <button class="pm-row" id="enter-play-mode">
+        <span class="pm-row-icon">${ic.gamepad(22)}</span>
+        <div class="pm-row-body">
+          <span class="pm-row-title">Play Mode</span>
+          <span class="pm-row-sub">Random Mode, Time Attack &amp; more</span>
+        </div>
+        <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
+      </button>
 
       <!-- Practice entry -->
       <button class="pm-row" id="open-practice">
@@ -161,6 +211,60 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   root.querySelector('#enter-play-mode')?.addEventListener('click', props.onEnterPlayMode);
   root.querySelector('#open-practice')?.addEventListener('click', props.onOpenPractice);
   root.querySelector('#open-quests')?.addEventListener('click', props.onOpenQuests);
+  root.querySelector('#home-daily-more')?.addEventListener('click', props.onOpenDailyDetail);
+
+  // --- Daily hero: countdown + rank + play/continue state ---
+  const countdownEl = root.querySelector<HTMLElement>('#home-daily-countdown')!;
+  const tick = () => { countdownEl.textContent = formatCountdown(msUntilNextUtcMidnight()); };
+  tick();
+  const countdownHandle = window.setInterval(tick, 1000);
+
+  const playBtn = root.querySelector<HTMLButtonElement>('#home-daily-play')!;
+  let savedGame: GameInProgress | null = null;
+  let alreadyCompleted = false;
+
+  playBtn.addEventListener('click', () => {
+    if (alreadyCompleted) return;
+    if (savedGame) props.onContinueDaily(savedGame);
+    else props.onPlayDaily();
+  });
+
+  function markCompleted() {
+    alreadyCompleted = true;
+    playBtn.textContent = '✓ Completed today';
+    playBtn.disabled = true;
+    playBtn.classList.add('pm-detail-btn-primary--done');
+  }
+
+  // Members get their rank from the leaderboard; a rank existing also means
+  // today's attempt is already spent (one attempt per day).
+  void api.getMyDailyRank(today).then((rank) => {
+    const rankEl = root.querySelector('#home-daily-rank');
+    if (rank) {
+      if (rankEl) rankEl.textContent = `#${rank.rank} / ${rank.total_players}`;
+      markCompleted();
+    } else if (rankEl) {
+      rankEl.textContent = 'Not played';
+    }
+  }).catch(() => { });
+
+  // Guests never reach daily_leaderboard — their completion lives in
+  // guest_game_history instead.
+  if (!state.user?.id) {
+    void api.getGuestLeaderboard(today).then((rows) => {
+      const mySessionId = api.getSessionId();
+      if (rows.some((r) => r.session_id === mySessionId)) markCompleted();
+    }).catch(() => { });
+  }
+
+  // A save with no moves is a phantom from opening and leaving straight away —
+  // don't offer "Continue" for it.
+  void listGames().then((games) => {
+    const saved = games.find((g) => g.mode === 'daily' && g.date === today);
+    if (!saved || alreadyCompleted || !saved.moves || saved.moves.length === 0) return;
+    savedGame = saved;
+    playBtn.textContent = 'Continue';
+  }).catch(() => { });
   wireBottomNav(root, props.nav, 'home');
   root.querySelector('#user-badge')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#save-progress')?.addEventListener('click', props.onAuthAction);
@@ -171,5 +275,5 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     btn.title = nowMuted ? 'Unmute' : 'Mute';
   });
 
-  return { unmount() { } };
+  return { unmount() { window.clearInterval(countdownHandle); } };
 }
