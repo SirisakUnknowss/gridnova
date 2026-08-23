@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.1 — 2026-08-23
+
+### Fixed
+- **PWA / Cloudflare quota**: ตัด `admin/**` กับไฟล์ยืนยัน Search Console ออกจาก precache ของ service worker — ผู้เล่นทุกคนกำลังดาวน์โหลดหน้า admin พร้อม `chart.umd.min.js` ทั้งที่ไม่มีวันเปิด และทุก entry ใน precache คือ 1 request ที่คนเข้าใหม่ยิงตอนโหลดแรก ซึ่งแต่ละ request เรียก Pages Function ด้วย · precache 77 → 73 entries, 4,911 → 4,419 KiB (ประหยัด ~492 KiB ต่อคนเข้าใหม่)
+- **`_routes.json`**: pattern ของไฟล์ยืนยัน Google เขียนเป็น `/google….html` แต่เบราว์เซอร์ขอมาแบบไม่มี `.html` เลยไม่ match — เพิ่มทั้งสองแบบ
+  - วัดจาก `wrangler pages deployment tail` บน production: 22 invocations/75 วิ → `/admin*` 5 ครั้ง (23%) และไฟล์ Google 2 ครั้ง (9%) มาจากสองสาเหตุนี้
+
 ## 1.9.0 — 2026-08-23
 
 ### Fixed

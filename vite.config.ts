@@ -44,6 +44,11 @@ export default defineConfig({
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+        // Every precached entry is a request each new visitor makes on first
+        // load, and each one invokes the Pages Function (see _routes.json).
+        // Players were downloading the admin panel and its chart library, and
+        // re-fetching the Search Console verification file, for nothing.
+        globIgnores: ['admin/**', 'google*.html'],
       },
     }),
   ],
