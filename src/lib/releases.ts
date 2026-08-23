@@ -14,6 +14,14 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '1.8.4',
+    date: '2026-08-23',
+    title: 'Leaderboard Tidy-Up',
+    changes: [
+      { icon: '🏆', text: 'Long player names no longer shove the score and time off the edge of the card — names now shorten with an ellipsis so every score stays where it belongs. Fixed on both the Members and Guests tabs' },
+    ],
+  },
+  {
     version: '1.8.0',
     date: '2026-07-26',
     title: 'Daily Front & Centre',
