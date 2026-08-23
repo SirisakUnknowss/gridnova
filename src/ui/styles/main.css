@@ -2579,6 +2579,12 @@ h3 {
   box-shadow: var(--app-card-shadow);
 }
 
+/* `display` above beats the UA `[hidden]` rule, so restate it explicitly */
+.lb-guest-badge[hidden],
+.lb-tabs[hidden] {
+  display: none;
+}
+
 .lb-guest-badge strong {
   font-family: 'Courier New', monospace;
   font-size: 14px;

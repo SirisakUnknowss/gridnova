@@ -118,7 +118,6 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
   const listEl = root.querySelector<HTMLElement>('#lb-list')!;
   const metaEl = root.querySelector<HTMLElement>('#lb-meta')!;
   const scrollBtn = root.querySelector<HTMLButtonElement>('#lb-scroll')!;
-  const dateTabs = root.querySelector<HTMLElement>('#lb-date-tabs')!;
   const guestBadge = root.querySelector<HTMLElement>('#lb-guest-badge')!;
 
   function activeDate(): string {
@@ -185,7 +184,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
           <span class="lb-avatar">${avatarHtml}</span>
           <div class="lb-info">
             <div class="lb-name">${name}${isMe ? ' <span class="lb-you">you</span>' : ''}</div>
-            <div class="lb-sub-name">Finished today</div>
+            <div class="lb-sub-name">Finished ${dateTab}</div>
           </div>
           <span class="lb-score">
             <strong>${r.score.toLocaleString()}</strong>
@@ -200,7 +199,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
     if (guestRows.length === 0) {
       listEl.innerHTML = `
         <div class="lb-empty">
-          <p>${ic.empty(20)} No guest scores yet for today.</p>
+          <p>${ic.empty(20)} No guest scores yet for ${activeDate()}.</p>
           <p style="opacity:0.75;font-size:13px;">Play the daily puzzle to appear here!</p>
         </div>`;
       metaEl.textContent = '';
@@ -240,11 +239,11 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
       if (mainTab === 'members') {
         const data = await api.getLeaderboard(activeDate(), 100);
         memberRows = (data ?? []) as MemberRow[];
-        subscribeRealtime();
       } else {
-        const data = await api.getGuestLeaderboard(todayUtc(), 100);
+        const data = await api.getGuestLeaderboard(activeDate(), 100);
         guestRows = (data ?? []) as GuestRow[];
       }
+      subscribeRealtime();
       loading = false;
       render();
     } catch (err) {
@@ -273,7 +272,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
         const data = await api.getLeaderboard(activeDate(), 100);
         memberRows = (data ?? []) as MemberRow[];
       } else {
-        const data = await api.getGuestLeaderboard(todayUtc(), 100);
+        const data = await api.getGuestLeaderboard(activeDate(), 100);
         guestRows = (data ?? []) as GuestRow[];
       }
       render();
@@ -294,8 +293,6 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
         b.classList.toggle('active', b.dataset.main === mainTab)
       );
 
-      // Show/hide date sub-tabs and guest badge
-      dateTabs.hidden = mainTab === 'guests';
       guestBadge.hidden = mainTab === 'members';
 
       void load();
