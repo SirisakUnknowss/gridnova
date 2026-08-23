@@ -17,7 +17,7 @@ import { getBoardPrefs, vibrateTap } from '@lib/prefs';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
-  origin?: 'random';
+  origin?: 'random' | 'book';
   difficulty: Difficulty;
   puzzle: Board;
   solution: Board;
@@ -73,15 +73,24 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const noteMask: Set<number>[][] = Array.from({ length: 9 }, () =>
     Array.from({ length: 9 }, () => new Set<number>()));
 
+  // Book Mode solves like a paper book: the app never compares an entry to the
+  // solution while you play, so there is nothing to be right or wrong about
+  // until the grid is full. No red cells, no hearts, no game over.
+  const BOOK = props.origin === 'book';
+
   const PAID_HINT_COSTS = [50, 75, 100];
   // Daily has a global leaderboard, so free hints stay equal for everyone
   // there. Practice/Random get a level perk: more free hints as you level up.
-  const FREE_HINTS = mode === 'daily' ? 3 : freeHintsForLevel(useStore.getState().level ?? 1);
+  // Book stays at 3 — it is the only oracle that mode has.
+  const FREE_HINTS = mode === 'daily' || BOOK
+    ? 3
+    : freeHintsForLevel(useStore.getState().level ?? 1);
 
   // Continue (buy back in after 3 mistakes) — not a hint, doesn't reveal
   // answers, so it's fine for Daily unlike paid hints. Disabled for Random
   // (origin='random'): "lose 1 = streak resets" is that mode's whole point.
-  const CONTINUES_ENABLED = mode === 'daily' || props.origin !== 'random';
+  // Book has no mistake counter to buy back from.
+  const CONTINUES_ENABLED = !BOOK && (mode === 'daily' || props.origin !== 'random');
   const DAILY_CONTINUE_COSTS = [2500, 4000, 10000];
   const PRACTICE_CONTINUE_BASE: Partial<Record<Difficulty, number>> = {
     easy: 300, 'easy-medium': 450, medium: 600, 'medium-hard': 900,
@@ -102,6 +111,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   let hintsLeft = FREE_HINTS;
   let paidHintsUsed = 0;
   let noteMode = false;
+  // Book Mode: how many times a full grid came back wrong, and whether the
+  // player asked to be shown where. Both feed the score in place of `mistakes`.
+  let bookFailedChecks = 0;
+  let bookRevealed = false;
+  let bookWasFull = false;
   const moves: Move[] = [];
   const history: HistoryEntry[] = [];
   const future: HistoryEntry[] = [];
@@ -116,7 +130,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // Unique key for this game session (used for save/load)
   const gameId = mode === 'daily'
     ? `daily-${props.date ?? new Date().toISOString().slice(0, 10)}`
-    : `practice-${difficulty}`;
+    : BOOK ? `book-${difficulty}` : `practice-${difficulty}`;
 
   // Restore saved state if resuming
   if (props.resume) {
@@ -146,7 +160,10 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     }
   }
 
-  const settings = getBoardPrefs();
+  // Book Mode overrides the player's "Show Conflicts" preference — marking a
+  // cell is exactly the spoiler this mode exists to remove. It flips back on
+  // only if the player asks to be shown after a failed check.
+  const settings = { ...getBoardPrefs(), ...(BOOK ? { showConflict: false } : {}) };
   const dotColor = DIFF_COLOR[difficulty] ?? '#6c5ce7';
   const diffLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1).replace('-', '-');
 
@@ -167,12 +184,12 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
                </div>`
             : `<button class="mode-pill" id="mode-pill-btn">
                 <span class="mode-dot" style="background:${dotColor}"></span>
-                <span id="mode-pill-label">${diffLabel}</span>
+                <span id="mode-pill-label">${BOOK ? `Book · ${diffLabel}` : diffLabel}</span>
                </button>`
           }
           <div class="topbar-right">
             <div class="game-stats-row">
-              <div class="stat-block">
+              <div class="stat-block"${BOOK ? ' hidden' : ''}>
                 <span class="stat-label">MISTAKES</span>
                 <span class="stat-value" id="hearts-display">
                   <span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span>
@@ -273,6 +290,17 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
           </div>
         </div>
       </div>
+
+      <div class="coin-hint-overlay" id="book-check-overlay" style="display:none;">
+        <div class="coin-hint-dialog">
+          <div class="coin-hint-title">Not quite</div>
+          <div class="coin-hint-body" id="book-check-body"></div>
+          <div class="coin-hint-actions">
+            <button class="coin-hint-btn coin-hint-btn--cancel" id="book-check-reveal">Show me</button>
+            <button class="coin-hint-btn coin-hint-btn--confirm" id="book-check-keep">Keep looking</button>
+          </div>
+        </div>
+      </div>
     </section>
   `;
 
@@ -337,8 +365,10 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   }
 
   function rerender() {
+    // Emptying any cell re-arms the Book Mode check for the next fill.
+    if (BOOK && bookWasFull && !boardIsFull()) bookWasFull = false;
     renderBoard(boardEl, { userBoard, solution, givenMask, hintMask, noteMask, selected, settings, onCellClick });
-    renderNumpad(numpadEl, { userBoard, solution, onNumber: handleNumber });
+    renderNumpad(numpadEl, { userBoard, solution, onNumber: handleNumber, countAllPlaced: BOOK });
   }
 
   // --- Board animations -------------------------------------------------
@@ -482,7 +512,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     noteMask[r][c].clear();
     vibrateTap();
 
-    if (n !== solution[r][c]) {
+    if (!BOOK && n !== solution[r][c]) {
       mistakes++;
       livesLost++;
       renderHearts(livesLost);
@@ -518,9 +548,12 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     // the animation lands on doesn't exist before it.
     if (mistakesDelta === 0) {
       pulse(r, c, 'cell-pop');
+      // Both celebrations test cells against the solution, so firing them in
+      // Book Mode would leak the answer twice over: a ripple says the unit is
+      // right, and silence where a ripple was due says something in it is wrong.
       // On the winning move, let winWave() own the whole board instead of
       // stacking these underneath it.
-      if (!boardsEqual(userBoard, solution)) {
+      if (!BOOK && !boardsEqual(userBoard, solution)) {
         const numberDone = celebrateNumberComplete(n);
         const unitDone = rippleCompletedUnits(r, c);
         // Finishing a digit is the bigger moment — don't play both stings.
@@ -605,7 +638,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       hintCountEl.textContent = String(hintsLeft);
       hintBtn.disabled = false;
       hintBtn.title = '';
-    } else if (mode !== 'daily' && paidHintsUsed < 3) {
+    } else if (mode !== 'daily' && !BOOK && paidHintsUsed < 3) {
       const cost = PAID_HINT_COSTS[paidHintsUsed];
       const coins = useStore.getState().coins ?? 0;
       hintCountEl.textContent = `🪙${cost}`;
@@ -627,8 +660,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       return;
     }
 
-    // Daily mode — no coin hints
-    if (mode === 'daily') return;
+    // Daily mode — no coin hints. Book is capped at its 3 by design.
+    if (mode === 'daily' || BOOK) return;
     // All paid hints used
     if (paidHintsUsed >= 3) return;
 
@@ -677,8 +710,55 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     confirmBtn.addEventListener('click', handleConfirm);
   }
 
+  function boardIsFull(): boolean {
+    return userBoard.every(row => row.every(v => v !== 0));
+  }
+
+  /**
+   * Book Mode's only moment of truth: the grid is full but doesn't match.
+   * Says how many cells are off, never which ones, unless the player asks.
+   *
+   * Fires once per fill, not per edit. Re-checking after every keystroke would
+   * hand back the very oracle this mode removes — watch the count tick down as
+   * you change a cell and you've learned that cell was right. To ask again the
+   * player has to empty a cell and refill it, and that costs another check.
+   */
+  function showBookCheck() {
+    bookFailedChecks++;
+
+    let wrong = 0;
+    for (let r = 0; r < 9; r++)
+      for (let c = 0; c < 9; c++)
+        if (userBoard[r][c] !== solution[r][c]) wrong++;
+
+    const overlay = root.querySelector('#book-check-overlay') as HTMLElement;
+    const body = root.querySelector('#book-check-body') as HTMLElement;
+    body.textContent = wrong === 1
+      ? "1 cell doesn't match. Nothing is marked — take another look."
+      : `${wrong} cells don't match. Nothing is marked — take another look.`;
+    overlay.style.display = 'flex';
+    sfxError();
+
+    const keepBtn = root.querySelector('#book-check-keep') as HTMLButtonElement;
+    const revealBtn = root.querySelector('#book-check-reveal') as HTMLButtonElement;
+    const close = () => { overlay.style.display = 'none'; };
+    keepBtn.onclick = close;
+    revealBtn.onclick = () => {
+      bookRevealed = true;
+      settings.showConflict = true;
+      close();
+      rerender();
+    };
+  }
+
   function checkWin() {
-    if (!boardsEqual(userBoard, solution)) return;
+    if (!boardsEqual(userBoard, solution)) {
+      if (BOOK && !gameWon && boardIsFull() && !bookWasFull) {
+        bookWasFull = true;
+        showBookCheck();
+      }
+      return;
+    }
     gameWon = true;
     if (timerHandle) clearInterval(timerHandle);
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
@@ -686,7 +766,12 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
     const timeSeconds = elapsedSeconds();
     const hintsUsed = FREE_HINTS - hintsLeft;
-    const scoreInput = { difficulty, timeSeconds, mistakes, hintsUsed };
+    // Book Mode never counts mistakes as you play, so a wrong entry that you
+    // spot and fix yourself costs nothing — which is the point of the mode.
+    // What does cost you is handing in a full grid that's wrong, and asking to
+    // be shown where.
+    const scoredMistakes = BOOK ? bookFailedChecks + (bookRevealed ? 1 : 0) : mistakes;
+    const scoreInput = { difficulty, timeSeconds, mistakes: scoredMistakes, hintsUsed };
     const score = mode === 'daily'
       ? computeDailyScore(scoreInput).score
       : computePracticeScore(scoreInput);
@@ -699,7 +784,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     // trip the server TIME_MISMATCH guard and silently 403 every daily submission.
     const completedAtMs = Date.now();
     const effectiveStartedAt = new Date(completedAtMs - timeSeconds * 1000).toISOString();
-    const finish = () => props.onWin({ mode, difficulty, timeSeconds, mistakes, hintsUsed, score, moves, puzzle, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
+    const finish = () => props.onWin({ mode, difficulty, timeSeconds, mistakes: scoredMistakes, hintsUsed, score, moves, puzzle, startedAt: effectiveStartedAt, completedAt: new Date(completedAtMs).toISOString() });
 
     // Let the board celebrate before the modal covers it. Timing data is
     // already captured above, so the delay can't skew the score or trip the

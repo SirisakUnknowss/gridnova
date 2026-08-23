@@ -11,6 +11,7 @@ export interface PlayModeViewProps {
   onBack: () => void;
   onOpenDaily: () => void;
   onOpenRandom: () => void;
+  onOpenBook: () => void;
   nav: BottomNavCallbacks;
 }
 
@@ -59,6 +60,15 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
           <span class="pm-streak-badge" id="pm-random-streak" style="display:none">${ic.streak(13)} <span id="pm-random-streak-n">0</span></span>
           <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
         </div>
+
+        <div class="pm-row" id="pm-book">
+          <span class="pm-row-icon pm-row-icon--book">${ic.brain(22)}</span>
+          <div class="pm-row-body">
+            <span class="pm-row-title">Book Mode</span>
+            <span class="pm-row-sub">No hints of right or wrong — just you and the grid</span>
+          </div>
+          <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
+        </div>
       </div>
     </section>
     ${bottomNavHTML('home')}
@@ -67,6 +77,7 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
   root.querySelector('#pm-back')?.addEventListener('click', props.onBack);
   root.querySelector('#pm-daily')?.addEventListener('click', props.onOpenDaily);
   root.querySelector('#pm-random')?.addEventListener('click', props.onOpenRandom);
+  root.querySelector('#pm-book')?.addEventListener('click', props.onOpenBook);
   wireBottomNav(root, props.nav, 'home');
 
   void getRandomModeStats().then((stats) => {

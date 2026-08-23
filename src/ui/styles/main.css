@@ -418,6 +418,11 @@ h3 {
   gap: 6px;
 }
 
+/* `display` below beats the UA `[hidden]` rule, so restate it explicitly */
+.stat-block[hidden] {
+  display: none;
+}
+
 .stat-block {
   display: flex;
   flex-direction: column;
@@ -1763,6 +1768,11 @@ h3 {
 .pm-row-icon--random {
   background: #d8e0ff;
   color: #22578a;
+}
+
+.pm-row-icon--book {
+  background: #ffe9d6;
+  color: #8a5122;
 }
 
 .pm-streak-badge {

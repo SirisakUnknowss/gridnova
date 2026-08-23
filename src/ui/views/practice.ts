@@ -11,6 +11,8 @@ export interface PracticeViewProps {
   onPlayPractice: (level: string) => void;
   onContinuePractice: (saved: GameInProgress) => void;
   nav: BottomNavCallbacks;
+  /** Book Mode reuses this picker — same grid, different copy and saves. */
+  variant?: 'practice' | 'book';
 }
 
 const PRACTICE_META: Record<string, { label: string; sub: string; color: string }> = {
@@ -21,6 +23,12 @@ const PRACTICE_META: Record<string, { label: string; sub: string; color: string 
 };
 
 export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): { unmount: () => void } {
+  const isBook = props.variant === 'book';
+  const title = isBook ? `${ic.brain(20)} Book Mode` : `${ic.practice(20)} Practice`;
+  const subtitle = isBook
+    ? 'Like a paper book — nothing is marked right or wrong until you fill the grid.'
+    : 'Choose your own difficulty — play as many times as you like.';
+
   root.innerHTML = `
     <section class="view view--practice">
       <div class="ach-sticky">
@@ -28,14 +36,14 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
           <button class="ach-back" id="practice-back" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <h1 class="ach-title">${ic.practice(20)} Practice</h1>
+          <h1 class="ach-title">${title}</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
 
       <div id="practice-continue-banner" style="display:none; width: 100%"></div>
 
-      <p class="practice-sub">Choose your own difficulty — play as many times as you like.</p>
+      <p class="practice-sub">${subtitle}</p>
 
       <div class="practice-grid-v2">
         ${Object.entries(PRACTICE_META).map(([key, meta]) => `
@@ -60,10 +68,11 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
   });
   wireBottomNav(root, props.nav, 'home');
 
-  // Check for a resumable practice save (exclude Random Mode's saves)
+  // Check for a resumable save. Practice excludes every origin-tagged game
+  // (Random's and Book's); Book only ever resumes its own.
   const continueBanner = root.querySelector<HTMLElement>('#practice-continue-banner')!;
   void listGames().then((games) => {
-    const saved = games.find((g) => g.mode === 'practice' && !g.origin);
+    const saved = games.find((g) => g.mode === 'practice' && (isBook ? g.origin === 'book' : !g.origin));
     if (!saved) return;
     continueBanner.style.display = 'block';
     continueBanner.innerHTML = `

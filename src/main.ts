@@ -243,7 +243,20 @@ function showPlayMode() {
     onBack: showHome,
     onOpenDaily: () => { dailyDetailBack = showPlayMode; showDailyDetail(); },
     onOpenRandom: showRandomDetail,
+    onOpenBook: showBook,
     nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function showBook() {
+  clearView('book');
+  const view = mountPracticeView(root, {
+    onBack: showPlayMode,
+    onPlayPractice: (level) => void playBook(level as Difficulty),
+    onContinuePractice: (saved) => playBookResume(saved),
+    nav: navCb,
+    variant: 'book',
   });
   currentUnmount = view.unmount;
 }
@@ -509,6 +522,53 @@ async function playPractice(level: Difficulty) {
     onWin: (result) => handleWin(result),
     onExit: showPractice,
     onNewGame: () => void playPractice(level),
+  });
+  currentUnmount = view.unmount;
+}
+
+async function playBook(level: Difficulty) {
+  const stale = await listGames();
+  for (const g of stale.filter(g => g.origin === 'book' && g.level === level)) {
+    await deleteGame(g.game_id);
+  }
+
+  const stage = Math.floor(Math.random() * 100) + 1;
+  const seed = `book:${level}:${stage}`;
+  const puzzleData = generatePuzzle({ difficulty: level, seed });
+
+  clearView('game_book');
+  const view = mountGameView(root, {
+    mode: 'practice',
+    origin: 'book',
+    difficulty: level,
+    puzzle: puzzleData.puzzle,
+    solution: puzzleData.solution,
+    stage,
+    onWin: (result) => handleWin(result),
+    onExit: showBook,
+    onNewGame: () => void playBook(level),
+  });
+  currentUnmount = view.unmount;
+}
+
+function playBookResume(saved: GameInProgress) {
+  const level = saved.level as Difficulty;
+  const stage = saved.stage ?? 1;
+  const seed = `book:${level}:${stage}`;
+  const puzzleData = generatePuzzle({ difficulty: level, seed });
+
+  clearView('game_book');
+  const view = mountGameView(root, {
+    mode: 'practice',
+    origin: 'book',
+    difficulty: level,
+    puzzle: puzzleData.puzzle,
+    solution: puzzleData.solution,
+    stage,
+    resume: saved,
+    onWin: (result) => handleWin(result),
+    onExit: showBook,
+    onNewGame: () => void playBook(level),
   });
   currentUnmount = view.unmount;
 }
