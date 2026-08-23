@@ -339,6 +339,17 @@
       </div>
     </div>
 
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>📣 Where Sessions Come From (7 days)</h3>
+        <div style="position:relative;height:220px"><canvas id="source-chart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>🔗 Top Referrers (7 days)</h3>
+        <div id="referrer-list" style="max-height:220px;overflow-y:auto;font-size:12px"></div>
+      </div>
+    </div>
+
     <div class="bottom-grid">
       <div class="chart-card">
         <h3>⏰ Hourly Activity (Today, Bangkok)</h3>
@@ -538,7 +549,7 @@ const AUTO_REFRESH  = 60_000;
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let trendChart = null, diffChart = null, hourlyChart = null, shopCatChart = null;
-let funnelChart = null, retentionChart = null;
+let funnelChart = null, retentionChart = null, sourceChart = null;
 
 let currentTab = 'analytics';
 let activeFilterLevel = 'all';
@@ -714,6 +725,39 @@ function renderFunnel(d) {
     scales:{ x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
              y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}} } }
   });
+}
+
+function renderAttribution(d) {
+  d = d || { by_source: [], by_referrer: [], total_sessions: 0 };
+  const sources = (d.by_source || []).slice(0, 10);
+
+  const ctx = document.getElementById('source-chart').getContext('2d');
+  if (sourceChart) sourceChart.destroy();
+  sourceChart = new Chart(ctx, { type:'bar', data:{
+    labels: sources.map(s=>s.source),
+    datasets:[
+      { label:'Sessions', data: sources.map(s=>s.sessions), backgroundColor:'rgba(99,102,241,.7)', borderRadius:4, borderSkipped:false },
+      { label:'Engaged',  data: sources.map(s=>s.engaged),  backgroundColor:'rgba(16,185,129,.75)', borderRadius:4, borderSkipped:false },
+    ]
+  }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},boxWidth:10}}},
+    scales:{ x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+             y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}} } }
+  });
+
+  const refs = d.by_referrer || [];
+  const el = document.getElementById('referrer-list');
+  if (!refs.length) {
+    // Expected until the tracking has been live for a while — and permanently
+    // normal for LINE/Facebook traffic, which arrives with no referrer at all.
+    el.innerHTML = '<div style="color:#64748b;padding:12px">No external referrers recorded yet. In-app browsers (LINE, Facebook) strip the referrer — check the source chart for those.</div>';
+    return;
+  }
+  el.innerHTML = refs.map(r => `
+    <div style="display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.06)">
+      <span style="color:#cbd5e1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(r.referrer_host)}</span>
+      <strong style="color:#818cf8">${r.sessions}</strong>
+    </div>`).join('');
 }
 
 function renderRetention(rows) {
@@ -1572,17 +1616,19 @@ async function loadData() {
   renderTable(d.difficulty_breakdown);
 
   // Load lists + shop stats + funnel/retention in parallel
-  const [onlineList, memberList, shopStats, funnel, retention] = await Promise.all([
+  const [onlineList, memberList, shopStats, funnel, retention, attribution] = await Promise.all([
     callRpc('get_admin_online_list', session.access_token),
     callRpc('get_admin_member_list', session.access_token),
     callRpc('get_admin_shop_stats', session.access_token),
     callRpc('get_admin_funnel', session.access_token),
     callRpc('get_admin_retention', session.access_token),
+    callRpcParam('get_admin_attribution', { p_days: 7 }, session.access_token),
   ]);
   renderOnlineList(onlineList);
   renderMemberList(memberList);
   renderFunnel(funnel);
   renderRetention(retention);
+  renderAttribution(attribution);
   if (shopStats && !shopStats.error) {
     renderShopStats(shopStats);
     renderShopTopItems(shopStats.top_items);
