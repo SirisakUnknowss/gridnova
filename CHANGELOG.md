@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.4 — 2026-08-23
+
+### Added
+- **What's New**: เพิ่ม entry ของ 1.8.3 (แก้บั๊ก leaderboard) ที่ตกไปใน `src/lib/releases.ts` — ต้อง bump เวอร์ชันด้วยเพราะ `shouldWhatsNewShow()` เทียบ `seen !== APP_VERSION` คนที่เปิดแอปหลัง deploy 1.8.3 ไปแล้วถูกมาร์ก `seen = 1.8.3` เรียบร้อย ถ้าเติม entry เฉย ๆ โดยไม่ขยับเวอร์ชัน modal จะไม่เด้งให้คนกลุ่มนั้นอีกเลย
+
 ## 1.8.3 — 2026-08-23
 
 ### Fixed
