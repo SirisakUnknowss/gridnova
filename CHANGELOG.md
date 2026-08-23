@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.9.0 — 2026-08-23
+
+### Fixed
+- **Cloudflare quota (เกือบทำเว็บล่ม)**: บัญชีชน 91% ของลิมิต Workers/Pages Functions 100,000 request/วัน — `functions/_middleware.js` มีอยู่แต่ไม่มี `_routes.json` ทำให้ Cloudflare เรียก Function **ทุก request ของ project รวม production** บรรทัด `if (!isStaging) return next()` ไม่ได้ช่วยอะไรเลย เพราะ invocation ถูกนับไปก่อนที่โค้ดบรรทัดนั้นจะรัน และเนื่องจาก PWA precache 77 ไฟล์ คนเข้าใหม่ 1 คนจึงเผา ~80 invocations ตั้งแต่โหลดแรก · เพิ่ม `public/_routes.json` ยกเว้น static asset ทั้งหมด เหลือ **2 invocations ต่อการติดตั้งใหม่** (`index.html` + `admin/index.html`)
+  - แลกมาด้วย: บน staging ไฟล์ static ไม่ถูก login gate แล้ว แต่เป็นไฟล์ชุดเดียวกับที่ production เสิร์ฟสาธารณะอยู่แล้ว ส่วนหน้า HTML ทุกหน้ารวม `/admin` ยัง gate ครบ
+
+### Added
+- **Analytics**: เก็บที่มาของแต่ละ session (`referrer`, `referrer_host`, `utm_*`, `click_id_kind`, `app_hint`, `landing_path`) — เดิม `visitor_sessions` บันทึกแค่ว่ามีคนเข้า แต่ไม่เคยบันทึกว่ามาจากไหน ทำให้ spike วันที่ 22–23 ส.ค. (10/วัน → 1,378/วัน) หาที่มาไม่ได้เลยหลังจากนั้น
+  - เก็บมากกว่าแค่ referrer เพราะทราฟฟิกส่วนใหญ่มาจาก in-app browser ของ LINE/Facebook ซึ่ง strip `document.referrer` ทิ้ง — ถ้าเก็บแค่ referrer ทราฟฟิกพวกนี้จะกองรวมใน "direct" แล้วตอบอะไรไม่ได้เหมือนเดิม
+  - `record_visit_attribution()` เป็น first-write-wins เพราะการเดินหน้าในแอป (SPA) รายงาน referrer เป็นโดเมนตัวเอง ถ้าไม่กันไว้จะเขียนทับที่มาจริงด้วยค่าว่าง
+  - `get_admin_attribution()` คืนทั้ง sessions และ engaged ต่อ source เพื่อดูว่า source ไหนส่งคนที่*เล่นจริง* ไม่ใช่แค่เปิดแท็บทิ้ง
+- **SEO**: เพิ่ม `WebSite` structured data — เดิมมีแต่ `WebApplication` ซึ่ง Google ไม่ได้ใช้กำหนด site name พอไม่มีสัญญาณ Google เลย fallback ไปใช้ชื่อโดเมน และ `pages.dev` เป็นของ Cloudflare ผลเสิร์ชจึงขึ้นว่า "Cloudflare" แทน GridNova
+  - ⚠️ Google รองรับ site name ระดับ subdomain เฉพาะภาษา en/fr/de/ja — ผลเสิร์ชภาษาไทยอาจยังไม่เปลี่ยน ทางแก้จริงคือย้ายไป custom domain
+
 ## 1.8.4 — 2026-08-23
 
 ### Added

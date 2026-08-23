@@ -3,6 +3,7 @@
 // See docs/02-technical/api-spec.md
 // =====================================================================
 import { supabase } from './supabase';
+import { getAttribution } from './attribution';
 import type { Move, Difficulty } from '@engine/types';
 
 // === Daily Puzzle ===
@@ -425,6 +426,22 @@ export async function trackVisit(isGuest: boolean, userId?: string): Promise<voi
         { session_id, visited_date, is_guest: isGuest, user_id: isGuest ? null : userId ?? null },
         { onConflict: 'session_id,visited_date' }
       );
+
+    // Separate call rather than columns on the upsert above: the RPC keeps the
+    // first origin it ever saw, so a later visit can't blank it out.
+    const a = getAttribution();
+    await supabase.rpc('record_visit_attribution', {
+      p_session_id: session_id,
+      p_visited_date: visited_date,
+      p_referrer: a.referrer,
+      p_referrer_host: a.referrer_host,
+      p_utm_source: a.utm_source,
+      p_utm_medium: a.utm_medium,
+      p_utm_campaign: a.utm_campaign,
+      p_click_id_kind: a.click_id_kind,
+      p_app_hint: a.app_hint,
+      p_landing_path: a.landing_path,
+    });
   } catch { /* offline / demo mode */ }
 }
 
