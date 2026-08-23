@@ -2613,7 +2613,7 @@ h3 {
 
 .lb-row {
   display: grid;
-  grid-template-columns: 44px 36px 1fr auto;
+  grid-template-columns: 44px 36px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   background: var(--app-card-bg);
@@ -2622,6 +2622,17 @@ h3 {
   border: 1px solid var(--app-border);
   transition: background var(--duration-fast);
   box-shadow: var(--app-card-shadow);
+}
+
+/* Guest rows render 3 cells (no avatar) — without this the name lands in the
+   avatar track and shoves the score out of the card. */
+.lb-row--guest {
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+}
+
+/* Grid items default to min-width:auto, which blocks the ellipsis below. */
+.lb-info {
+  min-width: 0;
 }
 
 .lb-row.is-me {
@@ -2727,6 +2738,7 @@ h3 {
 .lb-name {
   font-size: 14px;
   font-weight: 400;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2755,6 +2767,7 @@ h3 {
   flex-direction: column;
   align-items: flex-end;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .lb-score strong {

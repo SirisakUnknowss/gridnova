@@ -183,7 +183,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
         <div class="lb-row${isMe ? ' is-me' : ''}" data-uid="${escapeHtml(r.user_id)}">
           <span class="lb-rank">${rankBadge}</span>
           <span class="lb-avatar">${avatarHtml}</span>
-          <div>
+          <div class="lb-info">
             <div class="lb-name">${name}${isMe ? ' <span class="lb-you">you</span>' : ''}</div>
             <div class="lb-sub-name">Finished today</div>
           </div>
@@ -215,7 +215,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
     listEl.innerHTML = guestRows.map((r) => {
       const isMe = r.session_id === mySessionId;
       return `
-        <div class="lb-row${isMe ? ' is-me' : ''}" data-sid="${escapeHtml(r.session_id)}">
+        <div class="lb-row lb-row--guest${isMe ? ' is-me' : ''}" data-sid="${escapeHtml(r.session_id)}">
           <span class="lb-rank">${rankBadgeHtml(r.rank)}</span>
           <span class="lb-name lb-guest-id">
             ${escapeHtml(r.guest_display_id)}${isMe ? ' <span class="lb-you">you</span>' : ''}
