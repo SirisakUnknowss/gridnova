@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/assets/*",
+    "/icons/*",
+    "/sounds/*",
+    "/admin/lib/*",
+    "/sw.js",
+    "/sw.js.map",
+    "/registerSW.js",
+    "/manifest.webmanifest",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/google11b4ed3b7b5bad13.html"
+  ]
+}

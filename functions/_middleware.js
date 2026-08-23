@@ -1,3 +1,10 @@
+// NOTE: every request routed here counts against the account-wide Workers /
+// Pages Functions daily quota, on production as well as staging — the
+// `isStaging` early-exit below happens *after* the invocation is billed.
+// public/_routes.json excludes static assets so only navigations reach this;
+// without it a single new visitor burned ~80 invocations precaching the PWA,
+// which put the account at 91% of the 100k/day limit on 2026-08-23.
+//
 // Restricts staging.gridnova.pages.dev to admin. Any request without a valid
 // session is redirected to /login (a dedicated page, not a browser Basic Auth
 // popup). On success a signed, HttpOnly session cookie is set and the user is

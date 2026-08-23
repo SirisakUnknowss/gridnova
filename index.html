@@ -35,6 +35,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/ui/styles/main.css">
 
+  <!-- WebSite is the type Google reads for the search-result site name.
+       Without it Google falls back to the domain, and pages.dev belongs to
+       Cloudflare — so results showed "Cloudflare" instead of GridNova.
+       Subdomain site names are only supported in en/fr/de/ja, so this may not
+       take effect for Thai results until we move to our own domain. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "GridNova",
+    "alternateName": "GridNova Sudoku",
+    "url": "https://gridnova.pages.dev/"
+  }
+  </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
