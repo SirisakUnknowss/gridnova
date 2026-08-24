@@ -14,6 +14,17 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '1.10.0',
+    date: '2026-08-24',
+    title: 'Book Mode & Time Attack (Beta)',
+    changes: [
+      { icon: '📖', text: 'New: Book Mode (Beta) — solve like a paper book. Nothing is marked right or wrong while you play; fill the whole grid to find out how you did, with an optional reveal if you\'re stuck' },
+      { icon: '⏱️', text: 'New: Time Attack (Beta) — race the clock across 3 tiers (Sprint 3 min/Easy, Rush 5 min/Medium, Marathon 10 min/Hard), each with its own leaderboard' },
+      { icon: '🧪', text: 'Both new modes are in beta — found something off? Tell us from Settings → Contact Support' },
+      { icon: '🏆', text: 'Fixed the Guests tab on the leaderboard showing the same scores for both Today and Yesterday' },
+    ],
+  },
+  {
     version: '1.8.4',
     date: '2026-08-23',
     title: 'Leaderboard Tidy-Up',
