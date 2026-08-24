@@ -24,7 +24,9 @@ const PRACTICE_META: Record<string, { label: string; sub: string; color: string 
 
 export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): { unmount: () => void } {
   const isBook = props.variant === 'book';
-  const title = isBook ? `${ic.bookMode(20)} Book Mode` : `${ic.practice(20)} Practice`;
+  const title = isBook
+    ? `${ic.bookMode(20)} Book Mode <span class="pm-beta-badge">Beta</span>`
+    : `${ic.practice(20)} Practice`;
   const subtitle = isBook
     ? 'Like a paper book — nothing is marked right or wrong until you fill the grid.'
     : 'Choose your own difficulty — play as many times as you like.';

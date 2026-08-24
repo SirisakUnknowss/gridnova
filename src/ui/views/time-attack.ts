@@ -37,7 +37,7 @@ export function mountTimeAttackView(root: HTMLElement, props: TimeAttackViewProp
           <button class="ach-back" id="ta-back" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <h1 class="ach-title">${ic.timeAttack(20)} Time Attack</h1>
+          <h1 class="ach-title">${ic.timeAttack(20)} Time Attack <span class="pm-beta-badge">Beta</span></h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
@@ -76,6 +76,7 @@ export function mountTimeAttackView(root: HTMLElement, props: TimeAttackViewProp
       </div>
 
       <p class="ta-note">Run out of time and the round ends with no score — the clock keeps running even if you leave the app.</p>
+      <p class="ta-note">This mode is in beta — if a run doesn't submit right, let us know from Settings → Contact Support.</p>
     </section>
     ${bottomNavHTML('home')}
   `;

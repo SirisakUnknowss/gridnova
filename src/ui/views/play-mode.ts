@@ -46,7 +46,7 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
         <div class="pm-row" id="pm-time-attack">
           <span class="pm-row-icon pm-row-icon--time">${ic.timeAttack(22)}</span>
           <div class="pm-row-body">
-            <span class="pm-row-title">Time Attack</span>
+            <span class="pm-row-title">Time Attack <span class="pm-beta-badge">Beta</span></span>
             <span class="pm-row-sub">Race the clock — pick a tier</span>
           </div>
           <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
@@ -65,7 +65,7 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
         <div class="pm-row" id="pm-book">
           <span class="pm-row-icon pm-row-icon--book">${ic.bookMode(22)}</span>
           <div class="pm-row-body">
-            <span class="pm-row-title">Book Mode</span>
+            <span class="pm-row-title">Book Mode <span class="pm-beta-badge">Beta</span></span>
             <span class="pm-row-sub">No hints of right or wrong — just you and the grid</span>
           </div>
           <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
