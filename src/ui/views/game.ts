@@ -3,7 +3,7 @@
 // =====================================================================
 import type { Board, Difficulty, Move } from '@engine/types';
 import { cloneBoard, boardsEqual } from '@engine/validator';
-import { computeDailyScore, computePracticeScore } from '@engine/scoring';
+import { computeDailyScore, computePracticeScore, computeTimeAttackScore, type TimeAttackTier } from '@engine/scoring';
 import { renderBoard } from '@ui/components/board';
 import { renderNumpad } from '@ui/components/numpad';
 import { formatTime } from '@lib/format';
@@ -17,7 +17,19 @@ import { getBoardPrefs, vibrateTap } from '@lib/prefs';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
-  origin?: 'random' | 'book';
+  origin?: 'random' | 'book' | 'time-attack';
+  /**
+   * Time Attack: the clock counts DOWN to the deadline the server set when it
+   * issued the ticket. Timing is measured against issued_at rather than local
+   * elapsed time so the client agrees with the server exactly — and so
+   * backgrounding the app can't stop the race.
+   */
+  timeAttack?: {
+    tier: TimeAttackTier;
+    ticketId: string;
+    limitSeconds: number;
+    issuedAt: string;
+  };
   difficulty: Difficulty;
   puzzle: Board;
   solution: Board;
@@ -77,12 +89,15 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // solution while you play, so there is nothing to be right or wrong about
   // until the grid is full. No red cells, no hearts, no game over.
   const BOOK = props.origin === 'book';
+  const TA = props.timeAttack ?? null;
 
   const PAID_HINT_COSTS = [50, 75, 100];
   // Daily has a global leaderboard, so free hints stay equal for everyone
   // there. Practice/Random get a level perk: more free hints as you level up.
   // Book stays at 3 — it is the only oracle that mode has.
-  const FREE_HINTS = mode === 'daily' || BOOK
+  // Time Attack has a public leaderboard, so free hints stay equal for
+  // everyone the same way Daily does.
+  const FREE_HINTS = mode === 'daily' || BOOK || TA
     ? 3
     : freeHintsForLevel(useStore.getState().level ?? 1);
 
@@ -90,7 +105,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // answers, so it's fine for Daily unlike paid hints. Disabled for Random
   // (origin='random'): "lose 1 = streak resets" is that mode's whole point.
   // Book has no mistake counter to buy back from.
-  const CONTINUES_ENABLED = !BOOK && (mode === 'daily' || props.origin !== 'random');
+  // Time Attack: buying your way back into a ranked race is pay-to-win, and
+  // the clock wouldn't stop for it anyway.
+  const CONTINUES_ENABLED = !BOOK && !TA && (mode === 'daily' || props.origin !== 'random');
   const DAILY_CONTINUE_COSTS = [2500, 4000, 10000];
   const PRACTICE_CONTINUE_BASE: Partial<Record<Difficulty, number>> = {
     easy: 300, 'easy-medium': 450, medium: 600, 'medium-hard': 900,
@@ -130,7 +147,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // Unique key for this game session (used for save/load)
   const gameId = mode === 'daily'
     ? `daily-${props.date ?? new Date().toISOString().slice(0, 10)}`
-    : BOOK ? `book-${difficulty}` : `practice-${difficulty}`;
+    : BOOK ? `book-${difficulty}`
+    : TA ? `time-attack-${TA.ticketId}`
+    : `practice-${difficulty}`;
 
   // Restore saved state if resuming
   if (props.resume) {
@@ -184,7 +203,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
                </div>`
             : `<button class="mode-pill" id="mode-pill-btn">
                 <span class="mode-dot" style="background:${dotColor}"></span>
-                <span id="mode-pill-label">${BOOK ? `Book · ${diffLabel}` : diffLabel}</span>
+                <span id="mode-pill-label">${
+                  BOOK ? `Book · ${diffLabel}`
+                  : TA ? `${TA.tier.charAt(0).toUpperCase() + TA.tier.slice(1)} · ${diffLabel}`
+                  : diffLabel
+                }</span>
                </button>`
           }
           <div class="topbar-right">
@@ -322,7 +345,13 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const notesBtn   = root.querySelector('#notes-btn') as HTMLButtonElement;
   const notesBadge = root.querySelector('#notes-badge') as HTMLElement;
 
+  const taIssuedAtMs = TA ? new Date(TA.issuedAt).getTime() : 0;
+
   function elapsedMs(): number {
+    // Time Attack ignores pausedMs on purpose: the server measures the run
+    // from issued_at, so any local pause would only desync the two clocks and
+    // get an otherwise-legitimate finish rejected as TIME_EXPIRED.
+    if (TA) return Date.now() - taIssuedAtMs;
     return Date.now() - startTime - pausedMs;
   }
 
@@ -330,8 +359,29 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     return Math.floor(elapsedMs() / 1000);
   }
 
+  function secondsLeft(): number {
+    return TA ? Math.max(0, TA.limitSeconds - elapsedSeconds()) : 0;
+  }
+
+  function paintClock() {
+    if (!TA) { timerEl.textContent = formatTime(elapsedSeconds()); return; }
+    const left = secondsLeft();
+    timerEl.textContent = formatTime(left);
+    timerEl.classList.toggle('timer--urgent', left <= 30);
+    if (left <= 0 && !gameWon) timeUp();
+  }
+
+  function startClock() {
+    if (timerHandle) clearInterval(timerHandle);
+    timerHandle = window.setInterval(paintClock, 500);
+  }
+
   function saveProgress() {
     if (gameWon) return;
+    // A Time Attack run can't be resumed — the deadline is wall-clock, so a
+    // restored game would already be over. Saving it would only leave a dead
+    // "continue" entry behind.
+    if (TA) return;
     const notes: number[][] = [];
     for (let r = 0; r < 9; r++)
       for (let c = 0; c < 9; c++)
@@ -772,11 +822,15 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     // be shown where.
     const scoredMistakes = BOOK ? bookFailedChecks + (bookRevealed ? 1 : 0) : mistakes;
     const scoreInput = { difficulty, timeSeconds, mistakes: scoredMistakes, hintsUsed };
-    const score = mode === 'daily'
-      ? computeDailyScore(scoreInput).score
-      : computePracticeScore(scoreInput);
+    // Shown to the player immediately; for Time Attack the server recomputes it
+    // from the ticket and its number is the one that reaches the leaderboard.
+    const score = TA
+      ? computeTimeAttackScore({ ...scoreInput, tier: TA.tier })
+      : mode === 'daily'
+        ? computeDailyScore(scoreInput).score
+        : computePracticeScore(scoreInput);
 
-    if (mode === 'daily') sfxDailyWin(); else sfxWin();
+    if (mode === 'daily' || TA) sfxDailyWin(); else sfxWin();
 
     // Report started_at as an EFFECTIVE start (completedAt − actual play time) so the
     // server's wall-clock check matches time_seconds. The raw mount-time start drifts
@@ -800,6 +854,22 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       return;
     }
     endGame();
+  }
+
+  /** Time Attack: the clock ran out. Nothing is submitted — the run is void. */
+  function timeUp() {
+    gameWon = true;
+    if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+    if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
+    void deleteGame(gameId);
+    sfxError();
+    const overlay = root.querySelector('#gameover-overlay') as HTMLElement;
+    const title = overlay.querySelector('.gameover-title') as HTMLElement;
+    const sub = overlay.querySelector('.gameover-sub') as HTMLElement;
+    title.textContent = "Time's up";
+    sub.textContent = 'The clock beat you this time — no score submitted.';
+    overlay.classList.add('open');
+    props.onLose?.();
   }
 
   function endGame() {
@@ -847,7 +917,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         livesLost = 0;
         renderHearts(0);
         resumeClock();
-        timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
+        startClock();
       } catch {
         endGame();
       }
@@ -871,7 +941,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   function closeMenu() {
     if (pauseStart !== null) { pausedMs += Date.now() - pauseStart; pauseStart = null; }
     boardOverlay.classList.remove('open');
-    if (!gameWon) timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
+    if (!gameWon) startClock();
   }
 
   root.querySelector('#game-share-btn')?.addEventListener('click', async () => {
@@ -949,9 +1019,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   };
   document.addEventListener('keydown', onKey);
 
-  timerHandle = window.setInterval(() => {
-    timerEl.textContent = formatTime(elapsedSeconds());
-  }, 500);
+  paintClock();
+  startClock();
 
   // Autosave every 30s so users can return and continue
   autosaveHandle = window.setInterval(saveProgress, 30_000);
@@ -971,7 +1040,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       // Resume only when the pause came from being hidden, not from an open menu.
       pausedMs += Date.now() - pauseStart;
       pauseStart = null;
-      timerHandle = window.setInterval(() => { timerEl.textContent = formatTime(elapsedSeconds()); }, 500);
+      startClock();
     }
   }
   document.addEventListener('visibilitychange', onVisibilityChange);

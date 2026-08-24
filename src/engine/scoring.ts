@@ -45,6 +45,38 @@ export function computePracticeScore(input: ScoreInput): number {
   return Math.max(100, Math.round(base - timePenalty - mistakePenalty - hintPenalty));
 }
 
+/** Time limit per Time Attack tier, in seconds. */
+export const TIME_ATTACK_TIERS = {
+  sprint:   { seconds: 180, difficulty: 'easy'   as Difficulty },
+  rush:     { seconds: 300, difficulty: 'medium' as Difficulty },
+  marathon: { seconds: 600, difficulty: 'hard'   as Difficulty },
+} as const;
+
+export type TimeAttackTier = keyof typeof TIME_ATTACK_TIERS;
+
+/**
+ * Time Attack scoring. Unlike the other modes this rewards what's LEFT on the
+ * clock rather than penalising time spent — the two are the same measurement,
+ * but players are racing a visible countdown, so the score has to move in the
+ * direction they're watching.
+ *
+ * Difficulty is locked per tier, so scores within a tier are directly
+ * comparable and need no normalising.
+ */
+export function computeTimeAttackScore(
+  input: ScoreInput & { tier: TimeAttackTier },
+): number {
+  const limit = TIME_ATTACK_TIERS[input.tier].seconds;
+  const secondsLeft = Math.max(0, limit - input.timeSeconds);
+  const base = BASE_SCORE[input.difficulty];
+  // Finishing with half the clock left doubles the base — the headline reward.
+  const timeBonus = Math.round(base * (secondsLeft / limit));
+  const mistakePenalty = input.mistakes * 100;
+  const hintPenalty = input.hintsUsed * 250;
+  const flawless = input.mistakes === 0 && input.hintsUsed === 0 ? 300 : 0;
+  return Math.max(100, base + timeBonus - mistakePenalty - hintPenalty + flawless);
+}
+
 /** Coin reward for completing daily puzzle */
 export function computeDailyCoinReward(input: ScoreInput): number {
   const base: Record<Difficulty, number> = {

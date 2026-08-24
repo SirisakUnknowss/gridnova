@@ -45,45 +45,91 @@
 
 ## 📋 โหมดที่ 2: Time Attack *(ใหม่)*
 
-### เงื่อนไข
-แก้ให้เสร็จก่อนหมดเวลา — เลือกความยากเอง + เลือกเวลาที่มีให้เอง (tier)
+### เงื่อนไข (อัปเดต 2026-08-23 — เข้า v1.10.0)
 
-| Time Tier | เวลาที่ให้ | เหมาะกับความยาก |
+แก้ให้เสร็จก่อนหมดเวลา · **ความยากล็อกตาม tier ผู้เล่นเลือกเองไม่ได้**
+
+| Time Tier | เวลาที่ให้ | ความยาก (ล็อก) |
 |---|---|---|
-| Sprint | 3 นาที | Easy, Easy-Medium |
-| Rush | 5 นาที | Medium, Medium-Hard |
-| Marathon | 10 นาที | Hard, Hard-Expert, Expert |
+| Sprint | 3 นาที | Easy |
+| Rush | 5 นาที | Medium |
+| Marathon | 10 นาที | Hard |
 
 - แก้ไม่ทันตามเวลา = แพ้ (เกมจบทันที ไม่ submit คะแนน)
 - แก้ทันตามเวลา = คะแนน = `remaining time bonus + base score - mistake/hint penalty` (สูตรคล้าย practice/daily แต่ให้น้ำหนัก "เวลาที่เหลือ" มากกว่า)
 
-### ✅ Confirmed: ranking แยกตาม Time Tier
-**Sprint / Rush / Marathon มี leaderboard ของตัวเองแยกกัน** เพราะเวลาที่ต่างกันเทียบกันตรงๆ ไม่ได้ยุติธรรม เหมือนที่ Daily แยกตามวัน (ไม่ normalize รวมเป็น leaderboard เดียว — เก็บไว้พิจารณาใน v2 ถ้าต้องการ)
+### ✅ Confirmed: ความยากล็อกตาม tier
+
+เดิมสเปกให้ "เลือกความยากเอง + เลือก tier เอง" ซึ่งทำให้ leaderboard ไม่มีความหมาย:
+Marathon 10 นาที + Easy จะจบเร็วและเหลือเวลาเยอะที่สุดเสมอ ทุกคนก็จะเลือกแบบนั้น
+พอความยากล็อกตาม tier แล้ว คะแนนใน tier เดียวกันเทียบกันได้ตรง ๆ ไม่ต้อง normalize อะไรเลย
+
+### ✅ Confirmed: 3 leaderboard แยกกัน
+
+**Sprint / Rush / Marathon มี leaderboard ของตัวเองคนละตาราง** ไม่ normalize รวมเป็นอันเดียว
 
 **Time tier เป็น fix 3 แบบ** (ไม่มี custom time ให้ตั้งเองใน v1)
+
+### ⚠️ เวลาที่ตั้งไว้โหดกว่าที่คนเล่นทำได้จริง — รู้ตัวและยอมรับแล้ว
+
+วัดจาก `user_game_history` บน production (2026-08-23) เฉพาะเกมที่**เล่นจบ**:
+
+| ความยาก | จบทั้งหมด | median | p25 | p10 |
+|---|---|---|---|---|
+| Easy | 223 | **4:15** | 3:02 | 1:49 |
+| Medium | 122 | **7:06** | 4:10 | 3:00 |
+| Hard | 55 | **15:46** | 8:52 | 5:58 |
+
+เทียบกับเวลาของ tier แล้ว **ทั้ง 3 tier มีคนทำทันราว 25–30% ของคนที่เล่นจบ** และคนที่ไม่ทัน
+จะไม่ได้คะแนนเลยตามกติกา · ตัดสินใจคงเวลา 3/5/10 ไว้ตาม mockup โดยรู้ว่าเป็นโหมดสำหรับคนเก่ง
+ไม่ใช่โหมดสำหรับคนทั่วไป — ถ้า leaderboard ร้างหรือคนเลิกเล่นเร็ว ตัวแปรแรกที่ควรขยับคือเวลาต่อ tier
+(median คือ 5 / 8 / 15 นาที)
 
 ### Engine ที่ reuse ได้
 - Generator/solver เดิมทั้งหมด (`src/engine/`)
 - Scoring formula ปรับจาก `scoring.ts` เดิม เพิ่มตัวแปร `timeRemaining`
 
-### Schema ที่ต้องเพิ่ม
+### Schema
+
+โจทย์ต้องออกจาก server เท่านั้น — leaderboard สาธารณะที่รับคะแนนจาก client ตรง ๆ ปลอมได้ทันที
+และตัวชี้วัดหลักของโหมดนี้คือ "เหลือเวลาเท่าไหร่" ซึ่งเป็นเลขที่ client ส่งมาเอง
+
 ```sql
+CREATE TABLE time_attack_tickets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id),
+  tier TEXT NOT NULL,              -- 'sprint' | 'rush' | 'marathon'
+  difficulty difficulty_enum NOT NULL,
+  puzzle CHAR(81) NOT NULL,
+  solution CHAR(81) NOT NULL,      -- ห้ามหลุดถึง client
+  issued_at TIMESTAMPTZ DEFAULT now(),
+  consumed_at TIMESTAMPTZ
+);
+
 CREATE TABLE time_attack_leaderboard (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES profiles(id),
-  tier TEXT NOT NULL,            -- 'sprint' | 'rush' | 'marathon'
+  ticket_id UUID UNIQUE REFERENCES time_attack_tickets(id),
+  tier TEXT NOT NULL,
   difficulty difficulty_enum NOT NULL,
   score INTEGER NOT NULL,
   time_seconds INTEGER NOT NULL,
+  seconds_left INTEGER NOT NULL,
   mistakes INTEGER NOT NULL,
+  hints_used INTEGER NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 ```
-- Ranking window: แนะนำให้เป็น **all-time best per user per tier** (เก็บ record ที่ดีที่สุดของแต่ละคน ไม่ใช่ทุกครั้งที่เล่น) เพื่อไม่ให้ leaderboard รกด้วยหลาย record ของคนเดียวกัน
+
+`issued_at` ที่ server จดเองคือจุดอ้างอิงเวลาที่ปลอมไม่ได้ → ใช้บังคับเพดานเวลาของ tier ได้จริง
+(`submit-daily-score` ปัจจุบันรับ `started_at` จาก client จึงเช็คได้แค่ว่าเลขที่ส่งมาสอดคล้องกันเอง)
+
+- Ranking window: **all-time best per user per tier** — เก็บทุก record แต่ leaderboard เลือกแถวที่ดีที่สุดของแต่ละคน
 
 ### Rewards
 - Coin/XP ตามสูตร practice ปกติ + bonus ถ้าติด Top 100/10/1 ของ tier นั้น (คล้าย Daily)
-- จับคู่กับ **Speedster achievements ที่มีอยู่แล้ว** — เล่น Time Attack คือทางที่เร็วสุดในการปลดล็อค Speedster medals
+- **Speedster achievements ยังนับเฉพาะ Daily เหมือนเดิม** — Time Attack ไม่ปลด Speedster
+  (`ACH_SPEED_L1`/`L2` ระบุ "(Daily only)" ไว้ในนิยามอยู่แล้ว ตัดสินใจไม่ขยายให้ Time Attack)
 
 ---
 

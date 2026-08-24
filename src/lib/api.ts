@@ -139,6 +139,66 @@ export async function recordRandomModeResult(won: boolean): Promise<{ current_wi
   return data;
 }
 
+// === Time Attack ===
+
+export interface TimeAttackTicket {
+  ticket_id: string;
+  issued_at: string;
+  tier: 'sprint' | 'rush' | 'marathon';
+  difficulty: string;
+  seconds: number;
+  puzzle: string;
+}
+
+export interface TimeAttackRow {
+  rank: number;
+  user_id: string;
+  display_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  score: number;
+  time_seconds: number;
+  seconds_left: number;
+  created_at: string;
+}
+
+/** Ask the server for a puzzle + ticket. The solution stays on the server. */
+export async function startTimeAttack(tier: string): Promise<TimeAttackTicket> {
+  const { data, error } = await supabase.functions.invoke('start-time-attack', { body: { tier } });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error.code ?? 'START_FAILED');
+  return data as TimeAttackTicket;
+}
+
+export async function submitTimeAttackScore(payload: {
+  ticket_id: string;
+  time_seconds: number;
+  mistakes: number;
+  hints_used: number;
+  moves: Array<{ r: number; c: number; n: number; t: number; isHint?: boolean }>;
+}) {
+  const { data, error } = await supabase.functions.invoke('submit-time-attack-score', { body: payload });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error.code ?? 'SUBMIT_FAILED');
+  return data as {
+    score: number; seconds_left: number; mistakes: number;
+    hints_used: number; rank: number | null; coins: number; xp: number;
+  };
+}
+
+export async function getTimeAttackLeaderboard(tier: string, limit = 50): Promise<TimeAttackRow[]> {
+  const { data, error } = await supabase.rpc('get_time_attack_leaderboard', { p_tier: tier, p_limit: limit });
+  if (error) throw error;
+  return (data ?? []) as TimeAttackRow[];
+}
+
+export async function getMyTimeAttackBest(tier: string) {
+  const { data, error } = await supabase.rpc('get_my_time_attack_best', { p_tier: tier });
+  if (error) throw error;
+  const rows = (data ?? []) as Array<{ score: number; time_seconds: number; seconds_left: number }>;
+  return rows[0] ?? null;
+}
+
 export async function getWallet() {
   const { data, error } = await supabase
     .from('user_wallet')

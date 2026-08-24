@@ -12,6 +12,7 @@ export interface PlayModeViewProps {
   onOpenDaily: () => void;
   onOpenRandom: () => void;
   onOpenBook: () => void;
+  onOpenTimeAttack: () => void;
   nav: BottomNavCallbacks;
 }
 
@@ -42,13 +43,13 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
           <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
         </div>
 
-        <div class="pm-row pm-row--soon">
-          <span class="pm-row-icon pm-row-icon--soon">${ic.clock(22)}</span>
+        <div class="pm-row" id="pm-time-attack">
+          <span class="pm-row-icon pm-row-icon--time">${ic.clock(22)}</span>
           <div class="pm-row-body">
             <span class="pm-row-title">Time Attack</span>
             <span class="pm-row-sub">Race the clock — pick a tier</span>
           </div>
-          <span class="pm-soon-badge">Soon</span>
+          <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
         </div>
 
         <div class="pm-row" id="pm-random">
@@ -78,6 +79,7 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
   root.querySelector('#pm-daily')?.addEventListener('click', props.onOpenDaily);
   root.querySelector('#pm-random')?.addEventListener('click', props.onOpenRandom);
   root.querySelector('#pm-book')?.addEventListener('click', props.onOpenBook);
+  root.querySelector('#pm-time-attack')?.addEventListener('click', props.onOpenTimeAttack);
   wireBottomNav(root, props.nav, 'home');
 
   void getRandomModeStats().then((stats) => {

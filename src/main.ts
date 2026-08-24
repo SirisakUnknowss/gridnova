@@ -17,6 +17,10 @@ import { mountPracticeView } from './ui/views/practice';
 import { mountDailyDetailView } from './ui/views/daily-detail';
 import { mountRandomModeDetailView } from './ui/views/random-mode-detail';
 import { mountRandomLeaderboardView } from './ui/views/random-leaderboard';
+import { mountTimeAttackView } from './ui/views/time-attack';
+import { mountTimeAttackLeaderboardView } from './ui/views/time-attack-leaderboard';
+import { solve } from './engine/solver';
+import type { TimeAttackTier } from './engine/scoring';
 import { mountGameView, type GameResult } from './ui/views/game';
 import { showWinModal } from './ui/views/win-modal';
 import { showShareModal } from './ui/views/share-modal';
@@ -244,7 +248,81 @@ function showPlayMode() {
     onOpenDaily: () => { dailyDetailBack = showPlayMode; showDailyDetail(); },
     onOpenRandom: showRandomDetail,
     onOpenBook: showBook,
+    onOpenTimeAttack: showTimeAttack,
     nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function showTimeAttack() {
+  clearView('time_attack');
+  const view = mountTimeAttackView(root, {
+    onBack: showPlayMode,
+    onStart: (tier) => void playTimeAttack(tier),
+    onLeaderboard: (tier) => showTimeAttackLeaderboard(tier),
+    onRequireLogin: () => showAuthModal({
+      mode: 'signup',
+      onSuccess: showTimeAttack,
+      onCancel: showTimeAttack,
+    }),
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+function showTimeAttackLeaderboard(tier: TimeAttackTier) {
+  clearView('time_attack_leaderboard');
+  const view = mountTimeAttackLeaderboardView(root, {
+    onBack: showTimeAttack,
+    initialTier: tier,
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+async function playTimeAttack(tier: TimeAttackTier) {
+  const hideLoading = showLoadingOverlay('Preparing your puzzle...');
+  let ticket: api.TimeAttackTicket;
+  try {
+    ticket = await api.startTimeAttack(tier);
+  } catch (err) {
+    hideLoading();
+    toast((err as Error).message === 'UNAUTHORIZED'
+      ? 'Please sign in to play Time Attack.'
+      : 'Could not start the run. Try again.');
+    return;
+  }
+  hideLoading();
+
+  // The server keeps its copy of the solution and never sends it. The board
+  // still needs one to run (hints, hearts, win detection), so we solve the
+  // grid locally the same way Daily does — the submission is replayed and
+  // scored server-side regardless of anything decided here.
+  const puzzle = stringToBoard(ticket.puzzle);
+  const solution = solve(puzzle);
+  if (!solution) {
+    toast('That puzzle failed to load. Try again.');
+    showTimeAttack();
+    return;
+  }
+
+  clearView('game_time_attack');
+  const view = mountGameView(root, {
+    mode: 'practice',
+    origin: 'time-attack',
+    timeAttack: {
+      tier,
+      ticketId: ticket.ticket_id,
+      limitSeconds: ticket.seconds,
+      issuedAt: ticket.issued_at,
+    },
+    difficulty: ticket.difficulty as Difficulty,
+    puzzle,
+    solution,
+    onWin: (result) => void handleTimeAttackWin(result, tier, ticket.ticket_id),
+    onExit: showTimeAttack,
+    onLose: showTimeAttack,
+    onNewGame: () => void playTimeAttack(tier),
   });
   currentUnmount = view.unmount;
 }
@@ -708,6 +786,50 @@ async function handleWin(result: GameResult, date?: string) {
     onContinue: showHome,
     onShare: date ? () => shareResult(result, date, rank, totalPlayers) : undefined,
     onSignUp: isGuest ? () => showAuthModal({ mode: 'signup', onSuccess: showHome, onCancel: showHome }) : undefined,
+  });
+}
+
+async function handleTimeAttackWin(result: GameResult, tier: TimeAttackTier, ticketId: string) {
+  const hideLoading = showLoadingOverlay('Submitting your run...');
+  let rank: number | null = null;
+  let coins = 0;
+  let xp = 0;
+  let score = result.score;
+
+  try {
+    const res = await api.submitTimeAttackScore({
+      ticket_id: ticketId,
+      time_seconds: result.timeSeconds,
+      mistakes: result.mistakes,
+      hints_used: result.hintsUsed,
+      moves: result.moves as Array<{ r: number; c: number; n: number; t: number; isHint?: boolean }>,
+    });
+    rank = res.rank;
+    coins = res.coins;
+    xp = res.xp;
+    score = res.score;
+    const prevLevel = useStore.getState().level;
+    const prog = await api.getProgression();
+    if (prog) {
+      useStore.setState({ xp: Number(prog.xp ?? 0), level: prog.level ?? prevLevel });
+      maybeShowLevelUp(prevLevel, prog.level ?? prevLevel);
+    }
+    const wallet = await api.getWallet();
+    if (wallet) useStore.setState({ coins: Number(wallet.balance ?? 0) });
+  } catch (err) {
+    // The run still happened — show it, but don't claim a rank it didn't get.
+    toast(`Run not counted: ${(err as Error).message}`);
+  } finally {
+    hideLoading();
+  }
+
+  showWinModal({
+    result: { ...result, score },
+    rank: rank ?? undefined,
+    coinsEarned: coins,
+    xpEarned: xp,
+    isGuest: false,
+    onContinue: () => showTimeAttackLeaderboard(tier),
   });
 }
 
