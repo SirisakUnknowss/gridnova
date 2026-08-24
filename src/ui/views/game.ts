@@ -418,7 +418,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     // Emptying any cell re-arms the Book Mode check for the next fill.
     if (BOOK && bookWasFull && !boardIsFull()) bookWasFull = false;
     renderBoard(boardEl, { userBoard, solution, givenMask, hintMask, noteMask, selected, settings, onCellClick });
-    renderNumpad(numpadEl, { userBoard, solution, onNumber: handleNumber, countAllPlaced: BOOK });
+    renderNumpad(numpadEl, { userBoard, solution, onNumber: handleNumber, unlimited: BOOK });
   }
 
   // --- Board animations -------------------------------------------------
