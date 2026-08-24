@@ -50,7 +50,7 @@ export function mountTimeAttackLeaderboardView(
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">
-          ${ic.clock(13)} Time Attack
+          ${ic.timeAttack(13)} Time Attack
         </h2>
         <span style="width:38px;"></span>
       </div>

@@ -41,6 +41,8 @@ import sharingIcon from '@images/sharing-icon.png'
 import clockIcon from '@images/clock-icon.png'
 import soundOnIcon from '@images/soundOn-icon.png'
 import soundOffIcon from '@images/soundOff-icon.png'
+import bookModeIcon from '@images/book.png'
+import chronometerIcon from '@images/chronometer.png'
 
 function svg(paths: string, size = 18): string {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
@@ -98,6 +100,8 @@ export const ic = {
   dice: (s?: number) => img(diceIcon, s),
   gift: (s?: number) => img(giftIcon, s),
   stats: (s?: number) => img(statsIcon, s),
+  bookMode: (s?: number) => img(bookModeIcon, s),
+  timeAttack: (s?: number) => img(chronometerIcon, s),
 
   // Sound
   soundOn: (s?: number) => img(soundOnIcon, s),

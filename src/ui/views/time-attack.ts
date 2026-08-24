@@ -37,13 +37,13 @@ export function mountTimeAttackView(root: HTMLElement, props: TimeAttackViewProp
           <button class="ach-back" id="ta-back" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <h1 class="ach-title">${ic.clock(20)} Time Attack</h1>
+          <h1 class="ach-title">${ic.timeAttack(20)} Time Attack</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
 
       <div class="ta-hero">
-        <span class="ta-hero-icon">${ic.clock(26)}</span>
+        <span class="ta-hero-icon">${ic.timeAttack(26)}</span>
         <div class="ta-hero-body">
           <span class="ta-hero-title">Beat the clock</span>
           <span class="ta-hero-sub">Pick a tier and go — the difficulty is set by the tier.</span>
