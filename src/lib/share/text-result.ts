@@ -15,7 +15,10 @@
 import type { GameResult } from '@ui/views/game';
 import { formatTime } from '@lib/format';
 
-const SITE_URL = 'https://gridnova.pages.dev';
+// Exported so every share text uses the same string. Keep the scheme: LINE,
+// Facebook and Messenger only auto-link a bare domain inconsistently, so
+// "gridnova.pages.dev" pastes as plain text nobody can tap.
+export const SITE_URL = 'https://gridnova.pages.dev/';
 
 /** Date of Daily Puzzle #1 — the numbering anchor (UTC). */
 const DAILY_EPOCH = Date.UTC(2026, 4, 27); // 2026-05-27

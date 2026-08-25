@@ -6,6 +6,7 @@ import { useStore } from '@state/store';
 import { formatTime, escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
+import { SITE_URL } from '@lib/share/text-result';
 
 export interface RecapProps {
   onBack: () => void;
@@ -61,7 +62,7 @@ function buildShareText(r: Recap): string {
     r.bestTime != null && isFinite(r.bestTime) ? `⚡ Best: ${formatTime(r.bestTime)}` : '',
     `❌ ${r.totalMistakes} mistakes`,
     '',
-    'Play: gridnova.pages.dev',
+    `Play: ${SITE_URL}`,
   ].filter(Boolean);
   return lines.join('\n');
 }
