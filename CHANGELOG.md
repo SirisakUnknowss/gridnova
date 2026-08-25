@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.1 — 2026-08-25
+
+### Fixed
+- **Admin panel**: `get_admin_online_list()` join ข้อมูล profile ผิดคอลัมน์มาตั้งแต่ migration แรก (`session_id` ที่ client สุ่มเองแทนที่จะเป็น `user_id` จริง) ทำให้สมาชิกที่ online ทุกคนโชว์เป็น "Member" ทั่วไป ไม่มีชื่อจริง แก้ join แล้ว
+
+### Added
+- **Admin panel**: หน้า online list เพิ่มคอลัมน์ Mode โชว์ว่าผู้เล่นแต่ละคนกำลังเล่นโหมดไหนอยู่ตอนนี้ (Daily/Practice/Random/Time Attack/Book หรือ In menu) ดึงจาก view ล่าสุดที่แต่ละ session log ไว้
+
 ## 1.10.0 — 2026-08-24
 
 ### Added
