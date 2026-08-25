@@ -149,6 +149,16 @@
     .member-status-inactive { background:var(--muted); }
     .badge-banned-sm { background:rgba(248,113,113,.15); color:#f87171; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:700; }
 
+    /* Game mode cards */
+    .mode-card-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+    .mode-card-live { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:var(--green); background:rgba(16,185,129,.12); padding:3px 9px; border-radius:99px; margin-top:2px; }
+    .mode-card-live .dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse-dot 1.6s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
+    .mode-card-rows { width:100%; display:flex; flex-direction:column; gap:4px; margin-top:6px; text-align:left; }
+    .mode-card-rows .r { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); }
+    .mode-card-rows .r strong { color:var(--text); font-variant-numeric:tabular-nums; }
+    .mode-card-note { font-size:11px; color:var(--muted); margin-top:6px; line-height:1.4; }
+
     /* Member list table */
     .members-table-wrap { overflow-x:auto; }
 
@@ -259,6 +269,7 @@
       <button class="tab-btn active" id="btn-tab-analytics">📊 Dashboard & Analytics</button>
       <button class="tab-btn" id="btn-tab-members">👥 Members</button>
       <button class="tab-btn" id="btn-tab-leaderboard">🏆 Leaderboard</button>
+      <button class="tab-btn" id="btn-tab-gamemode">🎮 Game Mode</button>
       <button class="tab-btn" id="btn-tab-logs">📋 Log Monitor & Audit</button>
     </div>
 
@@ -538,6 +549,29 @@
       <div id="lb-admin-wrap"><div class="skeleton" style="height:240px;border-radius:var(--radius);"></div></div>
     </div> <!-- end of panel-leaderboard -->
 
+    <!-- Panel 5: Game Mode -->
+    <div id="panel-gamemode" style="display:none">
+      <div id="gamemode-overview-view">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>🥧 สัดส่วนการเล่นวันนี้ (ตามจำนวนครั้งที่เข้าโหมด)</h3>
+            <div style="position:relative;height:260px"><canvas id="gamemode-pie-chart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>🟢 กำลังเล่นอยู่ตอนนี้ แยกตามโหมด</h3>
+            <div style="position:relative;height:260px"><canvas id="gamemode-online-chart"></canvas></div>
+          </div>
+        </div>
+        <div class="section-h" style="margin-top:22px">รายละเอียดแต่ละโหมด — กดเพื่อดูรายชื่อผู้เล่น</div>
+        <div id="gamemode-card-grid" class="member-cards"></div>
+      </div>
+      <!-- Detail view -->
+      <div id="gamemode-detail" style="display:none">
+        <button class="detail-back" id="gamemode-detail-back-btn">← กลับไปภาพรวม</button>
+        <div id="gamemode-detail-content"><div class="skeleton" style="height:120px;width:100%;border-radius:12px;margin-bottom:14px;"></div></div>
+      </div>
+    </div> <!-- end of panel-gamemode -->
+
   </div> <!-- end of content -->
 </div> <!-- end of dashboard -->
 
@@ -795,6 +829,17 @@ function renderTable(data) {
     </tr>`).join('')}</tbody></table>`;
 }
 
+const ONLINE_MODE_LABELS = {
+  game_daily: '🗓️ Daily',
+  game_practice: '🎯 Practice',
+  game_random: '🎲 Random',
+  game_time_attack: '⏱️ Time Attack',
+  game_book: '📖 Book',
+};
+function modeLabelFor(view) {
+  return ONLINE_MODE_LABELS[view] || '<span style="color:var(--muted)">In menu</span>';
+}
+
 function renderOnlineList(data) {
   data = data || [];
   const wrap = document.getElementById('online-list-wrap');
@@ -808,17 +853,19 @@ function renderOnlineList(data) {
       <tr>
         <td><span class="online-dot member"></span><strong>${r.display_name || r.username || 'Member'}</strong></td>
         <td style="color:var(--muted);font-size:13px">@${r.username || '—'}</td>
+        <td style="font-size:13px">${modeLabelFor(r.current_view)}</td>
         <td style="text-align:right"><span class="badge-online">✉️ Member</span></td>
       </tr>`),
-    ...guests.map((_,i) => `
+    ...guests.map((r,i) => `
       <tr>
         <td><span class="online-dot guest"></span><span style="color:var(--muted)">Guest ${i+1}</span></td>
         <td style="color:var(--muted);font-size:13px">—</td>
+        <td style="font-size:13px">${modeLabelFor(r.current_view)}</td>
         <td style="text-align:right"><span style="color:var(--muted);font-size:12px">👻 Guest</span></td>
       </tr>`),
   ].join('');
   wrap.innerHTML = `<table><thead><tr>
-    <th>Name</th><th>Username</th><th style="text-align:right">Type</th>
+    <th>Name</th><th>Username</th><th>Mode</th><th style="text-align:right">Type</th>
   </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
@@ -843,6 +890,246 @@ function renderMemberList(data) {
       <td style="text-align:right;font-variant-numeric:tabular-nums">${fmt(r.coins)} 🪙</td>
       <td style="text-align:right;color:var(--muted);font-size:13px">${new Date(r.created_at).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}</td>
     </tr>`).join('')}</tbody></table>`;
+}
+
+// ── Game Mode Renders ────────────────────────────────────────────────
+const MODE_META = {
+  daily:       { label: 'Daily',       icon: '🗓️', color: '#667eea' },
+  practice:    { label: 'Practice',    icon: '🎯', color: '#10b981' },
+  random:      { label: 'Random',      icon: '🎲', color: '#f59e0b' },
+  time_attack: { label: 'Time Attack', icon: '⏱️', color: '#ef4444' },
+  book:        { label: 'Book',        icon: '📖', color: '#a78bfa' },
+};
+let gamemodePieChart = null, gamemodeOnlineChart = null;
+let gamemodeOverviewData = [];
+
+async function loadGameModeOverview() {
+  document.getElementById('gamemode-card-grid').innerHTML =
+    Array(5).fill(`<div class="member-card" style="cursor:default"><div class="skeleton" style="width:52px;height:52px;border-radius:14px;margin:0 auto 10px;"></div><div class="skeleton" style="height:14px;width:70%;margin:0 auto 6px;"></div><div class="skeleton" style="height:12px;width:50%;margin:0 auto;"></div></div>`).join('');
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  const data = await callRpc('get_admin_game_mode_overview', session.access_token);
+  gamemodeOverviewData = data || [];
+  renderGameModePieChart(gamemodeOverviewData);
+  renderGameModeOnlineChart(gamemodeOverviewData);
+  renderGameModeCards(gamemodeOverviewData);
+}
+
+function renderGameModePieChart(data) {
+  data = data || [];
+  // Today's view counts if there's any activity today, else fall back to
+  // all-time so the chart isn't empty during quiet early-morning hours.
+  const useToday = data.some(m => (m.views_today || 0) > 0);
+  const values = data.map(m => useToday ? (m.views_today || 0) : (m.views_total || 0));
+  const ctx = document.getElementById('gamemode-pie-chart').getContext('2d');
+  if (gamemodePieChart) gamemodePieChart.destroy();
+  gamemodePieChart = new Chart(ctx, { type: 'pie', data: {
+    labels: data.map(m => `${MODE_META[m.mode_key]?.icon || ''} ${MODE_META[m.mode_key]?.label || m.mode_key}`),
+    datasets: [{ data: values, backgroundColor: data.map(m => MODE_META[m.mode_key]?.color || '#667eea'), borderWidth: 2, borderColor: '#1a1a2e' }]
+  }, options: { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'right', labels: { color: '#e2e8f0', font: { size: 11 }, padding: 12 } },
+      tooltip: { callbacks: { label: (c) => {
+        const total = values.reduce((a,b) => a+b, 0) || 1;
+        return ` ${c.label}: ${c.raw} (${Math.round(c.raw/total*100)}%)`;
+      } } } } }
+  });
+}
+
+function renderGameModeOnlineChart(data) {
+  data = data || [];
+  const ctx = document.getElementById('gamemode-online-chart').getContext('2d');
+  if (gamemodeOnlineChart) gamemodeOnlineChart.destroy();
+  gamemodeOnlineChart = new Chart(ctx, { type: 'bar', data: {
+    labels: data.map(m => `${MODE_META[m.mode_key]?.icon || ''} ${MODE_META[m.mode_key]?.label || m.mode_key}`),
+    datasets: [{ label: 'กำลังเล่นอยู่', data: data.map(m => m.currently_playing || 0),
+      backgroundColor: data.map(m => MODE_META[m.mode_key]?.color || '#667eea'), borderRadius: 6, borderSkipped: false }]
+  }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { x: { ticks: { color: '#94a3b8', font: { size: 10 }, precision: 0 }, grid: { color: 'rgba(255,255,255,.04)' } },
+              y: { ticks: { color: '#e2e8f0', font: { size: 12 } }, grid: { display: false } } } }
+  });
+}
+
+function renderGameModeCards(data) {
+  data = data || [];
+  const wrap = document.getElementById('gamemode-card-grid');
+  if (!data.length) { wrap.innerHTML = '<div class="empty">ไม่มีข้อมูล</div>'; return; }
+
+  wrap.innerHTML = data.map(m => {
+    const meta = MODE_META[m.mode_key] || { label: m.mode_key, icon: '🎮', color: '#667eea' };
+    let rows = '';
+    let note = '';
+    if (m.mode_key === 'random') {
+      rows = `
+        <div class="r"><span>เล่นสะสม</span><strong>${fmt(m.random_total_played)}</strong></div>
+        <div class="r"><span>ผู้เล่นทั้งหมด</span><strong>${fmt(m.random_players)}</strong></div>
+        <div class="r"><span>สตรีคสูงสุด</span><strong>🔥 ${fmt(m.random_top_streak)}</strong></div>`;
+      note = 'ไม่มีคะแนนต่อเกม — วัดผลด้วย win streak เท่านั้น';
+    } else if (m.mode_key === 'book') {
+      rows = `
+        <div class="r"><span>เข้าเล่นวันนี้</span><strong>${fmt(m.views_today)} ครั้ง</strong></div>
+        <div class="r"><span>ผู้เล่น (สะสม)</span><strong>${fmt(m.active_sessions_total)}</strong></div>`;
+      note = 'ยังไม่มีข้อมูลคะแนน — ใช้ระบบบันทึกเดียวกับ Practice';
+    } else {
+      rows = `
+        <div class="r"><span>เกมวันนี้</span><strong>${fmt(m.games_today)}</strong></div>
+        <div class="r"><span>เกมเมื่อวาน</span><strong>${fmt(m.games_yesterday)}</strong></div>
+        <div class="r"><span>คะแนนเฉลี่ย</span><strong>${fmt(m.avg_score)}</strong></div>
+        <div class="r"><span>คะแนนสูงสุด</span><strong>${fmt(m.top_score)}</strong></div>`;
+      if (m.mode_key === 'practice') note = 'รวมเกมจาก Book Mode ด้วย (บันทึกร่วมกัน)';
+    }
+    return `
+      <div class="member-card" onclick="openGameModeDetail('${m.mode_key}')">
+        <div class="mode-card-icon" style="background:${meta.color}22;color:${meta.color}">${meta.icon}</div>
+        <div class="member-card-name">${meta.label}</div>
+        ${m.currently_playing > 0
+          ? `<span class="mode-card-live"><span class="dot"></span>${m.currently_playing} กำลังเล่น</span>`
+          : `<span style="font-size:11px;color:var(--muted)">ไม่มีคนเล่นตอนนี้</span>`}
+        <div class="mode-card-rows">${rows}</div>
+        ${note ? `<div class="mode-card-note">${note}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+async function openGameModeDetail(modeKey) {
+  document.getElementById('gamemode-overview-view').style.display = 'none';
+  document.getElementById('gamemode-detail').style.display = 'block';
+  document.getElementById('gamemode-detail-content').innerHTML = `
+    <div class="skeleton" style="height:100px;width:100%;border-radius:12px;margin-bottom:14px;"></div>
+    <div class="skeleton" style="height:300px;width:100%;border-radius:12px;"></div>`;
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  const players = await callRpcParam('get_admin_game_mode_players', { p_mode: modeKey }, session.access_token);
+  renderGameModeDetail(modeKey, players || []);
+}
+
+function renderGameModeDetail(modeKey, players) {
+  const meta = MODE_META[modeKey] || { label: modeKey, icon: '🎮', color: '#667eea' };
+  const overview = gamemodeOverviewData.find(m => m.mode_key === modeKey) || {};
+  const el = document.getElementById('gamemode-detail-content');
+
+  const header = `
+    <div class="detail-header">
+      <div class="mode-card-icon" style="width:64px;height:64px;font-size:30px;background:${meta.color}22;color:${meta.color}">${meta.icon}</div>
+      <div class="detail-info">
+        <h2>${meta.label}</h2>
+        <div class="detail-sub">${fmt(players.length)} ผู้เล่นในรายการ${modeKey === 'practice' ? ' (รวม Book Mode)' : ''}</div>
+      </div>
+    </div>`;
+
+  if (modeKey === 'daily' || modeKey === 'practice') {
+    const kpi = `
+      <div class="kpi-row">
+        <div class="kpi-mini"><div class="kv" style="color:var(--green)">${overview.currently_playing || 0}</div><div class="kl">🟢 กำลังเล่น</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.games_today)}</div><div class="kl">เกมวันนี้</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.games_yesterday)}</div><div class="kl">เกมเมื่อวาน</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.games_total)}</div><div class="kl">เกมทั้งหมด</div></div>
+        <div class="kpi-mini"><div class="kv" style="color:var(--yellow)">${fmt(overview.top_score)}</div><div class="kl">คะแนนสูงสุด</div></div>
+      </div>`;
+    const rows = players.map(p => `
+      <tr>
+        <td>${p.is_guest ? `<span style="color:var(--muted)">👻 ${escapeHtml(p.guest_display_id || 'Guest')}</span>` : `<strong>${escapeHtml(p.display_name)}</strong><div style="color:var(--muted);font-size:12px">@${escapeHtml(p.username || '—')}</div>`}</td>
+        <td style="text-align:center">${fmt(p.games_today)}</td>
+        <td style="text-align:center">${fmt(p.games_yesterday)}</td>
+        <td style="text-align:center;font-weight:700;color:var(--accent)">${fmt(p.games_total)}</td>
+        <td style="text-align:right">${fmt(p.avg_score)}</td>
+        <td style="text-align:right;color:var(--yellow)">${fmt(p.top_score)}</td>
+        <td style="text-align:right;color:var(--muted);font-size:12px">${p.last_played ? relativeTime(p.last_played) : '—'}</td>
+      </tr>`).join('');
+    el.innerHTML = header + kpi + `
+      <div class="table-card">
+        <div class="section-h">🕹️ ผู้เล่นทั้งหมด</div>
+        ${players.length ? `<div class="list-scroll" style="max-height:520px"><table><thead><tr>
+          <th>ผู้เล่น</th><th style="text-align:center">วันนี้</th><th style="text-align:center">เมื่อวาน</th>
+          <th style="text-align:center">ทั้งหมด</th><th style="text-align:right">คะแนนเฉลี่ย</th>
+          <th style="text-align:right">คะแนนสูงสุด</th><th style="text-align:right">เล่นล่าสุด</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>` : '<div class="empty">ยังไม่มีข้อมูล</div>'}
+      </div>`;
+
+  } else if (modeKey === 'random') {
+    const kpi = `
+      <div class="kpi-row">
+        <div class="kpi-mini"><div class="kv" style="color:var(--green)">${overview.currently_playing || 0}</div><div class="kl">🟢 กำลังเล่น</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.random_players)}</div><div class="kl">ผู้เล่นทั้งหมด</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.random_total_played)}</div><div class="kl">เล่นสะสม</div></div>
+        <div class="kpi-mini"><div class="kv" style="color:var(--yellow)">🔥 ${fmt(overview.random_top_streak)}</div><div class="kl">สตรีคสูงสุด</div></div>
+      </div>
+      <div style="color:var(--muted);font-size:12px;margin-bottom:14px">ℹ️ Random Mode ไม่มีคะแนนต่อเกม — วัดผลด้วย win streak เท่านั้น (แพ้ 1 เกม = streak รีเซ็ต) จึงไม่มีข้อมูล วันนี้/เมื่อวาน แยกเป็นรายวัน</div>`;
+    const rows = players.map(p => `
+      <tr>
+        <td><strong>${escapeHtml(p.display_name)}</strong><div style="color:var(--muted);font-size:12px">@${escapeHtml(p.username || '—')}</div></td>
+        <td style="text-align:center;font-weight:700;color:var(--accent)">${fmt(p.current_win_streak)}</td>
+        <td style="text-align:center;color:var(--yellow)">🔥 ${fmt(p.longest_win_streak)}</td>
+        <td style="text-align:center">${fmt(p.total_played)}</td>
+        <td style="text-align:right;color:var(--muted);font-size:12px">${p.last_played ? relativeTime(p.last_played) : '—'}</td>
+      </tr>`).join('');
+    el.innerHTML = header + kpi + `
+      <div class="table-card">
+        <div class="section-h">🎲 ผู้เล่นทั้งหมด (เรียงตาม Longest Streak)</div>
+        ${players.length ? `<div class="list-scroll" style="max-height:520px"><table><thead><tr>
+          <th>ผู้เล่น</th><th style="text-align:center">Streak ปัจจุบัน</th><th style="text-align:center">Streak สูงสุด</th>
+          <th style="text-align:center">เล่นสะสม</th><th style="text-align:right">เล่นล่าสุด</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>` : '<div class="empty">ยังไม่มีข้อมูล</div>'}
+      </div>`;
+
+  } else if (modeKey === 'time_attack') {
+    const kpi = `
+      <div class="kpi-row">
+        <div class="kpi-mini"><div class="kv" style="color:var(--green)">${overview.currently_playing || 0}</div><div class="kl">🟢 กำลังเล่น</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.games_today)}</div><div class="kl">เกมวันนี้</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.games_yesterday)}</div><div class="kl">เกมเมื่อวาน</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.games_total)}</div><div class="kl">เกมทั้งหมด</div></div>
+        <div class="kpi-mini"><div class="kv" style="color:var(--yellow)">${fmt(overview.top_score)}</div><div class="kl">คะแนนสูงสุด</div></div>
+      </div>`;
+    const rows = players.map(p => `
+      <tr>
+        <td><strong>${escapeHtml(p.display_name)}</strong><div style="color:var(--muted);font-size:12px">@${escapeHtml(p.username || '—')}</div></td>
+        <td style="text-align:center">${fmt(p.games_today)}</td>
+        <td style="text-align:center">${fmt(p.games_yesterday)}</td>
+        <td style="text-align:center;font-weight:700;color:var(--accent)">${fmt(p.games_total)}</td>
+        <td style="text-align:right">${fmt(p.avg_score)}</td>
+        <td style="text-align:right;color:var(--yellow)">${fmt(p.top_score)}</td>
+        <td style="text-align:right;color:var(--muted);font-size:12px">${p.last_played ? relativeTime(p.last_played) : '—'}</td>
+      </tr>`).join('');
+    el.innerHTML = header + kpi + `
+      <div class="table-card">
+        <div class="section-h">⏱️ ผู้เล่นทั้งหมด</div>
+        ${players.length ? `<div class="list-scroll" style="max-height:520px"><table><thead><tr>
+          <th>ผู้เล่น</th><th style="text-align:center">วันนี้</th><th style="text-align:center">เมื่อวาน</th>
+          <th style="text-align:center">ทั้งหมด</th><th style="text-align:right">คะแนนเฉลี่ย</th>
+          <th style="text-align:right">คะแนนสูงสุด</th><th style="text-align:right">เล่นล่าสุด</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>` : '<div class="empty">ยังไม่มีข้อมูล — โหมดนี้เพิ่งเปิดตัว</div>'}
+      </div>`;
+
+  } else if (modeKey === 'book') {
+    const kpi = `
+      <div class="kpi-row">
+        <div class="kpi-mini"><div class="kv" style="color:var(--green)">${overview.currently_playing || 0}</div><div class="kl">🟢 กำลังเล่น</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.views_today)}</div><div class="kl">เข้าเล่นวันนี้</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.views_yesterday)}</div><div class="kl">เข้าเล่นเมื่อวาน</div></div>
+        <div class="kpi-mini"><div class="kv">${fmt(overview.views_total)}</div><div class="kl">เข้าเล่นทั้งหมด</div></div>
+      </div>
+      <div style="color:var(--muted);font-size:12px;margin-bottom:14px">ℹ️ Book Mode บันทึกผลเกมด้วยระบบเดียวกับ Practice (ไม่มีฟิลด์แยกในฐานข้อมูล) จึงยังไม่มีข้อมูลคะแนน — รายการด้านล่างนับจาก "จำนวนครั้งที่เปิดหน้า Book Mode" แทน</div>`;
+    const rows = players.map(p => `
+      <tr>
+        <td>${p.user_id ? `<strong>${escapeHtml(p.display_name)}</strong><div style="color:var(--muted);font-size:12px">@${escapeHtml(p.username || '—')}</div>` : `<span style="color:var(--muted)">👻 Guest ${escapeHtml(String(p.session_id).slice(0,8))}</span>`}</td>
+        <td style="text-align:center">${fmt(p.visits_today)}</td>
+        <td style="text-align:center">${fmt(p.visits_yesterday)}</td>
+        <td style="text-align:center;font-weight:700;color:var(--accent)">${fmt(p.visits_total)}</td>
+        <td style="text-align:right;color:var(--muted);font-size:12px">${p.last_seen ? relativeTime(p.last_seen) : '—'}</td>
+      </tr>`).join('');
+    el.innerHTML = header + kpi + `
+      <div class="table-card">
+        <div class="section-h">📖 ผู้เข้าเล่นทั้งหมด</div>
+        ${players.length ? `<div class="list-scroll" style="max-height:520px"><table><thead><tr>
+          <th>ผู้เล่น</th><th style="text-align:center">วันนี้</th><th style="text-align:center">เมื่อวาน</th>
+          <th style="text-align:center">ทั้งหมด</th><th style="text-align:right">เข้าล่าสุด</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>` : '<div class="empty">ยังไม่มีข้อมูล</div>'}
+      </div>`;
+  }
 }
 
 // ── Shop Analytics Renders ─────────────────────────────────────────────
@@ -1558,10 +1845,12 @@ function switchTab(tab) {
   document.getElementById('btn-tab-analytics').classList.toggle('active',    tab === 'analytics');
   document.getElementById('btn-tab-members').classList.toggle('active',      tab === 'members');
   document.getElementById('btn-tab-leaderboard').classList.toggle('active',  tab === 'leaderboard');
+  document.getElementById('btn-tab-gamemode').classList.toggle('active',     tab === 'gamemode');
   document.getElementById('btn-tab-logs').classList.toggle('active',         tab === 'logs');
   document.getElementById('panel-analytics').style.display    = tab === 'analytics'    ? 'block' : 'none';
   document.getElementById('panel-members').style.display      = tab === 'members'      ? 'block' : 'none';
   document.getElementById('panel-leaderboard').style.display  = tab === 'leaderboard'  ? 'block' : 'none';
+  document.getElementById('panel-gamemode').style.display     = tab === 'gamemode'     ? 'block' : 'none';
   document.getElementById('panel-logs').style.display         = tab === 'logs'         ? 'block' : 'none';
 
   loadData();
@@ -1589,6 +1878,13 @@ async function loadData() {
 
   if (currentTab === 'members') {
     await loadMembersData();
+    const now = new Date();
+    setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
+    return;
+  }
+
+  if (currentTab === 'gamemode') {
+    await loadGameModeOverview();
     const now = new Date();
     setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
     return;
@@ -1657,7 +1953,14 @@ async function boot() {
     // Wire tabs
     document.getElementById('btn-tab-analytics').onclick = () => switchTab('analytics');
     document.getElementById('btn-tab-members').onclick   = () => switchTab('members');
+    document.getElementById('btn-tab-gamemode').onclick  = () => switchTab('gamemode');
     document.getElementById('btn-tab-logs').onclick      = () => switchTab('logs');
+
+    // Game Mode: back button
+    document.getElementById('gamemode-detail-back-btn').onclick = () => {
+      document.getElementById('gamemode-detail').style.display = 'none';
+      document.getElementById('gamemode-overview-view').style.display = '';
+    };
 
     // Members: view toggle
     document.getElementById('view-btn-card').onclick = () => {
