@@ -48,7 +48,14 @@ function applySfxGain(): void {
 }
 
 function applyBgVolume(): void {
-  if (bgAudio) bgAudio.volume = _muted ? 0 : _bgVol;
+  if (!bgAudio) return;
+  // iOS refuses to set .volume at all (it is read-only there and always reads
+  // back 1), so turning the track down is a no-op on iPhone and the music kept
+  // playing at full blast after tapping mute. Pause it instead, and set .muted
+  // which iOS does honour. setMuted(false) resumes via playBgMusic().
+  bgAudio.muted = _muted;
+  bgAudio.volume = _muted ? 0 : _bgVol;
+  if (_muted) bgAudio.pause();
 }
 
 // ── helpers ────────────────────────────────────────────────────────
@@ -158,6 +165,7 @@ function ensureBgAudio(): HTMLAudioElement | null {
     bgAudio = new Audio(BG_URL);
     bgAudio.loop = true;
     bgAudio.preload = 'auto';
+    bgAudio.muted = _muted;
     bgAudio.volume = _muted ? 0 : _bgVol;
   } catch {
     return null;
@@ -174,6 +182,7 @@ export async function playBgMusic(): Promise<void> {
   if (_muted || _bgVol <= 0) return;
   const el = ensureBgAudio();
   if (!el) return;
+  el.muted = false; // cleared here because applyBgVolume() sets it on mute
   el.volume = _bgVol;
   try {
     await el.play();
