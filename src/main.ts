@@ -817,7 +817,7 @@ async function handleTimeAttackWin(result: GameResult, tier: TimeAttackTier, tic
       maybeShowLevelUp(prevLevel, prog.level ?? prevLevel);
     }
     const wallet = await api.getWallet();
-    if (wallet) useStore.setState({ coins: Number(wallet.balance ?? 0) });
+    if (wallet) useStore.setState({ coins: Number(wallet.coins ?? 0) });
   } catch (err) {
     // The run still happened — show it, but don't claim a rank it didn't get.
     toast(`Run not counted: ${(err as Error).message}`);

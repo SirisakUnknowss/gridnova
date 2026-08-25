@@ -200,13 +200,24 @@ export async function getMyTimeAttackBest(tier: string) {
   return rows[0] ?? null;
 }
 
-export async function getWallet() {
+export interface Wallet {
+  user_id: string;
+  coins: number;
+  total_earned: number;
+  total_spent: number;
+  updated_at: string;
+}
+
+// Typed on purpose: while this returned an untyped row, main.ts read a
+// `balance` field that user_wallet has never had, and `Number(undefined ?? 0)`
+// silently zeroed the player's coin display after a Time Attack run.
+export async function getWallet(): Promise<Wallet | null> {
   const { data, error } = await supabase
     .from('user_wallet')
     .select('*')
     .maybeSingle();
   if (error) throw error;
-  return data;
+  return data as Wallet | null;
 }
 
 export async function getProgression() {
