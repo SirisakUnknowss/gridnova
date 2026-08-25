@@ -792,6 +792,7 @@ async function handleWin(result: GameResult, date?: string) {
 async function handleTimeAttackWin(result: GameResult, tier: TimeAttackTier, ticketId: string) {
   const hideLoading = showLoadingOverlay('Submitting your run...');
   let rank: number | null = null;
+  let totalPlayers: number | null = null;
   let coins = 0;
   let xp = 0;
   let score = result.score;
@@ -805,6 +806,7 @@ async function handleTimeAttackWin(result: GameResult, tier: TimeAttackTier, tic
       moves: result.moves as Array<{ r: number; c: number; n: number; t: number; isHint?: boolean }>,
     });
     rank = res.rank;
+    totalPlayers = res.total_players;
     coins = res.coins;
     xp = res.xp;
     score = res.score;
@@ -826,6 +828,7 @@ async function handleTimeAttackWin(result: GameResult, tier: TimeAttackTier, tic
   showWinModal({
     result: { ...result, score },
     rank: rank ?? undefined,
+    totalPlayers: totalPlayers ?? undefined,
     coinsEarned: coins,
     xpEarned: xp,
     isGuest: false,

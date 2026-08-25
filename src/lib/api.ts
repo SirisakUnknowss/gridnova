@@ -182,7 +182,8 @@ export async function submitTimeAttackScore(payload: {
   if (data?.error) throw new Error(data.error.code ?? 'SUBMIT_FAILED');
   return data as {
     score: number; seconds_left: number; mistakes: number;
-    hints_used: number; rank: number | null; coins: number; xp: number;
+    hints_used: number; rank: number | null; total_players: number | null;
+    coins: number; xp: number;
   };
 }
 

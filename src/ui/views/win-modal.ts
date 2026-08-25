@@ -123,7 +123,7 @@ export function showWinModal(props: WinModalProps): void {
         </div>
       </div>
 
-      ${rank ? `<p style="font-size:14px;margin-bottom:8px;">${ic.trophy(14)} Rank #${rank} / ${totalPlayers}</p>` : ''}
+      ${rank ? `<p style="font-size:14px;margin-bottom:8px;">${ic.trophy(14)} Rank #${rank}${totalPlayers ? ` / ${totalPlayers}` : ''}</p>` : ''}
       ${isPersonalBest ? `<p style="color:var(--brand-primary);font-weight:600;">${ic.trophy(14)} New Personal Best!</p>` : ''}
 
       <p style="margin:12px 0;font-size:14px;">
