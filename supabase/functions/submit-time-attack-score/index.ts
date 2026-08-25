@@ -176,12 +176,18 @@ Deno.serve(async (req) => {
     ? (rankRow.find((r: { user_id: string }) => r.user_id === user.id)?.rank ?? null)
     : null;
 
+  // Not rankRow.length — that is capped by p_limit above, so past 500 players
+  // the denominator would silently freeze.
+  const { data: playerCount } = await supabaseAdmin
+    .rpc('get_time_attack_player_count', { p_tier: ticket.tier });
+
   return respond(200, {
     score,
     seconds_left: secondsLeft,
     mistakes: mistakeCount,
     hints_used: hintCount,
     rank: myRank,
+    total_players: typeof playerCount === 'number' ? playerCount : null,
     coins: coinReward,
     xp: xpReward,
   });

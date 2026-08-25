@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.10.2 — 2026-08-25
+
+### Fixed
+- **Sound (iOS)**: กดปิดเสียงแล้วเพลงพื้นหลังไม่หยุดบน iPhone — `applyBgVolume()` ปิดเสียงด้วยการตั้ง `volume = 0` แต่ Apple ระบุว่าบน iOS คุณสมบัตินี้ตั้งค่าไม่ได้ (เป็น read-only และอ่านค่าได้ 1 เสมอ เพราะบังคับให้ระดับเสียงอยู่ใต้ปุ่มเสียงจริงของเครื่อง) คำสั่งจึงไม่มีผลเลยและเพลงดังต่อ · เปลี่ยนเป็น `pause()` + `muted = true` ซึ่ง iOS รองรับ · บน desktop เดิมทำงานถูกอยู่แล้ว บั๊กนี้จึงมองไม่เห็นถ้าไม่ทดสอบบนมือถือ · SFX ไม่เคยได้รับผลกระทบเพราะใช้ Web Audio `masterGain`
+- **Wallet**: เล่น Time Attack จบแล้วหน้า profile ขึ้นเหรียญ 0 — `handleTimeAttackWin` อ่าน `wallet.balance` แต่ตาราง `user_wallet` ไม่มีคอลัมน์นี้ (มี `coins`) `Number(undefined ?? 0)` จึงกลายเป็น 0 · เป็นบั๊กแสดงผลอย่างเดียว ข้อมูลใน DB ไม่กระทบ · แก้ต้นเหตุด้วยการใส่ type ให้ `getWallet()` ซึ่งเดิมคืนค่าแบบไม่มี type ทำให้ TypeScript ไม่จับฟิลด์ที่ไม่มีอยู่จริง
+- **Time Attack**: popup หลังเล่นจบขึ้น "Rank #2 / undefined" — `win-modal` ตรวจแค่ `rank` ไม่ได้ตรวจ `totalPlayers` และ `submit-time-attack-score` ก็ไม่เคยคืนตัวหารมาให้ · เพิ่ม RPC `get_time_attack_player_count` ที่นับ `DISTINCT user_id` (นับ row ไม่ได้ เพราะ `time_attack_leaderboard` เก็บทุกรอบที่เล่น — ข้อมูลจริงมี tier ที่มี 3 row จากผู้เล่นคนเดียว)
+- **Share**: ลิงก์ในข้อความแชร์เป็น `gridnova.pages.dev` เฉย ๆ ซึ่ง LINE/Facebook ไม่ได้ทำเป็นลิงก์ให้เสมอไป กดไม่ได้ · เปลี่ยนเป็น `https://gridnova.pages.dev/` และดึงมาจาก `SITE_URL` ที่เดียว แก้ทั้ง Weekly Recap และ popup หลังจบเกม (เป็นปัญหาเดียวกันทั้งคู่)
+
+### Changed
+- **Game**: เพิ่มระยะห่างระหว่างแถวปุ่มช่วยเหลือกับแป้นตัวเลขเป็น 2 เท่า (8px → 16px)
+- **Docs**: อัปเดต `CLAUDE.md` — Time Attack กับ Random Mode ย้ายจาก "Planned" มาเป็น "Currently Live" (ขึ้นจริงไปแล้วแต่เอกสารยังไม่ตาม), เพิ่มตาราง tier, ตาราง DB ที่ขาด, RPC/Edge Function ใหม่ และหมายเหตุเรื่อง Pages Functions quota กับ PWA precache
+
 ## 1.10.1 — 2026-08-25
 
 ### Fixed

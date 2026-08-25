@@ -4,6 +4,7 @@
 import type { GameResult } from './game';
 import { formatTime } from '@lib/format';
 import { ic } from '@ui/icons';
+import { SITE_URL } from '@lib/share/text-result';
 
 export interface WinModalProps {
   result: GameResult;
@@ -123,7 +124,7 @@ export function showWinModal(props: WinModalProps): void {
         </div>
       </div>
 
-      ${rank ? `<p style="font-size:14px;margin-bottom:8px;">${ic.trophy(14)} Rank #${rank} / ${totalPlayers}</p>` : ''}
+      ${rank ? `<p style="font-size:14px;margin-bottom:8px;">${ic.trophy(14)} Rank #${rank}${totalPlayers ? ` / ${totalPlayers}` : ''}</p>` : ''}
       ${isPersonalBest ? `<p style="color:var(--brand-primary);font-weight:600;">${ic.trophy(14)} New Personal Best!</p>` : ''}
 
       <p style="margin:12px 0;font-size:14px;">
@@ -173,7 +174,7 @@ export function buildShareText(result: GameResult, date?: string, rank?: number,
   if (rank && total) lines.push(`🏆 Rank #${rank} / ${total}`);
   lines.push(`Score: ${result.score.toLocaleString()}`);
   lines.push('');
-  lines.push('Play: gridnova.pages.dev');
+  lines.push(`Play: ${SITE_URL}`);
   return lines.join('\n');
 }
 

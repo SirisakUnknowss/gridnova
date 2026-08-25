@@ -140,12 +140,31 @@ Default / fallback: `theme_classic` (blue-purple gradient `#667eea → #764ba2`)
 |---|---|
 | **Daily** | One puzzle per day (server-generated). Shared globally. Leaderboard ranks by score. No coin hints allowed. |
 | **Practice** | Free play. Any difficulty. 3 free hints per game + up to 3 paid hints (50 / 75 / 100 coins). |
+| **Random** | One tap, random difficulty. Tracks a win streak — losing one game resets it, which is the whole point of the mode. No coin continues. |
+| **Time Attack** | Solve against a countdown. Three tiers, each a fixed time + difficulty. Own leaderboard per tier. |
+
+### Time Attack tiers
+Defined in `TIME_ATTACK_TIERS` (`src/engine/scoring.ts`) — the single source of truth:
+
+| Tier | Time | Difficulty |
+|---|---|---|
+| `sprint` | 180s | easy |
+| `rush` | 300s | medium |
+| `marathon` | 600s | hard |
+
+Scoring is inverted from the other modes: it rewards seconds **left** on the
+clock rather than penalising time spent. Same measurement, but players are
+racing a visible countdown so the number has to move with them.
+
+A run needs a ticket: `start-time-attack` issues one, `submit-time-attack-score`
+validates the run against it. Rank comes from `get_time_attack_leaderboard`,
+which collapses multiple runs per player with `DISTINCT ON (user_id)` — so any
+player count must be `COUNT(DISTINCT user_id)`, never a row count.
 
 ### Difficulty Levels (practice)
 `easy` · `easy-medium` · `medium` · `medium-hard` · `hard` · `hard-expert` · `expert`
 
 ### Planned Modes (do not build yet — design TBD)
-- **Time Attack** — solve as many puzzles as possible before timer expires
 - **Challenge** — special curated puzzles with extra rules or constraints
 - **Season** — seasonal event mode (bottom nav tab exists as "coming soon")
 
@@ -249,6 +268,13 @@ currentView: View
 | `user_achievements` | Unlocked achievements per user |
 | `push_tokens` | FCM push notification tokens |
 | `flagged_submissions` | Anti-cheat flagged scores |
+| `time_attack_tickets` | Issued run tickets — a Time Attack score is only accepted against one |
+| `time_attack_leaderboard` | Every Time Attack run (not one row per player — see the mode notes) |
+| `random_mode_stats` | Random Mode win streaks |
+| `guest_game_history` | Games finished before signup, claimed on account creation |
+| `visitor_sessions` | One row per session per day + where it came from (referrer/UTM/click-id/in-app browser) |
+| `session_views` | Which views a session visited — powers the admin funnel |
+| `feedbacks` | In-app rating + comment |
 
 **Key RPCs (Postgres functions)**
 - `spend_coins(p_user_id, p_amount, p_reason, p_metadata)` → returns `{ ok, balance, reason }`
@@ -256,6 +282,10 @@ currentView: View
 - `migrate_guest_scores(...)` — migrates guest submissions after login
 - `get_visitor_stats()` — admin: visitor/online counts
 - `get_or_create_streak(...)` — streak upsert
+- `get_time_attack_leaderboard(p_tier, p_limit)` — best run per player, ranked
+- `get_time_attack_player_count(p_tier)` — `COUNT(DISTINCT user_id)` for a tier
+- `record_visit_attribution(...)` — first-write-wins; a session keeps the origin it arrived with
+- `visitor_source(utm_source, click_id_kind, referrer_host, app_hint)` — one definition of "source" shared by the admin panel and ad-hoc queries
 
 **Edge Functions** (`supabase/functions/`)
 - `submit-daily-score` — validates + saves daily puzzle result
@@ -267,6 +297,9 @@ currentView: View
 - `generate-daily-puzzle` — cron: generates tomorrow's puzzle
 - `send-push-reminders` — cron: sends daily push notifications
 - `admin-actions` — admin-only operations
+- `start-time-attack` — issues a run ticket
+- `submit-time-attack-score` — validates a run against its ticket, awards coins/XP, returns rank
+- `claim-weekly-quest-reward` — weekly quest payout
 
 **Migration rules**: migrations are append-only. Never edit existing `.sql` files.
 New changes → new file with timestamp prefix `YYYYMMDDHHMMSS_description.sql`.
@@ -311,6 +344,21 @@ Canvas-based share images generated client-side. See `src/lib/share/`:
 - `src/sw.ts` — custom SW with `skipWaiting()` on install + `clients.claim()` on activate.
 - Version is in `package.json` → bump to force cache invalidation.
 - Built via `vite-plugin-pwa`. Workbox handles precaching.
+- **Every precached entry costs a request on each new visitor's first load, and
+  each one invokes the Pages Function** (see below). Keep `globIgnores` in
+  `vite.config.ts` tight — `admin/**` is excluded because players were
+  downloading the admin panel and its chart library for a page they never open.
+
+## Cloudflare Pages Functions
+
+`functions/_middleware.js` gates staging behind a login. It runs on **every
+request Cloudflare routes to the Function, production included** — the
+`if (!isStaging) return next()` early-exit happens after the invocation is
+already billed. `public/_routes.json` excludes static assets so only HTML
+navigations reach it. Without that file the free tier's 100k requests/day was
+exhausted in a single day (2026-08-23). If you add a route that must stay
+public or cheap, add it to the `exclude` list — and match the path browsers
+actually request (the Search Console file is fetched without its `.html`).
 
 ---
 
@@ -318,7 +366,6 @@ Canvas-based share images generated client-side. See `src/lib/share/`:
 
 - **Season system** — season pass, seasonal rewards, event puzzles. Season tab is
   already in bottom nav as placeholder.
-- **Time Attack mode** — rapid puzzle solving against a countdown.
 - **Challenge mode** — curated special puzzles.
 - **Social features** — friend list, challenge friends, compare streaks.
 - **Premium subscription** — via RevenueCat (code exists in `src/lib/purchases.ts` and
