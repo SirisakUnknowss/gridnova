@@ -795,6 +795,17 @@ function renderTable(data) {
     </tr>`).join('')}</tbody></table>`;
 }
 
+const ONLINE_MODE_LABELS = {
+  game_daily: '🗓️ Daily',
+  game_practice: '🎯 Practice',
+  game_random: '🎲 Random',
+  game_time_attack: '⏱️ Time Attack',
+  game_book: '📖 Book',
+};
+function modeLabelFor(view) {
+  return ONLINE_MODE_LABELS[view] || '<span style="color:var(--muted)">In menu</span>';
+}
+
 function renderOnlineList(data) {
   data = data || [];
   const wrap = document.getElementById('online-list-wrap');
@@ -808,17 +819,19 @@ function renderOnlineList(data) {
       <tr>
         <td><span class="online-dot member"></span><strong>${r.display_name || r.username || 'Member'}</strong></td>
         <td style="color:var(--muted);font-size:13px">@${r.username || '—'}</td>
+        <td style="font-size:13px">${modeLabelFor(r.current_view)}</td>
         <td style="text-align:right"><span class="badge-online">✉️ Member</span></td>
       </tr>`),
-    ...guests.map((_,i) => `
+    ...guests.map((r,i) => `
       <tr>
         <td><span class="online-dot guest"></span><span style="color:var(--muted)">Guest ${i+1}</span></td>
         <td style="color:var(--muted);font-size:13px">—</td>
+        <td style="font-size:13px">${modeLabelFor(r.current_view)}</td>
         <td style="text-align:right"><span style="color:var(--muted);font-size:12px">👻 Guest</span></td>
       </tr>`),
   ].join('');
   wrap.innerHTML = `<table><thead><tr>
-    <th>Name</th><th>Username</th><th style="text-align:right">Type</th>
+    <th>Name</th><th>Username</th><th>Mode</th><th style="text-align:right">Type</th>
   </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
