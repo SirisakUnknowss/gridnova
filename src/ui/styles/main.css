@@ -590,8 +590,9 @@ h3 {
 
 .cell.given {
   /* Bolder than .cell.user (400) on player request — givens and user entries
-     were distinguished only by cell background, not by the digit itself. */
-  font-weight: 700;
+     were distinguished only by cell background, not by the digit itself.
+     700 read as too heavy; 500 keeps the distinction without it. */
+  font-weight: 500;
   color: var(--cell-text);
   background: var(--board-cell-given, var(--cell-bg-given));
 }
