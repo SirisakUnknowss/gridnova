@@ -230,7 +230,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         </div>
 
         <div class="board-wrap">
-          <div id="board" class="board"></div>
+          <div class="board-coords">
+            <div class="board-col-labels">${Array.from({ length: 9 }, (_, i) => `<span>${String.fromCharCode(65 + i)}</span>`).join('')}</div>
+            <div class="board-row-labels">${Array.from({ length: 9 }, (_, i) => `<span>${i + 1}</span>`).join('')}</div>
+            <div id="board" class="board"></div>
+          </div>
           <div class="board-overlay" id="board-overlay">
             <div class="board-menu">
               <button class="board-menu-btn board-menu-btn--resume" id="overlay-resume">Resume</button>

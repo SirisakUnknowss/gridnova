@@ -5,6 +5,7 @@
 import { RELEASES } from '@lib/releases';
 import { APP_VERSION } from '@lib/version';
 import { escapeHtml } from '@lib/format';
+import { ic } from '@ui/icons';
 
 const SEEN_KEY = 'sudoku_whatsnew_seen_v1';
 
@@ -12,13 +13,18 @@ export function showWhatsNew(): void {
   const existing = document.getElementById('whatsnew-root');
   if (existing) existing.remove();
 
+  // Collapsed to just the version badge by default — only the release that
+  // prompted this popup (the newest one) opens automatically. With 7+
+  // releases in RELEASES, showing every changelog expanded made this a very
+  // long scroll for one "here's what changed" popup.
   const body = RELEASES.map((r, i) => `
-    <div class="whatsnew-release${i === 0 ? ' latest' : ''}">
-      <div class="whatsnew-ver">
+    <div class="whatsnew-release${i === 0 ? ' latest is-open' : ''}" data-release>
+      <button type="button" class="whatsnew-ver" data-release-toggle aria-expanded="${i === 0}">
         <span class="whatsnew-badge">v${escapeHtml(r.version)}</span>
         <span class="whatsnew-title">${escapeHtml(r.title)}</span>
-      </div>
-      <ul class="whatsnew-list">
+        <span class="whatsnew-chevron">${ic.chevronRight(14)}</span>
+      </button>
+      <ul class="whatsnew-list"${i === 0 ? '' : ' hidden'}>
         ${r.changes.map((c) => `<li><span class="whatsnew-ico">${c.icon}</span><span>${escapeHtml(c.text)}</span></li>`).join('')}
       </ul>
     </div>
@@ -38,6 +44,17 @@ export function showWhatsNew(): void {
     </div>
   `;
   document.body.appendChild(wrapper);
+
+  wrapper.querySelectorAll<HTMLButtonElement>('[data-release-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const release = btn.closest('[data-release]');
+      const list = release?.querySelector('.whatsnew-list');
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!open));
+      list?.toggleAttribute('hidden', open);
+      release?.classList.toggle('is-open', !open);
+    });
+  });
 
   const close = () => {
     markWhatsNewSeen();

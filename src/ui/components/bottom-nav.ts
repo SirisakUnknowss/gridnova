@@ -44,10 +44,18 @@ export function bottomNavHTML(active: NavTab): string {
   `;
 }
 
-export function wireBottomNav(root: ParentNode, cb: BottomNavCallbacks, active: NavTab): void {
+// `_active` is unused here (highlighting is bottomNavHTML's job) but kept in
+// the signature so every call site still reads `wireBottomNav(root, nav,
+// 'home')` right under its matching `bottomNavHTML('home')` — that pairing
+// is the whole point of "single source of truth" for this component.
+export function wireBottomNav(root: ParentNode, cb: BottomNavCallbacks, _active: NavTab): void {
   root.querySelectorAll<HTMLButtonElement>('[data-nav-tab]').forEach((btn) => {
     const tab = btn.dataset.navTab as NavTab;
-    if (tab === active || btn.disabled) return;
+    if (btn.disabled) return;
+    // Always wire, even for the tab marked `active`: most callers pass
+    // 'home'/'profile' just to highlight the right icon from a sub-page
+    // (Play Mode, Shop, Settings, ...) that isn't literally that screen, so
+    // skipping the tap there left Home/Profile dead on most of the app.
     btn.addEventListener('click', () => {
       sfxNav();
       if (tab === 'home') cb.onHome();
