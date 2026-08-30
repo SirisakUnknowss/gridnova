@@ -557,8 +557,53 @@ h3 {
   margin-bottom: 8px;
 }
 
+/* ===== Board coordinates (column letters A-I, row numbers 1-9) =====
+   #board keeps its own aspect-ratio:1 untouched — this wrapper only adds two
+   thin label strips outside it. The label row/column is a fixed pixel size,
+   so the row that holds #board is `auto`: its height is derived from
+   #board's own aspect-ratio (definite width in, square height out), the same
+   mechanism .board relied on by itself before this wrapper existed. */
+.board-coords {
+  width: 100%;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  grid-template-rows: 16px auto;
+  gap: 3px;
+}
+
+.board-col-labels,
+.board-row-labels {
+  display: grid;
+  color: var(--app-text-secondary);
+  user-select: none;
+}
+
+.board-col-labels {
+  grid-column: 2;
+  grid-row: 1;
+  grid-template-columns: repeat(9, 1fr);
+}
+
+.board-row-labels {
+  grid-column: 1;
+  grid-row: 2;
+  grid-template-rows: repeat(9, 1fr);
+}
+
+.board-col-labels span,
+.board-row-labels span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(10px, 2.4vw, 13px);
+  font-weight: 600;
+}
+
 /* ===== Board ===== */
 .board {
+  grid-column: 2;
+  grid-row: 2;
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
