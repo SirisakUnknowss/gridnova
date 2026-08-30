@@ -4836,7 +4836,36 @@ body.bg-anim-aurora {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.whatsnew-release.is-open .whatsnew-ver {
   margin-bottom: 8px;
+}
+
+.whatsnew-chevron {
+  display: flex;
+  margin-left: auto;
+  color: var(--app-text-secondary);
+  transition: transform var(--duration-base) var(--ease-default);
+  flex-shrink: 0;
+}
+
+.whatsnew-release.is-open .whatsnew-chevron {
+  transform: rotate(90deg);
+}
+
+/* .whatsnew-list sets display:flex unconditionally, which otherwise beats
+   the UA stylesheet's [hidden] rule (author styles always win on equal
+   specificity) and the collapsed items would stay visible. */
+.whatsnew-list[hidden] {
+  display: none;
 }
 
 .whatsnew-badge {
