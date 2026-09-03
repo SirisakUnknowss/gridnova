@@ -24,8 +24,8 @@ const BASE_SCORE: Record<string, number> = {
 };
 
 const PRACTICE_COINS: Record<string, number> = {
-  'easy': 5, 'easy-medium': 8, 'medium': 10,
-  'medium-hard': 15, 'hard': 20, 'hard-expert': 28, 'expert': 35
+  'easy': 2, 'easy-medium': 4, 'medium': 5,
+  'medium-hard': 7, 'hard': 10, 'hard-expert': 14, 'expert': 17
 };
 
 const PRACTICE_XP: Record<string, number> = {

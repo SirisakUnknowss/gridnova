@@ -4,12 +4,12 @@
 // as "XP earned within the current level" (it resets/subtracts on each
 // level-up), NOT a lifetime cumulative total. Any formula here must stay
 // in sync with supabase/migrations/*_flatten_level_curve.sql.
-//   xpForLevel(L) = floor(60 * L^1.2) — XP needed to clear level L
-//   (cumulative L1->L100 ≈ 677K, vs ≈6.0M under the old 100*L^1.6 curve)
+//   xpForLevel(L) = floor(100 * L^1.5) — XP needed to clear level L
+//   (cumulative L1->L100 ≈ 4.0M)
 // =====================================================================
 
 export function xpForLevel(level: number): number {
-  return Math.floor(60 * Math.pow(Math.max(1, level), 1.2));
+  return Math.floor(100 * Math.pow(Math.max(1, level), 1.5));
 }
 
 /**
