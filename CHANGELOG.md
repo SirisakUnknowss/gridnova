@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.11.0 — 2026-09-03
+
+### Added
+- **Hearts (global energy)**: ระบบหัวใจ global ผูกกับ account (0–5) เป็น coin sink ตัวใหม่ — กด start โหมด Daily/Random/Time Attack เสีย 1 ดวง ชนะได้คืน (แพ้/game over/ออกกลางคัน = เสียถาวร), Practice/Book ไม่คิด · หมดหัวใจ = เริ่มเกม gated ไม่ได้จนกว่าจะ regen/login/ซื้อ infinite · **คนละระบบกับ 3 mistakes ในเกม** (`mistakes`/`livesLost`) ซึ่งไม่เปลี่ยน
+  - **Regen แยกตามชนิด account** (อ่าน `auth.users.is_anonymous`): member +1 ดวง/30 นาที เพดาน 5; guest ไม่ regen ตามเวลา แต่ reset เต็มทุกเที่ยงคืน UTC
+  - **Guest ไม่มี auth session** (แอปตั้งใจไม่ `signInAnonymously` ตอน boot — จะ strip Bearer token) → หัวใจ guest เก็บใน `localStorage` (`gn_guest_hearts_v1`) ไม่ใช่ server · หมดแล้วต้อง login เพื่อเล่นต่อ (กระตุ้นสมัคร) · สมัครสำเร็จเรียก `refill_hearts_full` เติมเต็มทันที
+  - **Infinite Hearts buff**: ซื้อด้วย coin รายชั่วโมง 1/2/3/5 ชม. = 800/1,400/1,900/2,800 · ช่วงบัฟ start ไม่กินหัวใจ · ซื้อซ้ำ = เวลาบวกทบ · member เท่านั้น (guest ไม่มี wallet ฝั่ง server)
+  - **Server-authoritative ทั้งหมด**: ตาราง `user_hearts` (RLS อ่านเฉพาะของตัวเอง, เขียนผ่าน SECURITY DEFINER RPC เท่านั้น) + RPC `get_hearts` / `consume_heart` / `refund_heart` / `buy_infinite_hearts` / `refill_hearts_full` · `_refresh_hearts` lock `FOR UPDATE` กันกด start รัวสองทีแล้วหักซ้อน · client ไม่คำนวณยอดเอง กัน cheat นาฬิกา/ยอด
+  - UI: pill หัวใจใน home header (แตะเปิด modal ซื้อ/สถานะ + countdown regen/บัฟสด), modal "Out of hearts" ตอนถูกบล็อก (guest เห็นปุ่ม login, member เห็นปุ่มซื้อ)
+
 ## 1.10.3 — 2026-08-30
 
 ### Fixed

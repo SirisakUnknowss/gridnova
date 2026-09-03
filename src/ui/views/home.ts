@@ -14,6 +14,7 @@ import { dailyNumber } from '@lib/share/text-result';
 import { listGames, type GameInProgress } from '@lib/local-db';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
+import { heartsPillHTML, wireHeartsPill, refreshHearts } from '../components/hearts';
 
 export interface HomeViewProps {
   onEnterPlayMode: () => void;
@@ -79,6 +80,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
           </div>
         </button>
         <div class="home-header-right">
+          ${heartsPillHTML()}
           <span class="stat-pill">${ic.streak(13)} ${state.currentStreak}</span>
           <span class="stat-pill">${ic.coin(13)} ${formatNumber(state.coins)}</span>
           <button class="home-icon-btn" id="mute-btn" title="${muted ? 'Unmute' : 'Mute'}">
@@ -266,6 +268,8 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     playBtn.textContent = 'Continue';
   }).catch(() => { });
   wireBottomNav(root, props.nav, 'home');
+  const unwireHearts = wireHeartsPill(root);
+  void refreshHearts();
   root.querySelector('#user-badge')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#save-progress')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#mute-btn')?.addEventListener('click', (e) => {
@@ -275,5 +279,5 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     btn.title = nowMuted ? 'Unmute' : 'Mute';
   });
 
-  return { unmount() { window.clearInterval(countdownHandle); } };
+  return { unmount() { window.clearInterval(countdownHandle); unwireHearts(); } };
 }

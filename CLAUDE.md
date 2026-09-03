@@ -225,6 +225,38 @@ XP and coins are awarded after each completed game. Level is derived from cumula
 
 ---
 
+## Hearts System (global energy — NOT the in-game mistake counter)
+
+⚠️ **Naming collision:** the Continue System above calls the in-game 3-mistake
+counter "hearts" (`livesLost`). This section is a **different, account-wide**
+resource. In code the in-game one is `livesLost`/`mistakes` (game.ts); the
+global one lives in `src/lib/hearts.ts` + `user_hearts`. Don't conflate them.
+
+- **What it is**: a global energy pool (0–5) per account. Starting a **gated**
+  game costs 1 heart; **winning refunds it**, so only a loss / game-over / quit
+  actually spends one. Out of hearts → gated starts are blocked.
+- **Gated modes = every mode EXCEPT Practice**: Daily, Random, Time Attack cost
+  a heart on start. Practice and Book never do. The gate sits in the start
+  functions in `main.ts` (`playDaily`/`playRandom`/`playTimeAttack`) via
+  `consumeForStart`; **Daily *resume* does not re-charge** (only fresh starts).
+- **Regen differs by account type** (server reads `auth.users.is_anonymous`):
+  members +1 per 30 min capped at 5; guests get no time regen but reset to full
+  at **UTC midnight**.
+- **Guests have no auth session** (the app deliberately never `signInAnonymously`
+  at boot — it strips the Bearer token). So guest hearts live **client-side in
+  `localStorage`** (`gn_guest_hearts_v1`), not the DB. Members use the server.
+  Running out as a guest → prompt to sign in (the growth hook); signing up calls
+  `refill_hearts_full` to unblock immediately.
+- **Infinite Hearts buff**: bought with coins by the hour — 1/2/3/5h =
+  800/1,400/1,900/2,800. While active, starts don't spend a heart. Stacks
+  additively. Members only (guests have no server wallet). Buy by tapping the
+  hearts pill in the home header.
+- **Server-authoritative**: all mutation via SECURITY DEFINER RPCs; the client
+  never computes a balance. Prices live in the `buy_infinite_hearts` price map
+  (server) mirrored in `INFINITE_HEARTS_PRICES` for display only.
+
+---
+
 ## Zustand Store (`src/state/store.ts`)
 
 Key state fields:
@@ -271,6 +303,7 @@ currentView: View
 | `time_attack_tickets` | Issued run tickets — a Time Attack score is only accepted against one |
 | `time_attack_leaderboard` | Every Time Attack run (not one row per player — see the mode notes) |
 | `random_mode_stats` | Random Mode win streaks |
+| `user_hearts` | Global hearts (energy) per account + infinite-buff expiry — see Hearts System. Members only; guest hearts are client-side |
 | `guest_game_history` | Games finished before signup, claimed on account creation |
 | `visitor_sessions` | One row per session per day + where it came from (referrer/UTM/click-id/in-app browser) |
 | `session_views` | Which views a session visited — powers the admin funnel |
@@ -282,6 +315,9 @@ currentView: View
 - `migrate_guest_scores(...)` — migrates guest submissions after login
 - `get_visitor_stats()` — admin: visitor/online counts
 - `get_or_create_streak(...)` — streak upsert
+- `get_hearts()` / `consume_heart(p_mode)` / `refund_heart()` — hearts read / spend-on-start / refund-on-win
+- `buy_infinite_hearts(p_hours)` — coin-paid infinite-hearts buff (1/2/3/5h); server owns the price map
+- `refill_hearts_full()` — fill to 5 + restart clock (called after a guest upgrades to an account)
 - `get_time_attack_leaderboard(p_tier, p_limit)` — best run per player, ranked
 - `get_time_attack_player_count(p_tier)` — `COUNT(DISTINCT user_id)` for a tier
 - `record_visit_attribution(...)` — first-write-wins; a session keeps the origin it arrived with
