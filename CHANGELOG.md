@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.11.1 — 2026-09-05
+
+### Changed
+- เอา badge "Beta" ออกจาก Time Attack และ Book Mode ทั้งหมด — แถวใน Play Mode (`play-mode.ts`) + หัวหน้าของแต่ละโหมด (`time-attack.ts`, `practice.ts` ตอน `variant: 'book'`) · ลบ note "this mode is in beta — tell us from Settings → Contact Support" ในหน้า Time Attack และ rule `.pm-beta-badge` ที่ไม่เหลือใครใช้ · ข้อความ Beta ใน What's New ของ 1.10.0 คงไว้ เพราะเป็นบันทึกของรุ่นนั้น ไม่ใช่ copy ที่ใช้อยู่
+
 ## 1.11.0 — 2026-09-05
 
 ### Added
