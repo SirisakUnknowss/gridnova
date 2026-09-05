@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.11.0 — 2026-09-03
+## 1.11.0 — 2026-09-05
 
 ### Added
 - **Hearts (global energy)**: ระบบหัวใจ global ผูกกับ account (0–5) เป็น coin sink ตัวใหม่ — กด start โหมด Daily/Random/Time Attack เสีย 1 ดวง ชนะได้คืน (แพ้/game over/ออกกลางคัน = เสียถาวร), Practice/Book ไม่คิด · หมดหัวใจ = เริ่มเกม gated ไม่ได้จนกว่าจะ regen/login/ซื้อ infinite · **คนละระบบกับ 3 mistakes ในเกม** (`mistakes`/`livesLost`) ซึ่งไม่เปลี่ยน
@@ -9,6 +9,13 @@
   - **Infinite Hearts buff**: ซื้อด้วย coin รายชั่วโมง 1/2/3/5 ชม. = 800/1,400/1,900/2,800 · ช่วงบัฟ start ไม่กินหัวใจ · ซื้อซ้ำ = เวลาบวกทบ · member เท่านั้น (guest ไม่มี wallet ฝั่ง server)
   - **Server-authoritative ทั้งหมด**: ตาราง `user_hearts` (RLS อ่านเฉพาะของตัวเอง, เขียนผ่าน SECURITY DEFINER RPC เท่านั้น) + RPC `get_hearts` / `consume_heart` / `refund_heart` / `buy_infinite_hearts` / `refill_hearts_full` · `_refresh_hearts` lock `FOR UPDATE` กันกด start รัวสองทีแล้วหักซ้อน · client ไม่คำนวณยอดเอง กัน cheat นาฬิกา/ยอด
   - UI: pill หัวใจใน home header (แตะเปิด modal ซื้อ/สถานะ + countdown regen/บัฟสด), modal "Out of hearts" ตอนถูกบล็อก (guest เห็นปุ่ม login, member เห็นปุ่มซื้อ)
+
+### Fixed
+- **XP bar ค้างเต็มหลอด ไม่ยอมเลื่อน level**: migration `20260903164000` เปลี่ยน `grant_xp` เป็น `100 * L^1.5` และขึ้น prod DB ทันที (workflow `deploy-supabase.yml` ยิงจาก branch `staging` ซึ่งชี้ Supabase project เดียวกับ prod) แต่ `xpForLevel()` ฝั่ง client ยังค้างที่ `60 * L^1.2` บน `main` → `levelProgress()` clamp `into = min(xp, span)` ทำให้ผู้เล่นที่ XP เกิน span เก่าเห็น `2449 / 2449 XP` แถบ 100% ตลอด ทั้งที่เลเวลไม่ขึ้น (เจอ 15 คน) · แก้โดย sync สูตรทั้งสองฝั่ง
+- **ตัวเลข coin ที่โชว์ไม่ตรงกับที่ได้จริง**: `src/engine/scoring.ts` บน prod ยังเป็นตารางก่อน halve (easy 50/5) ขณะที่ edge function จ่ายตารางใหม่ (25/2) → โชว์เกินจริง 2 เท่า · ตอนนี้ตรงกันแล้ว
+
+### Changed
+- **ลดความชัน level curve**: `grant_xp` `100 * L^1.4` (จาก `1.5`) — level 22 ใช้ 7,575 XP แทน 10,318 (เดิมก่อน 3 ก.ย. คือ 2,449) · cumulative L1→L100 ≈ 2.6M (จาก 3.95M) · migration `20260905170000` settle ผู้เล่นที่ XP เกินเกณฑ์ใหม่แล้วให้เลื่อน level ทันทีด้วย `grant_xp(user_id, 0)`
 
 ## 1.10.3 — 2026-08-30
 
