@@ -1,7 +1,7 @@
 // =====================================================================
 // Tests for src/lib/level.ts — XP curve invariants
 // Must match the server's grant_xp Postgres function (see migrations
-// *_flatten_level_curve.sql)
+// *_soften_level_curve_1_4.sql)
 // =====================================================================
 import { describe, it, expect } from 'vitest';
 import { xpForLevel, applyXpGain, levelProgress, freeHintsForLevel } from '../../src/lib/level';
@@ -12,10 +12,10 @@ describe('xpForLevel', () => {
       expect(xpForLevel(lvl + 1)).toBeGreaterThan(xpForLevel(lvl));
     }
   });
-  it('matches the server formula floor(60 * L^1.2)', () => {
-    expect(xpForLevel(1)).toBe(60);
-    expect(xpForLevel(2)).toBe(Math.floor(60 * Math.pow(2, 1.2)));
-    expect(xpForLevel(5)).toBe(Math.floor(60 * Math.pow(5, 1.2)));
+  it('matches the server formula floor(100 * L^1.4)', () => {
+    expect(xpForLevel(1)).toBe(100);
+    expect(xpForLevel(2)).toBe(Math.floor(100 * Math.pow(2, 1.4)));
+    expect(xpForLevel(5)).toBe(Math.floor(100 * Math.pow(5, 1.4)));
   });
 });
 
