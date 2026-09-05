@@ -14,6 +14,20 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '1.11.0',
+    date: '2026-09-05',
+    title: 'Hearts',
+    changes: [
+      { icon: '❤️', text: 'New: Hearts — starting a Daily, Random, or Time Attack game now costs one heart. Win and you get it straight back, so only a loss actually spends one. Practice is always free and never touches your hearts' },
+      { icon: '🔄', text: 'You have up to 5 hearts. Signed-in players refill one every 30 minutes; guests start each day full and refill by signing in' },
+      { icon: '♾️', text: 'New: Infinite Hearts — tap your hearts to buy unlimited play for 1, 2, 3, or 5 hours, so you can keep going without spending a heart' },
+      { icon: '📖', text: 'Your in-game lives (the 3 you lose to mistakes) are unchanged — hearts are a separate, account-wide thing' },
+      { icon: '📈', text: 'Fixed the XP bar on Home getting stuck full and never levelling you up — it tracks your real progress again' },
+      { icon: '⚡', text: 'Eased the XP needed for each level, so levelling up takes noticeably less grinding' },
+      { icon: '🪙', text: 'The coin reward shown after a game now matches what actually lands in your wallet' },
+    ],
+  },
+  {
     version: '1.10.0',
     date: '2026-08-24',
     title: 'Book Mode & Time Attack (Beta)',

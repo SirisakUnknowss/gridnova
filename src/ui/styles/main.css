@@ -5163,3 +5163,92 @@ body.bg-anim-aurora {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(-90deg); }
 }
+
+/* ===== Hearts (global energy) ===== */
+.hearts-pill {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.1s ease;
+}
+.hearts-pill:active { transform: scale(0.94); }
+.hearts-pill .hearts-count { font-weight: 600; }
+
+.hearts-modal { text-align: center; }
+.hearts-modal h2 { margin-bottom: 12px; }
+
+.hearts-status-box { margin: 8px 0 16px; }
+.hearts-row {
+  display: inline-flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.hearts-dot { display: inline-flex; transition: filter 0.2s ease, opacity 0.2s ease; }
+.hearts-dot.empty { filter: grayscale(1); opacity: 0.3; }
+.hearts-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--app-text);
+}
+.hearts-sub, .hearts-blocked {
+  font-size: 13px;
+  color: var(--app-text-muted, #6b7280);
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+.hearts-blocked { margin: 0 0 14px; }
+
+.hearts-buy-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-muted, #6b7280);
+  margin: 14px 0 8px;
+}
+.hearts-buy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.hearts-buy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 8px;
+  border: 1px solid var(--border-thin, #e5e7eb);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.15s ease;
+}
+.hearts-buy:active { transform: scale(0.97); }
+.hearts-buy:not(.disabled):hover { border-color: var(--brand-primary, #667eea); }
+.hearts-buy.disabled { opacity: 0.45; cursor: not-allowed; }
+.hearts-buy-dur { font-size: 15px; font-weight: 700; }
+.hearts-buy-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--app-text-muted, #6b7280);
+}
+.hearts-balance {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--app-text-muted, #6b7280);
+  margin: 12px 0 0;
+}
+.hearts-error {
+  font-size: 13px;
+  color: var(--cell-text-conflict, #ef4444);
+  min-height: 18px;
+  margin: 6px 0 0;
+}

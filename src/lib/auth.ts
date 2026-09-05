@@ -75,6 +75,10 @@ export async function upgradeAnonymousToEmail(email: string, password: string): 
   // Mark profile as no longer anonymous
   await supabase.from('profiles').update({ is_anonymous: false }).eq('id', current.id);
 
+  // Signing up is the way a guest gets hearts back — reward it with a full pool
+  // and switch them onto the time-based regen path from here on.
+  try { await supabase.rpc('refill_hearts_full'); } catch { /* best-effort */ }
+
   return { ok: true, user: pwUpdate.user ?? emailUpdate.user ?? current };
 }
 

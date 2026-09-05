@@ -80,13 +80,13 @@ export function computeTimeAttackScore(
 /** Coin reward for completing daily puzzle */
 export function computeDailyCoinReward(input: ScoreInput): number {
   const base: Record<Difficulty, number> = {
-    'easy': 50,
-    'easy-medium': 75,
-    'medium': 100,
-    'medium-hard': 130,
-    'hard': 160,
-    'hard-expert': 180,
-    'expert': 200,
+    'easy': 25,
+    'easy-medium': 37,
+    'medium': 50,
+    'medium-hard': 65,
+    'hard': 80,
+    'hard-expert': 90,
+    'expert': 100,
   };
   let reward = base[input.difficulty];
   if (input.mistakes === 0) reward = Math.round(reward * 1.3);
@@ -97,13 +97,13 @@ export function computeDailyCoinReward(input: ScoreInput): number {
 /** Coin reward for practice mode */
 export function computePracticeCoinReward(difficulty: Difficulty): number {
   const map: Record<Difficulty, number> = {
-    'easy': 5,
-    'easy-medium': 8,
-    'medium': 10,
-    'medium-hard': 15,
-    'hard': 20,
-    'hard-expert': 28,
-    'expert': 35,
+    'easy': 2,
+    'easy-medium': 4,
+    'medium': 5,
+    'medium-hard': 7,
+    'hard': 10,
+    'hard-expert': 14,
+    'expert': 17,
   };
   return map[difficulty];
 }

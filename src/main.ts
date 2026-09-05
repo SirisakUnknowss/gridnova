@@ -22,6 +22,7 @@ import { mountTimeAttackLeaderboardView } from './ui/views/time-attack-leaderboa
 import { solve } from './engine/solver';
 import type { TimeAttackTier } from './engine/scoring';
 import { mountGameView, type GameResult } from './ui/views/game';
+import { consumeForStart, refundForWin, refreshHearts, showHeartsModal } from './ui/components/hearts';
 import { showWinModal } from './ui/views/win-modal';
 import { showShareModal } from './ui/views/share-modal';
 import { mountSplash } from './ui/views/splash';
@@ -280,7 +281,37 @@ function showTimeAttackLeaderboard(tier: TimeAttackTier) {
   currentUnmount = view.unmount;
 }
 
+// Gate a gated-mode start (Daily / Random / Time Attack) on the global hearts
+// pool. Returns whether the start may proceed and whether a heart was actually
+// spent (so the caller can refund it on a win). When blocked, opens the hearts
+// modal; buying Infinite there calls onRetry to re-attempt the start.
+async function gateHeart(
+  mode: string,
+  onRetry: () => void,
+): Promise<{ allowed: boolean; consumed: boolean }> {
+  const g = await consumeForStart(mode);
+  if (g.blocked) {
+    const u = useStore.getState().user;
+    const isGuest = !u || !!u.is_anonymous;
+    showHeartsModal({
+      blocked: true,
+      isGuest,
+      onLogin: () => showAuthModal({
+        isUpgrade: isGuest,
+        mode: 'signup',
+        onSuccess: () => { void refreshHearts().then(onRetry); },
+        onCancel: () => {},
+      }),
+      onPurchased: onRetry,
+    });
+    return { allowed: false, consumed: false };
+  }
+  return { allowed: g.allowed, consumed: g.consumed };
+}
+
 async function playTimeAttack(tier: TimeAttackTier) {
+  const gate = await gateHeart('time-attack', () => void playTimeAttack(tier));
+  if (!gate.allowed) return;
   const hideLoading = showLoadingOverlay('Preparing your puzzle...');
   let ticket: api.TimeAttackTicket;
   try {
@@ -319,7 +350,10 @@ async function playTimeAttack(tier: TimeAttackTier) {
     difficulty: ticket.difficulty as Difficulty,
     puzzle,
     solution,
-    onWin: (result) => void handleTimeAttackWin(result, tier, ticket.ticket_id),
+    onWin: (result) => {
+      if (gate.consumed) void refundForWin();
+      void handleTimeAttackWin(result, tier, ticket.ticket_id);
+    },
     onExit: showTimeAttack,
     onLose: showTimeAttack,
     onNewGame: () => void playTimeAttack(tier),
@@ -540,6 +574,8 @@ function openAuthAction() {
 // (profile menu now lives in mountProfileView)
 
 async function playDaily() {
+  const gate = await gateHeart('daily', () => void playDaily());
+  if (!gate.allowed) return;
   const date = todayUtc();
   let puzzleData;
   // Try fetch from server; fallback to local generation
@@ -571,7 +607,10 @@ async function playDaily() {
     puzzle: puzzleData.puzzle,
     solution: puzzleData.solution,
     date,
-    onWin: (result) => handleWin(result, date),
+    onWin: (result) => {
+      if (gate.consumed) void refundForWin();
+      handleWin(result, date);
+    },
     onExit: showDailyDetail,
   });
   currentUnmount = view.unmount;
@@ -651,7 +690,9 @@ function playBookResume(saved: GameInProgress) {
   currentUnmount = view.unmount;
 }
 
-function playRandom() {
+async function playRandom() {
+  const gate = await gateHeart('random', () => void playRandom());
+  if (!gate.allowed) return;
   const level = DIFFICULTIES[Math.floor(Math.random() * DIFFICULTIES.length)];
   const seed = `random:${Date.now()}:${Math.floor(Math.random() * 1_000_000)}`;
   const puzzleData = generatePuzzle({ difficulty: level, seed });
@@ -664,6 +705,7 @@ function playRandom() {
     puzzle: puzzleData.puzzle,
     solution: puzzleData.solution,
     onWin: (result) => {
+      if (gate.consumed) void refundForWin();
       handleWin(result);
       void api.recordRandomModeResult(true).catch(() => {});
     },

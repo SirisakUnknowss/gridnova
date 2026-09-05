@@ -35,8 +35,8 @@ const BASE_SCORE: Record<string, number> = {
 };
 
 const BASE_COIN: Record<string, number> = {
-  'easy': 50, 'easy-medium': 75, 'medium': 100,
-  'medium-hard': 130, 'hard': 160, 'hard-expert': 180, 'expert': 200
+  'easy': 25, 'easy-medium': 37, 'medium': 50,
+  'medium-hard': 65, 'hard': 80, 'hard-expert': 90, 'expert': 100
 };
 
 const BASE_XP: Record<string, number> = {

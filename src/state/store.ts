@@ -25,6 +25,14 @@ interface AppState {
   inventory: string[]; // item ids owned
   currentView: View;
 
+  // Global hearts (energy). Server-authoritative — see src/lib/hearts.ts.
+  hearts: number;
+  heartsMax: number;
+  heartsRegenMinutes: number;
+  heartsLastRegenAt: string | null;
+  heartsInfinite: boolean;
+  heartsInfiniteUntil: string | null;
+
   setUser: (user: User | null) => void;
   setProfile: (p: AppState['profile']) => void;
   setCoins: (n: number) => void;
@@ -35,6 +43,14 @@ interface AppState {
   setInventory: (ids: string[]) => void;
   addToInventory: (id: string) => void;
   setView: (v: View) => void;
+  setHearts: (h: {
+    hearts: number;
+    max: number;
+    regen_minutes: number;
+    last_regen_at: string | null;
+    infinite: boolean;
+    infinite_until: string | null;
+  }) => void;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -49,6 +65,13 @@ export const useStore = create<AppState>((set, get) => ({
   inventory: [],
   currentView: 'loading',
 
+  hearts: 5,
+  heartsMax: 5,
+  heartsRegenMinutes: 30,
+  heartsLastRegenAt: null,
+  heartsInfinite: false,
+  heartsInfiniteUntil: null,
+
   setUser: (user) => set({ user }),
   setProfile: (profile) => set({ profile }),
   setCoins: (coins) => set({ coins }),
@@ -59,4 +82,12 @@ export const useStore = create<AppState>((set, get) => ({
   setInventory: (inventory) => set({ inventory }),
   addToInventory: (id) => set({ inventory: Array.from(new Set([...get().inventory, id])) }),
   setView: (currentView) => set({ currentView }),
+  setHearts: (h) => set({
+    hearts: h.hearts,
+    heartsMax: h.max,
+    heartsRegenMinutes: h.regen_minutes,
+    heartsLastRegenAt: h.last_regen_at,
+    heartsInfinite: h.infinite,
+    heartsInfiniteUntil: h.infinite_until,
+  }),
 }));

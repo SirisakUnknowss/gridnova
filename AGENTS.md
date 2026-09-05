@@ -1,4 +1,4 @@
-# CLAUDE.md — GridNova Project Reference
+# AGENTS.md — GridNova Project Reference
 
 Read this before writing any code. It captures decisions, constraints, and context that
 cannot be derived from the code alone.

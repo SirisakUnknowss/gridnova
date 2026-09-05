@@ -4,6 +4,7 @@
 
 import coinIcon from '@images/coin.png';
 import streakIcon from '@images/streak-medal.png';
+import heartIcon from '@images/heart.png';
 import starIcon from '@images/star.png';
 import gamepadIcon from '@images/play-medal.png';
 import targetIcon from '@images/target-icon.png';
@@ -71,6 +72,7 @@ export const ic = {
 
   // Stats / rewards
   streak: (s?: number) => img(streakIcon, s),
+  heart: (s?: number) => img(heartIcon, s),
   coin: (s?: number) => img(coinIcon, s),
   badge: (s?: number) => img(badgeIcon, s),
   star: (s?: number) => img(starIcon, s),
