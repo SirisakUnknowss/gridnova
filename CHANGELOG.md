@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.12.0 — 2026-09-08
+
+### Added
+- **Hearts pre-start confirm**: ก่อน start โหมดที่กินหัวใจ (Daily / Random / Time Attack) มี popup ยืนยัน "Start this game?" บอกจำนวนหัวใจที่เหลือ + เตือนว่าใช้ 1 ดวง (ชนะได้คืน) · Cancel = ไม่หัก · เดิม `gateHeart` เรียก `consumeForStart` ทันทีที่กด กดพลาด = เสียหัวใจฟรี ตอนนี้อ่านยอดก่อน → ถาม → ค่อยหัก
+  - **ข้าม popup เมื่อ Infinite buff active** เพราะ start ฟรีอยู่แล้ว ไม่มีอะไรต้องเตือน
+  - **หัวใจ 0 = เด้ง modal "Out of hearts" ตรง ๆ** ไม่ผ่าน confirm และไม่หักอะไรเลย
+  - ไม่มี migration ไม่แตะ Supabase — logic ฝั่ง client ล้วน ระบบ Hearts ฝั่ง server เหมือนเดิมทุกอย่าง
+
 ## 1.11.2 — 2026-09-08
 
 ### Fixed
@@ -23,7 +31,6 @@
   - **Infinite Hearts buff**: ซื้อด้วย coin รายชั่วโมง 1/2/3/5 ชม. = 800/1,400/1,900/2,800 · ช่วงบัฟ start ไม่กินหัวใจ · ซื้อซ้ำ = เวลาบวกทบ · member เท่านั้น (guest ไม่มี wallet ฝั่ง server)
   - **Server-authoritative ทั้งหมด**: ตาราง `user_hearts` (RLS อ่านเฉพาะของตัวเอง, เขียนผ่าน SECURITY DEFINER RPC เท่านั้น) + RPC `get_hearts` / `consume_heart` / `refund_heart` / `buy_infinite_hearts` / `refill_hearts_full` · `_refresh_hearts` lock `FOR UPDATE` กันกด start รัวสองทีแล้วหักซ้อน · client ไม่คำนวณยอดเอง กัน cheat นาฬิกา/ยอด
   - UI: pill หัวใจใน home header (แตะเปิด modal ซื้อ/สถานะ + countdown regen/บัฟสด), modal "Out of hearts" ตอนถูกบล็อก (guest เห็นปุ่ม login, member เห็นปุ่มซื้อ)
-  - **Pre-start confirm**: ก่อน start โหมดที่กินหัวใจ มี popup ยืนยัน "Start this game?" บอกจำนวนหัวใจที่เหลือ + เตือนว่าใช้ 1 ดวง (ชนะได้คืน) · Cancel = ไม่หัก · **ข้าม popup เมื่อ Infinite buff active** (เพราะ start ฟรีอยู่แล้ว) · หัวใจ 0 = เด้ง modal "Out of hearts" ตรง ๆ ไม่ต้องผ่าน confirm
 
 ### Fixed
 - **XP bar ค้างเต็มหลอด ไม่ยอมเลื่อน level**: migration `20260903164000` เปลี่ยน `grant_xp` เป็น `100 * L^1.5` และขึ้น prod DB ทันที (workflow `deploy-supabase.yml` ยิงจาก branch `staging` ซึ่งชี้ Supabase project เดียวกับ prod) แต่ `xpForLevel()` ฝั่ง client ยังค้างที่ `60 * L^1.2` บน `main` → `levelProgress()` clamp `into = min(xp, span)` ทำให้ผู้เล่นที่ XP เกิน span เก่าเห็น `2449 / 2449 XP` แถบ 100% ตลอด ทั้งที่เลเวลไม่ขึ้น (เจอ 15 คน) · แก้โดย sync สูตรทั้งสองฝั่ง
