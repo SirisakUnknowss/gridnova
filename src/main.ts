@@ -22,7 +22,7 @@ import { mountTimeAttackLeaderboardView } from './ui/views/time-attack-leaderboa
 import { solve } from './engine/solver';
 import type { TimeAttackTier } from './engine/scoring';
 import { mountGameView, type GameResult } from './ui/views/game';
-import { consumeForStart, refundForWin, refreshHearts, showHeartsModal } from './ui/components/hearts';
+import { consumeForStart, refundForWin, refreshHearts, showHeartsModal, showHeartConfirm } from './ui/components/hearts';
 import { showWinModal } from './ui/views/win-modal';
 import { showShareModal } from './ui/views/share-modal';
 import { mountSplash } from './ui/views/splash';
@@ -289,23 +289,39 @@ async function gateHeart(
   mode: string,
   onRetry: () => void,
 ): Promise<{ allowed: boolean; consumed: boolean }> {
-  const g = await consumeForStart(mode);
-  if (g.blocked) {
-    const u = useStore.getState().user;
-    const isGuest = !u || !!u.is_anonymous;
-    showHeartsModal({
-      blocked: true,
-      isGuest,
-      onLogin: () => showAuthModal({
-        isUpgrade: isGuest,
-        mode: 'signup',
-        onSuccess: () => { void refreshHearts().then(onRetry); },
-        onCancel: () => {},
-      }),
-      onPurchased: onRetry,
-    });
-    return { allowed: false, consumed: false };
+  await refreshHearts();
+  const st = useStore.getState();
+  const isGuest = !st.user || !!st.user.is_anonymous;
+  const infinite = st.heartsInfinite && !!st.heartsInfiniteUntil
+    && new Date(st.heartsInfiniteUntil).getTime() > Date.now();
+
+  const openBlocked = () => showHeartsModal({
+    blocked: true,
+    isGuest,
+    onLogin: () => showAuthModal({
+      isUpgrade: isGuest,
+      mode: 'signup',
+      onSuccess: () => { void refreshHearts().then(onRetry); },
+      onCancel: () => {},
+    }),
+    onPurchased: onRetry,
+  });
+
+  // Out of hearts and no buff — go straight to the out-of-hearts modal, spend nothing.
+  if (!infinite && st.hearts <= 0) { openBlocked(); return { allowed: false, consumed: false }; }
+
+  // Infinite buff active — the start is free, so skip the confirm entirely.
+  if (infinite) {
+    const g = await consumeForStart(mode);
+    return { allowed: g.allowed, consumed: g.consumed };
   }
+
+  // Has hearts — warn before spending one.
+  const ok = await showHeartConfirm({ hearts: st.hearts, max: st.heartsMax, isGuest });
+  if (!ok) return { allowed: false, consumed: false };
+
+  const g = await consumeForStart(mode);
+  if (g.blocked) { openBlocked(); return { allowed: false, consumed: false }; }
   return { allowed: g.allowed, consumed: g.consumed };
 }
 

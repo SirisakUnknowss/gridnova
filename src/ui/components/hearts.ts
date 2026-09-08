@@ -106,6 +106,49 @@ export function wireHeartsPill(root: HTMLElement): () => void {
   return () => { unsub(); window.clearInterval(timer); };
 }
 
+/** Pre-start confirmation for a gated mode. Resolves true = start (spend a
+ *  heart), false = cancelled. Not shown while an Infinite buff is active
+ *  (nothing is spent then) — the caller decides that. */
+export function showHeartConfirm(opts: { hearts: number; max: number; isGuest: boolean }): Promise<boolean> {
+  return new Promise((resolve) => {
+    document.getElementById('heart-confirm-root')?.remove();
+    const wrapper = document.createElement('div');
+    wrapper.id = 'heart-confirm-root';
+    wrapper.className = 'modal-bg active';
+    document.body.appendChild(wrapper);
+
+    let settled = false;
+    const done = (v: boolean) => { if (settled) return; settled = true; wrapper.remove(); resolve(v); };
+
+    const heartsRow = `<span class="hearts-row">${
+      Array.from({ length: opts.max }, (_, i) =>
+        `<span class="hearts-dot${i < opts.hearts ? ' full' : ' empty'}">${ic.heart(20)}</span>`,
+      ).join('')
+    }</span>`;
+    const note = opts.isGuest
+      ? 'This uses 1 heart. Win it back — you only lose it if you don’t finish. Guest hearts reset at midnight UTC.'
+      : 'This uses 1 heart. Win it back — you only lose it if you don’t finish.';
+
+    wrapper.innerHTML = `
+      <div class="modal hearts-confirm" style="text-align:center;">
+        <button class="modal-close" id="hc-close" aria-label="Close">×</button>
+        <h2>Start this game?</h2>
+        <div class="hearts-status-box">
+          ${heartsRow}
+          <p class="hearts-sub">${note}</p>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn btn--secondary" id="hc-cancel" type="button">Cancel</button>
+          <button class="btn" id="hc-start" type="button">${ic.heart(14)} Start · −1</button>
+        </div>
+      </div>
+    `;
+    wrapper.querySelector('#hc-close')?.addEventListener('click', () => done(false));
+    wrapper.querySelector('#hc-cancel')?.addEventListener('click', () => done(false));
+    wrapper.querySelector('#hc-start')?.addEventListener('click', () => done(true));
+  });
+}
+
 interface HeartsModalOpts {
   /** true when opened because a gated start was blocked (no hearts). */
   blocked?: boolean;
