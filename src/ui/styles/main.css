@@ -2494,6 +2494,7 @@ h3 {
 }
 
 .modal {
+  position: relative;
   background: white;
   border-radius: var(--radius-2xl);
   padding: 28px;
@@ -2571,10 +2572,14 @@ h3 {
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 14px;
-  width: 32px;
-  height: 32px;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
   border: none;
   background: #f3f0ff;
   color: var(--app-text-secondary);
