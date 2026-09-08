@@ -270,6 +270,7 @@
       <button class="tab-btn" id="btn-tab-members">👥 Members</button>
       <button class="tab-btn" id="btn-tab-leaderboard">🏆 Leaderboard</button>
       <button class="tab-btn" id="btn-tab-gamemode">🎮 Game Mode</button>
+      <button class="tab-btn" id="btn-tab-funnel">🔎 Game Funnel</button>
       <button class="tab-btn" id="btn-tab-logs">📋 Log Monitor & Audit</button>
     </div>
 
@@ -571,6 +572,50 @@
         <div id="gamemode-detail-content"><div class="skeleton" style="height:120px;width:100%;border-radius:12px;margin-bottom:14px;"></div></div>
       </div>
     </div> <!-- end of panel-gamemode -->
+
+    <div id="panel-funnel" style="display:none">
+      <div class="section-h" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between">
+        <span>เก็บจาก game_events — เกมที่ "ไม่ชนะ" (แพ้ / หมดเวลา / ออกกลางคัน) ที่เมื่อก่อนไม่เคยบันทึก</span>
+        <span style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0">
+          <label style="color:var(--muted)">ช่วง</label>
+          <select id="gf-days" style="background:var(--surface);color:#e2e8f0;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:13px">
+            <option value="1">วันนี้</option>
+            <option value="7">7 วัน</option>
+            <option value="14" selected>14 วัน</option>
+            <option value="30">30 วัน</option>
+          </select>
+          <label style="color:var(--muted);margin-left:6px">จำลอง cap</label>
+          <input id="gf-cap" type="number" min="1" max="99" value="10"
+                 style="width:64px;background:var(--surface);color:#e2e8f0;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:13px">
+        </span>
+      </div>
+
+      <div class="cards-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card"><div class="label">เกมที่เริ่ม</div><div class="value" id="gf-c-starts">—</div><div class="sub" id="gf-c-starts-sub">fresh starts</div></div>
+        <div class="stat-card green"><div class="label">เล่นจนจบ</div><div class="value" id="gf-c-finish">—</div><div class="sub">จบเกม / (จบ + ออกกลางคัน)</div></div>
+        <div class="stat-card pink"><div class="label">อัตราแพ้</div><div class="value" id="gf-c-loss">—</div><div class="sub">= ราคาจริงของ 1 heart</div></div>
+        <div class="stat-card yellow"><div class="label">ออกกลางคัน</div><div class="value" id="gf-c-abandon">—</div><div class="sub" id="gf-c-abandon-sub">ของเกมที่จบลงทั้งหมด</div></div>
+      </div>
+
+      <div class="chart-card" style="margin-bottom:24px">
+        <h3>📊 ผลลัพธ์ของเกม แยกตามโหมด</h3>
+        <div style="position:relative;height:280px"><canvas id="gf-outcome-chart"></canvas></div>
+      </div>
+
+      <div class="table-card" style="margin-bottom:24px">
+        <h3>🎮 Funnel รายโหมด × ระดับ</h3>
+        <div id="gf-table-wrap"><div class="empty">กำลังโหลด…</div></div>
+      </div>
+
+      <div class="table-card">
+        <h3>🎯 Practice load — ถ้าใส่ cap เท่านี้ จะเสีย engagement เท่าไหร่</h3>
+        <div style="color:var(--muted);font-size:12px;margin-bottom:12px;line-height:1.5">
+          นับจาก<strong>เกมที่จบ</strong> (ชนะ + แพ้ + หมดเวลา) ต่อ 1 คนต่อ 1 วัน ต่อระดับ —
+          member นับจาก account, guest นับจาก session. ออกกลางคันไม่นับ.
+        </div>
+        <div id="gf-load-wrap"><div class="empty">กำลังโหลด…</div></div>
+      </div>
+    </div> <!-- end of panel-funnel -->
 
   </div> <!-- end of content -->
 </div> <!-- end of dashboard -->
@@ -901,6 +946,7 @@ const MODE_META = {
   book:        { label: 'Book',        icon: '📖', color: '#a78bfa' },
 };
 let gamemodePieChart = null, gamemodeOnlineChart = null;
+let gfOutcomeChart = null;
 let gamemodeOverviewData = [];
 
 async function loadGameModeOverview() {
@@ -1846,14 +1892,175 @@ function switchTab(tab) {
   document.getElementById('btn-tab-members').classList.toggle('active',      tab === 'members');
   document.getElementById('btn-tab-leaderboard').classList.toggle('active',  tab === 'leaderboard');
   document.getElementById('btn-tab-gamemode').classList.toggle('active',     tab === 'gamemode');
+  document.getElementById('btn-tab-funnel').classList.toggle('active',       tab === 'funnel');
   document.getElementById('btn-tab-logs').classList.toggle('active',         tab === 'logs');
   document.getElementById('panel-analytics').style.display    = tab === 'analytics'    ? 'block' : 'none';
   document.getElementById('panel-members').style.display      = tab === 'members'      ? 'block' : 'none';
   document.getElementById('panel-leaderboard').style.display  = tab === 'leaderboard'  ? 'block' : 'none';
   document.getElementById('panel-gamemode').style.display     = tab === 'gamemode'     ? 'block' : 'none';
+  document.getElementById('panel-funnel').style.display       = tab === 'funnel'       ? 'block' : 'none';
   document.getElementById('panel-logs').style.display         = tab === 'logs'         ? 'block' : 'none';
 
   loadData();
+}
+
+// -- Game Funnel -------------------------------------------------------
+// Everything here reads game_events, which is the only place a game that
+// was NOT won gets recorded. See supabase/migrations/*_game_events.sql.
+const GF_SURFACE_LABELS = {
+  daily: '🗓️ Daily',
+  practice: '🎯 Practice',
+  random: '🎲 Random',
+  'time-attack': '⏱️ Time Attack',
+  book: '📖 Book',
+};
+function gfSurfaceLabel(k) { return GF_SURFACE_LABELS[k] || k; }
+function gfPct(v) { return v == null ? '—' : v + '%'; }
+function gfNum(v) { return Number(v || 0); }
+
+function renderFunnelCards(rows) {
+  const starts   = rows.reduce((a, r) => a + gfNum(r.fresh_starts), 0);
+  const resumes  = rows.reduce((a, r) => a + gfNum(r.resumes), 0);
+  const guests   = rows.reduce((a, r) => a + gfNum(r.guest_starts), 0);
+  const wins     = rows.reduce((a, r) => a + gfNum(r.wins), 0);
+  const overs    = rows.reduce((a, r) => a + gfNum(r.game_overs), 0);
+  const timeouts = rows.reduce((a, r) => a + gfNum(r.timeouts), 0);
+  const abandons = rows.reduce((a, r) => a + gfNum(r.abandons), 0);
+  const ended    = wins + overs + timeouts + abandons;
+  const finished = wins + overs + timeouts;
+
+  setEl('gf-c-starts', fmt(starts));
+  setEl('gf-c-starts-sub', starts ? `+${fmt(resumes)} resume · guest ${Math.round((guests / starts) * 100)}%` : 'fresh starts');
+  setEl('gf-c-finish', ended ? Math.round((finished / ended) * 100) + '%' : '—');
+  setEl('gf-c-loss', finished ? Math.round(((overs + timeouts) / finished) * 100) + '%' : '—');
+  setEl('gf-c-abandon', ended ? Math.round((abandons / ended) * 100) + '%' : '—');
+  setEl('gf-c-abandon-sub', `${fmt(abandons)} จาก ${fmt(ended)} เกมที่จบลง`);
+}
+
+function renderOutcomeChart(rows) {
+  const bySurface = {};
+  rows.forEach(r => {
+    const k = r.surface;
+    bySurface[k] = bySurface[k] || { win: 0, over: 0, timeout: 0, abandon: 0 };
+    bySurface[k].win     += gfNum(r.wins);
+    bySurface[k].over    += gfNum(r.game_overs);
+    bySurface[k].timeout += gfNum(r.timeouts);
+    bySurface[k].abandon += gfNum(r.abandons);
+  });
+  const keys = Object.keys(bySurface);
+  const ctx = document.getElementById('gf-outcome-chart').getContext('2d');
+  if (gfOutcomeChart) gfOutcomeChart.destroy();
+  gfOutcomeChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: keys.map(gfSurfaceLabel),
+      datasets: [
+        { label: 'ชนะ',        data: keys.map(k => bySurface[k].win),     backgroundColor: 'rgba(16,185,129,.75)' },
+        { label: 'แพ้',        data: keys.map(k => bySurface[k].over),    backgroundColor: 'rgba(248,113,113,.75)' },
+        { label: 'หมดเวลา',    data: keys.map(k => bySurface[k].timeout), backgroundColor: 'rgba(251,191,36,.75)' },
+        { label: 'ออกกลางคัน', data: keys.map(k => bySurface[k].abandon), backgroundColor: 'rgba(148,163,184,.55)' },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 10 } } },
+      scales: {
+        x: { stacked: true, ticks: { color: '#94a3b8', font: { size: 11 } }, grid: { display: false } },
+        y: { stacked: true, ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' } },
+      },
+    },
+  });
+}
+
+function renderFunnelTable(rows) {
+  const wrap = document.getElementById('gf-table-wrap');
+  if (!rows.length) { wrap.innerHTML = '<div class="empty">ยังไม่มีข้อมูล — event จะเริ่มเข้าเมื่อ deploy ขึ้น production แล้วมีคนเล่น</div>'; return; }
+  wrap.innerHTML = `<table><thead><tr>
+    <th>โหมด</th><th>ระดับ</th>
+    <th style="text-align:right">เริ่ม</th>
+    <th style="text-align:right">เล่นต่อ</th>
+    <th style="text-align:right">ชนะ</th>
+    <th style="text-align:right">แพ้</th>
+    <th style="text-align:right">หมดเวลา</th>
+    <th style="text-align:right">ออกกลางคัน</th>
+    <th style="text-align:right">guest</th>
+    <th style="text-align:right">จบเกม</th>
+    <th style="text-align:right">แพ้ %</th>
+  </tr></thead><tbody>${rows.map(r => `
+    <tr>
+      <td>${gfSurfaceLabel(r.surface)}</td>
+      <td><span class="diff-badge diff-${escapeHtml(r.level)}">${escapeHtml(r.level)}</span></td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">${fmt(r.fresh_starts)}</td>
+      <td style="text-align:right;color:var(--muted)">${fmt(r.resumes)}</td>
+      <td style="text-align:right;color:#10b981">${fmt(r.wins)}</td>
+      <td style="text-align:right;color:#f87171">${fmt(r.game_overs)}</td>
+      <td style="text-align:right;color:#fbbf24">${fmt(r.timeouts)}</td>
+      <td style="text-align:right;color:#94a3b8">${fmt(r.abandons)}</td>
+      <td style="text-align:right;color:var(--muted)">${fmt(r.guest_starts)}</td>
+      <td style="text-align:right">${gfPct(r.finish_rate)}</td>
+      <td style="text-align:right;font-weight:700">${gfPct(r.loss_rate)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function renderPracticeLoad(rows, cap) {
+  const wrap = document.getElementById('gf-load-wrap');
+  if (!rows.length) { wrap.innerHTML = '<div class="empty">ยังไม่มีเกม Practice ที่เล่นจบในช่วงนี้</div>'; return; }
+  wrap.innerHTML = `<table><thead><tr>
+    <th>ระดับ</th>
+    <th style="text-align:right">คน-วัน</th>
+    <th style="text-align:right">เกมจบ</th>
+    <th style="text-align:right">เฉลี่ย/วัน</th>
+    <th style="text-align:right">p50</th>
+    <th style="text-align:right">p90</th>
+    <th style="text-align:right">สูงสุด</th>
+    <th style="text-align:right">ชน cap ${cap}</th>
+    <th style="text-align:right">% คน-วันที่ชน</th>
+    <th style="text-align:right">% เกมที่จะหาย</th>
+    <th style="text-align:right">guest</th>
+  </tr></thead><tbody>${rows.map(r => {
+    const lost = Number(r.pct_games_lost || 0);
+    const tone = lost >= 15 ? '#f87171' : lost >= 5 ? '#fbbf24' : '#10b981';
+    return `
+    <tr>
+      <td><span class="diff-badge diff-${escapeHtml(r.level)}">${escapeHtml(r.level)}</span></td>
+      <td style="text-align:right;color:var(--muted)">${fmt(r.player_days)}</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">${fmt(r.games)}</td>
+      <td style="text-align:right">${r.avg_per_day ?? '—'}</td>
+      <td style="text-align:right">${r.p50 ?? '—'}</td>
+      <td style="text-align:right">${r.p90 ?? '—'}</td>
+      <td style="text-align:right">${r.max_per_day ?? '—'}</td>
+      <td style="text-align:right">${fmt(r.days_over_cap)}</td>
+      <td style="text-align:right">${gfPct(r.pct_days_over_cap)}</td>
+      <td style="text-align:right;font-weight:700;color:${tone}">${gfPct(r.pct_games_lost)}</td>
+      <td style="text-align:right;color:var(--muted)">${gfPct(r.guest_share)}</td>
+    </tr>`; }).join('')}</tbody></table>`;
+}
+
+async function loadFunnelData() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.reload(); return; }
+  const days = Number(document.getElementById('gf-days').value || 14);
+  const cap  = Number(document.getElementById('gf-cap').value || 10);
+
+  const [funnel, load] = await Promise.all([
+    callRpcParam('get_game_funnel',   { p_days: days },             session.access_token),
+    callRpcParam('get_practice_load', { p_days: days, p_cap: cap }, session.access_token),
+  ]);
+
+  // Null means the RPC is missing or the call was rejected — say so rather
+  // than rendering an empty table that reads like "nobody played".
+  if (!Array.isArray(funnel)) {
+    document.getElementById('gf-table-wrap').innerHTML =
+      '<div class="empty">เรียก get_game_funnel ไม่ได้ — migration ขึ้นแล้วหรือยัง / บัญชีนี้เป็น admin หรือเปล่า</div>';
+    document.getElementById('gf-load-wrap').innerHTML = '<div class="empty">—</div>';
+    renderFunnelCards([]);
+    return;
+  }
+
+  renderFunnelCards(funnel);
+  renderOutcomeChart(funnel);
+  renderFunnelTable(funnel);
+  renderPracticeLoad(Array.isArray(load) ? load : [], cap);
 }
 
 // ── Load data ─────────────────────────────────────────────────────────
@@ -1878,6 +2085,13 @@ async function loadData() {
 
   if (currentTab === 'members') {
     await loadMembersData();
+    const now = new Date();
+    setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
+    return;
+  }
+
+  if (currentTab === 'funnel') {
+    await loadFunnelData();
     const now = new Date();
     setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
     return;
@@ -1954,7 +2168,12 @@ async function boot() {
     document.getElementById('btn-tab-analytics').onclick = () => switchTab('analytics');
     document.getElementById('btn-tab-members').onclick   = () => switchTab('members');
     document.getElementById('btn-tab-gamemode').onclick  = () => switchTab('gamemode');
+    document.getElementById('btn-tab-funnel').onclick     = () => switchTab('funnel');
     document.getElementById('btn-tab-logs').onclick      = () => switchTab('logs');
+
+    // Game Funnel: re-query on range / simulated-cap change
+    document.getElementById('gf-days').onchange = () => loadFunnelData();
+    document.getElementById('gf-cap').onchange  = () => loadFunnelData();
 
     // Game Mode: back button
     document.getElementById('gamemode-detail-back-btn').onclick = () => {

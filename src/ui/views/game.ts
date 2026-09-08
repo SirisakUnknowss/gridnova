@@ -14,6 +14,7 @@ import * as api from '@lib/api';
 import { saveGame, deleteGame, type GameInProgress } from '@lib/local-db';
 import { freeHintsForLevel } from '@lib/level';
 import { getBoardPrefs, vibrateTap } from '@lib/prefs';
+import { recordGameEvent, recordGameEventOnUnload, type GameEventName, type GameEventPayload } from '@lib/game-events';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
@@ -143,6 +144,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   let timerHandle: number | null = null;
   let autosaveHandle: number | null = null;
   let gameWon = false;
+  // Set once this game reaches an outcome, so unmount can tell "the player
+  // walked away" apart from "the game ended and the view is tearing down".
+  let outcomeRecorded = false;
 
   // Unique key for this game session (used for save/load)
   const gameId = mode === 'daily'
@@ -361,6 +365,35 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   function elapsedSeconds(): number {
     return Math.floor(elapsedMs() / 1000);
+  }
+
+  function eventPayload(event: GameEventName, resumed = false): GameEventPayload {
+    return {
+      event,
+      mode,
+      origin: props.origin,
+      level: difficulty,
+      resumed,
+      timeSeconds: elapsedSeconds(),
+      mistakes,
+      hintsUsed: FREE_HINTS - hintsLeft,
+      paidHints: paidHintsUsed,
+      continuesUsed,
+    };
+  }
+
+  function logEvent(event: GameEventName, resumed = false): void {
+    if (event !== 'start') outcomeRecorded = true;
+    recordGameEvent(eventPayload(event, resumed));
+  }
+
+  // Closing the tab is how most players leave a mobile PWA, and it is the
+  // case that silently costs a heart — so it has to be caught here rather
+  // than in unmount, which never runs on a real page teardown.
+  function onPageHide(): void {
+    if (outcomeRecorded || gameWon) return;
+    outcomeRecorded = true;
+    recordGameEventOnUnload(eventPayload('abandon'));
   }
 
   function secondsLeft(): number {
@@ -817,6 +850,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (timerHandle) clearInterval(timerHandle);
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
+    logEvent('win');
 
     const timeSeconds = elapsedSeconds();
     const hintsUsed = FREE_HINTS - hintsLeft;
@@ -866,6 +900,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
+    logEvent('timeout');
     sfxError();
     const overlay = root.querySelector('#gameover-overlay') as HTMLElement;
     const title = overlay.querySelector('.gameover-title') as HTMLElement;
@@ -881,6 +916,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
+    logEvent('game_over');
     const overlay = root.querySelector('#gameover-overlay') as HTMLElement;
     overlay.classList.add('open');
     props.onLose?.();
@@ -1048,6 +1084,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     }
   }
   document.addEventListener('visibilitychange', onVisibilityChange);
+  window.addEventListener('pagehide', onPageHide);
 
   // Sync UI state that depends on restored values
   renderHearts(livesLost);
@@ -1055,6 +1092,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   rerender();
   syncUndoRedo();
+
+  logEvent('start', !!props.resume);
 
   return {
     unmount() {
@@ -1064,6 +1103,10 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       if (getBgVolume() > 0) void playBgMusic();
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', onPageHide);
+      // Every exit route ends here — the pause menu's Leave, the bottom nav,
+      // New Game — so an unfinished game leaving the view is an abandon.
+      if (!outcomeRecorded) logEvent('abandon');
     },
   };
 }

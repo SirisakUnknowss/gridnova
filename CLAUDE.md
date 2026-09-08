@@ -277,6 +277,35 @@ global one lives in `src/lib/hearts.ts` + `user_hearts`. Don't conflate them.
 
 ---
 
+## Game Event Log (`game_events`)
+
+Everything the database used to know came from a **win**: `submit-daily-score`
+and `submit-practice-score` only fire when a puzzle is solved. Losses,
+game-overs, Time Attack timeouts and abandons were never recorded — and those
+are exactly the events Hearts and the Practice cap act on, which is why both
+features are parked until this log has data.
+
+- **Events**: `start` (with `resumed`) · `win` · `game_over` · `timeout` ·
+  `abandon`. One row each, written through `record_game_event()`.
+- **`origin` is kept**, unlike `user_game_history` — so Practice, Random, Book
+  and Time Attack are finally separable. `game_surface(mode, origin)` is the
+  single shared definition of "which mode was this", the same way
+  `visitor_source()` is for traffic.
+- **Guests included**: the RPC is granted to `anon`, and guests are the entire
+  top of the funnel.
+- **Abandon on tab close**: `unmount` never runs on a real page teardown, so
+  `pagehide` sends the abandon via `navigator.sendBeacon` (which can't set
+  headers — hence the anon key in the query string; it already ships in the
+  bundle). That path is unauthenticated, so those rows land as guest rows.
+- **Client-reported and clamped.** Behavioural analytics only — never an
+  authority for rewards or anti-cheat. Fire-and-forget: nothing is awaited,
+  nothing throws, a failure never touches the game.
+
+Read it with `get_game_funnel(p_days)` (admin only): starts, wins, game-overs,
+timeouts, abandons, finish rate and loss rate per surface + difficulty.
+
+Code: `src/lib/game-events.ts`, hooks in `src/ui/views/game.ts`.
+
 ## Zustand Store (`src/state/store.ts`)
 
 Key state fields:
@@ -324,6 +353,7 @@ currentView: View
 | `time_attack_leaderboard` | Every Time Attack run (not one row per player — see the mode notes) |
 | `random_mode_stats` | Random Mode win streaks |
 | `user_hearts` | Global hearts (energy) per account + infinite-buff expiry — see Hearts System. Members only; guest hearts are client-side |
+| `game_events` | Every game start/win/game-over/timeout/abandon — the only record of games that were NOT won. See Game Event Log |
 | `guest_game_history` | Games finished before signup, claimed on account creation |
 | `visitor_sessions` | One row per session per day + where it came from (referrer/UTM/click-id/in-app browser) |
 | `session_views` | Which views a session visited — powers the admin funnel |
@@ -338,6 +368,9 @@ currentView: View
 - `get_hearts()` / `consume_heart(p_mode)` / `refund_heart()` — hearts read / spend-on-start / refund-on-win
 - `buy_infinite_hearts(p_hours)` — coin-paid infinite-hearts buff (1/2/3/5h); server owns the price map
 - `refill_hearts_full()` — fill to 5 + restart clock (called after a guest upgrades to an account)
+- `record_game_event(...)` — game outcome log; granted to `anon` so guests are captured
+- `get_game_funnel(p_days)` — admin: starts/outcomes/finish rate/loss rate per surface + difficulty
+- `game_surface(mode, origin)` — one definition of "which mode was this", shared by admin and ad-hoc queries
 - `get_time_attack_leaderboard(p_tier, p_limit)` — best run per player, ranked
 - `get_time_attack_player_count(p_tier)` — `COUNT(DISTINCT user_id)` for a tier
 - `record_visit_attribution(...)` — first-write-wins; a session keeps the origin it arrived with
