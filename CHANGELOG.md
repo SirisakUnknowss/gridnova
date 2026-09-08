@@ -8,6 +8,9 @@
   - **หัวใจ 0 = เด้ง modal "Out of hearts" ตรง ๆ** ไม่ผ่าน confirm และไม่หักอะไรเลย
   - ไม่มี migration ไม่แตะ Supabase — logic ฝั่ง client ล้วน ระบบ Hearts ฝั่ง server เหมือนเดิมทุกอย่าง
 
+### Fixed
+- **ปุ่มปิด popup หลุดออกนอกกรอบจนกดไม่ได้**: `.modal-close` เป็น `position: absolute` แต่ `.modal` ไม่เคยตั้ง `position: relative` เลย ปุ่มจึงไป resolve กับ positioned ancestor ตัวถัดไปคือ `.modal-bg` (`position: fixed; inset: 0`) → ไปเกาะมุมขวาบนของ **viewport** ไม่ใช่ของ popup · บนมือถือตำแหน่งนั้นอยู่ใต้แถบ browser/status bar เลยแตะไม่โดน · กระทบ popup 6 ตัว: hearts confirm, hearts/Infinite Hearts, paywall, What's New, onboarding, level-up — รอดแค่ `.auth-modal` กับ avatar dialog ใน profile ที่บังเอิญตั้ง `position: relative` ของตัวเอง · แก้โดยเพิ่ม `position: relative` ให้ `.modal` แล้วขยายปุ่มเป็น 34px + `display: flex` จัด `×` ให้อยู่กลางวง · verify ที่ 375×812 ทั้ง 6 variant ด้วย `getBoundingClientRect` + `elementFromPoint` ตรงกลางปุ่ม — อยู่ในกรอบและ hit-test โดนทุกตัว
+
 ## 1.11.2 — 2026-09-08
 
 ### Fixed

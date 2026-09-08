@@ -21,6 +21,7 @@ export const RELEASES: ReleaseNote[] = [
       { icon: '✅', text: 'Starting a game that costs a heart now asks first and shows how many you have left, so a mistap never spends one' },
       { icon: '♾️', text: 'The check is skipped while Infinite Hearts is running, since nothing is being spent' },
       { icon: '🚫', text: 'Out of hearts? You go straight to the hearts screen instead of confirming something you cannot do yet' },
+      { icon: '❌', text: 'Fixed the close button on pop-ups landing off the edge of the screen — on phones it hid under the browser bar and could not be tapped at all' },
     ],
   },
   {
