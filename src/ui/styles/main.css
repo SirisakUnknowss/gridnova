@@ -223,6 +223,7 @@ h3 {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
 /* ===== Cards ===== */
@@ -1295,6 +1296,9 @@ h3 {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
   background: var(--app-card-bg);
   border: none;
   border-radius: var(--radius-xl);
@@ -1321,12 +1325,17 @@ h3 {
   flex-direction: column;
   align-items: flex-start;
   gap: 1px;
+  min-width: 0;
 }
 
 .home-user-name {
   font-size: 14px;
   color: var(--app-text);
   line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .home-user-id {
@@ -1334,17 +1343,25 @@ h3 {
   color: var(--app-text-secondary);
   font-family: 'Courier New', monospace;
   letter-spacing: 0.5px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* The pills + mute button never shrink; the display name truncates instead,
+   otherwise the row's min-content width pushes the mute button off-screen. */
 .home-header-right {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex: 0 0 auto;
 }
 
 .home-icon-btn {
   width: 34px;
   height: 34px;
+  flex-shrink: 0;
   border: none;
   border-radius: 50%;
   background: var(--app-card-bg);
@@ -1358,6 +1375,17 @@ h3 {
 
 .home-icon-btn:hover {
   background: #f0ecff;
+}
+
+/* Small phones (<=380px): the header still runs out of room once the coin
+   count reaches six figures, so tighten the pills rather than clip them. */
+@media (max-width: 380px) {
+  .home-header { gap: 6px; }
+  .home-header-right { gap: 3px; }
+  .home-header-right .stat-pill { padding: 6px 8px; font-size: 12px; }
+  .home-icon-btn { width: 30px; height: 30px; }
+  .home-user-btn { gap: 8px; padding: 6px 10px 6px 6px; }
+  .home-avatar { width: 30px; height: 30px; }
 }
 
 .home-xp {

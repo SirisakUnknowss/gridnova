@@ -2,7 +2,7 @@
 // Home view — main hub
 // =====================================================================
 import { useStore } from '@state/store';
-import { formatNumber, todayUtc } from '@lib/format';
+import { formatCompact, todayUtc } from '@lib/format';
 import { levelProgress } from '@lib/level';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { isMuted, toggleMute } from '@lib/sound';
@@ -81,8 +81,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
         </button>
         <div class="home-header-right">
           ${heartsPillHTML()}
-          <span class="stat-pill">${ic.streak(13)} ${state.currentStreak}</span>
-          <span class="stat-pill">${ic.coin(13)} ${formatNumber(state.coins)}</span>
+          <span class="stat-pill">${ic.coin(13)} ${formatCompact(state.coins)}</span>
           <button class="home-icon-btn" id="mute-btn" title="${muted ? 'Unmute' : 'Mute'}">
             ${muted ? ic.soundOff(16) : ic.soundOn(16)}
           </button>
