@@ -41,6 +41,26 @@ other branch deploys nothing.
 
 ---
 
+## 📋 ClickUp Task Tracking (do this at the START of every new piece of work)
+
+**Whenever we begin ANY new piece of work — a feature, a fix, a chore, a refactor —
+create a ClickUp task for it FIRST**, before writing code. This keeps the board in sync
+with what's actually being worked on.
+
+- **Workspace**: `9003014625` · **Space**: Software Development (`90168617844`)
+- **Default list for new work**: **Kanban → Backlog** (`901617390033`).
+  Bigger roadmap/epic items belong in **Product Master Backlog** (`901617390035`).
+- **Task should include**: a clear name, a short markdown description (goal + scope +
+  any relevant `file_path` context), and a sensible priority.
+- Move the task through the board statuses as work proceeds:
+  `to do → in progress → in review → deployed → Closed`.
+- The ClickUp MCP tools are available in-session (`clickup_create_task`, etc.); the
+  workspace has multiple teams, so always pass `workspace_id: 9003014625`.
+
+> If a task clearly already exists for the work, update/reuse it instead of duplicating.
+
+---
+
 ## Environments & Databases
 
 | Env | Branch | Web URL | Supabase project |
