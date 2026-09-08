@@ -3,6 +3,7 @@
 // =====================================================================
 import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
+import type { PracticeTotals, PracticeUsage } from '@lib/practice-limit';
 
 type View = 'loading' | 'login' | 'home' | 'game' | 'leaderboard' | 'shop' | 'profile' | 'settings' | 'stages';
 
@@ -33,6 +34,12 @@ interface AppState {
   heartsInfinite: boolean;
   heartsInfiniteUntil: string | null;
 
+  // Practice daily play counters + lifetime totals (the difficulty-unlock
+  // ledger), keyed by difficulty — see src/lib/practice-limit.ts.
+  // Server-backed for members, local for guests.
+  practicePlays: PracticeUsage;
+  practiceTotals: PracticeTotals;
+
   setUser: (user: User | null) => void;
   setProfile: (p: AppState['profile']) => void;
   setCoins: (n: number) => void;
@@ -51,6 +58,7 @@ interface AppState {
     infinite: boolean;
     infinite_until: string | null;
   }) => void;
+  setPracticeProgress: (p: { levels: PracticeUsage; totals: PracticeTotals }) => void;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -71,6 +79,8 @@ export const useStore = create<AppState>((set, get) => ({
   heartsLastRegenAt: null,
   heartsInfinite: false,
   heartsInfiniteUntil: null,
+  practicePlays: {},
+  practiceTotals: {},
 
   setUser: (user) => set({ user }),
   setProfile: (profile) => set({ profile }),
@@ -90,4 +100,5 @@ export const useStore = create<AppState>((set, get) => ({
     heartsInfinite: h.infinite,
     heartsInfiniteUntil: h.infinite_until,
   }),
+  setPracticeProgress: (p) => set({ practicePlays: p.levels, practiceTotals: p.totals }),
 }));

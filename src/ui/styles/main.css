@@ -5306,3 +5306,90 @@ body.bg-anim-aurora {
   min-height: 18px;
   margin: 6px 0 0;
 }
+
+/* ---------------------------------------------------------------------
+   Practice daily limit + difficulty ladder
+   --------------------------------------------------------------------- */
+.practice-card-v2-labels { min-width: 0; }
+.practice-card-v2-name,
+.practice-card-v2-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.practice-card-v2-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  flex: none;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--app-text-secondary);
+  background: var(--app-bg);
+  border-radius: 999px;
+  padding: 3px 6px;
+  white-space: nowrap;
+}
+.practice-card-v2-left[hidden] { display: none; }
+.practice-card-v2-left.is-empty { color: var(--cell-text-conflict, #ef4444); }
+.practice-card-v2-left.is-locked { color: var(--app-text-muted, #6b7280); }
+
+.practice-card-v2.is-spent,
+.practice-card-v2.is-locked { opacity: 0.55; }
+.practice-card-v2.is-locked .practice-card-v2-icon { filter: grayscale(1); }
+
+.plimit-modal { text-align: center; }
+.plimit-modal h2 { margin-bottom: 12px; }
+.plimit-status-box {
+  margin: 8px 0 16px;
+  padding: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--app-bg);
+}
+.plimit-count {
+  font-size: 14px;
+  color: var(--app-text);
+  margin: 0;
+}
+.plimit-sub, .plimit-blocked {
+  font-size: 13px;
+  color: var(--app-text-muted, #6b7280);
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+.plimit-blocked { margin: 0 0 14px; }
+.plimit-buy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.plimit-buy.disabled { opacity: 0.45; cursor: not-allowed; }
+.plimit-balance {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--app-text-muted, #6b7280);
+  margin: 12px 0 0;
+}
+.plimit-error {
+  font-size: 13px;
+  color: var(--cell-text-conflict, #ef4444);
+  min-height: 18px;
+  margin: 6px 0 0;
+}
+
+.plock-bar {
+  margin-top: 10px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--app-border);
+  overflow: hidden;
+}
+.plock-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand-gradient, var(--brand-primary));
+  transition: width var(--duration-fast);
+}

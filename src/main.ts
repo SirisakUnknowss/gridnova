@@ -13,7 +13,7 @@ import { DIFFICULTIES } from './engine/types';
 import { todayUtc } from './lib/format';
 import { mountHomeView } from './ui/views/home';
 import { mountPlayModeView } from './ui/views/play-mode';
-import { mountPracticeView } from './ui/views/practice';
+import { mountPracticeView, PRACTICE_META } from './ui/views/practice';
 import { mountDailyDetailView } from './ui/views/daily-detail';
 import { mountRandomModeDetailView } from './ui/views/random-mode-detail';
 import { mountRandomLeaderboardView } from './ui/views/random-leaderboard';
@@ -23,6 +23,8 @@ import { solve } from './engine/solver';
 import type { TimeAttackTier } from './engine/scoring';
 import { mountGameView, type GameResult } from './ui/views/game';
 import { consumeForStart, refundForWin, refreshHearts, showHeartsModal, showHeartConfirm } from './ui/components/hearts';
+import { gatePracticeStart, recordPracticeFinish, refreshPracticePlays } from './ui/components/practice-limit';
+import { previousLevel } from './lib/practice-limit';
 import { showWinModal } from './ui/views/win-modal';
 import { showShareModal } from './ui/views/share-modal';
 import { mountSplash } from './ui/views/splash';
@@ -199,7 +201,8 @@ function playPracticeResume(saved: GameInProgress) {
     solution: puzzleData.solution,
     stage,
     resume: saved,
-    onWin: (result) => handleWin(result),
+    onWin: (result) => { void recordPracticeFinish(level); handleWin(result); },
+    onLose: () => { void recordPracticeFinish(level); },
     onExit: showPractice,
     onNewGame: () => void playPractice(level),
   });
@@ -637,6 +640,15 @@ async function playDaily() {
 }
 
 async function playPractice(level: Difficulty) {
+  // Practice is capped at 10 finished games per difficulty per UTC day.
+  // Re-read the counters first: the picker paints from the store, which can
+  // be a few seconds stale, and the gate has to be the authoritative one.
+  await refreshPracticePlays();
+  const label = PRACTICE_META[level]?.label ?? level;
+  const prevKey = previousLevel(level);
+  const prevLabel = prevKey ? (PRACTICE_META[prevKey]?.label ?? prevKey) : '';
+  if (!gatePracticeStart(level, label, prevLabel, () => void playPractice(level), openAuthAction)) return;
+
   // Delete any stale saved games for this difficulty so the continue banner
   // never shows a finished or abandoned game after starting fresh.
   const stale = await listGames();
@@ -656,7 +668,8 @@ async function playPractice(level: Difficulty) {
     puzzle: puzzleData.puzzle,
     solution: puzzleData.solution,
     stage,
-    onWin: (result) => handleWin(result),
+    onWin: (result) => { void recordPracticeFinish(level); handleWin(result); },
+    onLose: () => { void recordPracticeFinish(level); },
     onExit: showPractice,
     onNewGame: () => void playPractice(level),
   });

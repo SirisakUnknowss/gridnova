@@ -159,7 +159,7 @@ Default / fallback: `theme_classic` (blue-purple gradient `#667eea → #764ba2`)
 | Mode | Description |
 |---|---|
 | **Daily** | One puzzle per day (server-generated). Shared globally. Leaderboard ranks by score. No coin hints allowed. |
-| **Practice** | Free play. Any difficulty. 3 free hints per game + up to 3 paid hints (50 / 75 / 100 coins). |
+| **Practice** | Free play (costs no heart). 4 difficulties on an unlock ladder, capped at 10 finished games per difficulty per day — see Practice Limits. 3 free hints per game + up to 3 paid hints (50 / 75 / 100 coins). |
 | **Random** | One tap, random difficulty. Tracks a win streak — losing one game resets it, which is the whole point of the mode. No coin continues. |
 | **Time Attack** | Solve against a countdown. Three tiers, each a fixed time + difficulty. Own leaderboard per tier. |
 
@@ -277,6 +277,47 @@ global one lives in `src/lib/hearts.ts` + `user_hearts`. Don't conflate them.
 
 ---
 
+## Practice Limits (daily cap + difficulty ladder) — ⚠️ ON HOLD, NOT SHIPPED
+
+> Code is written and verified locally but **nothing is deployed and the
+> migration is not applied**. Prod analysis on 2026-09-04 showed the cap would
+> remove 15-20% of Practice volume and the ladder would lock 80% of guest
+> Practice volume, with `push_tokens` = 1 (no way to bring a blocked player
+> back). Parked until `game_events` has ~2 weeks of real loss/abandon data.
+> Same applies to the **Hearts System** section above — written, not released.
+
+
+Practice is the one mode Hearts deliberately never gated, which left it an
+unbounded grind loop. Two limits shape it instead — both keyed on the same
+counter, both **members: server / guests: localStorage** (`gn_practice_plays_v1`),
+same split as Hearts and for the same reason (guests have no auth session).
+
+- **Daily cap** — 10 finished games *per difficulty*, reset at UTC midnight.
+  A play counts when a game **finishes** (win or game-over), never on start:
+  quitting, abandoning or re-rolling a puzzle costs nothing. The gate itself
+  sits on the start path (`playPractice` in `main.ts`), so a game already in
+  progress — including one resumed from a save made before the cap — always
+  finishes and is always recorded.
+- **Top-up** — running out is not a wall: +5 plays on that difficulty for
+  coins (300 / 500 / 800 / 1200 by difficulty, today only, no carry-over).
+  Server owns the price map (`_practice_pack_price`); `PRACTICE_PACK_PRICES`
+  mirrors it for display. Guests can't buy (no server wallet) → sign-in nudge.
+- **Difficulty ladder** — a new player starts on Easy only; each rung needs
+  **10 finished games on the one below** (easy → medium → hard → expert).
+  Lifetime totals live in `practice_level_totals`, which only ever grows, so
+  an unlock is permanent. Players who predate the feature are backfilled from
+  `practice_progress.plays`, and any recorded play at a difficulty keeps it
+  open regardless of the rung below — nobody gets sent back to Easy.
+- **Fail-open**: if the counter RPC is unreachable, everything reads as
+  unlocked with a full allowance. Practice is free; a network problem must
+  never lock a player out of it.
+- **Book Mode is NOT capped or laddered** even though it reuses the same
+  picker view (`variant: 'book'`). Random / Time Attack / Daily are unaffected
+  — they are gated by Hearts instead.
+
+Code: `src/lib/practice-limit.ts` (RPC wrapper + guest fallback + ladder
+rules), `src/ui/components/practice-limit.ts` (gate, badges, both modals).
+
 ## Game Event Log (`game_events`)
 
 Everything the database used to know came from a **win**: `submit-daily-score`
@@ -317,6 +358,8 @@ xp: number
 level: number
 currentStreak: number
 longestStreak: number
+practicePlays: Record<string, { used, extra }>   // today, per difficulty
+practiceTotals: Record<string, number>           // lifetime — unlock ladder
 equipped: { theme_id, background_id, board_color_id, avatar }
 inventory: string[]        // owned item IDs
 currentView: View
@@ -353,6 +396,8 @@ currentView: View
 | `time_attack_leaderboard` | Every Time Attack run (not one row per player — see the mode notes) |
 | `random_mode_stats` | Random Mode win streaks |
 | `user_hearts` | Global hearts (energy) per account + infinite-buff expiry — see Hearts System. Members only; guest hearts are client-side |
+| `practice_plays` | Practice games finished today per difficulty + any bought extras — see Practice Limits. Members only |
+| `practice_level_totals` | Lifetime practice plays per difficulty — the permanent difficulty-unlock ledger |
 | `game_events` | Every game start/win/game-over/timeout/abandon — the only record of games that were NOT won. See Game Event Log |
 | `guest_game_history` | Games finished before signup, claimed on account creation |
 | `visitor_sessions` | One row per session per day + where it came from (referrer/UTM/click-id/in-app browser) |
@@ -368,6 +413,7 @@ currentView: View
 - `get_hearts()` / `consume_heart(p_mode)` / `refund_heart()` — hearts read / spend-on-start / refund-on-win
 - `buy_infinite_hearts(p_hours)` — coin-paid infinite-hearts buff (1/2/3/5h); server owns the price map
 - `refill_hearts_full()` — fill to 5 + restart clock (called after a guest upgrades to an account)
+- `get_practice_plays()` / `record_practice_play(p_level)` / `buy_practice_plays(p_level)` — Practice daily cap + unlock ladder
 - `record_game_event(...)` — game outcome log; granted to `anon` so guests are captured
 - `get_game_funnel(p_days)` — admin: starts/outcomes/finish rate/loss rate per surface + difficulty
 - `game_surface(mode, origin)` — one definition of "which mode was this", shared by admin and ad-hoc queries

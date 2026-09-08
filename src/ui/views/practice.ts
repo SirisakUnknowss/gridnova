@@ -5,6 +5,8 @@ import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../compon
 import { ic } from '@ui/icons';
 import { formatTime } from '@lib/format';
 import { listGames, type GameInProgress } from '@lib/local-db';
+import { refreshPracticePlays, remainingBadge } from '../components/practice-limit';
+import { useStore } from '@state/store';
 
 export interface PracticeViewProps {
   onBack: () => void;
@@ -15,7 +17,7 @@ export interface PracticeViewProps {
   variant?: 'practice' | 'book';
 }
 
-const PRACTICE_META: Record<string, { label: string; sub: string; color: string }> = {
+export const PRACTICE_META: Record<string, { label: string; sub: string; color: string }> = {
   easy: { label: 'Easy', sub: 'Relaxed', color: '#10b981' },
   medium: { label: 'Medium', sub: 'Balanced', color: '#f59e0b' },
   hard: { label: 'Hard', sub: 'Tricky', color: '#ef4444' },
@@ -29,7 +31,7 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
     : `${ic.practice(20)} Practice`;
   const subtitle = isBook
     ? 'Like a paper book — nothing is marked right or wrong until you fill the grid.'
-    : 'Choose your own difficulty — play as many times as you like.';
+    : 'Ten games per difficulty each day. Finish 10 to unlock the next one.';
 
   root.innerHTML = `
     <section class="view view--practice">
@@ -57,6 +59,7 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
               <span class="practice-card-v2-name">${meta.label}</span>
               <span class="practice-card-v2-sub">${meta.sub}</span>
             </div>
+            ${isBook ? '' : `<span class="practice-card-v2-left" data-left="${key}"></span>`}
           </button>
         `).join('')}
       </div>
@@ -69,6 +72,28 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
     btn.addEventListener('click', () => props.onPlayPractice((btn as HTMLElement).dataset.practice!));
   });
   wireBottomNav(root, props.nav, 'home');
+
+  // Book Mode reuses this picker but is not capped — only Practice paints
+  // the per-difficulty daily counters.
+  let unsubPlays: (() => void) | null = null;
+  if (!isBook) {
+    const paintLeft = () => {
+      root.querySelectorAll<HTMLElement>('[data-left]').forEach((el) => {
+        const { text, label, empty, locked } = remainingBadge(el.dataset.left!);
+        el.innerHTML = locked ? `${ic.lock(11)}${text}` : text;
+        el.setAttribute('aria-label', label);
+        el.hidden = text === '';
+        el.classList.toggle('is-empty', empty && !locked);
+        el.classList.toggle('is-locked', locked);
+        const card = el.closest('.practice-card-v2');
+        card?.classList.toggle('is-spent', empty && !locked);
+        card?.classList.toggle('is-locked', locked);
+      });
+    };
+    paintLeft();
+    unsubPlays = useStore.subscribe(paintLeft);
+    void refreshPracticePlays().then(paintLeft);
+  }
 
   // Check for a resumable save. Practice excludes every origin-tagged game
   // (Random's and Book's); Book only ever resumes its own.
@@ -91,5 +116,5 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
     });
   });
 
-  return { unmount() { } };
+  return { unmount() { unsubPlays?.(); } };
 }
