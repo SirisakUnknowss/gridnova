@@ -1078,6 +1078,69 @@ h3 {
   line-height: 1.4;
 }
 
+/* ===== Update banner (new version available) ===== */
+.update-banner {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: calc(100% - var(--space-8));
+  max-width: 460px;
+  padding: 10px 10px 10px 16px;
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  animation: update-banner-in var(--duration-base) var(--ease-default);
+}
+
+@keyframes update-banner-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.update-banner__text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.update-banner__text strong {
+  display: block;
+  font-size: 13px;
+}
+
+.update-banner__text span {
+  font-size: 11px;
+  color: var(--app-text-secondary);
+}
+
+.update-banner__update {
+  flex: 0 0 auto;
+  background: var(--brand-gradient);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.update-banner__close {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: var(--app-text-secondary);
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
 /* ===== Daily card ===== */
 .daily-card {
   text-align: center;
@@ -4542,34 +4605,6 @@ body.bg-anim-aurora {
 }
 
 /* ===== Toast ===== */
-.update-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(90deg, #6c5ce7, #a78bfa);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  gap: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  z-index: 9999;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-  }
-
-  to {
-    transform: translateY(0);
-  }
-}
-
 .toast {
   position: fixed;
   bottom: 90px;

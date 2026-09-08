@@ -56,15 +56,19 @@ import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } fr
 import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, logView } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
 import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
+import { showUpdateBanner } from './ui/components/update-banner';
 
-// Show update banner when a new service worker takes control
+// A new service worker taking control means a fresh deploy is live. Rather than
+// force-reloading (which can yank the player mid-game and, in gated modes, burn
+// a heart that only refunds on a win), show a banner and let them refresh when
+// ready. controllerchange also fires on the first-ever install (the initial
+// clients.claim) — hadController guards against banner-on-first-visit.
 if ('serviceWorker' in navigator) {
-  let refreshing = false;
+  const hadController = !!navigator.serviceWorker.controller;
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (refreshing) return;
-    refreshing = true;
-    window.location.reload();
+    if (!hadController) return;
+    showUpdateBanner();
   });
 
   // Force SW to check for updates every time user opens the app (critical for PWA on home screen)
