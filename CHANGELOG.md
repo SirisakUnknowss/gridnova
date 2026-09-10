@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.12.1 — 2026-09-11
+
+### Added
+- **Admin Hearts monitor**: เพิ่มแท็บ Hearts ใน Admin Dashboard สำหรับดูสถานะหัวใจปัจจุบันของ members และ event การใช้งานย้อนหลัง · ส่วน snapshot อ่านจาก `user_hearts` โดยตรง: tracked members, full hearts, low/empty hearts, active Infinite Hearts และรายชื่อสมาชิกเรียงจากหัวใจน้อยสุด · ส่วน event log เริ่มเก็บจาก migration นี้เป็นต้นไปผ่านตาราง `heart_events`
+- **Heart event analytics**: log event จาก RPC หัวใจฝั่ง server: `consume`, `refund`, `blocked_no_hearts`, `infinite_start`, `buy_infinite`, `refill_full` พร้อม mode, hearts before/after, infinite expiry และ metadata · เพิ่ม admin RPC `get_admin_hearts_overview()` กับ `get_admin_heart_events(p_limit)` สำหรับ chart/event table ใน admin
+
+### Notes
+- Guest hearts ยัง monitor ฝั่ง server ไม่ได้ตาม design เดิม เพราะ guest ไม่มี auth session และหัวใจเก็บใน `localStorage`
+
 ## 1.12.0 — 2026-09-08
 
 ### Added
