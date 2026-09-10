@@ -220,6 +220,19 @@
     .log-meta-box { background:#07070d; padding:12px; border-radius:6px; border:1px dashed var(--border); font-family:monospace; font-size:12px; color:#a3e635; overflow-x:auto; margin:8px 0; white-space:pre-wrap; }
     .log-meta-toggle { background:transparent; border:none; color:var(--muted); font-size:12px; cursor:pointer; text-decoration:underline; }
     .log-meta-toggle:hover { color:var(--text); }
+
+    /* ── Hearts Monitor ── */
+    .heart-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+    .heart-monitor-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    @media(max-width:900px){ .heart-kpi-grid { grid-template-columns:repeat(2,1fr); } .heart-monitor-grid { grid-template-columns:1fr; } }
+    .heart-status { font-size:18px; letter-spacing:1px; white-space:nowrap; }
+    .heart-empty { opacity:.25; filter:grayscale(1); }
+    .event-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:700; text-transform:uppercase; }
+    .event-consume { background:rgba(248,113,113,.15); color:#f87171; }
+    .event-refund { background:rgba(16,185,129,.15); color:#10b981; }
+    .event-blocked_no_hearts { background:rgba(251,191,36,.15); color:#fbbf24; }
+    .event-buy_infinite, .event-infinite_start { background:rgba(102,126,234,.15); color:#818cf8; }
+    .event-refill_full { background:rgba(236,72,153,.15); color:#f472b6; }
   </style>
 </head>
 <body>
@@ -270,6 +283,7 @@
       <button class="tab-btn" id="btn-tab-members">👥 Members</button>
       <button class="tab-btn" id="btn-tab-leaderboard">🏆 Leaderboard</button>
       <button class="tab-btn" id="btn-tab-gamemode">🎮 Game Mode</button>
+      <button class="tab-btn" id="btn-tab-hearts">❤️ Hearts</button>
       <button class="tab-btn" id="btn-tab-logs">📋 Log Monitor & Audit</button>
     </div>
 
@@ -572,6 +586,58 @@
       </div>
     </div> <!-- end of panel-gamemode -->
 
+    <!-- Panel 6: Hearts Monitor -->
+    <div id="panel-hearts" style="display:none">
+      <div class="heart-kpi-grid">
+        <div class="stat-card pink">
+          <div class="label">❤️ Tracked Members</div>
+          <div class="value" id="h-tracked">—</div>
+          <div class="sub">server-side rows</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">💚 Full Hearts</div>
+          <div class="value" id="h-full">—</div>
+          <div class="sub">currently at 5/5</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="label">⚠️ Low / Empty</div>
+          <div class="value" id="h-low-empty">—</div>
+          <div class="sub" id="h-low-empty-sub">low / empty</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">∞ Infinite Active</div>
+          <div class="value" id="h-infinite">—</div>
+          <div class="sub">active buffs</div>
+        </div>
+      </div>
+
+      <div class="heart-monitor-grid">
+        <div class="chart-card">
+          <h3>❤️ Heart Events Today</h3>
+          <div style="position:relative;height:260px"><canvas id="hearts-events-chart"></canvas></div>
+        </div>
+        <div class="table-card">
+          <h3>🎮 Usage by Mode Today</h3>
+          <div id="hearts-mode-wrap"><div class="skeleton"></div></div>
+        </div>
+      </div>
+
+      <div class="heart-monitor-grid">
+        <div class="table-card">
+          <h3>❤️ Current Member Hearts <span style="font-weight:400;color:var(--muted);font-size:12px">lowest first</span></h3>
+          <div class="list-scroll" style="max-height:430px">
+            <div id="hearts-current-wrap"><div class="skeleton"></div></div>
+          </div>
+        </div>
+        <div class="table-card">
+          <h3>📋 Recent Heart Events</h3>
+          <div class="list-scroll" style="max-height:430px">
+            <div id="hearts-events-wrap"><div class="skeleton"></div></div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- end of panel-hearts -->
+
   </div> <!-- end of content -->
 </div> <!-- end of dashboard -->
 
@@ -584,6 +650,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let trendChart = null, diffChart = null, hourlyChart = null, shopCatChart = null;
 let funnelChart = null, retentionChart = null, sourceChart = null;
+let heartsEventsChart = null;
 
 let currentTab = 'analytics';
 let activeFilterLevel = 'all';
@@ -656,6 +723,10 @@ function fmt(n) {
 function fmtTime(s) {
   if (!s) return '—';
   return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+}
+function fmtDateTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('th-TH', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
 }
 function setEl(id, v) { const e = document.getElementById(id); if (e) e.textContent = v ?? '—'; }
 
@@ -1840,17 +1911,155 @@ async function loadMembersData() {
   renderMembersPanel();
 }
 
+// ── Hearts Monitor ───────────────────────────────────────────────────
+function heartDots(n) {
+  const count = Number(n) || 0;
+  return `<span class="heart-status">${Array.from({ length: 5 }, (_, i) =>
+    `<span class="${i < count ? '' : 'heart-empty'}">❤️</span>`
+  ).join('')}</span>`;
+}
+
+function eventLabel(type) {
+  const labels = {
+    consume: 'Spend',
+    refund: 'Refund',
+    blocked_no_hearts: 'Blocked',
+    buy_infinite: 'Buy ∞',
+    infinite_start: '∞ Start',
+    refill_full: 'Refill',
+  };
+  return labels[type] || type || 'Event';
+}
+
+function renderHeartsEventsChart(eventsToday) {
+  eventsToday = eventsToday || {};
+  const labels = ['Spend', 'Refund', 'Blocked', '∞ Start', 'Buff Buy'];
+  const values = [
+    eventsToday.consumes || 0,
+    eventsToday.refunds || 0,
+    eventsToday.blocked || 0,
+    eventsToday.infinite_starts || 0,
+    eventsToday.buff_purchases || 0,
+  ];
+  const ctx = document.getElementById('hearts-events-chart').getContext('2d');
+  if (heartsEventsChart) heartsEventsChart.destroy();
+  heartsEventsChart = new Chart(ctx, { type:'bar', data:{
+    labels,
+    datasets:[{ label:'Events', data:values, backgroundColor:[
+      'rgba(248,113,113,.75)',
+      'rgba(16,185,129,.75)',
+      'rgba(251,191,36,.75)',
+      'rgba(102,126,234,.75)',
+      'rgba(236,72,153,.75)',
+    ], borderRadius:6, borderSkipped:false }]
+  }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+    scales:{ x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}},
+             y:{ticks:{color:'#94a3b8',font:{size:10},precision:0},grid:{color:'rgba(255,255,255,.04)'}} } }
+  });
+}
+
+function renderHeartsModeTable(rows) {
+  rows = rows || [];
+  const wrap = document.getElementById('hearts-mode-wrap');
+  if (!rows.length) { wrap.innerHTML = '<div class="empty">ยังไม่มี heart event วันนี้</div>'; return; }
+  wrap.innerHTML = `<table><thead><tr>
+    <th>Mode</th>
+    <th style="text-align:right">Spend</th>
+    <th style="text-align:right">Blocked</th>
+    <th style="text-align:right">∞ Start</th>
+    <th style="text-align:right">Users</th>
+  </tr></thead><tbody>${rows.map(r => `
+    <tr>
+      <td><strong>${escapeHtml(r.mode)}</strong></td>
+      <td style="text-align:right;color:#f87171">${fmt(r.consumes)}</td>
+      <td style="text-align:right;color:#fbbf24">${fmt(r.blocked)}</td>
+      <td style="text-align:right;color:#818cf8">${fmt(r.infinite_starts)}</td>
+      <td style="text-align:right">${fmt(r.users)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function renderHeartsCurrentRows(rows) {
+  rows = rows || [];
+  const wrap = document.getElementById('hearts-current-wrap');
+  if (!rows.length) { wrap.innerHTML = '<div class="empty">ยังไม่มี member hearts row</div>'; return; }
+  wrap.innerHTML = `<table><thead><tr>
+    <th>Member</th>
+    <th>Hearts</th>
+    <th>Infinite</th>
+    <th style="text-align:right">Updated</th>
+  </tr></thead><tbody>${rows.map(r => `
+    <tr>
+      <td><strong>${escapeHtml(r.display_name)}</strong><br><span style="color:var(--muted);font-size:11px">@${escapeHtml(r.username || '—')}</span></td>
+      <td>${heartDots(r.hearts)}</td>
+      <td>${r.infinite_active ? `<span class="badge-online">Until ${fmtDateTime(r.infinite_until)}</span>` : '<span style="color:var(--muted);font-size:12px">—</span>'}</td>
+      <td style="text-align:right;color:var(--muted);font-size:12px">${fmtDateTime(r.updated_at)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function renderHeartEvents(rows) {
+  rows = rows || [];
+  const wrap = document.getElementById('hearts-events-wrap');
+  if (!rows.length) { wrap.innerHTML = '<div class="empty">ยังไม่มี event log หลัง deploy migration</div>'; return; }
+  wrap.innerHTML = `<table><thead><tr>
+    <th>Event</th>
+    <th>Member</th>
+    <th>Mode</th>
+    <th style="text-align:right">Hearts</th>
+    <th style="text-align:right">Time</th>
+  </tr></thead><tbody>${rows.map(r => `
+    <tr>
+      <td><span class="event-badge event-${escapeHtml(r.event_type)}">${eventLabel(r.event_type)}</span></td>
+      <td><strong>${escapeHtml(r.display_name)}</strong><br><span style="color:var(--muted);font-size:11px">@${escapeHtml(r.username || '—')}</span></td>
+      <td style="color:var(--muted);font-size:12px">${escapeHtml(r.mode || '—')}</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums">${r.hearts_before ?? '—'} → ${r.hearts_after ?? '—'}</td>
+      <td style="text-align:right;color:var(--muted);font-size:12px">${fmtDateTime(r.created_at)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+async function loadHeartsData() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  const [overview, events] = await Promise.all([
+    callRpc('get_admin_hearts_overview', session.access_token),
+    callRpcParam('get_admin_heart_events', { p_limit: 100 }, session.access_token),
+  ]);
+
+  if (!overview || overview.error) {
+    document.getElementById('hearts-mode-wrap').innerHTML = '<div class="empty">โหลดข้อมูลหัวใจไม่ได้</div>';
+    document.getElementById('hearts-current-wrap').innerHTML = '<div class="empty">โหลดข้อมูลหัวใจไม่ได้</div>';
+    document.getElementById('hearts-events-wrap').innerHTML = '<div class="empty">โหลดข้อมูล event ไม่ได้</div>';
+    renderHeartsEventsChart({});
+    return;
+  }
+
+  const current = overview?.current || {};
+  const today = overview?.events_today || {};
+  setEl('h-tracked', fmt(current.tracked_members));
+  setEl('h-full', fmt(current.full_hearts));
+  setEl('h-low-empty', `${fmt(current.low_hearts)} / ${fmt(current.zero_hearts)}`);
+  setEl('h-low-empty-sub', `avg ${current.avg_hearts ?? '—'} hearts`);
+  setEl('h-infinite', fmt(current.infinite_active));
+
+  renderHeartsEventsChart(today);
+  renderHeartsModeTable(overview?.by_mode_today || []);
+  renderHeartsCurrentRows(overview?.current_rows || []);
+  renderHeartEvents(Array.isArray(events) ? events : []);
+}
+
 function switchTab(tab) {
   currentTab = tab;
   document.getElementById('btn-tab-analytics').classList.toggle('active',    tab === 'analytics');
   document.getElementById('btn-tab-members').classList.toggle('active',      tab === 'members');
   document.getElementById('btn-tab-leaderboard').classList.toggle('active',  tab === 'leaderboard');
   document.getElementById('btn-tab-gamemode').classList.toggle('active',     tab === 'gamemode');
+  document.getElementById('btn-tab-hearts').classList.toggle('active',       tab === 'hearts');
   document.getElementById('btn-tab-logs').classList.toggle('active',         tab === 'logs');
   document.getElementById('panel-analytics').style.display    = tab === 'analytics'    ? 'block' : 'none';
   document.getElementById('panel-members').style.display      = tab === 'members'      ? 'block' : 'none';
   document.getElementById('panel-leaderboard').style.display  = tab === 'leaderboard'  ? 'block' : 'none';
   document.getElementById('panel-gamemode').style.display     = tab === 'gamemode'     ? 'block' : 'none';
+  document.getElementById('panel-hearts').style.display       = tab === 'hearts'       ? 'block' : 'none';
   document.getElementById('panel-logs').style.display         = tab === 'logs'         ? 'block' : 'none';
 
   loadData();
@@ -1885,6 +2094,13 @@ async function loadData() {
 
   if (currentTab === 'gamemode') {
     await loadGameModeOverview();
+    const now = new Date();
+    setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
+    return;
+  }
+
+  if (currentTab === 'hearts') {
+    await loadHeartsData();
     const now = new Date();
     setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
     return;
@@ -1954,6 +2170,7 @@ async function boot() {
     document.getElementById('btn-tab-analytics').onclick = () => switchTab('analytics');
     document.getElementById('btn-tab-members').onclick   = () => switchTab('members');
     document.getElementById('btn-tab-gamemode').onclick  = () => switchTab('gamemode');
+    document.getElementById('btn-tab-hearts').onclick    = () => switchTab('hearts');
     document.getElementById('btn-tab-logs').onclick      = () => switchTab('logs');
 
     // Game Mode: back button
