@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.12.2 — 2026-09-17
+
+### Added
+- **Mode info popup**: ปุ่ม ⓘ (รูป `information.png`) ข้างชื่อโหมดบนหัวหน้า landing ของ Daily / Time Attack / Random / Book กดแล้วเปิด popup "How to play" + "Scoring" · ตัวเลขคะแนนดึงจาก `BASE_SCORE` / `TIME_ATTACK_TIERS` ใน `scoring.ts` ตรง ๆ ไม่ hardcode ซ้ำ · Book ใช้หน้าร่วมกับ Practice ปุ่มจึงขึ้นเฉพาะ variant book · ไม่มี migration
+
+### Fixed
+- **Leaderboard ในหน้า Daily Puzzle ไม่เต็มกรอบ**: `#dd-lb-list` ไม่มี width และ `.view` เป็น `align-items: center` → หดตามเนื้อหา · แก้ด้วย `align-self: stretch`
+
 ## 1.12.1 — 2026-09-11
 
 ### Added
