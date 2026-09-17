@@ -2,6 +2,7 @@
 // Random Mode detail — current streak, empty state, Play Random
 // =====================================================================
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
+import { infoButtonHTML, wireInfoButtons } from '../components/mode-info';
 import { ic } from '@ui/icons';
 import { getRandomModeStats } from '@lib/api';
 
@@ -20,7 +21,7 @@ export function mountRandomModeDetailView(root: HTMLElement, props: RandomModeDe
           <button class="ach-back" id="rm-back" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <h1 class="ach-title">${ic.dice(20)} Random Mode</h1>
+          <h1 class="ach-title">${ic.dice(20)} Random Mode ${infoButtonHTML('random')}</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
@@ -31,6 +32,7 @@ export function mountRandomModeDetailView(root: HTMLElement, props: RandomModeDe
   `;
 
   root.querySelector('#rm-back')?.addEventListener('click', props.onBack);
+  wireInfoButtons(root);
   wireBottomNav(root, props.nav, 'home');
 
   const body = root.querySelector<HTMLElement>('#rm-body')!;

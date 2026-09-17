@@ -2,6 +2,7 @@
 // Time Attack detail — pick a tier, see your best, start the run
 // =====================================================================
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
+import { infoButtonHTML, wireInfoButtons } from '../components/mode-info';
 import { ic } from '@ui/icons';
 import { formatTime } from '@lib/format';
 import { TIME_ATTACK_TIERS, type TimeAttackTier } from '@engine/scoring';
@@ -37,7 +38,7 @@ export function mountTimeAttackView(root: HTMLElement, props: TimeAttackViewProp
           <button class="ach-back" id="ta-back" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <h1 class="ach-title">${ic.timeAttack(20)} Time Attack</h1>
+          <h1 class="ach-title">${ic.timeAttack(20)} Time Attack ${infoButtonHTML('time-attack')}</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
@@ -79,6 +80,7 @@ export function mountTimeAttackView(root: HTMLElement, props: TimeAttackViewProp
     </section>
     ${bottomNavHTML('home')}
   `;
+  wireInfoButtons(root);
   wireBottomNav(root, props.nav, 'home');
 
   const diffEl = root.querySelector<HTMLElement>('#ta-difficulty')!;

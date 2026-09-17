@@ -2,6 +2,7 @@
 // Practice view — free play, choose your own difficulty (moved out of Home)
 // =====================================================================
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
+import { infoButtonHTML, wireInfoButtons } from '../components/mode-info';
 import { ic } from '@ui/icons';
 import { formatTime } from '@lib/format';
 import { listGames, type GameInProgress } from '@lib/local-db';
@@ -38,7 +39,7 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
           <button class="ach-back" id="practice-back" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <h1 class="ach-title">${title}</h1>
+          <h1 class="ach-title">${title}${isBook ? ` ${infoButtonHTML('book')}` : ''}</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
@@ -68,6 +69,7 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
   root.querySelectorAll('[data-practice]').forEach((btn) => {
     btn.addEventListener('click', () => props.onPlayPractice((btn as HTMLElement).dataset.practice!));
   });
+  wireInfoButtons(root);
   wireBottomNav(root, props.nav, 'home');
 
   // Check for a resumable save. Practice excludes every origin-tagged game

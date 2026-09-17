@@ -2128,6 +2128,10 @@ h3 {
   gap: 6px;
 }
 
+.dd-lb-list {
+  align-self: stretch;
+}
+
 .dd-lb-more {
   width: 100%;
   background: none;
@@ -5271,3 +5275,41 @@ body.bg-anim-aurora {
   min-height: 18px;
   margin: 6px 0 0;
 }
+
+/* Mode info popup */
+.mode-info-btn {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -4px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.mode-info-btn:active { transform: scale(0.92); }
+.mode-info-modal {
+  text-align: left;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}
+.mode-info-modal h2 { text-align: center; margin: 8px 0 4px; }
+.mode-info-hero { display: block; margin: 0 auto; }
+.mode-info-heading {
+  margin: 16px 0 6px;
+  font-size: 15px;
+  color: var(--brand-primary);
+}
+.mode-info-list {
+  margin: 0 0 4px;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--app-text);
+}
+.mode-info-list li + li { margin-top: 4px; }
+.mode-info-modal .btn { margin-top: 18px; }
