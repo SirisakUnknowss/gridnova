@@ -1,3 +1,7 @@
+import { mountCollectionView } from './ui/views/collection';
+import { mountShopView } from './ui/views/shop';
+import { getGuestIdentity } from '@lib/guest-identity';
+import loadingArt from '@images/space/loading.webp';
 // =====================================================================
 // Main entry point
 // =====================================================================
@@ -145,6 +149,7 @@ async function loadUserData(): Promise<void> {
 // Shared callbacks for the bottom nav — same in every view
 const navCb = {
   onHome:         () => showHome(),
+  onShop:         () => showShop(),
   onAchievements: () => showAchievements(),
   onProfile:      () => showProfile(),
 };
@@ -453,9 +458,23 @@ function handleSignOut() {
   }
 }
 
+function showShop(avatarItemId?: string) {
+  clearView('shop');
+  const view = mountShopView(root, { onBack: showHome, onToast: toast, nav: navCb, avatarItemId });
+  currentUnmount = view.unmount;
+}
+
+function showCollection() {
+  clearView('collection');
+  const view = mountCollectionView(root, { onBack: showProfile, onShop: () => showShop(), onToast: toast, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
 function showProfile() {
   clearView('profile');
   const view = mountProfileView(root, {
+    onShopAvatar: (itemId) => showShop(itemId),
+    onOpenCollection: showCollection,
     onBack: showHome,
     onOpenStats: showStats,
     onOpenAchievements: () => showAchievements(true),
@@ -738,6 +757,7 @@ function showLoadingOverlay(text = 'Saving your score...'): () => void {
   const overlay = document.createElement('div');
   overlay.className = 'loading-overlay';
   overlay.innerHTML = `
+    <img src="${loadingArt}" class="space-loading-art" width="96" height="96" alt="">
     <div class="spinner"></div>
     <p style="font-weight: 600; font-size: 15px; text-align: center;">${text}</p>
   `;
@@ -1087,16 +1107,22 @@ async function boot() {
         await loadUserData();
       } else {
         // No existing session → run as guest (visitor tracking still works via anon key)
-        useStore.setState({ profile: { display_name: 'Guest' }, coins: 100 });
+        useStore.setState({ profile: { display_name: getGuestIdentity().name }, coins: 100 });
       }
     } catch (err) {
       captureError(err, { phase: 'boot' });
       console.warn('[Boot] Supabase error — offline demo mode:', err);
-      useStore.setState({ profile: { display_name: 'Guest' }, coins: 100 });
+      useStore.setState({ profile: { display_name: getGuestIdentity().name }, coins: 100 });
     }
   } else {
     console.info('[Boot] No Supabase config — running in offline demo mode');
-    useStore.setState({ profile: { display_name: 'Guest' }, coins: 100 });
+    useStore.setState({ profile: { display_name: getGuestIdentity().name }, coins: 100 });
+  }
+
+  if (!useStore.getState().user || useStore.getState().user?.is_anonymous) {
+    const guest = getGuestIdentity();
+    useStore.setState({ profile: { display_name: guest.name } });
+    useStore.getState().setEquipped({ avatar: { emoji: guest.emoji } });
   }
 
   // Wait for splash min duration, then unmount with exit animation

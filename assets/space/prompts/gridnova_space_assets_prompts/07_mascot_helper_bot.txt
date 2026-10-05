@@ -1,0 +1,20 @@
+Create an isolated tiny floating helper robot for GridNova.
+
+Design:
+small white spherical/rounded robot,
+dark navy face panel,
+two simple cyan glowing eyes,
+tiny antenna,
+subtle lavender trim,
+cute but premium,
+very simple silhouette readable at 32–64px.
+
+Style:
+soft 3D glossy plastic,
+light-space casual game aesthetic.
+
+Pose:
+floating at slight angle, friendly expression.
+
+Output:
+1:1, transparent background, no text.

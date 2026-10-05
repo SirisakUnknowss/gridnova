@@ -172,16 +172,16 @@ player count must be `COUNT(DISTINCT user_id)`, never a row count.
 
 ## Bottom Navigation
 
-4 tabs in order — `NavTab` type: `home | achievements | season | profile`
+4 tabs in order — `NavTab` type: `home | achievements | shop | profile`
 
 | Tab | Key | Status |
 |---|---|---|
 | Home | `home` | Live |
 | Medals (Achievements) | `achievements` | Live |
-| Season | `season` | Coming soon (disabled, no tap action) |
+| Shop | `shop` | Live — Themes and Avatars |
 | Profile | `profile` | Live |
 
-**There is no Shop tab in the nav** — shop is accessible from other views.
+**Shop is the third nav tab**, replacing Season by explicit user request. It sells Themes and Avatars.
 
 ---
 
@@ -400,8 +400,7 @@ actually request (the Search Console file is fetched without its `.html`).
 
 ## Future Plans
 
-- **Season system** — season pass, seasonal rewards, event puzzles. Season tab is
-  already in bottom nav as placeholder.
+- **Season system** — season pass, seasonal rewards, event puzzles. Season navigation was replaced by Shop; Season remains planned.
 - **Challenge mode** — curated special puzzles.
 - **Social features** — friend list, challenge friends, compare streaks.
 - **Premium subscription** — via RevenueCat (code exists in `src/lib/purchases.ts` and

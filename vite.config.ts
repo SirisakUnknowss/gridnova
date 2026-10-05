@@ -68,6 +68,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    watch: { ignored: ['**/dist-space-preview/**'] },
     host: true, // listen on 0.0.0.0 — allow LAN access (phone testing)
   },
 });

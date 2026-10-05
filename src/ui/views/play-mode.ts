@@ -1,3 +1,4 @@
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Play Mode Hub — Daily Puzzle (live) + Time Attack / Random Mode (soon)
 // =====================================================================
@@ -25,13 +26,12 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
     <section class="view view--play-mode">
       <div class="ach-sticky">
         <div class="ach-topbar">
-          <button class="ach-back" id="pm-back" aria-label="Back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+          <button class="icon-btn" id="pm-back" aria-label="Back">${ic.back(26)}</button>
           <h1 class="ach-title">${ic.gamepad(20)} Play Mode</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
+      ${pageArtHTML('random')}
 
       <div class="pm-list">
         <div class="pm-row" id="pm-daily">

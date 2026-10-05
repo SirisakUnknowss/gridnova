@@ -68,6 +68,22 @@ Deno.serve(async (req) => {
     return reject('INVALID_PAYLOAD', 'Missing item_id', 400);
   }
 
+  const { data: item, error: itemError } = await supabaseAdmin.from('shop_items')
+    .select('category, metadata').eq('id', itemId).maybeSingle();
+  if (itemError) return reject('INTERNAL_ERROR', 'Unable to check item', 500);
+  const requiredTheme = item?.category === 'avatar' && typeof item.metadata?.theme_id === 'string'
+    ? item.metadata.theme_id : null;
+  if (requiredTheme) {
+    const [{ data: theme, error: themeError }, { data: ownership, error: ownershipError }] = await Promise.all([
+      supabaseAdmin.from('shop_items').select('price_coin').eq('id', requiredTheme).eq('category', 'theme').maybeSingle(),
+      supabaseAdmin.from('user_inventory').select('item_id').eq('user_id', user.id).eq('item_id', requiredTheme).maybeSingle(),
+    ]);
+    if (themeError || ownershipError) return reject('INTERNAL_ERROR', 'Unable to check theme ownership', 500);
+    if (!theme || (theme.price_coin !== 0 && !ownership)) {
+      return reject('THEME_REQUIRED', 'Unlock the matching theme first');
+    }
+  }
+
   // Call the purchase_item DB function
   const { data, error: rpcErr } = await supabaseAdmin.rpc('purchase_item', {
     p_user_id: user.id,

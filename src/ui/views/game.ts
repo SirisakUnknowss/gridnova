@@ -1,3 +1,4 @@
+import { ic } from '@ui/icons';
 // =====================================================================
 // Game view — plays a single Sudoku puzzle (daily or practice)
 // =====================================================================
@@ -63,13 +64,6 @@ interface HistoryEntry {
   mistakesDelta: number;
 }
 
-const DIFF_COLOR: Record<string, string> = {
-  easy: '#10b981',
-  medium: '#6c5ce7',
-  'medium-hard': '#f59e0b',
-  hard: '#f87171',
-  expert: '#a78bfa',
-};
 
 // Module-level (not per-game) — once this tab has proven it's a real
 // visitor (3+ moves in any game today), stop pinging record_visitor_action.
@@ -183,7 +177,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // cell is exactly the spoiler this mode exists to remove. It flips back on
   // only if the player asks to be shown after a failed check.
   const settings = { ...getBoardPrefs(), ...(BOOK ? { showConflict: false } : {}) };
-  const dotColor = DIFF_COLOR[difficulty] ?? '#6c5ce7';
+  const modeArt = mode === 'daily' ? ic.daily(30) : BOOK ? ic.bookMode(30) : TA ? ic.timeAttack(30) : difficulty.includes('expert') ? ic.expert(30) : difficulty.includes('hard') ? ic.hard(30) : difficulty.includes('medium') ? ic.medium(30) : ic.easy(30);
   const diffLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1).replace('-', '-');
 
   // DOM
@@ -194,7 +188,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
           ${mode === 'daily'
             ? `<div style="display:flex;align-items:center;gap:8px;">
                 <div class="mode-pill no-click">
-                  <span class="mode-dot" style="background:${dotColor}"></span>
+                  <span class="game-mode-art" aria-hidden="true">${modeArt}</span>
                   <span>Daily Puzzle</span>
                 </div>
                 <button class="topbar-icon-btn" id="game-share-btn" title="Invite friends" style="color:var(--brand-primary);">
@@ -202,7 +196,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
                 </button>
                </div>`
             : `<button class="mode-pill" id="mode-pill-btn">
-                <span class="mode-dot" style="background:${dotColor}"></span>
+                <span class="game-mode-art" aria-hidden="true">${modeArt}</span>
                 <span id="mode-pill-label">${
                   BOOK ? `Book · ${diffLabel}`
                   : TA ? `${TA.tier.charAt(0).toUpperCase() + TA.tier.slice(1)} · ${diffLabel}`
@@ -215,11 +209,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
               <div class="stat-block"${BOOK ? ' hidden' : ''}>
                 <span class="stat-label">MISTAKES</span>
                 <span class="stat-value" id="hearts-display">
-                  <span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span>
+                  <span class="heart">${ic.heart(18)}</span><span class="heart">${ic.heart(18)}</span><span class="heart">${ic.heart(18)}</span>
                 </span>
               </div>
               <div class="stat-block">
-                <span class="stat-label">TIME</span>
+                <span class="stat-label game-time-label">${ic.clock(12)} TIME</span>
                 <span class="stat-value" id="timer">00:00</span>
               </div>
             </div>
@@ -254,38 +248,27 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
         <div class="action-bar">
           <button class="action-btn" id="undo-btn" title="Undo (Ctrl/⌘+Z)" disabled>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 7v6h6"/><path d="M3 13C5 8.3 9.1 5 14 5a9 9 0 0 1 0 18c-3.5 0-6.6-2-8.3-5"/>
-            </svg>
+            ${ic.undo(30)}
             <span>Undo</span>
           </button>
           <button class="action-btn" id="redo-btn" title="Redo (Ctrl/⌘+Y)" disabled>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 7v6h-6"/><path d="M21 13C19 8.3 14.9 5 10 5a9 9 0 0 0 0 18c3.5 0 6.6-2 8.3-5"/>
-            </svg>
+            ${ic.redo(30)}
             <span>Redo</span>
           </button>
           <button class="action-btn action-btn--erase" id="erase-btn" title="Erase (Backspace)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 20H7L3 16l13-13 5 5-2.5 2.5M6.5 17.5l5-5"/>
-            </svg>
+            ${ic.erase(30)}
             <span>Erase</span>
           </button>
           <button class="action-btn" id="notes-btn" title="Notes (N)">
             <div class="notes-btn-inner">
               <span class="notes-badge" id="notes-badge">OFF</span>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-              </svg>
+              ${ic.notes(30)}
             </div>
             <span>Notes</span>
           </button>
           <button class="action-btn" id="hint-btn" title="Hint (H)">
             <div class="hint-btn-inner">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 8v4M12 16h.01"/>
-              </svg>
+              ${ic.hint(30)}
               <span class="hint-count-badge" id="hint-count">3</span>
             </div>
             <span>Hint</span>
@@ -338,7 +321,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   function renderHearts(count: number) {
     heartsEl.innerHTML = [0, 1, 2]
-      .map(i => `<span class="heart${i < count ? ' heart--lost' : ''}">♥</span>`)
+      .map(i => `<span class="heart${i < count ? ' heart--lost' : ''}">${ic.heart(18)}</span>`)
       .join('');
   }
   const hintCountEl = root.querySelector('#hint-count') as HTMLElement;
@@ -527,6 +510,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   }
 
   function onCellClick(r: number, c: number) {
+    if (gameWon || pauseStart !== null) return;
     selected = { r, c };
     sfxSelect();
     rerender();
@@ -537,7 +521,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   }
 
   function handleNumber(n: number) {
-    if (gameWon || !selected) return;
+    if (gameWon || pauseStart !== null || !selected) return;
     const { r, c } = selected;
     if (givenMask[r][c] || hintMask[r][c]) return;
 
@@ -622,7 +606,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   }
 
   function eraseCell() {
-    if (gameWon || !selected) return;
+    if (gameWon || pauseStart !== null || !selected) return;
     const { r, c } = selected;
     if (givenMask[r][c] || hintMask[r][c]) return;
     const prevDigit = userBoard[r][c];
@@ -936,6 +920,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const boardOverlay = root.querySelector('#board-overlay') as HTMLElement;
 
   function openMenu() {
+    if (gameWon || boardOverlay.classList.contains('open')) return;
+    root.querySelectorAll<HTMLElement>('.action-bar, .numpad, #board').forEach(el => { el.inert = true; });
+    root.querySelector('.view--game')?.classList.add('game-paused');
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     pauseStart = Date.now();
     saveProgress();
@@ -945,6 +932,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   function closeMenu() {
     if (pauseStart !== null) { pausedMs += Date.now() - pauseStart; pauseStart = null; }
     boardOverlay.classList.remove('open');
+    root.querySelectorAll<HTMLElement>('.action-bar, .numpad, #board').forEach(el => { el.inert = false; });
+    root.querySelector('.view--game')?.classList.remove('game-paused');
     if (!gameWon) startClock();
   }
 
@@ -1006,7 +995,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   });
 
   const onKey = (e: KeyboardEvent) => {
-    if (gameWon) return;
+    if (gameWon || pauseStart !== null) return;
     if (e.key >= '1' && e.key <= '9') handleNumber(parseInt(e.key, 10));
     else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') eraseCell();
     else if (e.key === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); undoMove(); }

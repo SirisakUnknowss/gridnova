@@ -1,0 +1,20 @@
+Generate a coordinated set of 6 isolated pastel space planets for GridNova UI.
+
+Include:
+1. Easy planet — mint / aqua, friendly ring
+2. Medium planet — warm pale orange / peach
+3. Hard planet — coral / warm red
+4. Expert planet — violet / purple with subtle ring
+5. Daily planet — icy blue with tiny star sparkle
+6. Random mode planet — blue-violet swirling surface
+
+Style:
+soft 3D, glossy stylized spheres,
+rounded, premium casual mobile game,
+simple readable silhouettes,
+low detail, subtle rim light,
+same camera angle and light direction across all six.
+
+Output:
+each object separated, 1:1 transparent background,
+no text, no labels, no UI.

@@ -44,7 +44,7 @@ export function showAuthModal(props: AuthModalProps): void {
 
     wrapper.innerHTML = `
       <div class="modal auth-modal">
-        <button class="modal-close" id="auth-close" aria-label="Close">×</button>
+        <button class="modal-close" id="auth-close" aria-label="Close">${ic.close(24)}</button>
         <h2>${title}</h2>
         <p class="auth-sub">${subtitle}</p>
 

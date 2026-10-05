@@ -50,7 +50,7 @@ export function mountLedgerView(root: HTMLElement, props: LedgerProps): { unmoun
   root.innerHTML = `
     <section class="view">
       <div class="top-bar">
-        <button class="icon-btn" id="ledger-back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="icon-btn" id="ledger-back" aria-label="Back">${ic.back(26)}</button>
         <h2 style="margin:0;">${ic.coin(24)} Coin Ledger</h2>
         <span style="width:38px;"></span>
       </div>

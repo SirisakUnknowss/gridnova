@@ -1,0 +1,15 @@
+Create an onboarding hero illustration for GridNova Sudoku.
+
+Scene:
+The cute astronaut robot gently arranging glowing Sudoku tiles in zero gravity.
+A small ringed planet and helper bot float nearby.
+
+Style:
+bright soft 3D, light-space theme,
+white, icy blue, lavender,
+minimal, friendly, intelligent.
+
+Composition:
+portrait-friendly,
+leave clean negative space for onboarding title and body text.
+No text inside image.

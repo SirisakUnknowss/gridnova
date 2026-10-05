@@ -1,0 +1,17 @@
+Create 6 theme preview thumbnails for a Sudoku app.
+
+Themes:
+1. Default Light Space
+2. Deep Space but still light-readable
+3. Sunset Planet
+4. Forest Planet
+5. Ocean Planet
+6. Minimal White
+
+Style:
+small premium landscape thumbnails,
+soft 3D, clean, no text, no UI overlays,
+same framing and lighting consistency.
+
+Output:
+16:10 or 4:3 individual thumbnails.

@@ -71,7 +71,7 @@ export function mountRecapView(root: HTMLElement, props: RecapProps): { unmount:
   root.innerHTML = `
     <section class="view">
       <div class="top-bar">
-        <button class="icon-btn" id="recap-back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="icon-btn" id="recap-back" aria-label="Back">${ic.back(26)}</button>
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">${ic.daily(16)} Weekly Recap</h2>
         <span style="width:38px;"></span>
       </div>

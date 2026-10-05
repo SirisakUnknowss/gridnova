@@ -1,0 +1,11 @@
+Create a UI effect texture for an incorrect Sudoku cell.
+
+Appearance:
+soft coral/red translucent highlight,
+thin rounded red border,
+very subtle glow,
+white center,
+clear but not alarming.
+
+Premium light mobile game style.
+Transparent background.

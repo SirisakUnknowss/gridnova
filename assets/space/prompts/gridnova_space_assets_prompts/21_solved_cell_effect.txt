@@ -1,0 +1,11 @@
+Create a UI effect texture for a solved / correct Sudoku state.
+
+Appearance:
+soft mint green rounded highlight,
+subtle inner glow,
+white center,
+gentle success sparkle,
+low saturation.
+
+Premium light mobile game style.
+Transparent background.

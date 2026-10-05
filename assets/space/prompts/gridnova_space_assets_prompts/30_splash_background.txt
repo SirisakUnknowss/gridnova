@@ -1,0 +1,21 @@
+Create a vertical splash-screen background for GridNova Sudoku.
+
+Scene:
+A bright dreamlike orbital horizon,
+large soft planet in the distance,
+minimal stars,
+faint rings and soft atmospheric haze.
+
+Style:
+luxury light-space mobile game,
+white, lavender, icy blue,
+clean center,
+very subtle gradients,
+no objects competing with the logo.
+
+Composition:
+9:16 portrait,
+large central negative space,
+slightly more visual detail near top and bottom edges.
+
+No logo, no text, no UI.

@@ -1,0 +1,30 @@
+GRIDNOVA MASTER ART DIRECTION
+
+Create assets for a premium mobile Sudoku game called GridNova.
+
+Visual direction:
+- Light-space theme, NOT dark mode
+- Clean, calm, elegant, modern
+- Soft 3D / stylized game art
+- Glossy white and pearl materials
+- Pastel lavender, icy blue, soft periwinkle
+- Tiny accents of coral, mint, pale gold
+- Rounded geometry
+- Gentle soft shadows
+- Subtle ambient occlusion
+- Bright diffused daylight
+- Very low visual noise
+- Child-friendly but not childish
+- Premium casual puzzle game quality
+- Objects should remain legible at mobile UI scale
+- No text unless explicitly requested
+- Prefer isolated objects on transparent background for assets
+
+Keep all assets visually consistent:
+same material family, same lighting direction, same softness, same color palette,
+same level of stylization, same rounded bevel language.
+
+Avoid:
+dark mode, black backgrounds, cyberpunk, hard neon, gritty sci-fi, realistic NASA photography,
+overly detailed machinery, heavy bloom, excessive lens flare, clutter, dense star fields,
+strong perspective distortion, visual elements that compete with Sudoku numbers.

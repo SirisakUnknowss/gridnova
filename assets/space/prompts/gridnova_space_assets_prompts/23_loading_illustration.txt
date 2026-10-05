@@ -1,0 +1,13 @@
+Create a GridNova loading illustration.
+
+Concept:
+A tiny planet with a glowing orbit made from 9 small dots,
+plus the helper robot floating nearby.
+
+Style:
+minimal soft 3D, light-space,
+lavender, blue, mint,
+very clean and simple.
+
+Output:
+1:1 transparent background, no text.

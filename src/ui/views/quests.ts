@@ -1,3 +1,4 @@
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Quest renderers — drop-in for the #quest-list / #weekly-quest-list
 // elements on home. Daily and Weekly share the same generic engine
@@ -196,9 +197,7 @@ export function mountQuestsView(root: HTMLElement, props: QuestsPageProps): { un
     <section class="view view--ach">
       <div class="ach-sticky">
         <div class="ach-topbar">
-          <button class="ach-back" id="q-back" aria-label="Back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+          <button class="icon-btn" id="q-back" aria-label="Back">${ic.back(26)}</button>
           <h1 class="ach-title">${ic.quests(20)} Quests</h1>
           <div style="width:40px;flex:none"></div>
         </div>
@@ -207,6 +206,7 @@ export function mountQuestsView(root: HTMLElement, props: QuestsPageProps): { un
           <button class="lb-tab" data-tab="weekly">Weekly</button>
         </div>
       </div>
+      ${pageArtHTML('quests')}
       <div id="q-body" style="width:99%"></div>
     </section>
     ${bottomNavHTML('home')}

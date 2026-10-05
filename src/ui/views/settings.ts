@@ -1,3 +1,4 @@
+import settingsArt from '@images/space/page-settings.webp';
 // =====================================================================
 // Settings view — Sound, Notifications, Board, Official Community,
 // Help & About, Account.
@@ -92,8 +93,8 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
   root.innerHTML = `
     <section class="view">
       <div class="top-bar">
-        <button class="icon-btn" id="settings-back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <h2 style="margin:0;">Settings</h2>
+        <button class="icon-btn" id="settings-back" aria-label="Back">${ic.back(26)}</button>
+        <h2 class="settings-heading"><img src="${settingsArt}" width="32" height="32" alt="" decoding="async">Settings</h2>
         <span style="width:38px;"></span>
       </div>
 

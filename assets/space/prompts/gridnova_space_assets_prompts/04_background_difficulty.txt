@@ -1,0 +1,20 @@
+Create a vertical light-space background for a Sudoku difficulty selection screen.
+
+Scene:
+A clean white futuristic lunar platform with a distant ringed planet.
+Very subtle pastel environment.
+No important object in the center.
+
+Mood:
+calm, welcoming, progressive challenge.
+
+Style:
+soft 3D, pastel sci-fi, glossy white surfaces,
+lavender / ice blue / soft peach accents,
+minimal and bright.
+
+Composition:
+9:16 portrait, low-detail center, soft blurred environment,
+slightly richer scenery near top and bottom edges.
+
+No text, no UI, no logo.

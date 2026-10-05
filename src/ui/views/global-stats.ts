@@ -1,3 +1,4 @@
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Global Stats page — all-time records and community averages
 // =====================================================================
@@ -5,9 +6,9 @@ import * as api from '@lib/api';
 import { formatTime, formatNumber, escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
-import rank1Icon from '@images/1st-prize.png';
-import rank2Icon from '@images/2nd-place.png';
-import rank3Icon from '@images/3rd-place.png';
+import rank1Icon from '@images/space/replacements/1st-prize.webp';
+import rank2Icon from '@images/space/replacements/2nd-place.webp';
+import rank3Icon from '@images/space/replacements/3rd-place.webp';
 
 const RANK_ICONS = [rank1Icon, rank2Icon, rank3Icon];
 
@@ -27,11 +28,12 @@ export function mountGlobalStatsView(root: HTMLElement, props: GlobalStatsProps)
     <section class="view">
       <div class="top-bar">
         <button class="icon-btn" id="gs-back" aria-label="Back">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          ${ic.back(26)}
         </button>
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">${ic.globe(16)} Global Stats</h2>
         <span style="width:38px;"></span>
       </div>
+      ${pageArtHTML('stats')}
       <div id="gs-body" class="stats-body"><div class="shop-loading">Loading…</div></div>
     </section>
     ${bottomNavHTML('home')}

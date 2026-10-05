@@ -1,0 +1,50 @@
+{
+  "project": "GridNova",
+  "theme": "Light Space",
+  "asset_count": 36,
+  "folders": {
+    "backgrounds": [
+      "01_background_gameplay.txt",
+      "02_background_home.txt",
+      "03_background_menu_blur.txt",
+      "04_background_difficulty.txt",
+      "05_background_book_mode.txt",
+      "30_splash_background.txt"
+    ],
+    "mascots": [
+      "06_mascot_astronaut.txt",
+      "07_mascot_helper_bot.txt"
+    ],
+    "icons_assets": [
+      "08_planets_asset_set.txt",
+      "09_icon_set_navigation.txt",
+      "10_icon_set_gameplay.txt",
+      "11_achievement_badges.txt",
+      "12_daily_puzzle_card_art.txt",
+      "13_random_mode_card_art.txt",
+      "14_book_mode_card_art.txt",
+      "15_leaderboard_trophy.txt",
+      "16_streak_flame.txt",
+      "17_hint_lightbulb.txt",
+      "18_selected_cell_effect.txt",
+      "19_hint_cell_effect.txt",
+      "20_error_cell_effect.txt",
+      "21_solved_cell_effect.txt",
+      "22_empty_state_illustration.txt",
+      "23_loading_illustration.txt",
+      "24_profile_avatar_frames.txt",
+      "25_theme_thumbnails.txt",
+      "26_onboarding_hero.txt",
+      "27_game_completion_celebration.txt",
+      "28_daily_streak_scene.txt",
+      "29_shop_theme_asset.txt"
+    ],
+    "guides": [
+      "README.md",
+      "00_master_style_prompt.txt",
+      "32_ui_material_reference.txt",
+      "33_negative_prompt_master.txt",
+      "34_export_naming_guide.md"
+    ]
+  }
+}

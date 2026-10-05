@@ -1,0 +1,1140 @@
+{
+  "project": "GridNova",
+  "theme": "Light Space",
+  "generator": "built-in image_gen",
+  "assetCount": 134,
+  "masterStylePrompt": "prompts/gridnova_space_assets_prompts/00_master_style_prompt.txt",
+  "generationRule": "Paths to prompt files are relative to assets/space. Final prompt = master style + two newlines + source prompt + generationSuffix. promptOverride replaces that combination where present. Edits are subsequent prompts with the generated image as edit target. transparent specifies transparent_background.",
+  "assets": [
+    {
+      "name": "01_background_gameplay",
+      "path": "assets/space/generated/backgrounds/bg_gameplay_space_light.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/01_background_gameplay.txt",
+      "generationSuffix": "",
+      "promptOverride": "Create a vertical 9:16 mobile game background for GridNova Sudoku. Calm bright orbital platform, a large soft-focus moon far in the background at the edge, subtle floating asteroids and distant structures, atmospheric haze below. Middle 60% visually quiet negative space for Sudoku. More detail only near corners. Light space pastel sci-fi, premium soft 3D, glossy pearl white, ice blue, lavender, pale peach, subtle gold, rounded forms, bright diffused daylight, strongly defocused distant elements, very low contrast. No characters, text, UI, Sudoku board, logos, watermark, dark sky, neon, clutter or dense stars.",
+      "edits": []
+    },
+    {
+      "name": "02_background_home",
+      "path": "assets/space/generated/backgrounds/02_background_home.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/02_background_home.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "03_background_menu_blur",
+      "path": "assets/space/generated/backgrounds/03_background_menu_blur.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/03_background_menu_blur.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "04_background_difficulty",
+      "path": "assets/space/generated/backgrounds/04_background_difficulty.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/04_background_difficulty.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "05_background_book_mode",
+      "path": "assets/space/generated/backgrounds/05_background_book_mode.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/05_background_book_mode.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "06_mascot_astronaut",
+      "path": "assets/space/generated/illustrations/06_mascot_astronaut.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/06_mascot_astronaut.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "07_mascot_helper_bot",
+      "path": "assets/space/generated/illustrations/07_mascot_helper_bot.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/07_mascot_helper_bot.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "08_planets_asset_set_easy",
+      "path": "assets/space/generated/illustrations/08_planets_asset_set_easy.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/08_planets_asset_set.txt",
+      "generationSuffix": "\nGenerate ONLY the single easy member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "08_planets_asset_set_medium",
+      "path": "assets/space/generated/illustrations/08_planets_asset_set_medium.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/08_planets_asset_set.txt",
+      "generationSuffix": "\nGenerate ONLY the single medium member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "08_planets_asset_set_hard",
+      "path": "assets/space/generated/illustrations/08_planets_asset_set_hard.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/08_planets_asset_set.txt",
+      "generationSuffix": "\nGenerate ONLY the single hard member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "08_planets_asset_set_expert",
+      "path": "assets/space/generated/illustrations/08_planets_asset_set_expert.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/08_planets_asset_set.txt",
+      "generationSuffix": "\nGenerate ONLY the single expert member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "08_planets_asset_set_daily",
+      "path": "assets/space/generated/illustrations/08_planets_asset_set_daily.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/08_planets_asset_set.txt",
+      "generationSuffix": "\nGenerate ONLY the single daily member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "08_planets_asset_set_random",
+      "path": "assets/space/generated/illustrations/08_planets_asset_set_random.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/08_planets_asset_set.txt",
+      "generationSuffix": "\nGenerate ONLY the single random member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_home",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_home.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single home member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_daily_puzzle",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_daily_puzzle.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single daily puzzle member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_random_mode",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_random_mode.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single random mode member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_book_mode",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_book_mode.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single book mode member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_leaderboard",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_leaderboard.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single leaderboard member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_achievements",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_achievements.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single achievements member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_statistics",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_statistics.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single statistics member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_themes",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_themes.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single themes member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_profile",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_profile.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single profile member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_settings",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_settings.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single settings member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "09_icon_set_navigation_quests",
+      "path": "assets/space/generated/icons/09_icon_set_navigation_quests.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/09_icon_set_navigation.txt",
+      "generationSuffix": "\nGenerate ONLY the single quests member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_undo",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_undo.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single undo member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_redo",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_redo.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single redo member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_erase",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_erase.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single erase member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_notes",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_notes.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single notes member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_hint",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_hint.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single hint member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_pause",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_pause.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single pause member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_resume",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_resume.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single resume member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_restart",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_restart.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single restart member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_auto_check",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_auto_check.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single auto check member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_sound",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_sound.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single sound member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_music",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_music.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single music member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "10_icon_set_gameplay_haptics",
+      "path": "assets/space/generated/icons/10_icon_set_gameplay_haptics.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/10_icon_set_gameplay.txt",
+      "generationSuffix": "\nGenerate ONLY the single haptics member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_first_solve",
+      "path": "assets/space/generated/badges/11_achievement_badges_first_solve.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single first solve member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_7_day_streak",
+      "path": "assets/space/generated/badges/11_achievement_badges_7_day_streak.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single 7 day streak member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_30_day_streak",
+      "path": "assets/space/generated/badges/11_achievement_badges_30_day_streak.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single 30 day streak member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_no_mistakes",
+      "path": "assets/space/generated/badges/11_achievement_badges_no_mistakes.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single no mistakes member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_no_hints",
+      "path": "assets/space/generated/badges/11_achievement_badges_no_hints.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single no hints member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_under_5_minutes",
+      "path": "assets/space/generated/badges/11_achievement_badges_under_5_minutes.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single under 5 minutes member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_easy_master",
+      "path": "assets/space/generated/badges/11_achievement_badges_easy_master.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single easy master member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_medium_master",
+      "path": "assets/space/generated/badges/11_achievement_badges_medium_master.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single medium master member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_hard_master",
+      "path": "assets/space/generated/badges/11_achievement_badges_hard_master.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single hard master member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_expert_master",
+      "path": "assets/space/generated/badges/11_achievement_badges_expert_master.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single expert master member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_100_puzzles",
+      "path": "assets/space/generated/badges/11_achievement_badges_100_puzzles.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single 100 puzzles member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "11_achievement_badges_daily_champion",
+      "path": "assets/space/generated/badges/11_achievement_badges_daily_champion.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/11_achievement_badges.txt",
+      "generationSuffix": "\nGenerate ONLY the single daily champion member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "12_daily_puzzle_card_art",
+      "path": "assets/space/generated/illustrations/12_daily_puzzle_card_art.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/12_daily_puzzle_card_art.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "13_random_mode_card_art",
+      "path": "assets/space/generated/illustrations/13_random_mode_card_art.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/13_random_mode_card_art.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "14_book_mode_card_art",
+      "path": "assets/space/generated/illustrations/14_book_mode_card_art.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/14_book_mode_card_art.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "15_leaderboard_trophy",
+      "path": "assets/space/generated/illustrations/15_leaderboard_trophy.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/15_leaderboard_trophy.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "16_streak_flame",
+      "path": "assets/space/generated/illustrations/16_streak_flame.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/16_streak_flame.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "17_hint_lightbulb",
+      "path": "assets/space/generated/illustrations/17_hint_lightbulb.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/17_hint_lightbulb.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "18_selected_cell_effect",
+      "path": "assets/space/generated/illustrations/18_selected_cell_effect.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/18_selected_cell_effect.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "19_hint_cell_effect",
+      "path": "assets/space/generated/illustrations/19_hint_cell_effect.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/19_hint_cell_effect.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "20_error_cell_effect",
+      "path": "assets/space/generated/illustrations/20_error_cell_effect.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/20_error_cell_effect.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "21_solved_cell_effect",
+      "path": "assets/space/generated/illustrations/21_solved_cell_effect.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/21_solved_cell_effect.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "22_empty_state_illustration",
+      "path": "assets/space/generated/illustrations/22_empty_state_illustration.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/22_empty_state_illustration.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "23_loading_illustration",
+      "path": "assets/space/generated/illustrations/23_loading_illustration.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/23_loading_illustration.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "24_profile_avatar_frames_orbit",
+      "path": "assets/space/generated/frames/24_profile_avatar_frames_orbit.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/24_profile_avatar_frames.txt",
+      "generationSuffix": "\nGenerate ONLY the single orbit member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "24_profile_avatar_frames_moon",
+      "path": "assets/space/generated/frames/24_profile_avatar_frames_moon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/24_profile_avatar_frames.txt",
+      "generationSuffix": "\nGenerate ONLY the single moon member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "24_profile_avatar_frames_saturn_ring",
+      "path": "assets/space/generated/frames/24_profile_avatar_frames_saturn_ring.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/24_profile_avatar_frames.txt",
+      "generationSuffix": "\nGenerate ONLY the single saturn ring member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "24_profile_avatar_frames_comet",
+      "path": "assets/space/generated/frames/24_profile_avatar_frames_comet.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/24_profile_avatar_frames.txt",
+      "generationSuffix": "\nGenerate ONLY the single comet member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "24_profile_avatar_frames_nebula",
+      "path": "assets/space/generated/frames/24_profile_avatar_frames_nebula.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/24_profile_avatar_frames.txt",
+      "generationSuffix": "\nGenerate ONLY the single nebula member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "24_profile_avatar_frames_star_crown",
+      "path": "assets/space/generated/frames/24_profile_avatar_frames_star_crown.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/24_profile_avatar_frames.txt",
+      "generationSuffix": "\nGenerate ONLY the single star crown member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "24_profile_avatar_frames_rocket_trail",
+      "path": "assets/space/generated/frames/24_profile_avatar_frames_rocket_trail.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/24_profile_avatar_frames.txt",
+      "generationSuffix": "\nGenerate ONLY the single rocket trail member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "24_profile_avatar_frames_cosmic_master",
+      "path": "assets/space/generated/frames/24_profile_avatar_frames_cosmic_master.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/24_profile_avatar_frames.txt",
+      "generationSuffix": "\nGenerate ONLY the single cosmic master member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "25_theme_thumbnails_default_light_space",
+      "path": "assets/space/generated/themes/25_theme_thumbnails_default_light_space.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/25_theme_thumbnails.txt",
+      "generationSuffix": "\nGenerate ONLY the single default light space member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "25_theme_thumbnails_deep_space",
+      "path": "assets/space/generated/themes/25_theme_thumbnails_deep_space.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/25_theme_thumbnails.txt",
+      "generationSuffix": "\nGenerate ONLY the single deep space member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "25_theme_thumbnails_sunset_planet",
+      "path": "assets/space/generated/themes/25_theme_thumbnails_sunset_planet.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/25_theme_thumbnails.txt",
+      "generationSuffix": "\nGenerate ONLY the single sunset planet member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "25_theme_thumbnails_forest_planet",
+      "path": "assets/space/generated/themes/25_theme_thumbnails_forest_planet.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/25_theme_thumbnails.txt",
+      "generationSuffix": "\nGenerate ONLY the single forest planet member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "25_theme_thumbnails_ocean_planet",
+      "path": "assets/space/generated/themes/25_theme_thumbnails_ocean_planet.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/25_theme_thumbnails.txt",
+      "generationSuffix": "\nGenerate ONLY the single ocean planet member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "25_theme_thumbnails_minimal_white",
+      "path": "assets/space/generated/themes/25_theme_thumbnails_minimal_white.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/25_theme_thumbnails.txt",
+      "generationSuffix": "\nGenerate ONLY the single minimal white member from this set, on its own individual canvas. Do not include other members, labels or a contact sheet.",
+      "edits": []
+    },
+    {
+      "name": "26_onboarding_hero",
+      "path": "assets/space/generated/illustrations/26_onboarding_hero.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/26_onboarding_hero.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "27_game_completion_celebration",
+      "path": "assets/space/generated/illustrations/27_game_completion_celebration.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/27_game_completion_celebration.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "28_daily_streak_scene",
+      "path": "assets/space/generated/illustrations/28_daily_streak_scene.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/28_daily_streak_scene.txt",
+      "generationSuffix": "",
+      "edits": [
+        "Edit this GridNova Daily Streak illustration. Preserve the helper robot, soft 3D materials, lavender orbit, pale gold star and transparent background. Change only the number of small planets: there must be EXACTLY SEVEN distinct small planets along the path, followed by the separate pale gold star. Current image has six planets; insert one additional mint/pale peach small planet with its own orbit base into the path. Keep all seven planets visually separate and countable. No text or numbers. Keep the wide composition."
+      ]
+    },
+    {
+      "name": "29_shop_theme_asset",
+      "path": "assets/space/generated/illustrations/29_shop_theme_asset.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/29_shop_theme_asset.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "30_splash_background",
+      "path": "assets/space/generated/backgrounds/30_splash_background.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/30_splash_background.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "31_app_icon_prompt",
+      "path": "assets/space/generated/illustrations/31_app_icon_prompt.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/31_app_icon_prompt.txt",
+      "generationSuffix": "",
+      "edits": [
+        "Edit this GridNova app icon. Preserve the rounded square soft 3D Sudoku grid and ringed planet artwork exactly. Replace ALL checkerboard pixels outside the icon with a clean solid pearl-white background. No checkerboard anywhere, no simulated transparency, no pattern, no text. The entire square canvas must be opaque. Preserve the icon's lavender ice-blue palette and soft shadows."
+      ]
+    },
+    {
+      "name": "32_ui_material_reference",
+      "path": "assets/space/references/32_ui_material_reference.png",
+      "transparent": false,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/32_ui_material_reference.txt",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "35_time_attack_stopwatch",
+      "path": "assets/space/generated/illustrations/35_time_attack_stopwatch.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/gridnova_space_assets_prompts/35_time_attack_stopwatch.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: isolated Time Attack mode icon for GridNova Sudoku, square 1:1 canvas, actual transparent background. Create one compact futuristic stopwatch, instantly recognizable at 48–72 pixels. Rounded pearl-white glossy plastic body with lavender and icy-blue trim, dark navy clock face for legibility, simple pale-gold clock hands suggesting countdown, one softly beveled top button and a small rounded side button. A subtle orbital ring around the watch suggests the light-space world. Soft premium casual mobile game 3D, friendly calm pastel sci-fi, rounded geometry, bright diffused studio daylight from upper left, gentle ambient occlusion. Large centered object filling 80–85% of the canvas with clear margins, no clipping. Palette white, lavender, periwinkle, icy blue, pale gold, tiny navy contrast accents. No text, letters, numbers, logo, watermark, checkerboard, backdrop, card, pedestal, dark sky, gritty metal, realistic machinery, red dominant colors, hard neon or excessive sparkles. Match GridNova's generated soft 3D planet and robot assets.",
+      "edits": []
+    },
+    {
+      "name": "replacement_coin",
+      "path": "assets/space/generated/replacements/coin.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/coin.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One rounded pale-gold coin with a raised four-point nova star emblem, pearl-white rim and subtle lavender bevel. Clear gold currency silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_heart",
+      "path": "assets/space/generated/replacements/heart.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/heart.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One plump coral-peach heart with glossy pearl highlights and subtle lavender rim. Friendly energy/life symbol, simple readable silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_star",
+      "path": "assets/space/generated/replacements/star.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/star.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One plump five-point pale-gold reward star, softly rounded points, subtle lavender rim and glossy pearl highlights.",
+      "edits": []
+    },
+    {
+      "name": "replacement_target-icon",
+      "path": "assets/space/generated/replacements/target-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/target-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact target with three concentric pearl-white and lavender rings, a pale-gold center, and a simple icy-blue arrow pointing into its center.",
+      "edits": []
+    },
+    {
+      "name": "replacement_warning-icon",
+      "path": "assets/space/generated/replacements/warning-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/warning-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One rounded soft coral warning triangle containing a clear dark-navy exclamation mark symbol, pearl-white bevel. The exclamation symbol is allowed; no letters or words.",
+      "edits": []
+    },
+    {
+      "name": "replacement_lock-quest",
+      "path": "assets/space/generated/replacements/lock-quest.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/lock-quest.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact rounded padlock with pearl-white body, lavender shackle, dark-navy simple keyhole and tiny pale-gold trim.",
+      "edits": []
+    },
+    {
+      "name": "replacement_information",
+      "path": "assets/space/generated/replacements/information.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/information.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One glossy icy-blue circular information badge containing a clear dark-navy lowercase i symbol. Only this single i symbol is allowed, no other letters or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_mistake-icon",
+      "path": "assets/space/generated/replacements/mistake-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/mistake-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One rounded coral circular error badge containing a clear dark-navy cross X symbol. X is a pictographic cross, not text; simple and friendly, not alarming.",
+      "edits": []
+    },
+    {
+      "name": "replacement_gift-icon",
+      "path": "assets/space/generated/replacements/gift-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/gift-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact pearl-white gift box with a plump lavender ribbon and pale-gold bow, simple clear gift silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_celebrate-icon",
+      "path": "assets/space/generated/replacements/celebrate-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/celebrate-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact pearl-white and lavender party popper with just three soft pale-gold stars bursting from it, minimal joyful silhouette, no clutter.",
+      "edits": []
+    },
+    {
+      "name": "replacement_level-up",
+      "path": "assets/space/generated/replacements/level-up.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/level-up.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact ascending group of three pearl-white rounded steps topped by a pale-gold star, an icy-blue upward arrow beside the steps. Clearly suggests progress and leveling up.",
+      "edits": []
+    },
+    {
+      "name": "replacement_brain-icon",
+      "path": "assets/space/generated/replacements/brain-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/brain-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One friendly softly rounded brain, lavender and icy-blue lobes, simplified folds, tiny pearl-white orbital accent. Clear brain silhouette, not anatomical realism.",
+      "edits": []
+    },
+    {
+      "name": "replacement_zap-icon",
+      "path": "assets/space/generated/replacements/zap-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/zap-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact softly beveled lightning bolt, pale-gold core with lavender edges and pearl-white gloss. Readable solid bolt silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_repeat-icon",
+      "path": "assets/space/generated/replacements/repeat-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/repeat-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: Two thick rounded icy-blue and lavender curved arrows forming one circular repeat loop. A small pearl-white center, clear arrowheads, no numerals.",
+      "edits": []
+    },
+    {
+      "name": "replacement_turtle-icon",
+      "path": "assets/space/generated/replacements/turtle-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/turtle-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One friendly miniature turtle, mint shell with simple lavender segments, rounded pearl-white head and feet, side three-quarter view, clear slow-and-steady silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_clock-icon",
+      "path": "assets/space/generated/replacements/clock-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/clock-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact round pearl-white wall clock, lavender rim, navy face and two pale-gold clock hands. Clear time symbol. No top stopwatch button, no numerals.",
+      "edits": []
+    },
+    {
+      "name": "replacement_globe",
+      "path": "assets/space/generated/replacements/globe.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/globe.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact icy-blue globe with mint continents, pearl-white and lavender orbital rim, simplified recognizable Earth silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_bell-icon",
+      "path": "assets/space/generated/replacements/bell-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/bell-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact rounded notification bell, glossy pearl-white shell with pale-gold clapper, lavender trim, simple readable bell silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_rocket-icon",
+      "path": "assets/space/generated/replacements/rocket-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/rocket-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact friendly rocket tilted slightly upward, pearl-white rounded fuselage, icy-blue porthole, lavender fins, short pale-gold exhaust. No realistic machinery.",
+      "edits": []
+    },
+    {
+      "name": "replacement_cloud-icon",
+      "path": "assets/space/generated/replacements/cloud-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/cloud-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One softly rounded pearl-white cloud with icy-blue underside and lavender edge shading. Simple quiet three-lobed cloud silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_sparkle-icon",
+      "path": "assets/space/generated/replacements/sparkle-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/sparkle-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One large softly beveled four-point pale-gold sparkle accompanied by one much smaller icy-blue sparkle. Simple clear twinkle symbol, no particle cloud.",
+      "edits": []
+    },
+    {
+      "name": "replacement_wave-icon",
+      "path": "assets/space/generated/replacements/wave-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/wave-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact curling ocean wave made of softly rounded icy-blue translucent glass, mint inner curl and pearl-white foam. Simple coherent wave silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_soundOn-icon",
+      "path": "assets/space/generated/replacements/soundOn-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/soundOn-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One rounded pearl-white speaker with lavender body and two distinct icy-blue sound-wave arcs to the right. Clear sound-on symbol, no other objects.",
+      "edits": []
+    },
+    {
+      "name": "replacement_soundOff-icon",
+      "path": "assets/space/generated/replacements/soundOff-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/soundOff-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One rounded pearl-white speaker with lavender body, crossed by one clear coral diagonal mute slash. No sound-wave arcs. Clear sound-off symbol.",
+      "edits": []
+    },
+    {
+      "name": "replacement_sharing-icon",
+      "path": "assets/space/generated/replacements/sharing-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/sharing-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One share-network pictogram: exactly three pearl-white round nodes joined by two thick icy-blue rods in the familiar sideways branching share pattern, lavender accents.",
+      "edits": []
+    },
+    {
+      "name": "replacement_share-icon",
+      "path": "assets/space/generated/replacements/share-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/share-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact share/export pictogram: a thick lavender arrow curves up and right out of a pearl-white rounded tray. Clear arrowhead, simple share silhouette.",
+      "edits": []
+    },
+    {
+      "name": "replacement_download-icon",
+      "path": "assets/space/generated/replacements/download-icon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/download-icon.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact download pictogram: a thick icy-blue arrow points straight downward into a pearl-white rounded tray with lavender trim. Clear arrowhead.",
+      "edits": []
+    },
+    {
+      "name": "replacement_1st-prize",
+      "path": "assets/space/generated/replacements/1st-prize.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/1st-prize.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One premium FIRST PLACE collectible trophy medallion. Rich pale-gold metal rim, pearl-white center, gold crown with three points and a large lavender nova gem, small laurel branches. Most prestigious of three podium prizes. No numbers or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_2nd-place",
+      "path": "assets/space/generated/replacements/2nd-place.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/2nd-place.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One premium SECOND PLACE collectible trophy medallion. Distinct brushed pearl-silver metal rim, icy-blue center, one large lavender star and two small pearl-white laurel branches. Clearly silver, less ornate than the gold crowned first-place medallion. No numbers or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_3rd-place",
+      "path": "assets/space/generated/replacements/3rd-place.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/3rd-place.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One premium THIRD PLACE collectible trophy medallion. Distinct warm peach-bronze metal rim, pearl-white center, one small icy-blue star and simple short laurel branches. Clearly bronze, simpler than gold or silver prizes. No numbers or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_trophy-2",
+      "path": "assets/space/generated/replacements/trophy-2.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/trophy-2.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One compact leaderboard trophy cup with pearl-white glossy body, pale-gold rim and handles, lavender base and icy-blue star emblem. Broad readable trophy silhouette, simple premium space style.",
+      "edits": []
+    },
+    {
+      "name": "replacement_bronze-lv-1",
+      "path": "assets/space/generated/replacements/bronze-lv-1.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/bronze-lv-1.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One BRONZE LEVEL 1 collectible achievement medallion. warm peach-bronze metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 1 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 1. Simple plain circular rim. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_bronze-lv-2",
+      "path": "assets/space/generated/replacements/bronze-lv-2.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/bronze-lv-2.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One BRONZE LEVEL 2 collectible achievement medallion. warm peach-bronze metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 2 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 2. Double rounded rim and small symmetric laurel branches. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_bronze-lv-3",
+      "path": "assets/space/generated/replacements/bronze-lv-3.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/bronze-lv-3.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One BRONZE LEVEL 3 collectible achievement medallion. warm peach-bronze metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 3 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 3. Triple rounded rim with more prominent laurel branches and a small top nova ornament. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_silver-lv-1",
+      "path": "assets/space/generated/replacements/silver-lv-1.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/silver-lv-1.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One SILVER LEVEL 1 collectible achievement medallion. pearl-silver and icy-blue metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 1 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 1. Simple plain circular rim. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_silver-lv-2",
+      "path": "assets/space/generated/replacements/silver-lv-2.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/silver-lv-2.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One SILVER LEVEL 2 collectible achievement medallion. pearl-silver and icy-blue metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 2 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 2. Double rounded rim and small symmetric laurel branches. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_silver-lv-3",
+      "path": "assets/space/generated/replacements/silver-lv-3.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/silver-lv-3.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One SILVER LEVEL 3 collectible achievement medallion. pearl-silver and icy-blue metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 3 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 3. Triple rounded rim with more prominent laurel branches and a small top nova ornament. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_gold-lv-1",
+      "path": "assets/space/generated/replacements/gold-lv-1.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/gold-lv-1.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One GOLD LEVEL 1 collectible achievement medallion. pale-gold metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 1 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 1. Simple plain circular rim. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_gold-lv-2",
+      "path": "assets/space/generated/replacements/gold-lv-2.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/gold-lv-2.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One GOLD LEVEL 2 collectible achievement medallion. pale-gold metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 2 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 2. Double rounded rim and small symmetric laurel branches. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_gold-lv-3",
+      "path": "assets/space/generated/replacements/gold-lv-3.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/gold-lv-3.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One GOLD LEVEL 3 collectible achievement medallion. pale-gold metal rim, pearl-white center, subtle lavender space trim, a small simplified orbital planet motif. Show EXACTLY 3 clearly separated raised pale-gold star ornaments across the lower ribbon to distinguish level 3. Triple rounded rim with more prominent laurel branches and a small top nova ornament. Keep circular silhouette consistent with other medals in this series. No numerals, labels or text.",
+      "edits": []
+    },
+    {
+      "name": "replacement_max-level",
+      "path": "assets/space/generated/replacements/max-level.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/replacements/max-level.txt",
+      "generationSuffix": "",
+      "promptOverride": "Use case: stylized-concept. Asset type: GridNova mobile Sudoku UI icon, one object on one square 1:1 canvas, actual transparent background. Premium light-space soft 3D style matching the existing GridNova robots, planets and new Time Attack stopwatch. Glossy pearl-white plastic, pastel lavender, icy blue, periwinkle, mint, coral-peach and pale-gold accents, navy only for small contrast symbols. Rounded bevels, bright diffused studio daylight from upper left, gentle ambient occlusion, low visual noise. Center the entire object, fill about 80–85% of canvas, generous unclipped margin, readable at 24–72 px. Avoid backgrounds, checkerboard, words, logos, watermark, harsh neon, dark sky, sharp metal, intricate mechanical details and gritty textures. \nSubject: One highest-level COSMIC MASTER achievement medallion. Pearl-white and iridescent icy-blue rim, lavender crystal center, prominent pale-gold crown, softly rounded laurel branches, one large luminous four-point nova gem and three small distinct stars. More prestigious than gold level 3, elegant rather than busy. No text or numerals.",
+      "edits": []
+    },
+    {
+      "name": "control_close",
+      "path": "assets/space/generated/controls/close.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/controls/close.txt",
+      "promptOverride": "GridNova light space mobile UI control icon. Single centered object filling 85% square canvas. Premium soft glossy 3D plastic, rounded edges, pastel lavender icy-blue pearl-white, navy contrast. Front view, soft studio daylight. Actual transparent background. No text, numbers, scene, watermark, checkerboard or cast shadow outside object. A single thick rounded X cross, navy-lavender core, pearl white beveled edges. No enclosing circle. Symmetric clear close symbol.",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "control_back",
+      "path": "assets/space/generated/controls/back.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/controls/back.txt",
+      "promptOverride": "GridNova light space mobile UI control icon. Single centered object filling 85% square canvas. Premium soft glossy 3D plastic, rounded edges, pastel lavender icy-blue pearl-white, navy contrast. Front view, soft studio daylight. Actual transparent background. No text, numbers, scene, watermark, checkerboard or cast shadow outside object. A single thick arrow pointing LEFT, broad triangular arrowhead and short horizontal shaft. Lavender-blue core, pearl-white beveled edges. No enclosing circle.",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "control_volume",
+      "path": "assets/space/generated/controls/volume.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/controls/volume.txt",
+      "promptOverride": "GridNova light space mobile UI control icon. Single centered object filling 85% square canvas. Premium soft glossy 3D plastic, rounded edges, pastel lavender icy-blue pearl-white, navy contrast. Front view, soft studio daylight. Actual transparent background. No text, numbers, scene, watermark, checkerboard or cast shadow outside object. A round pearl-white volume slider thumb knob viewed straight-on, lavender outer rim, tiny navy speaker symbol with two icy-blue sound arcs embossed in center. No track. Simple readable knob.",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "avatar_lunar-fox",
+      "path": "assets/space/generated/avatars/lunar-fox.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/avatars/lunar-fox.txt",
+      "promptOverride": "Use case: stylized-concept. Create ONE brand-new GridNova profile avatar character, square 1:1 actual transparent background. Head and shoulders portrait, front-facing friendly expressive face centered, fills 85% of canvas, entire ears/horns/mane within generous safe margin. Premium soft glossy 3D toy illustration consistent with light-space game theme: pearl white pastel lavender icy blue mint pale gold, navy eye contrast. Rounded chunky silhouette recognizable at 48px, bright diffused upper-left studio light, gentle ambient occlusion. No full body, waving hands, surrounding scene, props outside portrait, words, logos, numbers, checkerboard, watermark, harsh neon or dark background. Subject: cute arctic space fox with large pointed ears, pearl white fur, lavender ear interiors, icy-blue eyes, tiny astronaut collar",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "avatar_nebula-cat",
+      "path": "assets/space/generated/avatars/nebula-cat.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/avatars/nebula-cat.txt",
+      "promptOverride": "Use case: stylized-concept. Create ONE brand-new GridNova profile avatar character, square 1:1 actual transparent background. Head and shoulders portrait, front-facing friendly expressive face centered, fills 85% of canvas, entire ears/horns/mane within generous safe margin. Premium soft glossy 3D toy illustration consistent with light-space game theme: pearl white pastel lavender icy blue mint pale gold, navy eye contrast. Rounded chunky silhouette recognizable at 48px, bright diffused upper-left studio light, gentle ambient occlusion. No full body, waving hands, surrounding scene, props outside portrait, words, logos, numbers, checkerboard, watermark, harsh neon or dark background. Subject: cute lavender space cat with triangular ears, mint eyes, pearl-white muzzle and small gold crescent forehead emblem",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "avatar_comet-panda",
+      "path": "assets/space/generated/avatars/comet-panda.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/avatars/comet-panda.txt",
+      "promptOverride": "Use case: stylized-concept. Create ONE brand-new GridNova profile avatar character, square 1:1 actual transparent background. Head and shoulders portrait, front-facing friendly expressive face centered, fills 85% of canvas, entire ears/horns/mane within generous safe margin. Premium soft glossy 3D toy illustration consistent with light-space game theme: pearl white pastel lavender icy blue mint pale gold, navy eye contrast. Rounded chunky silhouette recognizable at 48px, bright diffused upper-left studio light, gentle ambient occlusion. No full body, waving hands, surrounding scene, props outside portrait, words, logos, numbers, checkerboard, watermark, harsh neon or dark background. Subject: cute pearl-white panda astronaut with lavender eye patches, navy eyes, icy-blue helmet rim",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "avatar_cosmo-owl",
+      "path": "assets/space/generated/avatars/cosmo-owl.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/avatars/cosmo-owl.txt",
+      "promptOverride": "Use case: stylized-concept. Create ONE brand-new GridNova profile avatar character, square 1:1 actual transparent background. Head and shoulders portrait, front-facing friendly expressive face centered, fills 85% of canvas, entire ears/horns/mane within generous safe margin. Premium soft glossy 3D toy illustration consistent with light-space game theme: pearl white pastel lavender icy blue mint pale gold, navy eye contrast. Rounded chunky silhouette recognizable at 48px, bright diffused upper-left studio light, gentle ambient occlusion. No full body, waving hands, surrounding scene, props outside portrait, words, logos, numbers, checkerboard, watermark, harsh neon or dark background. Subject: wise round space owl, pearl-white feathers lavender wings, oversized icy-blue eyes, tiny gold star forehead crest",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "avatar_nova-dragon",
+      "path": "assets/space/generated/avatars/nova-dragon.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/avatars/nova-dragon.txt",
+      "promptOverride": "Use case: stylized-concept. Create ONE brand-new GridNova profile avatar character, square 1:1 actual transparent background. Head and shoulders portrait, front-facing friendly expressive face centered, fills 85% of canvas, entire ears/horns/mane within generous safe margin. Premium soft glossy 3D toy illustration consistent with light-space game theme: pearl white pastel lavender icy blue mint pale gold, navy eye contrast. Rounded chunky silhouette recognizable at 48px, bright diffused upper-left studio light, gentle ambient occlusion. No full body, waving hands, surrounding scene, props outside portrait, words, logos, numbers, checkerboard, watermark, harsh neon or dark background. Subject: friendly baby cosmic dragon with short lavender horns, mint scales, pearl white cheeks, navy eyes, rounded icy-blue fins",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "avatar_astra-knight",
+      "path": "assets/space/generated/avatars/astra-knight.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/avatars/astra-knight.txt",
+      "promptOverride": "Use case: stylized-concept. Create ONE brand-new GridNova profile avatar character, square 1:1 actual transparent background. Head and shoulders portrait, front-facing friendly expressive face centered, fills 85% of canvas, entire ears/horns/mane within generous safe margin. Premium soft glossy 3D toy illustration consistent with light-space game theme: pearl white pastel lavender icy blue mint pale gold, navy eye contrast. Rounded chunky silhouette recognizable at 48px, bright diffused upper-left studio light, gentle ambient occlusion. No full body, waving hands, surrounding scene, props outside portrait, words, logos, numbers, checkerboard, watermark, harsh neon or dark background. Subject: friendly miniature celestial knight robot head, pearl-white rounded helmet lavender visor surround, luminous blue eyes, small gold crown crest",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "avatar_orbit-bunny",
+      "path": "assets/space/generated/avatars/orbit-bunny.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/avatars/orbit-bunny.txt",
+      "promptOverride": "Use case: stylized-concept. Create ONE brand-new GridNova profile avatar character, square 1:1 actual transparent background. Head and shoulders portrait, front-facing friendly expressive face centered, fills 85% of canvas, entire ears/horns/mane within generous safe margin. Premium soft glossy 3D toy illustration consistent with light-space game theme: pearl white pastel lavender icy blue mint pale gold, navy eye contrast. Rounded chunky silhouette recognizable at 48px, bright diffused upper-left studio light, gentle ambient occlusion. No full body, waving hands, surrounding scene, props outside portrait, words, logos, numbers, checkerboard, watermark, harsh neon or dark background. Subject: cute white moon rabbit astronaut, tall rounded ears with icy-blue interiors, lavender cheeks, navy eyes, small gold star collar",
+      "generationSuffix": "",
+      "edits": []
+    },
+    {
+      "name": "avatar_solar-lion",
+      "path": "assets/space/generated/avatars/solar-lion.png",
+      "transparent": true,
+      "sourcePrompt": "prompts/avatars/solar-lion.txt",
+      "promptOverride": "Use case: stylized-concept. Create ONE brand-new GridNova profile avatar character, square 1:1 actual transparent background. Head and shoulders portrait, front-facing friendly expressive face centered, fills 85% of canvas, entire ears/horns/mane within generous safe margin. Premium soft glossy 3D toy illustration consistent with light-space game theme: pearl white pastel lavender icy blue mint pale gold, navy eye contrast. Rounded chunky silhouette recognizable at 48px, bright diffused upper-left studio light, gentle ambient occlusion. No full body, waving hands, surrounding scene, props outside portrait, words, logos, numbers, checkerboard, watermark, harsh neon or dark background. Subject: friendly celestial lion cub, pale gold rounded mane, pearl-white muzzle, lavender face highlights, navy eyes, small icy-blue forehead gem",
+      "generationSuffix": "",
+      "edits": []
+    }
+  ]
+}

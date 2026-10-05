@@ -1,3 +1,4 @@
+import { ic } from '@ui/icons';
 // =====================================================================
 // Paywall modal — RevenueCat-backed purchase flow
 // Falls back to "coming soon" UI when RC is not configured
@@ -29,7 +30,7 @@ export function showPaywall(props: PaywallProps): void {
   wrapper.className = 'modal-bg active';
   wrapper.innerHTML = `
     <div class="modal paywall-modal">
-      <button class="modal-close" id="pw-close" aria-label="Close">×</button>
+      <button class="modal-close" id="pw-close" aria-label="Close">${ic.close(24)}</button>
       <div style="font-size:42px;margin-bottom:4px;">✨</div>
       <h2 style="margin-bottom:4px;">GridNova Premium</h2>
       <p class="auth-sub">Unlock everything. Cancel anytime.</p>

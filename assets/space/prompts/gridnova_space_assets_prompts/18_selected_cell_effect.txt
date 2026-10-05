@@ -1,0 +1,15 @@
+Create a UI effect texture for a selected Sudoku cell.
+
+Appearance:
+very subtle icy blue / lavender inner glow,
+soft rounded square border,
+thin luminous edge,
+clean white center,
+no heavy neon,
+no text.
+
+Style:
+premium mobile puzzle UI, light theme.
+
+Output:
+transparent PNG-style asset, square, no background.

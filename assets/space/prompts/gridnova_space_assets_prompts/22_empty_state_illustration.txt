@@ -1,0 +1,13 @@
+Create a small empty-state illustration for GridNova.
+
+Concept:
+The astronaut mascot floating beside a tiny unfinished Sudoku board,
+looking curious and cheerful.
+
+Style:
+soft 3D, pastel light-space,
+white, lavender, icy blue,
+minimal composition.
+
+Output:
+1:1 transparent background, no text.

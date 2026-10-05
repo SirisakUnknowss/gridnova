@@ -131,7 +131,7 @@ export function showHeartConfirm(opts: { hearts: number; max: number; isGuest: b
 
     wrapper.innerHTML = `
       <div class="modal hearts-confirm" style="text-align:center;">
-        <button class="modal-close" id="hc-close" aria-label="Close">×</button>
+        <button class="modal-close" id="hc-close" aria-label="Close">${ic.close(24)}</button>
         <h2>Start this game?</h2>
         <div class="hearts-status-box">
           ${heartsRow}
@@ -246,7 +246,7 @@ export function showHeartsModal(opts: HeartsModalOpts = {}): void {
 
     wrapper.innerHTML = `
       <div class="modal hearts-modal">
-        <button class="modal-close" id="hearts-close" aria-label="Close">×</button>
+        <button class="modal-close" id="hearts-close" aria-label="Close">${ic.close(24)}</button>
         <h2>${title}</h2>
         ${body}
       </div>

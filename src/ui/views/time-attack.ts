@@ -1,3 +1,4 @@
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Time Attack detail — pick a tier, see your best, start the run
 // =====================================================================
@@ -35,13 +36,12 @@ export function mountTimeAttackView(root: HTMLElement, props: TimeAttackViewProp
     <section class="view view--play-mode">
       <div class="ach-sticky">
         <div class="ach-topbar">
-          <button class="ach-back" id="ta-back" aria-label="Back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+          <button class="icon-btn" id="ta-back" aria-label="Back">${ic.back(26)}</button>
           <h1 class="ach-title">${ic.timeAttack(20)} Time Attack ${infoButtonHTML('time-attack')}</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
+      ${pageArtHTML('timeAttack')}
 
       <div class="ta-hero">
         <span class="ta-hero-icon">${ic.timeAttack(26)}</span>

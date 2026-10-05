@@ -1,0 +1,27 @@
+Create a set of 12 GridNova Sudoku achievement badges.
+
+Themes:
+First Solve
+7-Day Streak
+30-Day Streak
+No Mistakes
+No Hints
+Under 5 Minutes
+Easy Master
+Medium Master
+Hard Master
+Expert Master
+100 Puzzles
+Daily Champion
+
+Style:
+soft 3D collectible badges,
+light-space visual language,
+rounded medallions, small planets, stars, rockets, crowns, puzzle motifs,
+white / lavender / icy blue base,
+accent colors mint, coral, pale gold, violet.
+
+Output:
+consistent badge family,
+1:1, transparent background,
+no text inside badges.

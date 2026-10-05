@@ -1,0 +1,15 @@
+Create 8 collectible avatar frames for GridNova profile pictures.
+
+Themes:
+Orbit, Moon, Saturn Ring, Comet, Nebula, Star Crown, Rocket Trail, Cosmic Master.
+
+Style:
+soft 3D circular frames,
+light-space aesthetic,
+white / lavender / icy blue base,
+small pale gold highlights,
+clean and premium.
+
+Center must remain empty for avatar placement.
+Transparent background.
+No text.

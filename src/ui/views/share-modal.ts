@@ -1,8 +1,8 @@
 // Share Modal — preview + share/download for Win / Profile / Recap / Invite cards
 import { renderWinCard, renderProfileCard, renderRecapCard, renderInviteCard, buildResultText } from '@lib/share/index';
 import type { WinCardData, ProfileCardData, RecapCardData, InviteCardData } from '@lib/share/index';
-import downloadIcon from '@images/download-icon.png';
-import shareIcon from '@images/share-icon.png';
+import downloadIcon from '@images/space/replacements/download-icon.webp';
+import shareIcon from '@images/space/replacements/share-icon.webp';
 
 export interface ShareModalProps {
   win?: WinCardData;

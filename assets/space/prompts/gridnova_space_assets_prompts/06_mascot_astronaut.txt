@@ -1,0 +1,29 @@
+Create an isolated GridNova mascot character.
+
+Character:
+A small friendly astronaut robot with a rounded white helmet,
+glossy dark navy face visor,
+simple glowing cyan eyes,
+compact chibi proportions,
+white futuristic suit with subtle lavender and icy blue accents,
+tiny pale gold badge,
+soft rounded hands and boots.
+
+Personality:
+smart, calm, curious, supportive.
+
+Style:
+premium soft 3D mobile game mascot,
+glossy plastic, rounded geometry,
+high-quality Pixar-like game rendering without copying any existing character,
+bright soft studio lighting.
+
+Pose:
+neutral standing pose, slightly waving.
+
+Output:
+1:1, centered, transparent background, no text, no shadow cut-off.
+
+Negative:
+human face, realistic astronaut, scary robot, dark armor,
+weapons, cyberpunk, excessive mechanical detail.

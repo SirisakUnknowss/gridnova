@@ -1,0 +1,15 @@
+Create an isolated leaderboard trophy asset for GridNova Sudoku.
+
+Design:
+A compact futuristic trophy cup,
+white ceramic / glossy plastic body,
+pale gold top rim,
+lavender and icy blue accents,
+small star emblem.
+
+Style:
+soft 3D casual mobile game,
+bright, premium, minimal.
+
+Output:
+1:1 transparent background, centered, no text.

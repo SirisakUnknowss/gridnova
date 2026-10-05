@@ -1,3 +1,4 @@
+import { THEME_BACKGROUNDS } from './theme-backgrounds';
 // =====================================================================
 // Theme system — applies a set of CSS custom properties on <html>
 // Themes correspond to shop_items where category='theme'
@@ -119,18 +120,20 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_neon: {
-    id: 'theme_neon', name: 'Neon Night', preview: '⚡',
+    id: 'theme_neon', name: 'Sky Citadel', preview: '🏛️',
     tokens: {
-      '--brand-gradient': 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)',
-      '--cell-bg': '#1a1140',
-      '--cell-bg-given': '#0f0c29',
-      '--cell-bg-selected': '#ff00ff',
-      '--cell-bg-related': '#3a2470',
-      '--cell-text': '#00ffff',
-      '--cell-text-user': '#ff00ff',
-      '--cell-text-hint': '#39ff14',
-      '--border-thick': '#000000',
-      '--border-thin': '#5a3aa0',
+      '--brand-primary': '#007f86',
+      '--brand-secondary': '#b7e6ea',
+      '--brand-gradient': 'linear-gradient(135deg, #007f86, #d8f3f5)',
+      '--cell-bg': '#f7fcfd',
+      '--cell-bg-given': '#e8f5f7',
+      '--cell-bg-selected': '#b7e6ea',
+      '--cell-bg-related': '#edf8f9',
+      '--cell-text': '#24434a',
+      '--cell-text-user': '#007f86',
+      '--cell-text-hint': '#007f86',
+      '--border-thick': '#73b6bf',
+      '--border-thin': '#d4ecef',
     },
   },
   theme_sakura: {
@@ -173,6 +176,8 @@ export function applyTheme(themeId: string | null | undefined): void {
   const id = themeId || 'theme_classic';
   const theme = THEMES[id] ?? THEMES['theme_classic'];
   const root = document.documentElement;
+  root.dataset.theme = theme.id;
+  root.style.setProperty('--theme-background', `url("${THEME_BACKGROUNDS[theme.id]}")`);
 
   // Reset to classic first to clear any leftover overrides
   for (const [k, v] of Object.entries(CLASSIC)) {
@@ -182,6 +187,59 @@ export function applyTheme(themeId: string | null | undefined): void {
   for (const [k, v] of Object.entries(theme.tokens)) {
     root.style.setProperty(k, v as string);
   }
+  const bases: Record<string, string> = {
+    theme_classic: '#667eea', theme_paper: '#a0522d', theme_dark: '#475569',
+    theme_pastel: '#c2185b', theme_ocean: '#0288d1', theme_forest: '#388e3c',
+    theme_sunset: '#d96528', theme_neon: '#007f86', theme_sakura: '#c74878',
+    theme_thai: '#a66b17', theme_mono: '#424242',
+  };
+  const primary = bases[theme.id] ?? '#667eea';
+  const white = '#ffffff';
+  const surface = `color-mix(in srgb, ${white} 97%, ${primary})`;
+  const text = `color-mix(in srgb, ${primary} 25%, #182033)`;
+  const appTokens: Record<string, string> = {
+    '--calendar-filter': {
+      theme_classic: 'hue-rotate(190deg) saturate(.75)',
+      theme_paper: 'saturate(.65)',
+      theme_dark: 'grayscale(.65) hue-rotate(175deg) saturate(.55)',
+      theme_pastel: 'hue-rotate(285deg) saturate(.65)',
+      theme_ocean: 'hue-rotate(145deg) saturate(.75)',
+      theme_forest: 'hue-rotate(65deg) saturate(.7)',
+      theme_sunset: 'hue-rotate(345deg) saturate(.9)',
+      theme_neon: 'hue-rotate(120deg) saturate(.8)',
+      theme_sakura: 'hue-rotate(290deg) saturate(.7)',
+      theme_thai: 'none',
+      theme_mono: 'grayscale(1)',
+    }[theme.id] ?? 'none',
+    '--brand-primary': primary,
+    '--brand-secondary': `color-mix(in srgb, ${primary} 55%, ${white})`,
+    '--brand-gradient': `linear-gradient(135deg, ${primary}, color-mix(in srgb, ${primary} 45%, ${white}))`,
+    '--cell-bg': surface,
+    '--cell-bg-given': `color-mix(in srgb, ${white} 92%, ${primary})`,
+    '--cell-bg-selected': `color-mix(in srgb, ${white} 70%, ${primary})`,
+    '--cell-bg-related': `color-mix(in srgb, ${white} 91%, ${primary})`,
+    '--cell-bg-same': `color-mix(in srgb, ${white} 80%, ${primary})`,
+    '--cell-text': text,
+    '--cell-text-user': primary,
+    '--cell-text-hint': primary,
+    '--app-bg': `color-mix(in srgb, ${surface} 90%, ${primary})`,
+    '--app-card-bg': surface,
+    '--app-card': surface,
+    '--app-text': text,
+    '--app-text-secondary': `color-mix(in srgb, ${text} 65%, ${surface})`,
+    '--app-section-label': `color-mix(in srgb, ${text} 60%, ${surface})`,
+    '--app-border': `color-mix(in srgb, ${primary} 20%, ${surface})`,
+    '--app-card-shadow': `0 2px 12px color-mix(in srgb, ${primary} 12%, transparent)`,
+    '--game-bg': 'var(--app-bg)',
+    '--game-card-bg': surface,
+    '--game-topbar-text': text,
+    '--game-muted': 'var(--app-text-secondary)',
+    '--action-bar-bg': 'var(--app-bg)',
+    '--action-btn-text': text,
+    '--action-btn-hover': 'var(--app-border)',
+    '--numpad-btn-bg': surface,
+  };
+  for (const [key, value] of Object.entries(appTokens)) root.style.setProperty(key, value);
   try { localStorage.setItem(ACTIVE_THEME_KEY, id); } catch { /* private */ }
 }
 

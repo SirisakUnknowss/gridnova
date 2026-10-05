@@ -26,7 +26,7 @@ function dayStatus(entry: DailyCalendarEntry | undefined, isFuture: boolean): 's
 
 export function mountCalendarView(root: HTMLElement, props: CalendarProps): { unmount: () => void } {
   const state = useStore.getState();
-  const userId = state.user?.id ?? null;
+  const userId = state.user && !state.user.is_anonymous ? state.user.id : null;
   const today = todayUtc();
   const now = new Date();
   let viewYear = now.getFullYear();
@@ -34,11 +34,11 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
   let entries: Record<string, DailyCalendarEntry> = {};
 
   root.innerHTML = `
-    <section class="view view--play-mode">
+    <section class="view view--play-mode view--calendar${!userId ? ' cal-guest' : ''}">
       <div class="ach-sticky">
         <div class="ach-topbar">
-          <button class="ach-back" id="cal-back" aria-label="Back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <button class="icon-btn" id="cal-back" aria-label="Back">
+            ${ic.back(26)}
           </button>
           <h1 class="ach-title">${ic.daily(20)} Daily Recap</h1>
           <div style="width:40px;flex:none"></div>
@@ -47,7 +47,7 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
 
       <div class="cal-streak-banner">
         <div class="cal-streak-left">
-          <span class="cal-streak-icon">${ic.streak(20)}</span>
+          <span class="cal-streak-icon">${ic.streak(42)}</span>
           <div>
             <div class="cal-streak-num">${state.currentStreak}</div>
             <div class="cal-streak-label">Current streak</div>
@@ -60,7 +60,7 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
       </div>
 
       <div class="cal-nav">
-        <button class="cal-nav-btn" id="cal-prev" aria-label="Previous month"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="cal-nav-btn" id="cal-prev" aria-label="Previous month">${ic.back(26)}</button>
         <span class="cal-nav-label" id="cal-nav-label"></span>
         <button class="cal-nav-btn" id="cal-next" aria-label="Next month"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
       </div>
@@ -217,8 +217,9 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
     navLabel.textContent = `${MONTH_NAMES[viewMonth - 1]} ${viewYear}`;
     nextBtn.disabled = viewYear === now.getFullYear() && viewMonth === now.getMonth() + 1;
     if (!userId) {
-      grid.innerHTML = `<div class="ach-empty">Sign in to track your Daily Puzzle history.</div>`;
+      grid.innerHTML = `<div class="cal-empty"><div aria-hidden="true">${ic.daily(112)}</div><h2>Your daily journey starts here</h2><p>Sign in to track your Daily Puzzle history, review completed puzzles, and follow your streak.</p><button class="btn btn--primary" id="cal-guest-profile">Go to Profile</button></div>`;
       summary.innerHTML = '';
+      grid.querySelector('#cal-guest-profile')?.addEventListener('click', props.nav.onProfile);
       return;
     }
     grid.innerHTML = `<div class="ach-loading">Loading…</div>`;

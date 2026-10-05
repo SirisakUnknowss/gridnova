@@ -1,0 +1,11 @@
+Create a UI effect texture for a Sudoku hint cell.
+
+Appearance:
+soft pale gold highlight,
+gentle warm glow around a rounded square,
+white center,
+subtle sparkle in one corner.
+
+Must remain readable with dark navy Sudoku numbers.
+Light theme only.
+Transparent background.

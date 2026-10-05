@@ -1,0 +1,13 @@
+Create a premium app icon for GridNova Sudoku.
+
+Concept:
+A stylized small Sudoku grid combined with a ringed planet/orbit.
+Rounded square app icon.
+Deep navy used only as a small contrast element,
+main palette remains white, lavender, icy blue, violet.
+
+Style:
+soft 3D, glossy, simple, recognizable at small size,
+clean iOS/Android icon quality.
+
+No text, no letters, no watermark.

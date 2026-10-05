@@ -1,3 +1,4 @@
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Practice view — free play, choose your own difficulty (moved out of Home)
 // =====================================================================
@@ -36,13 +37,12 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
     <section class="view view--practice">
       <div class="ach-sticky">
         <div class="ach-topbar">
-          <button class="ach-back" id="practice-back" aria-label="Back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+          <button class="icon-btn" id="practice-back" aria-label="Back">${ic.back(26)}</button>
           <h1 class="ach-title">${title}${isBook ? ` ${infoButtonHTML('book')}` : ''}</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
+      ${pageArtHTML(isBook ? 'book' : 'mascot')}
 
       <div id="practice-continue-banner" style="display:none; width: 100%"></div>
 

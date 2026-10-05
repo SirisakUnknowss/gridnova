@@ -1,0 +1,25 @@
+Create a vertical hero background for the GridNova Sudoku home screen.
+
+Scene:
+A bright futuristic orbital base above a dreamy planet.
+A cute compact astronaut robot sits near one side of the composition,
+with a tiny floating helper bot nearby.
+A large ringed planet appears far in the background.
+Soft clouds, distant orbital structures, subtle asteroids.
+
+Style:
+premium light-space mobile game,
+soft 3D, glossy white materials, lavender and icy blue lighting,
+friendly, elegant, polished, cinematic but clean.
+
+Composition:
+- 9:16 portrait
+- reserve large clean areas for UI cards and title
+- character should sit in the upper or middle-side area, not dead center
+- lower 40% should allow overlay navigation/cards
+- background depth strongly blurred
+- no text, no logos, no UI
+
+Negative:
+dark sci-fi, cyberpunk, too many characters, realistic human face,
+busy machinery, cluttered stars, heavy lens flare, dramatic war scene.

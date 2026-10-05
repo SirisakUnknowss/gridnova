@@ -1,0 +1,21 @@
+GRIDNOVA UI MATERIAL REFERENCE
+
+Generate a material reference sheet containing:
+- glossy white plastic
+- pearl white surface
+- frosted glass
+- icy blue translucent glass
+- lavender translucent glass
+- pale gold metallic accent
+- dark navy ink / icon color
+- coral error accent
+- mint success accent
+
+All shown as simple rounded spheres, cubes, and cards.
+
+Style:
+bright studio lighting,
+soft shadows,
+premium mobile UI material study,
+clean white background,
+no labels or text.

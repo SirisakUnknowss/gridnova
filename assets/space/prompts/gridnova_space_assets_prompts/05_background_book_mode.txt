@@ -1,0 +1,17 @@
+Create a vertical background for GridNova Sudoku Book Mode.
+
+Concept:
+A futuristic reading nook inside a bright orbital library.
+White curved architecture, floating translucent book-like panels,
+soft planet view through a large window.
+
+Style:
+light pastel sci-fi, minimal, soft 3D,
+white, lavender, icy blue, pale warm gold,
+quiet and sophisticated.
+
+Composition:
+9:16 portrait.
+Keep central area clean for the puzzle/book interface.
+Decorative library elements only near edges.
+No readable text, no UI, no logos.

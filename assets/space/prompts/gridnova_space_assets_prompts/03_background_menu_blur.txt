@@ -1,0 +1,18 @@
+Create a blurred modal background plate for a light-space Sudoku mobile game.
+
+Use the same GridNova space world:
+soft pale blue orbital scenery, distant planet, faint structures,
+but intentionally heavily defocused.
+
+Requirements:
+- 9:16 portrait
+- very low contrast
+- soft blur / bokeh
+- center suitable for a white translucent modal
+- no sharp objects
+- no text
+- no UI
+- no characters
+
+Visual target:
+premium calm mobile game background, glassmorphism-friendly, focus-first.

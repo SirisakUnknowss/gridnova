@@ -1,3 +1,4 @@
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Daily Puzzle detail — info, rank today, Play/Continue, leaderboard inline
 // =====================================================================
@@ -44,13 +45,12 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
     <section class="view view--play-mode">
       <div class="ach-sticky">
         <div class="ach-topbar">
-          <button class="ach-back" id="dd-back" aria-label="Back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+          <button class="icon-btn" id="dd-back" aria-label="Back">${ic.back(26)}</button>
           <h1 class="ach-title">${ic.daily(20)} Daily Puzzle ${infoButtonHTML('daily')}</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
+      ${pageArtHTML('daily')}
 
       <div class="pm-detail-head">
         <span class="pm-detail-icon">${ic.daily(24)}</span>

@@ -1,4 +1,5 @@
-import infoIcon from '@images/information.png';
+import { ic } from '@ui/icons';
+import infoIcon from '@images/space/replacements/information.webp';
 import { BASE_SCORE, TIME_ATTACK_TIERS } from '@engine/scoring';
 
 export type ModeInfoKey = 'daily' | 'time-attack' | 'random' | 'book';
@@ -108,7 +109,7 @@ export function showModeInfoModal(key: ModeInfoKey): void {
   wrapper.className = 'modal-bg active';
   wrapper.innerHTML = `
     <div class="modal mode-info-modal" role="dialog" aria-modal="true" aria-labelledby="mode-info-title">
-      <button class="modal-close" id="mode-info-close" aria-label="Close">×</button>
+      <button class="modal-close" id="mode-info-close" aria-label="Close">${ic.close(24)}</button>
       <img class="mode-info-hero" src="${infoIcon}" alt="" width="56" height="56">
       <h2 id="mode-info-title">${info.title}</h2>
       <h3 class="mode-info-heading">How to play</h3>

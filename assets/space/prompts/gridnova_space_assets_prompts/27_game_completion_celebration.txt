@@ -1,0 +1,17 @@
+Create a game-completion celebration illustration for GridNova Sudoku.
+
+Scene:
+Astronaut mascot floating happily with a small trophy,
+soft stars and confetti-like glowing particles,
+ringed planet in the distance.
+
+Style:
+bright, premium, soft 3D,
+light-space palette,
+celebratory but not visually chaotic.
+
+Output:
+portrait/4:5,
+center character,
+clean edges for overlay text/buttons,
+no text.

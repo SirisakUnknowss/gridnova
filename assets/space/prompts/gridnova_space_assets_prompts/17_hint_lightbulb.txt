@@ -1,0 +1,12 @@
+Create an isolated hint icon for GridNova Sudoku.
+
+Design:
+A friendly futuristic lightbulb,
+white translucent glass,
+warm pale gold glow,
+lavender base,
+tiny star sparkles,
+soft 3D glossy style.
+
+Readable at 32px.
+Transparent background, no text.

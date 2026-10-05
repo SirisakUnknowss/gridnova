@@ -1,3 +1,4 @@
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Random Mode detail — current streak, empty state, Play Random
 // =====================================================================
@@ -18,13 +19,12 @@ export function mountRandomModeDetailView(root: HTMLElement, props: RandomModeDe
     <section class="view view--play-mode">
       <div class="ach-sticky">
         <div class="ach-topbar">
-          <button class="ach-back" id="rm-back" aria-label="Back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+          <button class="icon-btn" id="rm-back" aria-label="Back">${ic.back(26)}</button>
           <h1 class="ach-title">${ic.dice(20)} Random Mode ${infoButtonHTML('random')}</h1>
           <div style="width:40px;flex:none"></div>
         </div>
       </div>
+      ${pageArtHTML('random')}
 
       <div id="rm-body" class="pm-detail-body"><div class="ach-loading">Loading…</div></div>
     </section>

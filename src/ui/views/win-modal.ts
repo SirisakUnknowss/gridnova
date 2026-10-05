@@ -1,3 +1,4 @@
+import celebration from '@images/space/celebration.webp';
 // =====================================================================
 // Win modal — shown after game completion
 // =====================================================================
@@ -105,7 +106,8 @@ export function showWinModal(props: WinModalProps): void {
 
   wrapper.innerHTML = `
     <div class="modal">
-      <h2>${ic.celebrate(22)} You won!</h2>
+      <img src="${celebration}" class="space-win-art" width="144" height="180" alt="" decoding="async">
+      <h2>You won!</h2>
       <div class="big-number">${result.score.toLocaleString()}</div>
       <p class="small" style="opacity:0.8;">Points</p>
 

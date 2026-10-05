@@ -1,0 +1,31 @@
+Create a vertical mobile game background for GridNova Sudoku.
+
+Scene:
+A calm futuristic space environment viewed from a bright orbital platform.
+Large soft-focus planet or moon in the far background.
+Very subtle floating asteroids and distant space structures.
+Soft clouds / atmospheric haze near the lower area.
+No character in the center.
+The middle 60% of the screen must be visually quiet because a Sudoku board will sit there.
+
+Style:
+light space theme, pastel sci-fi, premium casual mobile game,
+white, ice blue, lavender, pale peach, subtle gold highlights,
+soft depth of field, strong blur on distant elements,
+clean luminous atmosphere, soft daylight, elegant and minimal.
+
+Composition:
+- 9:16 portrait
+- clear negative space in center
+- slightly more detail near top corners and bottom corners
+- edges can contain soft space scenery
+- center must remain clean and low contrast
+- no text, no UI, no Sudoku board
+
+Important:
+The background must support concentration and never compete with the puzzle grid.
+
+Negative:
+dark mode, black sky, dense stars, neon cyberpunk, high contrast,
+busy spaceship interiors, sharp debris, centered planet behind the board,
+text, logo, watermark.

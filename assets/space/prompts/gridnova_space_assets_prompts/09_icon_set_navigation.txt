@@ -1,0 +1,19 @@
+Create a coordinated icon set for GridNova Sudoku mobile UI.
+
+Icons:
+Home, Daily Puzzle, Random Mode, Book Mode, Leaderboard,
+Achievements, Statistics, Themes, Profile, Settings, Quests.
+
+Visual style:
+light-space themed,
+rounded 3D / semi-3D icons,
+white base with periwinkle/lavender/icy blue accents,
+tiny pale gold accents where suitable,
+simple silhouettes readable at 24–32px,
+consistent stroke weight and depth.
+
+Output:
+transparent background,
+one icon per square canvas,
+no text,
+no card background.

@@ -1,3 +1,6 @@
+import { collectionMedals } from '@lib/collection-medals';
+import { RARE_AVATAR_CATALOG } from '@lib/rare-avatar-catalog';
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Achievements view — tiered badge groups + special one-off achievements
 // =====================================================================
@@ -7,26 +10,26 @@ import { useStore } from '@state/store';
 import { escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
-import badgeIcon from '@images/badge.png';
-import trophyIcon from '@images/trophy-cup.png';
-import levelUpIcon from '@images/level-up.png';
-import questIcon from '@images/quest.png';
-import playIcon from '@images/play-medal.png';
-import dailyIcon from '@images/daily-medal.png';
-import streakIcon from '@images/streak-medal.png';
-import flawlessIcon from '@images/flawless-medal.png';
-import speedsterIcon from '@images/speedster-medal.png';
-import pureIcon from '@images/clean-solve.png';
-import bronzeLv1 from '@images/level/bronze-lv-1.png';
-import bronzeLv2 from '@images/level/bronze-lv-2.png';
-import bronzeLv3 from '@images/level/bronze-lv-3.png';
-import silverLv1 from '@images/level/silver-lv-1.png';
-import silverLv2 from '@images/level/silver-lv-2.png';
-import silverLv3 from '@images/level/silver-lv-3.png';
-import goldLv1 from '@images/level/gold-lv-1.png';
-import goldLv2 from '@images/level/gold-lv-2.png';
-import goldLv3 from '@images/level/gold-lv-3.png';
-import maxLevelIcon from '@images/level/max-level.png';
+import badgeIcon from '@images/space/page-medals.webp';
+import trophyIcon from '@images/space/trophyIcon.webp';
+import levelUpIcon from '@images/space/replacements/level-up.webp';
+import questIcon from '@images/space/page-quests.webp';
+import playIcon from '@images/space/badge-first.webp';
+import dailyIcon from '@images/space/dailyIcon.webp';
+import streakIcon from '@images/space/badge-streak.webp';
+import flawlessIcon from '@images/space/badge-flawless.webp';
+import speedsterIcon from '@images/space/badge-speed.webp';
+import pureIcon from '@images/space/badge-pure.webp';
+import bronzeLv1 from '@images/space/replacements/bronze-lv-1.webp';
+import bronzeLv2 from '@images/space/replacements/bronze-lv-2.webp';
+import bronzeLv3 from '@images/space/replacements/bronze-lv-3.webp';
+import silverLv1 from '@images/space/replacements/silver-lv-1.webp';
+import silverLv2 from '@images/space/replacements/silver-lv-2.webp';
+import silverLv3 from '@images/space/replacements/silver-lv-3.webp';
+import goldLv1 from '@images/space/replacements/gold-lv-1.webp';
+import goldLv2 from '@images/space/replacements/gold-lv-2.webp';
+import goldLv3 from '@images/space/replacements/gold-lv-3.webp';
+import maxLevelIcon from '@images/space/replacements/max-level.webp';
 
 // 10-slot sequence for legacy flat groups (Leaderboard/Level/Quest, badge_level 1-10)
 const LEVEL_IMAGES_10 = [bronzeLv1, bronzeLv2, bronzeLv3, silverLv1, silverLv2, silverLv3, goldLv1, goldLv2, goldLv3, maxLevelIcon];
@@ -64,6 +67,7 @@ const BADGE_GROUP_META: Record<string, { label: string; emoji: string; icon?: st
   leaderboard: { label: 'Leaderboard', emoji: '🏆', icon: trophyIcon },
   progression: { label: 'Level', emoji: '📈', icon: levelUpIcon },
   quest: { label: 'Quest', emoji: '📋', icon: questIcon },
+  collection: { label: 'Collection', emoji: '🏆', icon: trophyIcon },
   special: { label: 'Special', emoji: '✨', icon: badgeIcon },
 };
 
@@ -359,27 +363,6 @@ const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const SVG_LOCK = ic.lock(16);
 const SVG_COIN = ic.coin(16);
 
-function enableDragScroll(el: HTMLElement): void {
-  let down = false, startX = 0, startScroll = 0, moved = false;
-  el.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse') return;
-    down = true; moved = false;
-    startX = e.clientX; startScroll = el.scrollLeft;
-  });
-  el.addEventListener('pointermove', (e) => {
-    if (!down) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > 3) { moved = true; el.classList.add('dragging'); }
-    el.scrollLeft = startScroll - dx;
-  });
-  const end = () => { down = false; el.classList.remove('dragging'); };
-  el.addEventListener('pointerup', end);
-  el.addEventListener('pointerleave', end);
-  el.addEventListener('click', (e) => {
-    if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
-  }, true);
-}
-
 export interface AchievementsProps {
   onBack: () => void;
   nav: BottomNavCallbacks;
@@ -387,6 +370,7 @@ export interface AchievementsProps {
 
 export function mountAchievementsView(root: HTMLElement, props: AchievementsProps): { unmount: () => void } {
   let defs: AchievementDef[] = [];
+  let shopMedals: ReturnType<typeof collectionMedals> = [];
   let unlocked: Set<string> = new Set();
   let newlyUnlocked: Set<string> = new Set();
   let loading = true;
@@ -409,9 +393,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     <section class="view view--ach">
       <div class="ach-sticky">
         <div class="ach-topbar">
-          <button class="ach-back" id="ach-back" aria-label="Back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
+          <button class="icon-btn" id="ach-back" aria-label="Back">${ic.back(26)}</button>
           <h1 class="ach-title">${ic.badge(24)} Medals</h1>
           <div style="width:40px;flex:none"></div>
         </div>
@@ -428,7 +410,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   const filterEl = root.querySelector<HTMLElement>('#ach-filter')!;
   const bodyEl = root.querySelector<HTMLElement>('#ach-body')!;
 
-  enableDragScroll(filterEl);
+
 
   function renderSummary() {
     const total = defs.length;
@@ -437,11 +419,11 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     const circ = 175.9;
     const offset = circ - (circ * pct / 100);
     summaryEl.innerHTML = `
-      <div class="ach-summary">
+      <div class="ach-summary">${pageArtHTML('medals')}
         <div class="ach-sum-ring">
           <svg viewBox="0 0 68 68" width="68" height="68">
-            <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
-            <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="7"
+            <circle cx="34" cy="34" r="28" fill="none" stroke="var(--app-border)" stroke-width="7"/>
+            <circle cx="34" cy="34" r="28" fill="none" stroke="var(--brand-primary)" stroke-width="7"
               stroke-dasharray="${circ}" stroke-dashoffset="${offset.toFixed(1)}"
               stroke-linecap="round" transform="rotate(-90 34 34)"/>
           </svg>
@@ -544,6 +526,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
         <div class="ach-row-body">
           <div class="ach-row-name">${escapeHtml(d.name)}</div>
           <div class="ach-row-desc">${escapeHtml(d.description)}</div>
+          ${d.category === 'collection' ? `<div class="ach-row-desc">${shopMedals.find(medal => medal.id === d.id)?.current ?? 0} / ${shopMedals.find(medal => medal.id === d.id)?.target ?? 0}</div>` : ''}
         </div>
         <div class="ach-row-right">
           ${isUnlocked
@@ -685,6 +668,16 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
           .map((u) => u.achievement_id),
       );
       const ownedIds = ((inventory ?? []) as any[]).map((r) => r.item_id as string);
+      const catalog = await api.getShopItems();
+      const shopAvatars = new Set(['avatar_face_happy', 'avatar_face_cool', 'avatar_face_nerd', 'avatar_face_lion', 'avatar_hat_cap', 'avatar_pet_dog', 'avatar_pet_cat', 'avatar_pet_dragon']);
+      const collectionCatalog = (catalog ?? []).filter(item => item.category === 'theme' || (item.category === 'avatar' && (shopAvatars.has(item.id) || item.id.startsWith('avatar_rare_'))));
+      for (const rare of RARE_AVATAR_CATALOG) {
+        if (!collectionCatalog.some(item => item.id === rare.id)) collectionCatalog.push(rare);
+      }
+      shopMedals = collectionMedals(collectionCatalog, ownedIds);
+      defs = defs.filter(def => !shopMedals.some(medal => medal.id === def.id));
+      defs.push(...shopMedals.map((medal, index) => ({ id: medal.id, name: medal.name, description: medal.description, tier: index < 2 ? 'bronze' : 'gold', category: 'collection', badge_level: 0, badge_mission: 1, mission_name: null, reward_coin: 0, reward_xp: 0, sort_order: 10000 + index })));
+      for (const medal of shopMedals) if (medal.unlocked) unlocked.add(medal.id);
       const statsData = (streakStats as any)?.data ?? {};
       const distinctDays = new Set(
         ((distinctDaysRes as any)?.data ?? []).map((r: any) => r.completed_at?.slice(0, 10))

@@ -1,0 +1,14 @@
+Create a coordinated gameplay tool icon set for GridNova Sudoku.
+
+Icons:
+Undo, Redo, Erase, Notes / Pencil, Hint / Lightbulb,
+Pause, Resume / Play, Restart, Auto-check, Sound, Music, Haptics.
+
+Style:
+premium light-space mobile UI,
+clean rounded line icons with subtle 3D depth,
+navy symbol color with lavender / icy blue active accents,
+minimal, high legibility.
+
+Output:
+transparent background, 1:1 icon assets, no labels, no card backgrounds.

@@ -1,12 +1,14 @@
+import { RARE_AVATAR_CATALOG } from '@lib/rare-avatar-catalog';
+import { THEME_BACKGROUNDS } from '@lib/theme-backgrounds';
+import { avatarArtHTML, shopAvatarName } from '../components/avatar-art';
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Shop view — browse / purchase / equip items
 // =====================================================================
 import * as api from '@lib/api';
 import { useStore } from '@state/store';
 import { escapeHtml, formatNumber } from '@lib/format';
-import { applyTheme, themePreview, THEMES } from '@lib/themes';
-import { applyBackground, BACKGROUNDS, bgPreviewIcon } from '@lib/backgrounds';
-import { applyBoardColorFromItem } from '@lib/board-colors';
+import { applyTheme, THEMES } from '@lib/themes';
 import { countUp, floatReward } from '@lib/animate';
 import { PREMIUM_THEMES, isPremium } from '@lib/premium';
 import { showPaywall } from './paywall';
@@ -15,12 +17,13 @@ import { ic } from '@ui/icons';
 import { sfxThemeChange, sfxCoin } from '@lib/sound';
 
 export interface ShopProps {
+  avatarItemId?: string;
   onBack: () => void;
   onToast: (msg: string) => void;
   nav: BottomNavCallbacks;
 }
 
-type Category = 'theme' | 'background' | 'board_color' | 'avatar' | 'all';
+type Category = 'theme' | 'avatar';
 
 interface ShopItem {
   id: string;
@@ -32,80 +35,61 @@ interface ShopItem {
   unlock_type: string;
   available: boolean;
   sort_order: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
+  catalogPending?: boolean;
 }
 
 const RARITY_LABEL: Record<string, string> = {
   common: '◯ COMMON', rare: '◉ RARE', epic: '◈ EPIC', legendary: '★ LEGENDARY',
 };
 
-const AVATAR_EMOJI: Record<string, string> = {
-  avatar_face_happy:   '😊',
-  avatar_face_cool:    '😎',
-  avatar_face_nerd:    '🤓',
-  avatar_face_lion:    '🦁',
-  avatar_hat_cap:      '🧢',
-  avatar_hat_top:      '🎩',
-  avatar_hat_crown:    '👑',
-  avatar_pet_dog:      '🐶',
-  avatar_pet_cat:      '🐱',
-  avatar_pet_dragon:   '🐲',
-  avatar_frame_bronze: '🥉',
-  avatar_frame_gold:   '🥇',
-  avatar_frame_rainbow:'🌈',
-};
+function avatarPreviewIcon(id: string): string { return avatarArtHTML(id, 88); }
 
-function avatarPreviewIcon(id: string): string {
-  return AVATAR_EMOJI[id] ?? '👤';
+function themePreview(id: string): string {
+  const theme = THEMES[id] ?? THEMES.theme_classic;
+  const tokens = { ...THEMES.theme_classic.tokens, ...theme.tokens };
+  const style = Object.entries(tokens).map(([key, value]) => key + ':' + value).join(';');
+  return `<div class="shop-theme-sample" style="${escapeHtml(style)};background-image:url(&quot;${escapeHtml(THEME_BACKGROUNDS[id])}&quot;)" aria-hidden="true"><div class="shop-theme-top"></div><div class="shop-theme-board">${[1, '', 3, '', 5, '', 7, '', 9].map((value, i) => `<span class="${i === 4 ? 'selected' : ''}">${value}</span>`).join('')}</div></div>`;
 }
 
-function boardColorPreviewIcon(id: string): string {
-  if (id.includes('default')) return '💜';
-  if (id.includes('ocean')) return '💙';
-  if (id.includes('forest')) return '💚';
-  if (id.includes('sakura')) return '💗';
-  if (id.includes('midnight')) return '🖤';
-  if (id.includes('ember')) return '🧡';
-  return '▦';
-}
+const AVATAR_SHOP_IDS = new Set(['avatar_face_happy', 'avatar_face_cool', 'avatar_face_nerd', 'avatar_face_lion', 'avatar_hat_cap', 'avatar_pet_dog', 'avatar_pet_cat', 'avatar_pet_dragon']);
 
 const CATEGORY_TABS: { key: Category; label: string }[] = [
-  { key: 'all', label: 'All' },
   { key: 'theme', label: 'Themes' },
-  { key: 'background', label: 'Backgrounds' },
-  { key: 'board_color', label: 'Board Colors' },
   { key: 'avatar', label: 'Avatars' },
 ];
 
 export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: () => void } {
-  let activeCat: Category = 'all';
+  let activeCat: Category = props.avatarItemId ? 'avatar' : 'theme';
+  let pendingAvatar = props.avatarItemId;
   let items: ShopItem[] = [];
   let loading = true;
   let errorMsg: string | null = null;
 
   root.innerHTML = `
-    <section class="view">
+    <section class="view view--shop">
       <div class="top-bar">
         <button class="icon-btn" id="shop-back" aria-label="Back">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          ${ic.back(26)}
         </button>
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Shop
+          ${ic.shop(26)} Shop
         </h2>
-        <span class="stat-pill" style="background:#fffbeb;color:#b45309;border:1px solid #fde68a;">${ic.coin(12)} ${formatNumber(useStore.getState().coins)}</span>
+        <span class="stat-pill" >${ic.coin(12)} ${formatNumber(useStore.getState().coins)}</span>
       </div>
+      ${pageArtHTML('shop')}
 
       <div class="shop-tabs">
         ${CATEGORY_TABS.map((t) => `
-          <button class="shop-tab${t.key === 'all' ? ' active' : ''}" data-cat="${t.key}">${escapeHtml(t.label)}</button>
+          <button class="shop-tab${t.key === activeCat ? ' active' : ''}" data-cat="${t.key}">${escapeHtml(t.label)}</button>
         `).join('')}
       </div>
 
       <div class="shop-grid" id="shop-grid"></div>
     </section>
-    ${bottomNavHTML('home')}
+    ${bottomNavHTML('shop')}
   `;
-  wireBottomNav(root, props.nav, 'home');
+  wireBottomNav(root, props.nav, 'shop');
 
   const gridEl = root.querySelector<HTMLElement>('#shop-grid')!;
 
@@ -147,9 +131,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       gridEl.querySelector('#shop-retry')?.addEventListener('click', () => void load());
       return;
     }
-    const filtered = activeCat === 'all'
-      ? items
-      : items.filter((i) => i.category === activeCat);
+    const filtered = items.filter((item) => item.category === activeCat);
     if (!filtered.length) {
       gridEl.innerHTML = `<div class="lb-empty"><p>${ic.empty(20)} No items here.</p></div>`;
       return;
@@ -163,17 +145,26 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       const isOwned = owned.has(item.id) || item.price_coin === 0;
       const isEquipped =
         (item.category === 'theme' && equipped.theme_id === item.id) ||
-        (item.category === 'background' && equipped.background_id === item.id) ||
-        (item.category === 'board_color' && equipped.board_color_id === item.id);
+        (item.category === 'avatar' && equipped.avatar?.item_id === item.id);
       const canAfford = state.coins >= item.price_coin;
       const rarity = item.rarity ?? 'common';
+      const requiredTheme = item.category === 'avatar' && typeof item.metadata?.theme_id === 'string' ? item.metadata.theme_id : null;
+      const themeLocked = !!requiredTheme && !owned.has(requiredTheme) && !items.some(theme => theme.id === requiredTheme && theme.price_coin === 0);
 
       const isPremiumGated = PREMIUM_THEMES.has(item.id) && !isOwned && !isPremium();
       let action = '';
-      if (isEquipped) {
+      if ((!state.user || state.user.is_anonymous) && item.category === 'theme') {
+        action = isEquipped ? '<span class="quest-tag">✓ Equipped</span>' : `<button class="btn btn--small" data-equip="${escapeHtml(item.id)}">Try theme</button>`;
+      } else if (!isOwned && themeLocked) {
+        action = `<button class="btn btn--small" disabled>${ic.lock(14)} Unlock theme first</button>`;
+      } else if (!state.user || state.user.is_anonymous) {
+        action = '<button class="btn btn--small" data-signin>Sign in</button>';
+      } else if (isEquipped) {
         action = `<span class="quest-tag">✓ Equipped</span>`;
       } else if (isOwned) {
         action = `<button class="btn btn--small" data-equip="${escapeHtml(item.id)}">Equip</button>`;
+      } else if (item.catalogPending) {
+        action = '<button class="btn btn--small" disabled>Coming soon</button>';
       } else if (isPremiumGated) {
         action = `<button class="btn btn--small" data-premium="${escapeHtml(item.id)}">${ic.sparkle(13)} Premium</button>`;
       } else {
@@ -182,22 +173,32 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
 
       let preview = '🎁';
       if (item.category === 'theme') preview = themePreview(item.id);
-      else if (item.category === 'background') preview = bgPreviewIcon(item.id);
-      else if (item.category === 'board_color') preview = boardColorPreviewIcon(item.id);
       else if (item.category === 'avatar') preview = avatarPreviewIcon(item.id);
 
       const previewable = item.category === 'theme';
+      const matchedTheme = previewable ? item.id : typeof item.metadata?.theme_id === 'string' ? item.metadata.theme_id : null;
       return `
-        <div class="shop-card shop-rarity-${rarity}${previewable ? ' previewable' : ''}" data-preview="${previewable ? escapeHtml(item.id) : ''}">
+        <div class="shop-card shop-rarity-${rarity}${previewable ? ' previewable' : ''}" data-shop-item="${escapeHtml(item.id)}" data-preview="${previewable ? escapeHtml(item.id) : ''}" ${matchedTheme ? `style="--shop-card-image:url(&quot;${escapeHtml(THEME_BACKGROUNDS[matchedTheme])}&quot;)"` : ''}>
           ${isPremiumGated ? `<div class="shop-premium-badge" title="Premium-only">${ic.sparkle(12)}</div>` : ''}
           <div class="shop-preview">${preview}</div>
           <div class="shop-name">${escapeHtml(item.name)}</div>
           ${item.description ? `<div class="shop-desc">${escapeHtml(item.description)}</div>` : ''}
-          <div class="shop-rarity">${RARITY_LABEL[rarity] ?? `⚪ ${escapeHtml(rarity)}`}</div>
+          <div class="shop-price">${item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? `⚪ ${escapeHtml(rarity)}`}</div>
           <div class="shop-action">${action}</div>
         </div>
       `;
     }).join('');
+
+    if (pendingAvatar) {
+      const target = Array.from(gridEl.querySelectorAll<HTMLElement>('[data-shop-item]')).find(card => card.dataset.shopItem === pendingAvatar);
+      if (target) {
+        target.scrollIntoView({ block: 'center', behavior: 'instant' });
+        target.classList.add('shop-card--target');
+        pendingAvatar = undefined;
+      }
+    }
+
+    gridEl.querySelectorAll('[data-signin]').forEach(btn => btn.addEventListener('click', props.nav.onProfile));
 
     // Wire actions
     gridEl.querySelectorAll<HTMLButtonElement>('[data-buy]').forEach((btn) => {
@@ -224,17 +225,53 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
     });
   }
 
+
+  let dismissPurchase: (() => void) | null = null;
+  function confirmPurchase(item: ShopItem): Promise<boolean> {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-bg active';
+      overlay.innerHTML = `
+        <div class="modal shop-confirm" role="dialog" aria-modal="true" aria-labelledby="shop-confirm-title">
+          <button class="modal-close" aria-label="Close purchase">${ic.close(24)}</button>
+          <div class="shop-preview">${item.category === 'avatar' ? avatarPreviewIcon(item.id) : themePreview(item.id)}</div>
+          <h2 id="shop-confirm-title">Unlock ${escapeHtml(item.name)}?</h2>
+          <p>${ic.coin(20)} ${formatNumber(item.price_coin)} coins</p>
+          <div class="modal-buttons"><button class="btn btn--secondary" data-cancel>Cancel</button><button class="btn btn--primary" data-confirm>Buy</button></div>
+        </div>`;
+      const finish = (confirmed: boolean) => {
+        overlay.remove();
+        dismissPurchase = null;
+        resolve(confirmed);
+      };
+      dismissPurchase = () => finish(false);
+      overlay.querySelector('[data-confirm]')?.addEventListener('click', () => finish(true));
+      overlay.querySelector('[data-cancel]')?.addEventListener('click', () => finish(false));
+      overlay.querySelector('.modal-close')?.addEventListener('click', () => finish(false));
+      overlay.addEventListener('click', e => { if (e.target === overlay) finish(false); });
+      overlay.addEventListener('keydown', e => { if (e.key === 'Escape') finish(false); });
+      document.body.appendChild(overlay);
+      overlay.querySelector<HTMLButtonElement>('[data-cancel]')?.focus();
+    });
+  }
+
   async function buy(itemId: string, btn: HTMLButtonElement) {
     const item = items.find((i) => i.id === itemId);
-    if (!item) return;
-    if (!confirm(`Buy ${item.name} for ${item.price_coin} coins?`)) return;
+    if (!item || item.catalogPending) return;
+    const requiredTheme = item.category === 'avatar' && typeof item.metadata?.theme_id === 'string' ? item.metadata.theme_id : null;
+    if (requiredTheme && !useStore.getState().inventory.includes(requiredTheme) && !items.some(theme => theme.id === requiredTheme && theme.price_coin === 0)) {
+      props.onToast('Unlock the matching theme first');
+      return;
+    }
+    if (!useStore.getState().user || useStore.getState().user?.is_anonymous) { props.nav.onProfile(); return; }
+    btn.disabled = true;
+    if (!await confirmPurchase(item)) { btn.disabled = false; return; }
     btn.disabled = true; btn.textContent = '…';
     try {
-      const { error } = await api.purchaseItem(itemId);
-      if (error) throw error;
-      // Optimistic: deduct coins + add to inventory (animated)
+      const { data, error } = await api.purchaseItem(itemId);
+      if (error || !data?.success || typeof data.new_balance !== 'number') throw error ?? new Error('Purchase failed');
       const prevCoins = useStore.getState().coins;
-      useStore.setState({ coins: Math.max(0, prevCoins - item.price_coin) });
+      useStore.setState({ coins: data.new_balance });
       useStore.getState().addToInventory(itemId);
       sfxCoin();
       props.onToast(`${item.name} purchased!`);
@@ -251,30 +288,34 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   async function equip(itemId: string, btn: HTMLButtonElement) {
     const item = items.find((i) => i.id === itemId);
     if (!item) return;
+    const state = useStore.getState();
+    if (!state.user || state.user.is_anonymous) {
+      if (item.category !== 'theme' || !THEMES[itemId]) return;
+      previewSavedTheme = null;
+      state.setEquipped({ theme_id: itemId });
+      applyTheme(itemId);
+      sfxThemeChange();
+      props.onToast(`${item.name} equipped`);
+      render();
+      return;
+    }
     btn.disabled = true; btn.textContent = '…';
-    const payload: { theme_id?: string; background_id?: string; board_color_id?: string } = {};
+    const payload: { theme_id?: string; background_id?: string; board_color_id?: string; avatar?: { item_id: string } } = {};
     if (item.category === 'theme') payload.theme_id = itemId;
-    else if (item.category === 'background') payload.background_id = itemId;
-    else if (item.category === 'board_color') payload.board_color_id = itemId;
+
+    if (item.category === 'avatar') payload.avatar = { item_id: itemId };
 
     try {
       const { error } = await api.equipItem(payload);
       if (error) throw error;
       useStore.getState().setEquipped(payload);
       if (item.category === 'theme' && THEMES[itemId]) { applyTheme(itemId); sfxThemeChange(); }
-      if (item.category === 'background' && BACKGROUNDS[itemId]) applyBackground(itemId);
-      if (item.category === 'board_color') applyBoardColorFromItem(item);
       props.onToast(`✓ ${item.name} equipped`);
       render();
     } catch (err) {
-      // Server may not have equip-item function in MVP — fall back to local-only
-      console.warn('Equip endpoint missing, local-only:', err);
-      useStore.getState().setEquipped(payload);
-      if (item.category === 'theme' && THEMES[itemId]) { applyTheme(itemId); sfxThemeChange(); }
-      if (item.category === 'background' && BACKGROUNDS[itemId]) applyBackground(itemId);
-      if (item.category === 'board_color') applyBoardColorFromItem(item);
-      props.onToast(`✓ ${item.name} equipped (local)`);
-      render();
+      props.onToast('Could not equip item. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Equip';
     }
   }
 
@@ -286,8 +327,8 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         api.getInventory().catch(() => []),
         api.getEquipped().catch(() => null),
       ]);
-      items = (shopItems ?? []) as ShopItem[];
-      useStore.getState().setInventory((inventory ?? []).map((r: any) => r.item_id));
+      items = ((shopItems ?? []) as ShopItem[]).filter(item => item.category === 'theme' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_')))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
+      useStore.getState().setInventory((inventory ?? []).map((r: { item_id: string }) => r.item_id));
       if (equipped) {
         useStore.getState().setEquipped({
           theme_id: equipped.theme_id ?? null,
@@ -296,10 +337,11 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
           avatar: equipped.avatar ?? { emoji: '👤' },
         });
         if (equipped.theme_id) applyTheme(equipped.theme_id);
-        if (equipped.background_id) applyBackground(equipped.background_id);
-        if (equipped.board_color_id) {
-          const boardItem = items.find((i) => i.id === equipped.board_color_id);
-          if (boardItem) applyBoardColorFromItem(boardItem);
+      }
+      if (import.meta.env.DEV) {
+        items = items.map(item => item.category === 'theme' && item.price_coin > 0 && item.price_coin !== 5000 ? { ...item, price_coin: 5000, catalogPending: true } : item);
+        for (const rare of RARE_AVATAR_CATALOG) {
+          if (!items.some(item => item.id === rare.id)) items.push({ ...rare, catalogPending: true });
         }
       }
       loading = false;
@@ -332,6 +374,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
 
   return {
     unmount() {
+      dismissPurchase?.();
       previewOut();
       window.removeEventListener('scroll', onScroll);
     },

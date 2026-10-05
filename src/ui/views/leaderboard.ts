@@ -1,3 +1,4 @@
+import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Leaderboard view — Members (Today/Yesterday) + Guests tab
 // =====================================================================
@@ -7,10 +8,10 @@ import * as api from '@lib/api';
 import { formatTime, todayUtc, escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
-import img1st from '@images/1st-prize.png';
-import img2nd from '@images/2nd-place.png';
-import img3rd from '@images/3rd-place.png';
-import imgTrophy from '@images/trophy-2.png';
+import img1st from '@images/space/replacements/1st-prize.webp';
+import img2nd from '@images/space/replacements/2nd-place.webp';
+import img3rd from '@images/space/replacements/3rd-place.webp';
+import imgTrophy from '@images/space/replacements/trophy-2.webp';
 
 export interface LeaderboardProps {
   onBack: () => void;
@@ -79,13 +80,14 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
     <section class="view">
       <div class="top-bar">
         <button class="icon-btn" id="lb-back" aria-label="Back">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          ${ic.back(26)}
         </button>
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">
           ${ic.trophy(13)} Leaderboard
         </h2>
         <span style="width:38px;"></span>
       </div>
+      ${pageArtHTML('trophy')}
 
       <!-- Main tabs: Members | Guests -->
       <div class="lb-tabs lb-tabs--main">

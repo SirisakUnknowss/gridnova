@@ -1,3 +1,6 @@
+import { RARE_AVATAR_CATALOG } from '@lib/rare-avatar-catalog';
+import { AVATAR_OPTIONS, PAID_AVATAR_ITEMS, avatarArtHTML } from '../components/avatar-art';
+import { getGuestIdentity, saveGuestIdentity } from '@lib/guest-identity';
 // =====================================================================
 // Profile view — avatar picker, editable display name, stats summary
 // =====================================================================
@@ -11,6 +14,8 @@ import { APP_VERSION } from '@lib/version';
 import { isPremium } from '@lib/premium';
 
 export interface ProfileProps {
+  onOpenCollection: () => void;
+  onShopAvatar: (itemId: string) => void;
   onBack: () => void;
   onOpenStats: () => void;
   onOpenAchievements: () => void;
@@ -23,11 +28,6 @@ export interface ProfileProps {
   nav: BottomNavCallbacks;
 }
 
-const DEFAULT_AVATARS = [
-  '👤', '🧑', '👩', '👨', '🧒', '👵', '👴',
-  '🦸', '🧙', '🥷', '🤖', '👻', '🐱', '🦊',
-  '🐼', '🐯', '🦁', '🐸', '🐧', '🦉', '🐙',
-];
 
 export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmount: () => void } {
   const state = useStore.getState();
@@ -38,29 +38,33 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
   // Anonymous Supabase users + offline-demo guests both lack a real account.
   const isSignedIn = !!user && !isAnonymous;
   const isGuest = !isSignedIn;
-  const currentEmoji = (state.equipped.avatar?.emoji as string) ?? '👤';
+  const currentEmoji = (state.equipped.avatar?.item_id as string) ?? (state.equipped.avatar?.emoji as string) ?? '👤';
+  const avatarLocked = (id: string) => {
+    const itemId = PAID_AVATAR_ITEMS[id] ?? (id.startsWith('avatar_rare_') ? id : null);
+    return !!itemId && (isGuest || !state.inventory.includes(itemId));
+  };
   const displayName = profile.display_name || profile.username || (isGuest ? 'Guest' : 'Player');
 
   root.innerHTML = `
     <section class="view">
       <div class="top-bar">
         <button class="icon-btn" id="prof-back" aria-label="Back">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          ${ic.back(26)}
         </button>
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+          ${ic.profile(24)} Profile
         </h2>
         <span style="width:38px;"></span>
       </div>
       <div class="profile-hero">
         <button class="profile-avatar" id="prof-avatar-btn" title="Change avatar" style="padding:0; overflow:hidden; display:inline-flex; align-items:center; justify-content:center;">
-          ${profile.avatar_url ? `<img src="${profile.avatar_url}" style="width:100%; height:100%; object-fit:cover;" />` : currentEmoji}
+          ${profile.avatar_url && !state.equipped.avatar?.item_id ? `<img src="${profile.avatar_url}" style="width:100%; height:100%; object-fit:cover;" />` : avatarArtHTML(currentEmoji, 76)}
         </button>
         <input type="file" id="prof-file-input" style="display:none;" accept="image/*" />
         <div class="profile-name">
           <span id="prof-name">${escapeHtml(displayName)}</span>
           <button class="icon-btn--ghost" id="prof-edit-name" title="Edit name">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+${ic.notes(26)}
           </button>
         </div>
         <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;flex-wrap:wrap;">
@@ -96,6 +100,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
       </div>
 
       <div class="card">
+        <button class="profile-row" id="prof-collection"><span>${ic.shop(24)} My Collection<br><small>Themes and avatars you own</small></span><span>›</span></button>
         <button class="profile-row" id="prof-stats">
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.stats(16)}
@@ -144,17 +149,37 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
 
       <div class="app-version">v${APP_VERSION}</div>
 
-      <div id="avatar-grid" class="avatar-grid hidden">
-        ${DEFAULT_AVATARS.map((e) => `
-          <button class="avatar-cell${e === currentEmoji ? ' selected' : ''}" data-emoji="${e}">${e}</button>
-        `).join('')}
-      </div>
     </section>
 
+
+    <div id="avatar-picker-bg" class="modal-bg">
+      <div class="modal profile-picker" role="dialog" aria-modal="true" aria-labelledby="avatar-picker-title">
+        <button class="modal-close" id="avatar-picker-close" aria-label="Close avatar picker">${ic.close(24)}</button>
+        <h2 id="avatar-picker-title">Choose your avatar</h2>
+      <div id="avatar-grid" class="avatar-grid">
+        ${[...AVATAR_OPTIONS, ...RARE_AVATAR_CATALOG.map(item => ({ id: item.id, name: item.name, art: (size = 48) => avatarArtHTML(item.id, size) }))].sort((a, b) => Number(avatarLocked(a.id)) - Number(avatarLocked(b.id))).map(option => {
+          const itemId = PAID_AVATAR_ITEMS[option.id] ?? (option.id.startsWith('avatar_rare_') ? option.id : null);
+          const locked = !!itemId && (isGuest || !state.inventory.includes(itemId));
+          return `<button class="avatar-cell${(option.id === currentEmoji || itemId === currentEmoji) ? ' selected' : ''}${locked ? ' avatar-cell--locked' : ''}" data-emoji="${option.id}" ${itemId ? `data-item-id="${itemId}"` : ''} aria-label="${option.name}${locked ? ' — Locked, available in Shop' : ''}"><span class="avatar-cell-art">${option.art(48)}</span>${locked ? `<span class="avatar-cell-lock" aria-hidden="true">${ic.lock(14)}</span>` : ''}</button>`;
+        }).join('')}
+      </div>
+
+      </div>
+    </div>
+    <div id="rename-bg" class="modal-bg">
+      <form class="modal profile-rename" role="dialog" aria-modal="true" aria-labelledby="rename-title" id="rename-form">
+        <button type="button" class="modal-close" id="rename-close" aria-label="Close rename">${ic.close(24)}</button>
+        <h2 id="rename-title">Choose your name</h2>
+        <label for="rename-input">Display name</label>
+        <input id="rename-input" name="display-name" maxlength="20" required autocomplete="nickname">
+        <p id="rename-error" role="alert"></p>
+        <button class="btn btn--primary" type="submit">Save name</button>
+      </form>
+    </div>
     <!-- Modal Options Dialog for Avatar -->
     <div id="avatar-modal-bg" class="modal-bg">
       <div class="modal" style="position: relative;">
-        <button class="modal-close" id="avatar-modal-close" aria-label="Close">×</button>
+        <button class="modal-close" id="avatar-modal-close" aria-label="Close">${ic.close(24)}</button>
         <h2 style="margin: 0 0 16px 0; font-size: 18px; text-align: center;">Edit Profile Picture</h2>
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <button class="btn btn--primary" id="avatar-opt-upload" style="width: 100%;">
@@ -163,9 +188,9 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
           </button>
           <button class="btn btn--secondary" id="avatar-opt-emoji" style="width: 100%;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            Choose Emoji
+            Choose Avatar
           </button>
-          <button class="btn btn--danger" id="avatar-opt-remove" style="width: 100%; display: ${profile.avatar_url ? 'block' : 'none'};">
+          <button class="btn btn--danger" id="avatar-opt-remove" style="width: 100%; display: ${profile.avatar_url && !state.equipped.avatar?.item_id ? 'block' : 'none'};">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             Remove Photo
           </button>
@@ -184,9 +209,15 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
   const avatarModal = root.querySelector<HTMLElement>('#avatar-modal-bg')!;
   const optRemove = root.querySelector<HTMLElement>('#avatar-opt-remove')!;
 
+  const picker = root.querySelector<HTMLElement>('#avatar-picker-bg')!;
+  const openPicker = () => { picker.classList.add('active'); picker.querySelector<HTMLButtonElement>('.avatar-cell.selected')?.focus(); };
+  const closePicker = () => { picker.classList.remove('active'); avatarBtn.focus(); };
+  root.querySelector('#avatar-picker-close')?.addEventListener('click', closePicker);
+  picker.addEventListener('click', e => { if (e.target === picker) closePicker(); });
+
   avatarBtn.addEventListener('click', () => {
     if (isGuest) {
-      avatarGrid.classList.toggle('hidden');
+      openPicker();
     } else {
       avatarModal.classList.add('active');
     }
@@ -212,7 +243,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
 
     root.querySelector('#avatar-opt-emoji')?.addEventListener('click', () => {
       avatarModal.classList.remove('active');
-      avatarGrid.classList.remove('hidden');
+      openPicker();
     });
 
     optRemove?.addEventListener('click', async () => {
@@ -227,7 +258,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
           profile: { ...(useStore.getState().profile ?? {}), avatar_url: undefined }
         });
         const emoji = (useStore.getState().equipped.avatar?.emoji as string) ?? '👤';
-        avatarBtn.textContent = emoji;
+        avatarBtn.innerHTML = avatarArtHTML(emoji, 76);
         if (optRemove) optRemove.style.display = 'none';
         props.onToast('Photo removed');
       } catch (err) {
@@ -277,10 +308,42 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
   avatarGrid.querySelectorAll<HTMLButtonElement>('.avatar-cell').forEach((cell) => {
     cell.addEventListener('click', async () => {
       const emoji = cell.dataset.emoji!;
+      const itemId = cell.dataset.itemId;
+      if (cell.disabled) return;
+      if (itemId && (isGuest || !useStore.getState().inventory.includes(itemId))) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-bg active';
+        overlay.innerHTML = `<div class="modal avatar-unlock-dialog" role="dialog" aria-modal="true" aria-labelledby="avatar-unlock-title"><button class="modal-close" aria-label="Close">${ic.close(24)}</button>${avatarArtHTML(emoji, 80)}<h2 id="avatar-unlock-title">Unlock this avatar</h2><p>Purchase this avatar in the Shop to use it.</p><button class="btn btn--primary" data-open-shop>Go to Shop</button></div>`;
+        root.appendChild(overlay);
+        const dismiss = () => { overlay.remove(); cell.focus(); };
+        overlay.querySelector('.modal-close')?.addEventListener('click', dismiss);
+        overlay.addEventListener('click', event => { if (event.target === overlay) dismiss(); });
+        overlay.querySelector<HTMLButtonElement>('[data-open-shop]')?.addEventListener('click', () => {
+          overlay.remove();
+          closePicker();
+          props.onShopAvatar(itemId);
+        });
+        overlay.querySelector<HTMLButtonElement>('[data-open-shop]')?.focus();
+        return;
+      }
+      if (itemId) {
+        cell.disabled = true;
+        try {
+          const { error } = await api.equipItem({ avatar: { item_id: itemId } });
+          if (error) throw error;
+        } catch {
+          props.onToast('Unable to equip avatar');
+          return;
+        } finally {
+          cell.disabled = false;
+        }
+      }
       avatarGrid.querySelectorAll('.avatar-cell').forEach((c) => c.classList.remove('selected'));
       cell.classList.add('selected');
-      avatarBtn.textContent = emoji;
-      const newAvatar = { emoji };
+      avatarBtn.innerHTML = avatarArtHTML(emoji, 76);
+      const newAvatar = itemId ? { item_id: itemId } : { emoji };
+      if (isGuest) saveGuestIdentity({ ...getGuestIdentity(), emoji });
+      closePicker();
       useStore.getState().setEquipped({ avatar: newAvatar });
 
       try {
@@ -291,7 +354,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
           });
           if (optRemove) optRemove.style.display = 'none';
         }
-        await api.equipItem({ avatar: newAvatar });
+        if (!isGuest && !itemId) await api.equipItem({ avatar: newAvatar });
       } catch {
         // local-only fallback
       }
@@ -299,26 +362,49 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
     });
   });
 
-  root.querySelector('#prof-edit-name')?.addEventListener('click', async () => {
-    const next = prompt('Display name:', displayName);
-    if (next == null) return;
-    const trimmed = next.trim().slice(0, 20);
-    if (!trimmed) return;
-    try {
-      await api.updateProfile({ display_name: trimmed });
-      useStore.setState({
-        profile: { ...(useStore.getState().profile ?? {}), display_name: trimmed },
-      });
-      const nameEl = root.querySelector<HTMLElement>('#prof-name');
-      if (nameEl) nameEl.textContent = trimmed;
-      props.onToast('Name updated');
-    } catch (err) {
-      props.onToast('Could not update name');
-      console.warn(err);
-    }
+
+  const rename = root.querySelector<HTMLElement>('#rename-bg')!;
+  const nameInput = root.querySelector<HTMLInputElement>('#rename-input')!;
+  const nameError = root.querySelector<HTMLElement>('#rename-error')!;
+  const editName = root.querySelector<HTMLButtonElement>('#prof-edit-name')!;
+  const closeRename = () => { rename.classList.remove('active'); editName.focus(); };
+  editName.addEventListener('click', () => {
+    nameInput.value = useStore.getState().profile?.display_name || displayName;
+    nameError.textContent = '';
+    rename.classList.add('active');
+    nameInput.focus();
+    nameInput.select();
   });
+  root.querySelector('#rename-close')?.addEventListener('click', closeRename);
+  rename.addEventListener('click', e => { if (e.target === rename) closeRename(); });
+  root.querySelector('#rename-form')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const trimmed = nameInput.value.trim().slice(0, 20);
+    if (!trimmed) { nameError.textContent = 'Please enter a name.'; return; }
+    const submit = root.querySelector<HTMLButtonElement>('#rename-form button[type="submit"]')!;
+    submit.disabled = true;
+    try {
+      if (isGuest) saveGuestIdentity({ ...getGuestIdentity(), name: trimmed, generated: false });
+      else await api.updateProfile({ display_name: trimmed });
+      useStore.setState({ profile: { ...(useStore.getState().profile ?? {}), display_name: trimmed } });
+      root.querySelector('#prof-name')!.textContent = trimmed;
+      closeRename();
+      props.onToast('Name updated');
+    } catch {
+      nameError.textContent = 'Could not update name. Please try again.';
+    } finally { submit.disabled = false; }
+  });
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      if (picker.classList.contains('active')) closePicker();
+      if (rename.classList.contains('active')) closeRename();
+      avatarModal.classList.remove('active');
+    }
+  };
+  root.addEventListener('keydown', onKey);
 
   root.querySelector('#prof-back')?.addEventListener('click', props.onBack);
+  root.querySelector('#prof-collection')?.addEventListener('click', props.onOpenCollection);
   root.querySelector('#prof-stats')?.addEventListener('click', props.onOpenStats);
   root.querySelector('#prof-ach')?.addEventListener('click', props.onOpenAchievements);
   root.querySelector('#prof-recap')?.addEventListener('click', props.onOpenRecap);
@@ -348,5 +434,5 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
     });
   });
 
-  return { unmount() { /* no listeners to clean */ } };
+  return { unmount() { root.removeEventListener('keydown', onKey); } };
 }

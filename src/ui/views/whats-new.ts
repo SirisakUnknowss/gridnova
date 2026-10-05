@@ -7,6 +7,39 @@ import { APP_VERSION } from '@lib/version';
 import { escapeHtml } from '@lib/format';
 import { ic } from '@ui/icons';
 
+const releaseIcons: Record<string, (size?: number) => string> = {
+  '✅': ic.heart,
+  '♾️': ic.repeat,
+  '🚫': ic.warning,
+  '❌': ic.close,
+  '❤️': ic.heart,
+  '🔄': ic.repeat,
+  '📖': ic.bookMode,
+  '📈': ic.stats,
+  '⚡': ic.zap,
+  '🪙': ic.coin,
+  '⏱️': ic.timeAttack,
+  '🧪': ic.brain,
+  '🏆': ic.trophy,
+  '📅': ic.daily,
+  '✨': ic.sparkle,
+  '🔢': ic.puzzle,
+  '📋': ic.notes,
+  '👆': ic.target,
+  '🔇': ic.soundOff,
+  '🗓️': ic.quests,
+  '💰': ic.coin,
+  '📊': ic.chart,
+  '📱': ic.gamepad,
+  '🐛': ic.warning,
+  '⚙️': ic.brain,
+  '🎵': ic.soundOn,
+  '📳': ic.wave,
+  '🔔': ic.bell,
+  '🎁': ic.gift,
+  '🎯': ic.target,
+};
+
 const SEEN_KEY = 'sudoku_whatsnew_seen_v1';
 
 export function showWhatsNew(): void {
@@ -25,7 +58,7 @@ export function showWhatsNew(): void {
         <span class="whatsnew-chevron">${ic.chevronRight(14)}</span>
       </button>
       <ul class="whatsnew-list"${i === 0 ? '' : ' hidden'}>
-        ${r.changes.map((c) => `<li><span class="whatsnew-ico">${c.icon}</span><span>${escapeHtml(c.text)}</span></li>`).join('')}
+        ${r.changes.map((c) => `<li><span class="whatsnew-ico">${(releaseIcons[c.icon] ?? ic.sparkle)(26)}</span><span>${escapeHtml(c.text)}</span></li>`).join('')}
       </ul>
     </div>
   `).join('');
@@ -34,9 +67,9 @@ export function showWhatsNew(): void {
   wrapper.id = 'whatsnew-root';
   wrapper.className = 'modal-bg active';
   wrapper.innerHTML = `
-    <div class="modal whatsnew-modal">
-      <button class="modal-close" id="whatsnew-close" aria-label="Close">×</button>
-      <h2 style="margin:0 0 4px 0;">✨ What’s New</h2>
+    <div class="modal whatsnew-modal" role="dialog" aria-modal="true" aria-labelledby="whatsnew-heading">
+      <button class="modal-close" id="whatsnew-close" aria-label="Close">${ic.close(24)}</button>
+<header class="whatsnew-header"><div class="whatsnew-art" aria-hidden="true">${ic.rocket(76)}</div><div><p class="whatsnew-kicker">MISSION UPDATE</p><h2 id="whatsnew-heading">What’s New</h2><p class="whatsnew-subtitle">Fresh discoveries for your next adventure.</p></div></header>
       <div class="whatsnew-scroll">${body}</div>
       <div class="modal-buttons">
         <button class="btn btn--primary" id="whatsnew-ok">Awesome!</button>

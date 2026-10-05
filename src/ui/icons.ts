@@ -1,59 +1,79 @@
+import shopIcon from '@images/space/shop-capsule.webp';
+import closeControl from '@images/space/controls/close.webp';
+import backControl from '@images/space/controls/back.webp';
+import hintIcon from '@images/space/hintIcon.webp';
+import notesIcon from '@images/space/notesIcon.webp';
+import eraseIcon from '@images/space/eraseIcon.webp';
+import redoIcon from '@images/space/redoIcon.webp';
+import undoIcon from '@images/space/undoIcon.webp';
+import homeIcon from '@images/space/homeIcon.webp';
 // =====================================================================
 // Icon library — inline SVG (Lucide-compatible paths)
 // =====================================================================
 
-import coinIcon from '@images/coin.png';
-import streakIcon from '@images/streak-medal.png';
-import heartIcon from '@images/heart.png';
-import starIcon from '@images/star.png';
-import gamepadIcon from '@images/play-medal.png';
-import targetIcon from '@images/target-icon.png';
-import questIcon from '@images/quest-icon.png';
-import diceIcon from '@images/random-icon.png';
-import dailyIcon from '@images/daily-medal.png';
-import trophyIcon from '@images/trophy-icon.png';
-import playIcon from '@images/play-icon.png';
-import puzzleIcon from '@images/puzzle.png';
-import guestIcon from '@images/guest-icon.png';
-import userIcon from '@images/user-icon.png';
-import warningIcon from '@images/warning-icon.png';
-import giftIcon from '@images/gift-icon.png';
-import easyIcon from '@images/easy-mode.png';
-import mediumIcon from '@images/medium-mode.png';
-import hardIcon from '@images/hard-mode.png';
-import expertIcon from '@images/expert-mode.png';
-import statsIcon from '@images/stat.png'
-import badgeIcon from '@images/badge.png';
-import lockIcon from '@images/lock-quest.png'
-import celebrateIcon from '@images/celebrate-icon.png'
-import globeIcon from '@images/globe.png';
-import brainIcon from '@images/brain-icon.png'
-import zapIcon from '@images/zap-icon.png';
-import repeatIcon from '@images/repeat-icon.png'
-import turtleIcon from '@images/turtle-icon.png'
-import mistakesIcon from '@images/mistake-icon.png'
-import bellIcon from '@images/bell-icon.png'
-import rocketIcon from '@images/rocket-icon.png'
-import cloudIcon from '@images/cloud-icon.png'
-import sparkleIcon from '@images/sparkle-icon.png'
-import waveIcon from '@images/wave-icon.png'
-import emptyIcon from '@images/empty-icon.png'
-import sharingIcon from '@images/sharing-icon.png'
-import clockIcon from '@images/clock-icon.png'
-import soundOnIcon from '@images/soundOn-icon.png'
-import soundOffIcon from '@images/soundOff-icon.png'
-import bookModeIcon from '@images/book.png'
-import chronometerIcon from '@images/chronometer.png'
+import coinIcon from '@images/space/replacements/coin.webp';
+import streakIcon from '@images/space/streakIcon.webp';
+import heartIcon from '@images/space/replacements/heart.webp';
+import starIcon from '@images/space/replacements/star.webp';
+import gamepadIcon from '@images/space/gamepadIcon.webp';
+import targetIcon from '@images/space/replacements/target-icon.webp';
+import questIcon from '@images/space/questIcon.webp';
+import diceIcon from '@images/space/diceIcon.webp';
+import dailyIcon from '@images/space/dailyIcon.webp';
+import trophyIcon from '@images/space/trophyIcon.webp';
+import playIcon from '@images/space/playIcon.webp';
+import puzzleIcon from '@images/space/puzzleIcon.webp';
+import guestIcon from '@images/space/guestIcon.webp';
+import userIcon from '@images/space/userIcon.webp';
+import warningIcon from '@images/space/replacements/warning-icon.webp';
+import giftIcon from '@images/space/replacements/gift-icon.webp';
+import easyIcon from '@images/space/easyIcon.webp';
+import mediumIcon from '@images/space/mediumIcon.webp';
+import hardIcon from '@images/space/hardIcon.webp';
+import expertIcon from '@images/space/expertIcon.webp';
+import statsIcon from '@images/space/statsIcon.webp';
+import badgeIcon from '@images/space/badgeIcon.webp';
+import lockIcon from '@images/space/replacements/lock-quest.webp'
+import celebrateIcon from '@images/space/replacements/celebrate-icon.webp'
+import globeIcon from '@images/space/replacements/globe.webp';
+import brainIcon from '@images/space/replacements/brain-icon.webp'
+import zapIcon from '@images/space/replacements/zap-icon.webp';
+import repeatIcon from '@images/space/replacements/repeat-icon.webp'
+import turtleIcon from '@images/space/replacements/turtle-icon.webp'
+import mistakesIcon from '@images/space/replacements/mistake-icon.webp'
+import bellIcon from '@images/space/replacements/bell-icon.webp'
+import rocketIcon from '@images/space/replacements/rocket-icon.webp'
+import cloudIcon from '@images/space/replacements/cloud-icon.webp'
+import sparkleIcon from '@images/space/replacements/sparkle-icon.webp'
+import waveIcon from '@images/space/replacements/wave-icon.webp'
+import emptyIcon from '@images/space/emptyIcon.webp';
+import sharingIcon from '@images/space/replacements/sharing-icon.webp'
+import clockIcon from '@images/space/replacements/clock-icon.webp'
+import soundOnIcon from '@images/space/replacements/soundOn-icon.webp'
+import soundOffIcon from '@images/space/replacements/soundOff-icon.webp'
+import bookModeIcon from '@images/space/bookModeIcon.webp';
+import chronometerIcon from '@images/space/time-attack.webp';
 
 function svg(paths: string, size = 18): string {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
 }
 
 function img(src: string, size = 18): string {
-  return `<img src="${src}" width="${size}" height="${size}" style="object-fit:contain;vertical-align:-${Math.round(size * 0.15)}px" alt="" />`;
+  return `<img class="ui-art-icon" src="${src}" width="${size}" height="${size}" style="object-fit:contain;vertical-align:-${Math.round(size * 0.15)}px" alt="" />`;
 }
 
 export const ic = {
+  shop: (s?: number) => img(shopIcon, s),
+  close: (s?: number) => img(closeControl, s),
+  back: (s?: number) => img(backControl, s),
+  home: (s?: number) => img(homeIcon, s),
+  profile: (s?: number) => img(userIcon, s),
+  achievements: (s?: number) => img(badgeIcon, s),
+  undo: (s?: number) => img(undoIcon, s),
+  redo: (s?: number) => img(redoIcon, s),
+  erase: (s?: number) => img(eraseIcon, s),
+  notes: (s?: number) => img(notesIcon, s),
+  hint: (s?: number) => img(hintIcon, s),
   // Difficulty
   easy: (s?: number) => img(easyIcon, s),
   medium: (s?: number) => img(mediumIcon, s),

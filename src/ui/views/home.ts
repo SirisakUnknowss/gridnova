@@ -1,3 +1,5 @@
+import dailyCalendar from '@images/space/daily-calendar-fantasy.webp';
+import { avatarArtHTML } from '../components/avatar-art';
 // =====================================================================
 // Home view — main hub
 // =====================================================================
@@ -10,7 +12,6 @@ import { useVisitorStore } from '@state/visitor-store';
 import { getGuestDisplayId } from '@lib/api';
 import * as api from '@lib/api';
 import { difficultyForDayOfWeek } from '@engine/generator';
-import { dailyNumber } from '@lib/share/text-result';
 import { listGames, type GameInProgress } from '@lib/local-db';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
@@ -53,18 +54,17 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   const isAnonymous = !!state.user?.is_anonymous;
   const isGuest = !state.user || isAnonymous;
   const displayName = state.profile?.display_name || state.profile?.username || (isGuest ? 'Guest' : 'Player');
-  const equippedEmoji = (state.equipped.avatar?.emoji as string) ?? null;
+  const equippedEmoji = (state.equipped.avatar?.item_id as string) ?? (state.equipped.avatar?.emoji as string) ?? null;
   const avatarUrl = state.profile?.avatar_url ?? null;
-  const userIcon = avatarUrl
+  const userIcon = avatarUrl && !state.equipped.avatar?.item_id
     ? `<img src="${avatarUrl}" class="user-avatar-img" alt="avatar" referrerpolicy="no-referrer">`
-    : equippedEmoji
-      ? `<span style="font-size:20px">${equippedEmoji}</span>`
-      : isGuest ? ic.guest(20) : ic.member(20);
+    : equippedEmoji && equippedEmoji !== '👤'
+      ? avatarArtHTML(equippedEmoji, 38)
+      : isGuest ? ic.guest(38) : ic.member(38);
   const lvl = levelProgress(state.level, state.xp);
   const muted = isMuted();
   const guestId = getGuestDisplayId();
   const today = todayUtc();
-  const dailyNo = dailyNumber(today);
   const todayDifficulty = difficultyForDayOfWeek(new Date(today + 'T00:00:00Z').getUTCDay());
 
   root.innerHTML = `
@@ -110,30 +110,23 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
       <!-- Daily Puzzle — the hero. Same puzzle for everyone, ranked. -->
       <div class="playmode-card-v2 daily-hero">
         <div class="daily-hero-top">
-          <span class="playmode-card-v2-icon">${ic.daily(24)}</span>
-          <span class="daily-hero-diff">${todayDifficulty}</span>
+          <div class="daily-calendar-scene"><img class="daily-fantasy-calendar" src="${dailyCalendar}" width="230" height="180" alt="" decoding="async"></div>
+          <div class="playmode-card-v2-title">Daily Puzzle</div>
+          <span class="daily-hero-diff">${todayDifficulty.charAt(0).toUpperCase() + todayDifficulty.slice(1)}</span>
         </div>
-        <div class="playmode-card-v2-title">Daily Puzzle${dailyNo > 0 ? ` #${dailyNo}` : ''}</div>
-        <div class="playmode-card-v2-sub">Everyone plays the same puzzle today</div>
-
+        <button class="btn playmode-card-v2-btn" id="home-daily-play">Play Daily <span aria-hidden="true">›</span></button>
+        <div class="daily-entry-note" id="home-daily-entry">${ic.heart(14)} 1 heart · Refunded on win</div>
         <div class="daily-hero-stats">
-          <div class="daily-hero-stat">
-            <div class="daily-hero-stat-label">Your rank today</div>
-            <div class="daily-hero-stat-value" id="home-daily-rank">—</div>
-          </div>
-          <div class="daily-hero-stat">
-            <div class="daily-hero-stat-label">Resets in</div>
-            <div class="daily-hero-stat-value" id="home-daily-countdown">--:--:--</div>
-          </div>
+          <div class="daily-hero-stat"><div class="daily-stat-icon" aria-hidden="true">${ic.daily(22)}</div><div class="daily-hero-stat-value" id="home-daily-status">Not played<br>today</div></div>
+          <div class="daily-hero-stat"><div class="daily-stat-icon" aria-hidden="true">${ic.trophy(22)}</div><div class="daily-hero-stat-label">Rank</div><div class="daily-hero-stat-value" id="home-daily-rank">—</div></div>
+          <div class="daily-hero-stat"><div class="daily-stat-icon" aria-hidden="true">${ic.clock(22)}</div><div class="daily-hero-stat-label">Reset</div><div class="daily-hero-stat-value" id="home-daily-countdown">--:--:--</div></div>
         </div>
-
-        <button class="btn playmode-card-v2-btn" id="home-daily-play">Play</button>
-        <button class="daily-hero-link" id="home-daily-more">${ic.trophy(13)} Leaderboard &amp; recap</button>
+        <button class="daily-hero-link" id="home-daily-more">View leaderboard <span aria-hidden="true">›</span></button>
       </div>
 
       <!-- Other modes -->
       <button class="pm-row" id="enter-play-mode">
-        <span class="pm-row-icon">${ic.gamepad(22)}</span>
+        <span class="pm-row-icon">${ic.gamepad(40)}</span>
         <div class="pm-row-body">
           <span class="pm-row-title">Play Mode</span>
           <span class="pm-row-sub">Random Mode, Time Attack &amp; more</span>
@@ -143,7 +136,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
 
       <!-- Practice entry -->
       <button class="pm-row" id="open-practice">
-        <span class="pm-row-icon">${ic.practice(22)}</span>
+        <span class="pm-row-icon">${ic.practice(40)}</span>
         <div class="pm-row-body">
           <span class="pm-row-title">Practice</span>
           <span class="pm-row-sub">Choose your own difficulty</span>
@@ -232,6 +225,8 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
 
   function markCompleted() {
     alreadyCompleted = true;
+    root.querySelector('#home-daily-status')!.textContent = 'Completed';
+    root.querySelector('#home-daily-entry')!.textContent = 'Come back tomorrow for a new puzzle';
     playBtn.textContent = '✓ Completed today';
     playBtn.disabled = true;
     playBtn.classList.add('pm-detail-btn-primary--done');
@@ -245,7 +240,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
       if (rankEl) rankEl.textContent = `#${rank.rank} / ${rank.total_players}`;
       markCompleted();
     } else if (rankEl) {
-      rankEl.textContent = 'Not played';
+      rankEl.textContent = '—';
     }
   }).catch(() => { });
 
@@ -264,11 +259,17 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     const saved = games.find((g) => g.mode === 'daily' && g.date === today);
     if (!saved || alreadyCompleted || !saved.moves || saved.moves.length === 0) return;
     savedGame = saved;
-    playBtn.textContent = 'Continue';
+    playBtn.textContent = 'Continue Daily';
+    root.querySelector('#home-daily-status')!.textContent = 'In progress';
+    root.querySelector('#home-daily-entry')!.textContent = 'Resume free · No extra heart';
   }).catch(() => { });
   wireBottomNav(root, props.nav, 'home');
   const unwireHearts = wireHeartsPill(root);
-  void refreshHearts();
+  void refreshHearts().then(() => {
+    if (!alreadyCompleted && !savedGame && useStore.getState().heartsInfinite) {
+      root.querySelector('#home-daily-entry')!.textContent = 'Infinite Hearts active · Free entry';
+    }
+  });
   root.querySelector('#user-badge')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#save-progress')?.addEventListener('click', props.onAuthAction);
   root.querySelector('#mute-btn')?.addEventListener('click', (e) => {
