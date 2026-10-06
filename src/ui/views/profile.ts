@@ -38,7 +38,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
   // Anonymous Supabase users + offline-demo guests both lack a real account.
   const isSignedIn = !!user && !isAnonymous;
   const isGuest = !isSignedIn;
-  const currentEmoji = (state.equipped.avatar?.item_id as string) ?? (state.equipped.avatar?.emoji as string) ?? '👤';
+  const currentEmoji = isGuest ? getGuestIdentity().emoji : (state.equipped.avatar?.item_id as string) ?? (state.equipped.avatar?.emoji as string) ?? '👤';
   const avatarLocked = (id: string) => {
     const itemId = PAID_AVATAR_ITEMS[id] ?? (id.startsWith('avatar_rare_') ? id : null);
     return !!itemId && (isGuest || !state.inventory.includes(itemId));

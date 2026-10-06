@@ -1,6 +1,7 @@
 const gods = ['Apollo', 'Artemis', 'Athena', 'Astraeus', 'Helios', 'Nyx', 'Orion', 'Selene', 'Thor', 'Freya'];
 const space = ['Nova', 'Cosmos', 'Nebula', 'Stellar', 'Lunar', 'Astral', 'Comet', 'Orbit'];
 const KEY = 'gn_guest_identity_v1';
+const FREE_AVATARS = new Set(['space_orbit-bunny', '👤', '🤖', '🦸', '🧙', '🥷', '🐱', '🦊', '🐼', '🐯', '🦁', '🐸', '🐧', '🦉', '🐙', '👻', '🧑']);
 interface GuestIdentity { name: string; emoji: string; generated?: boolean }
 let identity: GuestIdentity | undefined;
 export function getGuestIdentity(): GuestIdentity {
@@ -9,8 +10,11 @@ export function getGuestIdentity(): GuestIdentity {
     const saved: unknown = JSON.parse(localStorage.getItem(KEY) ?? 'null');
     if (saved && typeof saved === 'object' && 'name' in saved && typeof saved.name === 'string' && saved.name.trim()) {
       identity = { name: saved.name.slice(0, 20), emoji: 'emoji' in saved && typeof saved.emoji === 'string' ? saved.emoji : '👤' };
+      const invalidAvatar = !FREE_AVATARS.has(identity.emoji);
+      if (invalidAvatar) identity.emoji = '👤';
       const generated = !('generated' in saved) || saved.generated === true;
       identity.generated = generated;
+      if (invalidAvatar) saveGuestIdentity(identity);
       if (generated) {
         const prefix = space.find(word => gods.some(god => identity!.name === word + god));
         if (prefix) {
@@ -28,6 +32,6 @@ export function getGuestIdentity(): GuestIdentity {
   return identity;
 }
 export function saveGuestIdentity(next: GuestIdentity): void {
-  identity = { ...next, generated: next.generated ?? false };
+  identity = { ...next, emoji: FREE_AVATARS.has(next.emoji) ? next.emoji : '👤', generated: next.generated ?? false };
   try { localStorage.setItem(KEY, JSON.stringify(identity)); } catch { /* Keep this session usable without storage. */ }
 }

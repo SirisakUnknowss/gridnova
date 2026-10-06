@@ -41,3 +41,20 @@ it('migrates an earlier combined generated name to one name', async () => {
   const { getGuestIdentity } = await import('../../src/lib/guest-identity');
   expect(getGuestIdentity().name).toBe('Stellar');
 });
+
+it('removes a paid avatar from an older guest identity and persists the repair', async () => {
+  localStorage.setItem('gn_guest_identity_v1', JSON.stringify({ name: 'Comet', emoji: 'avatar_rare_ocean', generated: false }));
+  const { getGuestIdentity } = await import('../../src/lib/guest-identity');
+  expect(getGuestIdentity().emoji).toBe('👤');
+  expect(JSON.parse(localStorage.getItem('gn_guest_identity_v1')!).emoji).toBe('👤');
+});
+
+it('rejects paid shop aliases when saving a guest avatar', async () => {
+  const { saveGuestIdentity, getGuestIdentity } = await import('../../src/lib/guest-identity');
+  for (const emoji of ['space_lunar-fox', 'avatar_pet_dog', 'avatar_rare_ocean']) {
+    saveGuestIdentity({ name: 'Comet', emoji });
+    expect(getGuestIdentity().emoji).toBe('👤');
+  }
+  saveGuestIdentity({ name: 'Comet', emoji: 'space_orbit-bunny' });
+  expect(getGuestIdentity().emoji).toBe('space_orbit-bunny');
+});

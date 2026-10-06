@@ -6038,10 +6038,10 @@ html body:is(.bg-default, :not([class*="bg-"])) .view--game {
     overflow: hidden;
   }
   #app {
-    --desktop-app-width: 430px;
+    --desktop-app-width: clamp(520px, 48dvh, 760px);
     position: relative;
-    width: var(--desktop-app-width);
-    height: min(900px, calc(100dvh - 32px));
+    width: min(var(--desktop-app-width), 100%);
+    height: calc(100dvh - 32px);
     min-height: 0;
     overflow: hidden;
     border-radius: 24px;
@@ -6116,3 +6116,41 @@ html body:is(.bg-default, :not([class*="bg-"])) .view--game {
 .collection-shop-button:hover { background: linear-gradient(180deg, var(--app-card-bg), color-mix(in srgb, var(--brand-primary) 32%, var(--app-card-bg))); }
 .collection-shop-button:active { transform: translateY(2px); }
 .collection-shop-button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 3px; }
+
+:is(.btn, .btn.btn--primary, .btn.btn--secondary, .btn.btn--accent, .btn-google,
+  .coin-hint-btn, .hearts-buy, .auth-tab, .share-tab, .shop-tab, .lb-tab, .lb-tab-sm,
+  .mode-pill, .ta-tier, .ach-chip) {
+  --control-accent: var(--brand-primary);
+  color: var(--app-text);
+  border: 1px solid color-mix(in srgb, var(--control-accent) 45%, var(--app-card-bg));
+  border-radius: 16px 8px 16px 8px;
+  background: linear-gradient(180deg, var(--app-card-bg), color-mix(in srgb, var(--control-accent) 22%, var(--app-card-bg)));
+  box-shadow: inset 0 1px 0 var(--on-brand), inset 0 -2px 0 color-mix(in srgb, var(--control-accent) 15%, transparent), 0 3px 0 color-mix(in srgb, var(--control-accent) 25%, transparent);
+}
+.btn.btn--danger { --control-accent: var(--cell-text-conflict); color: var(--cell-text-conflict); }
+:is(.auth-tab, .share-tab, .shop-tab, .lb-tab, .lb-tab-sm, .mode-pill, .ta-tier).active,
+.view--ach .ach-chip.on, .onb-choices .btn.selected {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand-primary) 18%, var(--app-card-bg)), color-mix(in srgb, var(--brand-primary) 36%, var(--app-card-bg)));
+  color: var(--app-text);
+  border-color: var(--brand-primary);
+}
+@media (hover: hover) {
+  :is(.btn, .btn.btn--primary, .btn.btn--secondary, .btn.btn--accent, .btn-google,
+    .coin-hint-btn, .hearts-buy, .auth-tab, .share-tab, .shop-tab, .lb-tab, .lb-tab-sm,
+    .mode-pill, .ta-tier, .ach-chip):hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--app-card-bg), color-mix(in srgb, var(--control-accent) 32%, var(--app-card-bg)));
+    color: var(--app-text);
+  }
+}
+:is(.btn, .btn-google, .coin-hint-btn, .hearts-buy):active:not(:disabled) {
+  transform: translateY(2px);
+}
+button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 3px; }
+.btn.btn--danger:hover { color: var(--cell-text-conflict); }
+.whatsnew-ver { color: var(--app-text); border-radius: 12px; padding: 10px 8px; }
+.whatsnew-ver:hover { background: color-mix(in srgb, var(--brand-primary) 10%, var(--app-card-bg)); }
+.whatsnew-badge, .whatsnew-release:not(.latest) .whatsnew-badge {
+  background: color-mix(in srgb, var(--brand-primary) 15%, var(--app-card-bg));
+  color: var(--app-text-secondary);
+}
+.whatsnew-release.latest .whatsnew-badge { background: var(--app-border); color: var(--app-text); }

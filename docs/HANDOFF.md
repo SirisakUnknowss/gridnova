@@ -1,6 +1,7 @@
 # GridNova staging handoff — 2026-10-06
 
 ## Current staging status (supersedes older pending notes below)
+- UI follow-up: desktop frame uses viewport height with width 520–760px instead of 430×900; shared action buttons/tabs and What's New use theme surfaces, borders and hover colors. Guest identity now rejects paid/Rare avatar values in stored or newly saved data; guest boot/signout clears member inventory/equipment. Regression suite: 56 tests passed, typecheck/lint passed. Local guest clicking Coral Keeper opens unlock dialog without equipping.
 - Isolated project `xrtgcxofjisqaigaaboy` is ready. Localhost and deployed staging JavaScript were both checked and contain only its Supabase URL.
 - Web deployment `37445684473` succeeded for `3e47e80`; https://staging.gridnova.pages.dev is updated. GitHub Environment staging frontend secrets use the new project. Production secrets and main branch were not edited.
 - Schema/catalog, ten player/required Edge Functions, Auth redirects, 30 fresh Daily puzzles, signup/email confirmation/login, purchases/prerequisite rejection/duplicate rejection, equipment and Collection, Practice and Time Attack submissions verified on the new project. No production player data copied.

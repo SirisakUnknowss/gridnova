@@ -450,7 +450,7 @@ function showLeaderboard() {
 function handleSignOut() {
   if (confirm('Sign out?')) {
     void signOut().then(() => {
-      useStore.setState({ user: null, profile: null, coins: 0, xp: 0, level: 1, currentStreak: 0 });
+      useStore.setState({ user: null, profile: null, coins: 0, xp: 0, level: 1, currentStreak: 0, longestStreak: 0, inventory: [], equipped: { theme_id: null, background_id: null, board_color_id: null, avatar: { emoji: getGuestIdentity().emoji } } });
       applyBackground('bg_default');
       applyTheme('theme_classic');
       void boot();
@@ -1121,8 +1121,7 @@ async function boot() {
 
   if (!useStore.getState().user || useStore.getState().user?.is_anonymous) {
     const guest = getGuestIdentity();
-    useStore.setState({ profile: { display_name: guest.name } });
-    useStore.getState().setEquipped({ avatar: { emoji: guest.emoji } });
+    useStore.setState({ profile: { display_name: guest.name }, inventory: [], equipped: { theme_id: null, background_id: null, board_color_id: null, avatar: { emoji: guest.emoji } } });
   }
 
   // Wait for splash min duration, then unmount with exit animation
