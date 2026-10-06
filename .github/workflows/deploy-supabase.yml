@@ -8,6 +8,8 @@ on:
 
 jobs:
   deploy:
+    # Staging has consolidated migration history and must use its account-scoped connector.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
