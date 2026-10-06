@@ -184,6 +184,11 @@ const corsHeaders = {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!serviceKey || req.headers.get('Authorization') !== `Bearer ${serviceKey}`) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+  }
 
   const body = await req.json().catch(() => ({}));
   const days = Math.max(1, Math.min(30, body.days ?? 30));

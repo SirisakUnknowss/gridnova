@@ -1280,6 +1280,10 @@ h3 {
   padding-top: calc(env(safe-area-inset-top) + 10px);
 }
 
+.view--home > * {
+  flex-shrink: 0;
+}
+
 .view--home .card {
   margin-bottom: 0;
 }
@@ -3789,6 +3793,7 @@ h3 {
   width: 100%;
   box-sizing: border-box;
   cursor: grab;
+  user-select: none;
 }
 
 .ach-filter.dragging {

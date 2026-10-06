@@ -410,8 +410,44 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
   const filterEl = root.querySelector<HTMLElement>('#ach-filter')!;
   const bodyEl = root.querySelector<HTMLElement>('#ach-body')!;
 
-
-
+  let dragStart: { x: number; scrollLeft: number; pointerId: number } | null = null;
+  let dragged = false;
+  filterEl.addEventListener('wheel', (event) => {
+    if (event.ctrlKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+    const before = filterEl.scrollLeft;
+    const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? filterEl.clientWidth : 1);
+    filterEl.scrollLeft += delta;
+    if (filterEl.scrollLeft !== before) event.preventDefault();
+  }, { passive: false });
+  filterEl.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    dragStart = { x: event.clientX, scrollLeft: filterEl.scrollLeft, pointerId: event.pointerId };
+    dragged = false;
+  });
+  filterEl.addEventListener('pointermove', (event) => {
+    if (!dragStart || event.pointerId !== dragStart.pointerId) return;
+    const distance = event.clientX - dragStart.x;
+    if (!dragged && Math.abs(distance) < 5) return;
+    dragged = true;
+    filterEl.setPointerCapture(event.pointerId);
+    filterEl.classList.add('dragging');
+    filterEl.scrollLeft = dragStart.scrollLeft - distance;
+    event.preventDefault();
+  });
+  const endDrag = () => {
+    dragStart = null;
+    filterEl.classList.remove('dragging');
+  };
+  filterEl.addEventListener('pointerup', endDrag);
+  filterEl.addEventListener('pointercancel', endDrag);
+  filterEl.addEventListener('lostpointercapture', endDrag);
+  filterEl.addEventListener('pointerleave', () => { if (!dragged) endDrag(); });
+  filterEl.addEventListener('click', (event) => {
+    if (!dragged) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    dragged = false;
+  }, true);
   function renderSummary() {
     const total = defs.length;
     const done = unlocked.size;
