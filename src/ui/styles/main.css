@@ -2092,12 +2092,12 @@ h3 {
 }
 
 .pm-detail-btn-secondary {
-  flex: 1;
+  flex: none;
   min-height: 46px;
 }
 
 .pm-detail-btn-primary {
-  flex: 1;
+  flex: none;
   min-height: 46px;
   background: var(--brand-primary);
   color: var(--on-brand);
@@ -2106,6 +2106,9 @@ h3 {
 .pm-detail-btn-primary:hover {
   background: color-mix(in srgb, var(--brand-primary) 85%, var(--app-text));
 }
+
+.pm-detail-actions > .btn { flex: 1; }
+.view--play-mode > .profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 .pm-detail-btn-primary--done {
   background: var(--app-card-bg) !important;
@@ -5110,7 +5113,7 @@ body.bg-anim-aurora {
 
 /* === Static content pages (How to Play, Privacy, Terms, Contact) === */
 .static-content {
-  max-width: 520px;
+  max-width: none;
   text-align: left;
 }
 
@@ -6068,6 +6071,10 @@ html body:is(.bg-default, :not([class*="bg-"])) .view--game {
     max-width: none;
     padding-left: 16px;
     padding-right: 16px;
+  }
+  #app .view :is(.card, .save-banner, .profile-stats, .profile-hero, .settings-group, .stats-body, .lb-list, .lb-meta, .lb-empty, .lb-guest-badge) {
+    max-width: none;
+    flex-shrink: 0;
   }
   #app .bottom-nav {
     width: 100%;

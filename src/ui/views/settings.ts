@@ -13,7 +13,7 @@ import {
   isVibrateEnabled, setVibrateEnabled,
   getPushPref, setPushPref,
 } from '@lib/prefs';
-import { isPushSupported, enablePushNotifications, disablePushNotifications } from '@lib/push';
+import { isPushSupported, isPushConfigured, enablePushNotifications, disablePushNotifications } from '@lib/push';
 
 // Notification.permission is synchronous; push.ts's getPushPermission()
 // wraps it in a Promise, which doesn't fit this view's sync initial render.
@@ -88,7 +88,10 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
   const bgOn = getBgVolume() > 0;
   const sfxOn = getSfxVolume() > 0;
   const pushSupported = isPushSupported();
-  const pushOn = pushSupported && getPushPref() && pushPermission() === 'granted';
+  const pushOn = isSignedIn && isPushConfigured() && pushSupported && getPushPref() && pushPermission() === 'granted';
+  const pushSubtitle = !isSignedIn ? 'Sign in to enable reminders'
+    : !isPushConfigured() ? 'Reminders are not set up in this environment yet'
+    : !pushSupported ? 'Not supported in this browser' : 'Get notified before it resets';
 
   root.innerHTML = `
     <section class="view">
@@ -112,7 +115,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
       <div class="settings-group">
         <div class="settings-group-label">Notifications</div>
         <div class="card settings-card">
-          ${toggleRow('set-push', ic.bell(18), 'Daily Puzzle Reminder', 'Get notified before it resets', pushOn)}
+          ${toggleRow('set-push', ic.bell(18), 'Daily Puzzle Reminder', pushSubtitle, pushOn)}
         </div>
       </div>
 
@@ -235,6 +238,15 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
   });
 
   wireToggle('set-push', () => pushSupported && getPushPref(), async () => {
+    if (!isSignedIn) {
+      props.onToast('Sign in to enable Daily Puzzle Reminder');
+      props.onUpgradeAccount();
+      return false;
+    }
+    if (!isPushConfigured()) {
+      props.onToast('Daily Puzzle Reminder is not set up in this environment yet');
+      return false;
+    }
     if (!pushSupported) {
       props.onToast('Notifications aren’t supported on this device');
       return false;
@@ -243,7 +255,9 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
     if (turningOn) {
       const ok = await enablePushNotifications();
       setPushPref(ok);
-      if (!ok) props.onToast('Enable notifications in your browser/device settings to turn this on');
+      if (!ok) props.onToast(pushPermission() === 'denied'
+        ? 'Allow notifications in your browser settings, then try again'
+        : 'Could not enable reminders. Please try again later');
       return ok;
     } else {
       await disablePushNotifications();

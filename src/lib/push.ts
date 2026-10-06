@@ -18,6 +18,10 @@ export function isPushSupported(): boolean {
   return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
 }
 
+export function isPushConfigured(): boolean {
+  return Boolean(VAPID_PUBLIC_KEY);
+}
+
 export async function getPushPermission(): Promise<NotificationPermission> {
   return Notification.permission;
 }
@@ -34,19 +38,19 @@ export async function enablePushNotifications(): Promise<boolean> {
   if (permission !== 'granted') return false;
 
   try {
-    const reg = await navigator.serviceWorker.ready;
-    const subscription = await reg.pushManager.subscribe({
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || user.is_anonymous) return false;
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg?.active) return false;
+    const subscription = await reg.pushManager.getSubscription() ?? await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as unknown as ArrayBuffer,
     });
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-
     const endpoint = subscription.endpoint;
     const keys = subscription.toJSON().keys ?? {};
 
-    await supabase.from('push_tokens').upsert(
+    const { error } = await supabase.from('push_tokens').upsert(
       {
         user_id: user.id,
         token: endpoint,
@@ -57,6 +61,8 @@ export async function enablePushNotifications(): Promise<boolean> {
       },
       { onConflict: 'user_id,platform' }
     );
+
+    if (error) throw error;
 
     return true;
   } catch (err) {

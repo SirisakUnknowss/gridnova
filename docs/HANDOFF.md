@@ -1,6 +1,7 @@
 # GridNova staging handoff — 2026-10-06
 
 ## Current staging status (supersedes older pending notes below)
+- UI alignment follow-up: desktop cards/settings/legal content share the available width, Daily stats use two equal columns, Play buttons no longer stretch vertically outside horizontal action rows. Reminder now opens sign-in for guests and reports missing setup accurately. Staging web builds deliberately omit the legacy production VAPID key until a separate sender/key/schedule is configured. Subscription database errors are checked, and absent service workers return without hanging. Push delivery remains unavailable on staging; this is not a completed notification setup.
 - UI follow-up: desktop frame uses viewport height with width 520–760px instead of 430×900; shared action buttons/tabs and What's New use theme surfaces, borders and hover colors. Guest identity now rejects paid/Rare avatar values in stored or newly saved data; guest boot/signout clears member inventory/equipment. Regression suite: 56 tests passed, typecheck/lint passed. Local guest clicking Coral Keeper opens unlock dialog without equipping.
 - Isolated project `xrtgcxofjisqaigaaboy` is ready. Localhost and deployed staging JavaScript were both checked and contain only its Supabase URL.
 - Web deployment `37445684473` succeeded for `3e47e80`; https://staging.gridnova.pages.dev is updated. GitHub Environment staging frontend secrets use the new project. Production secrets and main branch were not edited.
