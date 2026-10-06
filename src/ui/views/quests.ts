@@ -207,7 +207,7 @@ export function mountQuestsView(root: HTMLElement, props: QuestsPageProps): { un
         </div>
       </div>
       ${pageArtHTML('quests')}
-      <div id="q-body" style="width:99%"></div>
+      <div id="q-body" class="quests-list"></div>
     </section>
     ${bottomNavHTML('home')}
   `;

@@ -13,12 +13,12 @@ export interface PaywallProps {
 }
 
 const PERKS = [
-  '🎨 All premium themes unlocked',
-  '🎨 Exclusive board color packs',
-  '📊 Full stats history',
-  '🎁 Monthly coin bonus (+200 coins)',
-  '⚡ Ad-free experience',
-  '🏅 Premium badge on profile',
+  { icon: () => ic.sparkle(32), text: 'All premium themes unlocked' },
+  { icon: () => ic.puzzle(32), text: 'Exclusive board color packs' },
+  { icon: () => ic.stats(32), text: 'Full stats history' },
+  { icon: () => ic.gift(32), text: 'Monthly coin bonus (+200 coins)' },
+  { icon: () => ic.zap(32), text: 'Ad-free experience' },
+  { icon: () => ic.badge(32), text: 'Premium badge on profile' },
 ];
 
 export function showPaywall(props: PaywallProps): void {
@@ -31,19 +31,19 @@ export function showPaywall(props: PaywallProps): void {
   wrapper.innerHTML = `
     <div class="modal paywall-modal">
       <button class="modal-close" id="pw-close" aria-label="Close">${ic.close(24)}</button>
-      <div style="font-size:42px;margin-bottom:4px;">✨</div>
+      <div class="paywall-hero">${ic.sparkle(64)}</div>
       <h2 style="margin-bottom:4px;">GridNova Premium</h2>
       <p class="auth-sub">Unlock everything. Cancel anytime.</p>
 
-      <ul class="onb-list" style="text-align:left;margin:12px 0;">
-        ${PERKS.map((p) => `<li style="margin-bottom:4px;">${p}</li>`).join('')}
+      <ul class="paywall-perks">
+        ${PERKS.map((p) => `<li><span class="paywall-perk-icon">${p.icon()}</span><span>${p.text}</span></li>`).join('')}
       </ul>
 
       <div id="pw-plans" class="paywall-plans">
         <div class="pw-loading">Loading plans…</div>
       </div>
 
-      <div id="pw-error" style="color:#f87171;font-size:12px;margin:8px 0;display:none;"></div>
+      <div id="pw-error" class="paywall-error"></div>
 
       <button class="btn btn--secondary" id="pw-restore" style="width:100%;margin-top:10px;font-size:13px;">
         Restore Purchase
@@ -69,6 +69,7 @@ export function showPaywall(props: PaywallProps): void {
     const packages = await getOfferings();
     if (packages.length === 0) {
       plansEl.innerHTML = '';
+      wrapper.querySelector('.auth-sub')!.textContent = 'Premium membership is coming soon.';
       noteEl.style.display = 'block';
       restoreBtn.style.display = 'none';
       return;
