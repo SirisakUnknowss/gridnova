@@ -1,4 +1,16 @@
-# GridNova redesign handoff — 2026-10-05
+# GridNova staging handoff — 2026-10-06
+
+## Current staging status (supersedes older pending notes below)
+- Isolated project `xrtgcxofjisqaigaaboy` is ready. Localhost and deployed staging JavaScript were both checked and contain only its Supabase URL.
+- Web deployment `37445684473` succeeded for `3e47e80`; https://staging.gridnova.pages.dev is updated. GitHub Environment staging frontend secrets use the new project. Production secrets and main branch were not edited.
+- Schema/catalog, ten player/required Edge Functions, Auth redirects, 30 fresh Daily puzzles, signup/email confirmation/login, purchases/prerequisite rejection/duplicate rejection, equipment and Collection, Practice and Time Attack submissions verified on the new project. No production player data copied.
+- 54 tests, typecheck, lint and build passed; CI run `37445157129` passed.
+- Browser checks behind the staging access gate await the owner signing in on the open staging tab. Never request its password in chat. Daily generation cron is not configured; seeded puzzles last through November 4. See STAGING_SETUP.md for bootstrap exclusions and telemetry limitations.
+- INCIDENT: legacy backend workflow run `37445157144` targeted production via fallback secrets. Logs show only `20261006093112_staging_access_hardening.sql` applied in this run; Edge Function inspection shows generator changed, other functions already updated in the previous run. Rare catalog migration already existed. No rollback attempted; do not alter production without explicit owner direction. Backend workflow now skips staging entirely to prevent recurrence and unsafe CLI replay of consolidated migrations.
+- Production impact: read-only cron inspection confirmed its active generator job supplies no Authorization header. The new generator therefore rejects scheduled calls. Owner authorization was requested to restore only the generator from `61dd5fa`; do not proceed until explicitly authorized. The applied migration restricts purchase/equip RPCs to service_role and fixes increment_view search_path; it does not delete player records.
+- Current local branch stays `codex/redesign-game`; only staging was pushed. User's untracked GRIDNOVA_OVERVIEW.md remains untouched.
+
+## Earlier redesign notes
 
 ## Working state
 - Local branch: `codex/redesign-game`; backup/deployment target: `staging` per AGENTS.md. Do not push main.
@@ -16,7 +28,7 @@
 - Profile → My Collection: free/owned Themes and Avatars, Equip and Equipped. Visit Shop uses theme-aware fantasy button.
 - Medals Collection group: first paid purchase, five paid items, all Rare themes, all Rare avatars. Progress/unlocked computed from server inventory and available shop catalog; excludes free items and duplicates. No new coin/XP rewards or DB medal rows granted.
 
-## Important pending server work
+## Earlier pending server work (superseded above)
 - NOT applied: supabase/migrations/20261005000000_theme_prices_rare_avatars.sql (paid theme prices, Sky Citadel name, Rare avatar catalog).
 - NOT deployed: supabase/functions/purchase-item/index.ts prerequisite ownership check.
 - Staging SHARES PRODUCTION DB. Previous question to authorize DB migration had no reply. Do not apply migration or deploy backend without resolving this scope.
@@ -36,7 +48,7 @@
 2. Confirm latest Classic calendar framing, small gray lock avatars, unlock-popup Shop scroll, Collection equip behavior for a member.
 3. Review all theme backgrounds at calendar card crop; adjust theme-specific focal points if necessary.
 4. Resolve shared-production DB approval before backend/catalog changes. Never test real coin purchases on shared DB casually.
-5. Confirm staging deployment in GitHub Actions after push; production remains untouched.
+5. Confirm staging deployment in GitHub Actions after push; refer to the incident above before making any claims about production.
 
 ## User preference reminders
 English game UI; Thai chat. Light themed colors and white, no unrelated purple hover. Fantasy buttons balanced to text. No waving mascot. Exactly four bottom nav tabs. Generated art must match theme names. Keep GRIDNOVA_OVERVIEW.md (existing unrelated untracked user file) untouched.

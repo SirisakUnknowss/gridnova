@@ -2,7 +2,7 @@
 
 - Project: `gridnova-staging` (`xrtgcxofjisqaigaaboy`), organization `axwseulkkgnkgilijjlq`.
 - Connector account: `Unknowss` / `link_6ac4a45fc4bc8191805d49118d608bc1` currently resolves to the new GridNova account. Verify by listing projects before every backend operation; connector labels alone are not reliable.
-- Incident: staging push `4fbc537` triggered the legacy backend workflow, whose missing staging secrets fell back to repository production secrets. Run `37445157144` applied `20261005000000_theme_prices_rare_avatars` and `20261006093112_staging_access_hardening` to production and deployed Edge Functions. No player data was exported or copied. No rollback was attempted; production changes require the owner's explicit direction.
+- Incident: staging push `4fbc537` triggered the legacy backend workflow, whose missing staging secrets fell back to repository production secrets. Run `37445157144` applied only `20261006093112_staging_access_hardening` to production and changed the generator function. The Rare catalog migration was already present before this run. No player data was exported or copied. No rollback was attempted; production changes require the owner's explicit direction.
 - Backend automation now excludes staging; staging backend operations use the verified, account-scoped connector. Never enable CLI migration push against consolidated staging history without reconciling it first.
 - Local `.env.local` overrides the old `.env`; it is ignored by Git. Staging GitHub Environment owns `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; repository and production secrets are unchanged.
 - Deploy workflow verifies the staging project URL and anon-key project/role before building, preventing fallback to production.

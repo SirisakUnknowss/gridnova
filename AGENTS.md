@@ -46,13 +46,13 @@ other branch deploys nothing.
 | Env | Branch | Web URL | Supabase project |
 |---|---|---|---|
 | Production | `main` | `gridnova.pages.dev` | `sudoku-daily` (`sqjllqilozhxbzvfjhra`) |
-| Staging | `staging` | `staging.gridnova.pages.dev` | ⚠️ **shares prod DB** (`sudoku-daily`) — not yet separated |
+| Staging | `staging` | `staging.gridnova.pages.dev` | `gridnova-staging` (`xrtgcxofjisqaigaaboy`) |
 
-⚠️ **Staging currently SHARES the production Supabase database.** A dedicated staging
-project is wanted but blocked by the Supabase free-tier limit (2 active projects per org,
-already full: `sudoku-daily` + `Vestly`). Separation is pending a Pro upgrade or freeing a
-slot. **Until then, be careful: staging writes hit production data.** Avoid destructive or
-seed operations from staging.
+Staging was separated on 2026-10-06. Both localhost and deployed staging assets were
+verified against the new project. Backend staging deployment uses the account-scoped
+connector; the legacy GitHub backend workflow skips staging because its consolidated
+migration history cannot be replayed blindly. See docs/STAGING_SETUP.md and
+docs/HANDOFF.md for setup limits and the production fallback incident.
 
 When separated, the per-environment Supabase URL/anon key will come from **GitHub
 Environment secrets** (`staging` vs `production` environments), consumed by
