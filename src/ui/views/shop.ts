@@ -75,7 +75,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         <h2 style="margin:0;font-size:16px;color:var(--app-text);">
           ${ic.shop(26)} Shop
         </h2>
-        <span class="stat-pill" >${ic.coin(12)} ${formatNumber(useStore.getState().coins)}</span>
+        <span class="stat-pill">${ic.coin(12)} <span id="shop-coin-balance">${formatNumber(useStore.getState().coins)}</span></span>
       </div>
       ${pageArtHTML('shop')}
 
@@ -94,13 +94,13 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   const gridEl = root.querySelector<HTMLElement>('#shop-grid')!;
 
   function refreshCoinBadge(prev?: number) {
-    const pill = root.querySelector<HTMLElement>('.top-bar .stat-pill');
+    const pill = root.querySelector<HTMLElement>('#shop-coin-balance');
     if (!pill) return;
     const now = useStore.getState().coins;
     if (typeof prev === 'number') {
-      countUp(pill, prev, now, 600, (n) => `${ic.coin(12)} ${formatNumber(Math.round(n))}`);
+      countUp(pill, prev, now, 600, (n) => formatNumber(Math.round(n)));
     } else {
-      pill.innerHTML = `${ic.coin(12)} ${formatNumber(now)}`;
+      pill.textContent = formatNumber(now);
     }
   }
 
