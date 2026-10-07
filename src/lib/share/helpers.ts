@@ -1,5 +1,18 @@
 // Shared canvas drawing utilities for share cards
 
+export function sharePalette() {
+  const probe = document.createElement('span');
+  probe.style.display = 'none';
+  document.body.appendChild(probe);
+  const color = (token: string) => {
+    probe.style.color = `var(${token})`;
+    return getComputedStyle(probe).color;
+  };
+  const palette = { background: color('--app-bg'), surface: color('--app-card-bg'), text: color('--app-text'), muted: color('--app-text-secondary'), primary: color('--brand-primary'), secondary: color('--brand-secondary'), border: color('--app-border') };
+  probe.remove();
+  return palette;
+}
+
 export function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number, y: number, w: number, h: number, r: number,

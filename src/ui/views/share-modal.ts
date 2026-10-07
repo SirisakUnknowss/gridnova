@@ -1,6 +1,7 @@
 // Share Modal — preview + share/download for Win / Profile / Recap / Invite cards
 import { renderWinCard, renderProfileCard, renderRecapCard, renderInviteCard, buildResultText } from '@lib/share/index';
 import type { WinCardData, ProfileCardData, RecapCardData, InviteCardData } from '@lib/share/index';
+import { ic } from '@ui/icons';
 import downloadIcon from '@images/space/replacements/download-icon.webp';
 import shareIcon from '@images/space/replacements/share-icon.webp';
 
@@ -16,10 +17,10 @@ export interface ShareModalProps {
 type CardType = 'win' | 'profile' | 'recap' | 'invite';
 
 const LABELS: Record<CardType, string> = {
-  invite: '📣 Invite',
-  win: '🏆 Result',
-  profile: '👤 Profile',
-  recap: '📅 Recap',
+  invite: `${ic.gift(20)} Invite`,
+  win: `${ic.trophy(20)} Result`,
+  profile: `${ic.member(20)} Profile`,
+  recap: `${ic.daily(20)} Recap`,
 };
 
 export function showShareModal(props: ShareModalProps): void {
@@ -35,6 +36,7 @@ export function showShareModal(props: ShareModalProps): void {
 
   let activeType: CardType = available[0];
   let activeBlob: Blob | null = null;
+  let renderVersion = 0;
 
   const root = document.createElement('div');
   root.id = 'share-modal-root';
@@ -46,7 +48,7 @@ export function showShareModal(props: ShareModalProps): void {
       <div class="share-sheet-header">
         <span class="share-sheet-title">Share</span>
         <button class="icon-btn" id="share-close" aria-label="Close">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          ${ic.close(24)}
         </button>
       </div>
       ${available.length > 1 ? `
@@ -133,6 +135,7 @@ export function showShareModal(props: ShareModalProps): void {
   })();
 
   async function renderCard(type: CardType) {
+    const version = ++renderVersion;
     loading.style.display = 'flex';
     canvas.style.opacity = '0.3';
     activeBlob = null;
@@ -143,6 +146,7 @@ export function showShareModal(props: ShareModalProps): void {
     if (type === 'profile' && props.profile) blob = await renderProfileCard(props.profile);
     if (type === 'recap' && props.recap) blob = await renderRecapCard(props.recap);
 
+    if (version !== renderVersion) return;
     loading.style.display = 'none';
     canvas.style.opacity = '1';
 
@@ -152,6 +156,7 @@ export function showShareModal(props: ShareModalProps): void {
     const url = URL.createObjectURL(blob);
     const img = new Image();
     img.onload = () => {
+      if (version !== renderVersion) { URL.revokeObjectURL(url); return; }
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       const ctx = canvas.getContext('2d')!;

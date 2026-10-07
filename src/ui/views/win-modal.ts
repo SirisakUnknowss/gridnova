@@ -1,4 +1,4 @@
-import celebration from '@images/space/celebration.webp';
+import celebration from '@images/space/trophyIcon.webp';
 // =====================================================================
 // Win modal — shown after game completion
 // =====================================================================
@@ -28,7 +28,8 @@ function launchConfetti(container: HTMLElement): () => void {
   container.appendChild(canvas);
   const ctx = canvas.getContext('2d')!;
 
-  const COLORS = ['#f97316','#6c5ce7','#f59e0b','#10b981','#ec4899','#3b82f6','#a78bfa','#fbbf24'];
+  const theme = getComputedStyle(document.documentElement);
+  const COLORS = ['--brand-primary', '--brand-secondary', '--color-xp'].map(token => theme.getPropertyValue(token).trim());
   const COUNT = 120;
 
   interface Piece {
@@ -105,22 +106,22 @@ export function showWinModal(props: WinModalProps): void {
   wrapper.className = 'modal-bg active';
 
   wrapper.innerHTML = `
-    <div class="modal">
+    <div class="modal win-modal">
       <img src="${celebration}" class="space-win-art" width="144" height="180" alt="" decoding="async">
       <h2>You won!</h2>
       <div class="big-number">${result.score.toLocaleString()}</div>
       <p class="small" style="opacity:0.8;">Points</p>
 
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0;">
-        <div style="background:rgba(108,92,231,0.08);padding:8px;border-radius:12px;">
+      <div class="win-stats">
+        <div class="win-stat">
           <div style="font-size:11px;opacity:0.8;">Time</div>
           <div style="font-size:18px;">${formatTime(result.timeSeconds)}</div>
         </div>
-        <div style="background:rgba(108,92,231,0.08);padding:8px;border-radius:12px;">
+        <div class="win-stat">
           <div style="font-size:11px;opacity:0.8;">Mistakes</div>
           <div style="font-size:18px;">${result.mistakes}</div>
         </div>
-        <div style="background:rgba(108,92,231,0.08);padding:8px;border-radius:12px;">
+        <div class="win-stat">
           <div style="font-size:11px;opacity:0.8;">Hints</div>
           <div style="font-size:18px;">${result.hintsUsed}</div>
         </div>

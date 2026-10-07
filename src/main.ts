@@ -971,6 +971,7 @@ async function shareResult(result: GameResult, date: string, rank?: number, tota
     profile: profile && userId ? {
       displayName: profile.display_name || profile.username || 'Player',
       avatarUrl: profile.avatar_url,
+      avatarId: state.equipped.avatar?.item_id as string | undefined,
       avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
       level: state.level,
       bestStreak: state.currentStreak,

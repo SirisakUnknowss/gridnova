@@ -4849,7 +4849,9 @@ body.bg-anim-aurora {
 
 /* ─── Share Modal (bottom sheet) ─────────────────────────────────── */
 .share-sheet {
-  background: var(--app-bg);
+  background: var(--app-card-bg);
+  max-height: 94dvh;
+  overflow-y: auto;
   border-radius: 20px 20px 0 0;
   width: 100%;
   max-width: 480px;
@@ -4897,6 +4899,10 @@ body.bg-anim-aurora {
 }
 
 .share-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   flex: 1;
   padding: 8px 4px;
   border: 1.5px solid var(--app-border);
@@ -4912,7 +4918,7 @@ body.bg-anim-aurora {
 .share-tab.active {
   border-color: var(--brand-primary);
   color: var(--brand-primary);
-  background: rgba(108, 92, 231, 0.08);
+  background: color-mix(in srgb, var(--brand-primary) 12%, var(--app-card-bg));
 }
 
 .share-preview-wrap {
@@ -4920,7 +4926,7 @@ body.bg-anim-aurora {
   margin: 0 16px 12px;
   border-radius: 16px;
   overflow: hidden;
-  background: #f0edff;
+  background: var(--app-card-bg);
   min-height: 220px;
   display: flex;
   align-items: center;
@@ -4950,7 +4956,7 @@ body.bg-anim-aurora {
   justify-content: center;
   font-size: 14px;
   color: var(--app-text-secondary);
-  background: rgba(240, 237, 255, 0.8);
+  background: var(--app-card-bg);
 }
 
 .share-actions {
@@ -4978,8 +4984,7 @@ body.bg-anim-aurora {
   overflow-x: auto;
   font-family: inherit;
   font-size: 11px;
-  /* Emoji are ~square, so line-height 1 keeps the 9x9 block actually square */
-  line-height: 1;
+  line-height: 1.5;
   text-align: center;
   white-space: pre;
   color: var(--app-text);
@@ -6342,3 +6347,6 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
   color: var(--app-text-secondary);
 }
 .whatsnew-release.latest .whatsnew-badge { background: var(--app-border); color: var(--app-text); }
+.win-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 18px 0; }
+.win-stat { background: color-mix(in srgb, var(--brand-primary) 10%, var(--app-card-bg)); border: 1px solid var(--app-border); padding: 8px; border-radius: 12px; }
+.win-modal .ui-art-icon { vertical-align: middle; }
