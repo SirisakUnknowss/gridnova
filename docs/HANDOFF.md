@@ -56,3 +56,5 @@
 
 ## User preference reminders
 English game UI; Thai chat. Light themed colors and white, no unrelated purple hover. Fantasy buttons balanced to text. No waving mascot. Exactly four bottom nav tabs. Generated art must match theme names. Keep GRIDNOVA_OVERVIEW.md (existing unrelated untracked user file) untouched.
+
+- Illustrated frames (2026-10-07): 20 generated transparent originals in assets/space/avatar-frames; optimized 384px WebP runtime art totals 931KB. Added as 20 independent permanent frame items, 1200–3000 coins, alongside four existing frames (24 total). Append-only illustrated_avatar_frames migration applied only to xrtgcxofjisqaigaaboy. Shared renderer displays art in Shop previews, Collection, Home and Profile. Existing equip ownership guard remains. QA bought and equipped Celestial Crown; a logged 1200-coin staging_illustrated_frame_qa_credit restored its test balance. 60 tests/typecheck/lint/build and staging API smoke passed. Staging web deployment pending verification.

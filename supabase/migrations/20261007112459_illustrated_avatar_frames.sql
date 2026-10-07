@@ -1,0 +1,22 @@
+insert into public.shop_items (id, category, name, description, price_coin, rarity, unlock_type, available, sort_order, metadata)
+values
+('frame_art_celestial_crown','avatar_frame','Celestial Crown','pearl silver ring, crescent moon and tiny stars',1200,'rare','coin',true,420,'{}'),
+('frame_art_ocean_pearl','avatar_frame','Ocean Pearl','aqua coral ring with bubbles and pearls',1600,'rare','coin',true,421,'{}'),
+('frame_art_sakura_petals','avatar_frame','Sakura Petals','rose gold ring wrapped in pink cherry blossoms',1600,'rare','coin',true,422,'{}'),
+('frame_art_royal_orbit','avatar_frame','Royal Orbit','gold double ring with amethyst crown',2400,'epic','coin',true,423,'{}'),
+('frame_art_forest_guardian','avatar_frame','Forest Guardian','emerald vine ring with tiny leaves',1200,'rare','coin',true,424,'{}'),
+('frame_art_solar_flare','avatar_frame','Solar Flare','golden ring with soft orange flame tips',1800,'rare','coin',true,425,'{}'),
+('frame_art_frost_crystal','avatar_frame','Frost Crystal','pale blue ring of faceted ice crystals',1800,'rare','coin',true,426,'{}'),
+('frame_art_nebula_dream','avatar_frame','Nebula Dream','lavender ring with miniature planets and stardust',2000,'rare','coin',true,427,'{}'),
+('frame_art_dragon_crest','avatar_frame','Dragon Crest','gold jade ring with two small stylized dragon ornaments',2400,'epic','coin',true,428,'{}'),
+('frame_art_phoenix_wings','avatar_frame','Phoenix Wings','rose gold ring with feather wings at bottom',2200,'epic','coin',true,429,'{}'),
+('frame_art_lunar_eclipse','avatar_frame','Lunar Eclipse','navy silver ring with two crescent moons',1600,'rare','coin',true,430,'{}'),
+('frame_art_candy_cloud','avatar_frame','Candy Cloud','pastel pink blue ring with puffy cloud ornaments',1200,'rare','coin',true,431,'{}'),
+('frame_art_crystal_lotus','avatar_frame','Crystal Lotus','turquoise ring with lotus petal crystal base',2000,'rare','coin',true,432,'{}'),
+('frame_art_clockwork_orbit','avatar_frame','Clockwork Orbit','bronze ring with delicate cogs and clock accents',1800,'rare','coin',true,433,'{}'),
+('frame_art_thunder_spark','avatar_frame','Thunder Spark','silver violet ring with small lightning shards',1800,'rare','coin',true,434,'{}'),
+('frame_art_coral_kingdom','avatar_frame','Coral Kingdom','pale aqua ring with seashells and branching coral',1600,'rare','coin',true,435,'{}'),
+('frame_art_rose_garden','avatar_frame','Rose Garden','ivory gold ring with red pink miniature roses',1600,'rare','coin',true,436,'{}'),
+('frame_art_comet_trail','avatar_frame','Comet Trail','blue silver ring with swooping comet tail and star',2000,'rare','coin',true,437,'{}'),
+('frame_art_aurora_ribbon','avatar_frame','Aurora Ribbon','pearl ring with flowing mint violet ribbons',2000,'rare','coin',true,438,'{}'),
+('frame_art_galaxy_sovereign','avatar_frame','Galaxy Sovereign','deep violet gold ring with elaborate diamond crown',3000,'epic','coin',true,439,'{}');

@@ -14,7 +14,7 @@ const { error: loginError } = await client.auth.signInWithPassword({ email: env.
 assert.ifError(loginError);
 const catalog = await client.from('shop_items').select('id,price_coin').eq('category', 'avatar_frame');
 assert.ifError(catalog.error);
-assert.equal(catalog.data.length, 4);
+assert.equal(catalog.data.length, 24);
 const inventory = await client.from('user_inventory').select('item_id');
 assert.ifError(inventory.error);
 const owned = new Set(inventory.data.map(item => item.item_id));

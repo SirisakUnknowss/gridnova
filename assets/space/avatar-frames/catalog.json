@@ -1,0 +1,102 @@
+[
+  {
+    "name": "Celestial Crown",
+    "description": "pearl silver ring, crescent moon and tiny stars",
+    "file": "01-celestial-crown.png"
+  },
+  {
+    "name": "Ocean Pearl",
+    "description": "aqua coral ring with bubbles and pearls",
+    "file": "02-ocean-pearl.png"
+  },
+  {
+    "name": "Sakura Petals",
+    "description": "rose gold ring wrapped in pink cherry blossoms",
+    "file": "03-sakura-petals.png"
+  },
+  {
+    "name": "Royal Orbit",
+    "description": "gold double ring with amethyst crown",
+    "file": "04-royal-orbit.png"
+  },
+  {
+    "name": "Forest Guardian",
+    "description": "emerald vine ring with tiny leaves",
+    "file": "05-forest-guardian.png"
+  },
+  {
+    "name": "Solar Flare",
+    "description": "golden ring with soft orange flame tips",
+    "file": "06-solar-flare.png"
+  },
+  {
+    "name": "Frost Crystal",
+    "description": "pale blue ring of faceted ice crystals",
+    "file": "07-frost-crystal.png"
+  },
+  {
+    "name": "Nebula Dream",
+    "description": "lavender ring with miniature planets and stardust",
+    "file": "08-nebula-dream.png"
+  },
+  {
+    "name": "Dragon Crest",
+    "description": "gold jade ring with two small stylized dragon ornaments",
+    "file": "09-dragon-crest.png"
+  },
+  {
+    "name": "Phoenix Wings",
+    "description": "rose gold ring with feather wings at bottom",
+    "file": "10-phoenix-wings.png"
+  },
+  {
+    "name": "Lunar Eclipse",
+    "description": "navy silver ring with two crescent moons",
+    "file": "11-lunar-eclipse.png"
+  },
+  {
+    "name": "Candy Cloud",
+    "description": "pastel pink blue ring with puffy cloud ornaments",
+    "file": "12-candy-cloud.png"
+  },
+  {
+    "name": "Crystal Lotus",
+    "description": "turquoise ring with lotus petal crystal base",
+    "file": "13-crystal-lotus.png"
+  },
+  {
+    "name": "Clockwork Orbit",
+    "description": "bronze ring with delicate cogs and clock accents",
+    "file": "14-clockwork-orbit.png"
+  },
+  {
+    "name": "Thunder Spark",
+    "description": "silver violet ring with small lightning shards",
+    "file": "15-thunder-spark.png"
+  },
+  {
+    "name": "Coral Kingdom",
+    "description": "pale aqua ring with seashells and branching coral",
+    "file": "16-coral-kingdom.png"
+  },
+  {
+    "name": "Rose Garden",
+    "description": "ivory gold ring with red pink miniature roses",
+    "file": "17-rose-garden.png"
+  },
+  {
+    "name": "Comet Trail",
+    "description": "blue silver ring with swooping comet tail and star",
+    "file": "18-comet-trail.png"
+  },
+  {
+    "name": "Aurora Ribbon",
+    "description": "pearl ring with flowing mint violet ribbons",
+    "file": "19-aurora-ribbon.png"
+  },
+  {
+    "name": "Galaxy Sovereign",
+    "description": "deep violet gold ring with elaborate diamond crown",
+    "file": "20-galaxy-sovereign.png"
+  }
+]
