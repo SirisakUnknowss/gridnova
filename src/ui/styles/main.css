@@ -1,10 +1,10 @@
 @import './tokens.css';
 
 .splash-screen {
-  --splash-bg: #171331;
-  --splash-ink: #f4f0ff;
-  --splash-violet: #9474f5;
-  --splash-blue: #77d9ff;
+  --splash-bg: var(--app-bg);
+  --splash-ink: var(--app-text);
+  --splash-violet: var(--brand-primary);
+  --splash-blue: var(--brand-secondary);
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -12,8 +12,11 @@
   place-items: center;
   overflow: hidden;
   color: var(--splash-ink);
-  background: radial-gradient(ellipse at 25% 25%, color-mix(in srgb, var(--splash-violet) 28%, transparent), transparent 60%),
-    radial-gradient(ellipse at 85% 75%, color-mix(in srgb, var(--splash-blue) 18%, transparent), transparent 55%), var(--splash-bg);
+  background-color: var(--splash-bg);
+  background-image: linear-gradient(color-mix(in srgb, var(--splash-bg) 35%, transparent), color-mix(in srgb, var(--splash-bg) 65%, transparent)),
+    var(--theme-background, url('../../images/space/bg-home.webp'));
+  background-position: center;
+  background-size: cover;
 }
 .splash-screen::before {
   content: '';

@@ -1039,7 +1039,7 @@ function stringToBoard(s: string): number[][] {
 async function boot() {
   // Apply cached theme + background before first paint to avoid flicker
   const cachedTheme = loadCachedThemeId();
-  if (cachedTheme) applyTheme(cachedTheme);
+  applyTheme(cachedTheme);
   const cachedBg = loadCachedBgId();
   if (cachedBg) applyBackground(cachedBg);
 
