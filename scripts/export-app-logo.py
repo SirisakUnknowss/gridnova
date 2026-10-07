@@ -6,8 +6,6 @@ source = root / 'assets/space/generated/illustrations/31_app_icon_prompt.png'
 with Image.open(source) as original:
     image = original.convert('RGB')
     for relative, size in {
-        'src/images/logo.png': 256,
-        'public/icons/logo.png': 256,
         'assets/icon.png': 1024,
         'public/icons/icon-1024.png': 1024,
         'public/icons/icon-512.png': 512,
@@ -22,3 +20,9 @@ with Image.open(source) as original:
         mark = image.resize((size - inset * 2, size - inset * 2), Image.Resampling.LANCZOS)
         canvas.paste(mark, (inset, inset))
         canvas.save(root / f'public/icons/icon-{size}-maskable.png', optimize=True)
+
+with Image.open(root / 'assets/space/generated/illustrations/app-logo-transparent.png') as cutout:
+    cutout = cutout.convert('RGBA')
+    cutout.thumbnail((320, 320), Image.Resampling.LANCZOS)
+    for relative in ('src/images/logo.png', 'public/icons/logo.png'):
+        cutout.save(root / relative, optimize=True)

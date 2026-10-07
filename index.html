@@ -69,8 +69,19 @@
 </head>
 <body>
   <div id="app">
-    <div id="loading-screen" class="loading-screen">
-      <img src="/icons/logo.png" alt="GridNova" style="width:80px;height:80px;border-radius:20px;">
+    <div id="loading-screen" class="splash-screen">
+      <div class="splash-logo-wrap">
+        <div class="splash-orbit-stage">
+          <div class="splash-orbit splash-orbit-outer" aria-hidden="true"></div>
+          <div class="splash-orbit splash-orbit-inner" aria-hidden="true"></div>
+          <img class="splash-logo" src="/icons/logo.png" alt="GridNova" width="160" height="160">
+        </div>
+        <div class="splash-title">Grid<span>Nova</span></div>
+        <div class="splash-loading" role="status">
+          <span>Preparing your universe</span>
+          <div class="splash-loading-track" aria-hidden="true"><span></span></div>
+        </div>
+      </div>
     </div>
   </div>
   <div id="orientation-lock" class="orientation-lock">

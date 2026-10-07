@@ -8,10 +8,15 @@ export function mountSplash(root: HTMLElement): { unmount: () => Promise<void> }
   el.className = 'splash-screen';
   el.innerHTML = `
     <div class="splash-logo-wrap">
-      <img class="splash-logo" src="${logo}" alt="GridNova" width="160" height="160">
+      <div class="splash-orbit-stage">
+        <div class="splash-orbit splash-orbit-outer" aria-hidden="true"></div>
+        <div class="splash-orbit splash-orbit-inner" aria-hidden="true"></div>
+        <img class="splash-logo" src="${logo}" alt="GridNova" width="160" height="160">
+      </div>
       <div class="splash-title">Grid<span>Nova</span></div>
-      <div class="splash-dots" aria-hidden="true">
-        <span></span><span></span><span></span>
+      <div class="splash-loading" role="status" aria-live="polite">
+        <span>Preparing your universe</span>
+        <div class="splash-loading-track" aria-hidden="true"><span></span></div>
       </div>
     </div>
   `;
