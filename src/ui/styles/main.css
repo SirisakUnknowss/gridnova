@@ -3548,6 +3548,28 @@ h3 {
 }
 
 /* ===== Profile ===== */
+.avatar-frame { position: relative; display: inline-flex; align-items: center; justify-content: center; width: var(--avatar-size); height: var(--avatar-size); flex: none; isolation: isolate; }
+.avatar-frame-content { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: hidden; }
+.avatar-frame-content > img { max-width: 100%; max-height: 100%; object-fit: cover; }
+.avatar-frame-ring { position: absolute; inset: -7%; border: 3px solid var(--brand-primary); border-radius: 50%; pointer-events: none; box-shadow: inset 0 0 0 2px var(--app-card-bg), 0 2px 6px color-mix(in srgb, var(--brand-primary) 35%, transparent); }
+.avatar-frame-gem { position: absolute; top: -12%; right: 4%; width: 20%; height: 20%; background: var(--color-xp); border: 2px solid var(--app-card-bg); transform: rotate(45deg); border-radius: 3px; pointer-events: none; }
+.avatar-frame--star .avatar-frame-ring { border-style: double; border-width: 5px; }
+.avatar-frame--star .avatar-frame-gem { clip-path: polygon(50% 0,62% 34%,100% 50%,62% 64%,50% 100%,36% 64%,0 50%,36% 34%); transform: none; width: 28%; height: 28%; }
+.avatar-frame--ocean .avatar-frame-ring { border-width: 5px; border-color: var(--brand-secondary); box-shadow: inset 0 0 0 2px var(--app-card-bg), 0 0 0 2px var(--brand-primary); }
+.avatar-frame--ocean .avatar-frame-gem { border-radius: 50%; background: var(--app-card-bg); box-shadow: inset 0 0 0 2px var(--brand-secondary), -8px 12px 0 -3px var(--brand-secondary); }
+.avatar-frame--sakura .avatar-frame-ring { border-style: dotted; border-width: 6px; border-color: var(--brand-secondary); }
+.avatar-frame--sakura .avatar-frame-gem { border-radius: 50% 10% 50% 10%; background: var(--brand-primary); box-shadow: -6px 6px 0 var(--brand-secondary); }
+.avatar-frame--royal .avatar-frame-ring { border: 5px double var(--color-xp); outline: 2px solid var(--brand-primary); outline-offset: 3px; }
+.avatar-frame--royal .avatar-frame-gem { left: 40%; top: -19%; background: var(--brand-primary); border-color: var(--color-xp); }
+.avatar-frame--ocean { --frame-accent: #58b8d6; --frame-soft: #b6e8f2; }
+.avatar-frame--ocean .avatar-frame-ring { border-color: var(--frame-soft); box-shadow: inset 0 0 0 2px var(--app-card-bg), 0 0 0 2px var(--frame-accent); }
+.avatar-frame--ocean .avatar-frame-gem { box-shadow: inset 0 0 0 2px var(--frame-accent), -8px 12px 0 -3px var(--frame-soft); }
+.avatar-frame--sakura { --frame-accent: #d986ad; --frame-soft: #f1c2d8; }
+.avatar-frame--sakura .avatar-frame-ring { border-color: var(--frame-soft); }
+.avatar-frame--sakura .avatar-frame-gem { background: var(--frame-accent); box-shadow: -6px 6px 0 var(--frame-soft); }
+.frame-preview-button { border: 0; background: transparent; color: var(--brand-primary); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; margin-bottom: 8px; padding: 6px; }
+.frame-preview-large { display: flex; justify-content: center; margin: 24px 0; }
+.frame-preview-modal p { color: var(--app-text-secondary); margin-top: 10px; }
 .profile-hero {
   width: 100%;
   max-width: 520px;

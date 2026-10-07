@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js';
 type View = 'loading' | 'login' | 'home' | 'game' | 'leaderboard' | 'shop' | 'profile' | 'settings' | 'stages';
 
 interface Equipped {
+  frame_id?: string | null;
   theme_id: string | null;
   background_id: string | null;
   board_color_id: string | null;

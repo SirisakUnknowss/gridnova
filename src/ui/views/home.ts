@@ -1,5 +1,6 @@
 import dailyCalendar from '@images/space/daily-calendar-fantasy.webp';
 import { avatarArtHTML } from '../components/avatar-art';
+import { framedAvatarHTML } from '../components/avatar-frame';
 // =====================================================================
 // Home view — main hub
 // =====================================================================
@@ -73,7 +74,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
       <!-- Header -->
       <div class="home-header">
         <button class="home-user-btn" id="user-badge" type="button">
-          <span class="home-avatar">${userIcon}</span>
+          <span class="home-avatar">${framedAvatarHTML(userIcon, isGuest ? null : state.equipped.frame_id, 38)}</span>
           <div class="home-user-info">
             <span class="home-user-name">${displayName}</span>
             ${isGuest ? `<span class="home-user-id">${guestId}</span>` : ''}

@@ -1,6 +1,7 @@
 import { RARE_AVATAR_CATALOG } from '@lib/rare-avatar-catalog';
 import { THEME_BACKGROUNDS } from '@lib/theme-backgrounds';
 import { avatarArtHTML, shopAvatarName } from '../components/avatar-art';
+import { framePreviewHTML } from '../components/avatar-frame';
 import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Shop view — browse / purchase / equip items
@@ -23,7 +24,7 @@ export interface ShopProps {
   nav: BottomNavCallbacks;
 }
 
-type Category = 'theme' | 'avatar';
+type Category = 'theme' | 'avatar' | 'avatar_frame';
 
 interface ShopItem {
   id: string;
@@ -57,6 +58,7 @@ const AVATAR_SHOP_IDS = new Set(['avatar_face_happy', 'avatar_face_cool', 'avata
 const CATEGORY_TABS: { key: Category; label: string }[] = [
   { key: 'theme', label: 'Themes' },
   { key: 'avatar', label: 'Avatars' },
+  { key: 'avatar_frame', label: 'Frames' },
 ];
 
 export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: () => void } {
@@ -65,6 +67,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   let items: ShopItem[] = [];
   let loading = true;
   let errorMsg: string | null = null;
+  let framePreview: HTMLElement | null = null;
 
   root.innerHTML = `
     <section class="view view--shop">
@@ -145,7 +148,8 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       const isOwned = owned.has(item.id) || item.price_coin === 0;
       const isEquipped =
         (item.category === 'theme' && equipped.theme_id === item.id) ||
-        (item.category === 'avatar' && equipped.avatar?.item_id === item.id);
+        (item.category === 'avatar' && equipped.avatar?.item_id === item.id) ||
+        (item.category === 'avatar_frame' && equipped.frame_id === item.id);
       const canAfford = state.coins >= item.price_coin;
       const rarity = item.rarity ?? 'common';
       const requiredTheme = item.category === 'avatar' && typeof item.metadata?.theme_id === 'string' ? item.metadata.theme_id : null;
@@ -174,6 +178,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       let preview = '🎁';
       if (item.category === 'theme') preview = themePreview(item.id);
       else if (item.category === 'avatar') preview = avatarPreviewIcon(item.id);
+      else if (item.category === 'avatar_frame') preview = framePreviewHTML(item.id, state.equipped.avatar.item_id as string ?? state.equipped.avatar.emoji);
 
       const previewable = item.category === 'theme';
       const matchedTheme = previewable ? item.id : typeof item.metadata?.theme_id === 'string' ? item.metadata.theme_id : null;
@@ -184,6 +189,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
           <div class="shop-name">${escapeHtml(item.name)}</div>
           ${item.description ? `<div class="shop-desc">${escapeHtml(item.description)}</div>` : ''}
           <div class="shop-price">${item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? `⚪ ${escapeHtml(rarity)}`}</div>
+          ${item.category === 'avatar_frame' ? `<button class="frame-preview-button" data-frame-preview="${escapeHtml(item.id)}">Preview</button>` : ''}
           <div class="shop-action">${action}</div>
         </div>
       `;
@@ -199,6 +205,20 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
     }
 
     gridEl.querySelectorAll('[data-signin]').forEach(btn => btn.addEventListener('click', props.nav.onProfile));
+    gridEl.querySelectorAll<HTMLButtonElement>('[data-frame-preview]').forEach(btn => btn.addEventListener('click', () => {
+      const item = items.find(candidate => candidate.id === btn.dataset.framePreview)!;
+      const avatar = useStore.getState().equipped.avatar;
+      const overlay = document.createElement('div');
+      framePreview?.remove();
+      framePreview = overlay;
+      overlay.className = 'modal-bg active';
+      overlay.innerHTML = `<div class="modal frame-preview-modal" role="dialog" aria-modal="true" aria-label="Frame preview"><button class="modal-close" aria-label="Close preview">${ic.close(24)}</button><div class="frame-preview-large">${framePreviewHTML(item.id, avatar.item_id as string ?? avatar.emoji)}</div><h2>${escapeHtml(item.name)}</h2><p>Preview only — your equipped frame stays unchanged.</p></div>`;
+      overlay.querySelector('button')?.addEventListener('click', () => overlay.remove());
+      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+      overlay.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.remove(); });
+      document.body.appendChild(overlay);
+      overlay.querySelector<HTMLButtonElement>('button')?.focus();
+    }));
 
     // Wire actions
     gridEl.querySelectorAll<HTMLButtonElement>('[data-buy]').forEach((btn) => {
@@ -234,7 +254,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       overlay.innerHTML = `
         <div class="modal shop-confirm" role="dialog" aria-modal="true" aria-labelledby="shop-confirm-title">
           <button class="modal-close" aria-label="Close purchase">${ic.close(24)}</button>
-          <div class="shop-preview">${item.category === 'avatar' ? avatarPreviewIcon(item.id) : themePreview(item.id)}</div>
+          <div class="shop-preview">${item.category === 'avatar' ? avatarPreviewIcon(item.id) : item.category === 'avatar_frame' ? framePreviewHTML(item.id, useStore.getState().equipped.avatar.item_id as string ?? useStore.getState().equipped.avatar.emoji) : themePreview(item.id)}</div>
           <h2 id="shop-confirm-title">Unlock ${escapeHtml(item.name)}?</h2>
           <p>${ic.coin(20)} ${formatNumber(item.price_coin)} coins</p>
           <div class="modal-buttons"><button class="btn btn--secondary" data-cancel>Cancel</button><button class="btn btn--primary" data-confirm>Buy</button></div>
@@ -300,10 +320,11 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       return;
     }
     btn.disabled = true; btn.textContent = '…';
-    const payload: { theme_id?: string; background_id?: string; board_color_id?: string; avatar?: { item_id: string } } = {};
+    const payload: { theme_id?: string; frame_id?: string; avatar?: { item_id: string } } = {};
     if (item.category === 'theme') payload.theme_id = itemId;
 
     if (item.category === 'avatar') payload.avatar = { item_id: itemId };
+    if (item.category === 'avatar_frame') payload.frame_id = itemId;
 
     try {
       const { error } = await api.equipItem(payload);
@@ -327,7 +348,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         api.getInventory().catch(() => []),
         api.getEquipped().catch(() => null),
       ]);
-      items = ((shopItems ?? []) as ShopItem[]).filter(item => item.category === 'theme' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_')))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
+      items = ((shopItems ?? []) as ShopItem[]).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_')))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
       useStore.getState().setInventory((inventory ?? []).map((r: { item_id: string }) => r.item_id));
       if (equipped) {
         useStore.getState().setEquipped({
@@ -335,6 +356,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
           background_id: equipped.background_id ?? null,
           board_color_id: equipped.board_color_id ?? null,
           avatar: equipped.avatar ?? { emoji: '👤' },
+          frame_id: equipped.frame_id ?? null,
         });
         if (equipped.theme_id) applyTheme(equipped.theme_id);
       }
@@ -375,6 +397,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   return {
     unmount() {
       dismissPurchase?.();
+      framePreview?.remove();
       previewOut();
       window.removeEventListener('scroll', onScroll);
     },

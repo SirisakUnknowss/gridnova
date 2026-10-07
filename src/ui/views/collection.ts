@@ -1,4 +1,5 @@
 import * as api from '@lib/api';
+import { framePreviewHTML } from '../components/avatar-frame';
 import { useStore } from '@state/store';
 import { applyTheme, THEMES } from '@lib/themes';
 import { THEME_BACKGROUNDS } from '@lib/theme-backgrounds';
@@ -12,7 +13,7 @@ export function mountCollectionView(root: HTMLElement, props: { onBack: () => vo
   let category = 'theme';
   let items: Item[] = [];
   let alive = true;
-  root.innerHTML = `<section class="view view--shop"><div class="top-bar"><button class="icon-btn" id="collection-back" aria-label="Back">${ic.back(26)}</button><h2>My Collection</h2><span></span></div><div class="shop-tabs"><button class="shop-tab active" data-category="theme">Themes</button><button class="shop-tab" data-category="avatar">Avatars</button></div><div class="shop-grid" id="collection-grid">Loading…</div><button class="btn collection-shop-button" id="collection-shop">${ic.shop(26)}<span>Visit Shop</span>${ic.chevronRight(18)}</button></section>${bottomNavHTML('profile')}`;
+  root.innerHTML = `<section class="view view--shop"><div class="top-bar"><button class="icon-btn" id="collection-back" aria-label="Back">${ic.back(26)}</button><h2>My Collection</h2><span></span></div><div class="shop-tabs"><button class="shop-tab active" data-category="theme">Themes</button><button class="shop-tab" data-category="avatar">Avatars</button><button class="shop-tab" data-category="avatar_frame">Frames</button></div><div class="shop-grid" id="collection-grid">Loading…</div><button class="btn collection-shop-button" id="collection-shop">${ic.shop(26)}<span>Visit Shop</span>${ic.chevronRight(18)}</button></section>${bottomNavHTML('profile')}`;
   wireBottomNav(root, props.nav, 'profile');
   root.querySelector('#collection-back')?.addEventListener('click', props.onBack);
   root.querySelector('#collection-shop')?.addEventListener('click', props.onShop);
@@ -27,13 +28,14 @@ export function mountCollectionView(root: HTMLElement, props: { onBack: () => vo
     const grid = root.querySelector<HTMLElement>('#collection-grid')!;
     const visible = items.filter(item => item.category === category);
     grid.innerHTML = visible.map(item => {
-      const equipped = item.category === 'theme' ? (state.equipped.theme_id ?? 'theme_classic') === item.id : item.emoji ? state.equipped.avatar.emoji === item.emoji && !state.equipped.avatar.item_id : state.equipped.avatar.item_id === item.id;
-      return `<div class="shop-card"><div class="shop-preview">${item.category === 'theme' ? `<img class="collection-theme-art" src="${THEME_BACKGROUNDS[item.id]}" alt="">` : avatarArtHTML(item.emoji ?? item.id, 88)}</div><div class="shop-name">${escapeHtml(item.name)}</div><div class="shop-action">${equipped ? '<span class="quest-tag">✓ Equipped</span>' : `<button class="btn btn--small" data-equip="${escapeHtml(item.id)}">Equip</button>`}</div></div>`;
+      const equipped = item.category === 'avatar_frame' ? (state.equipped.frame_id ?? 'frame_none') === item.id : item.category === 'theme' ? (state.equipped.theme_id ?? 'theme_classic') === item.id : item.emoji ? state.equipped.avatar.emoji === item.emoji && !state.equipped.avatar.item_id : state.equipped.avatar.item_id === item.id;
+      const preview = item.category === 'theme' ? `<img class="collection-theme-art" src="${THEME_BACKGROUNDS[item.id]}" alt="">` : item.category === 'avatar_frame' ? framePreviewHTML(item.id, state.equipped.avatar.item_id as string ?? state.equipped.avatar.emoji) : avatarArtHTML(item.emoji ?? item.id, 88);
+      return `<div class="shop-card"><div class="shop-preview">${preview}</div><div class="shop-name">${escapeHtml(item.name)}</div><div class="shop-action">${equipped ? '<span class="quest-tag">✓ Equipped</span>' : `<button class="btn btn--small" data-equip="${escapeHtml(item.id)}">${item.id === 'frame_none' ? 'Remove frame' : 'Equip'}</button>`}</div></div>`;
     }).join('') || '<p>No items yet. Discover your next treasure in the Shop.</p>';
     grid.querySelectorAll<HTMLButtonElement>('[data-equip]').forEach(button => button.addEventListener('click', async () => {
       const item = items.find(candidate => candidate.id === button.dataset.equip)!;
       const avatar = item.emoji ? { emoji: item.emoji } : { item_id: item.id };
-      const payload = item.category === 'theme' ? { theme_id: item.id } : { avatar };
+      const payload = item.category === 'avatar_frame' ? { frame_id: item.id === 'frame_none' ? null : item.id } : item.category === 'theme' ? { theme_id: item.id } : { avatar };
       button.disabled = true;
       try {
         if (state.user && !state.user.is_anonymous) {
@@ -50,7 +52,7 @@ export function mountCollectionView(root: HTMLElement, props: { onBack: () => vo
         if (!alive) return;
         useStore.getState().setEquipped(payload);
         if (item.category === 'theme') applyTheme(item.id);
-        props.onToast(`${item.name} equipped`);
+        props.onToast(item.id === 'frame_none' ? 'Frame removed' : `${item.name} equipped`);
         render();
       } catch { props.onToast('Could not equip item'); button.disabled = false; }
     }));
@@ -62,7 +64,8 @@ export function mountCollectionView(root: HTMLElement, props: { onBack: () => vo
       const [catalog, inventory] = await Promise.all([api.getShopItems(), member ? api.getInventory() : Promise.resolve([])]);
       if (!alive) return;
       if (member) state.setInventory((inventory ?? []).map((row: { item_id: string }) => row.item_id));
-      items = (catalog as Item[]).filter(item => ['theme', 'avatar'].includes(item.category) && (item.price_coin === 0 || (member && useStore.getState().inventory.includes(item.id)))).map(item => ({ ...item, emoji: item.id === 'avatar_face_happy' ? 'space_orbit-bunny' : undefined, name: item.category === 'avatar' ? shopAvatarName(item.id) ?? item.name : item.id === 'theme_neon' ? 'Sky Citadel' : item.name }));
+      items = (catalog as Item[]).filter(item => ['theme', 'avatar', 'avatar_frame'].includes(item.category) && (item.price_coin === 0 || (member && useStore.getState().inventory.includes(item.id)))).map(item => ({ ...item, emoji: item.id === 'avatar_face_happy' ? 'space_orbit-bunny' : undefined, name: item.category === 'avatar' ? shopAvatarName(item.id) ?? item.name : item.id === 'theme_neon' ? 'Sky Citadel' : item.name }));
+      if (member) items.unshift({ id: 'frame_none', category: 'avatar_frame', name: 'No frame', price_coin: 0 });
       for (const option of AVATAR_OPTIONS.filter(option => !PAID_AVATAR_ITEMS[option.id] && option.id !== 'space_orbit-bunny')) items.push({ id: option.id, emoji: option.id, category: 'avatar', name: option.name, price_coin: 0 });
       items = items.filter(item => item.category !== 'theme' || THEMES[item.id]);
       render();

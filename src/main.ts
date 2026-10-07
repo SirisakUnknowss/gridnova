@@ -118,6 +118,7 @@ async function loadUserData(): Promise<void> {
         background_id: equipped.background_id ?? null,
         board_color_id: (equipped as any).board_color_id ?? null,
         avatar: equipped.avatar ?? { emoji: '👤' },
+        frame_id: equipped.frame_id ?? null,
       });
       if (equipped.theme_id) applyTheme(equipped.theme_id);
       if (equipped.background_id) applyBackground(equipped.background_id);

@@ -1,4 +1,5 @@
 import { RARE_AVATAR_CATALOG } from '@lib/rare-avatar-catalog';
+import { framedAvatarHTML } from '../components/avatar-frame';
 import { AVATAR_OPTIONS, PAID_AVATAR_ITEMS, avatarArtHTML } from '../components/avatar-art';
 import { getGuestIdentity, saveGuestIdentity } from '@lib/guest-identity';
 // =====================================================================
@@ -57,8 +58,8 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
         <span style="width:38px;"></span>
       </div>
       <div class="profile-hero">
-        <button class="profile-avatar" id="prof-avatar-btn" title="Change avatar" style="padding:0; overflow:hidden; display:inline-flex; align-items:center; justify-content:center;">
-          ${profile.avatar_url && !state.equipped.avatar?.item_id ? `<img src="${profile.avatar_url}" style="width:100%; height:100%; object-fit:cover;" />` : avatarArtHTML(currentEmoji, 76)}
+        <button class="profile-avatar" id="prof-avatar-btn" title="Change avatar" style="padding:0; overflow:visible; display:inline-flex; align-items:center; justify-content:center;">
+          ${framedAvatarHTML(profile.avatar_url && !state.equipped.avatar?.item_id ? `<img src="${profile.avatar_url}" style="width:100%; height:100%; object-fit:cover;" />` : avatarArtHTML(currentEmoji, 76), isGuest ? null : state.equipped.frame_id, 76)}
         </button>
         <input type="file" id="prof-file-input" style="display:none;" accept="image/*" />
         <div class="profile-name">
@@ -100,7 +101,7 @@ ${ic.notes(26)}
       </div>
 
       <div class="card">
-        <button class="profile-row" id="prof-collection"><span>${ic.shop(24)} My Collection<br><small>Themes and avatars you own</small></span><span>›</span></button>
+        <button class="profile-row" id="prof-collection"><span>${ic.shop(24)} My Collection<br><small>Themes, avatars, and frames you own</small></span><span>›</span></button>
         <button class="profile-row" id="prof-stats">
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.stats(16)}
@@ -258,7 +259,7 @@ ${ic.notes(26)}
           profile: { ...(useStore.getState().profile ?? {}), avatar_url: undefined }
         });
         const emoji = (useStore.getState().equipped.avatar?.emoji as string) ?? '👤';
-        avatarBtn.innerHTML = avatarArtHTML(emoji, 76);
+        avatarBtn.innerHTML = framedAvatarHTML(avatarArtHTML(emoji, 76), useStore.getState().equipped.frame_id, 76);
         if (optRemove) optRemove.style.display = 'none';
         props.onToast('Photo removed');
       } catch (err) {
@@ -292,7 +293,7 @@ ${ic.notes(26)}
         useStore.setState({
           profile: { ...(useStore.getState().profile ?? {}), avatar_url: publicUrl }
         });
-        avatarBtn.innerHTML = `<img src="${publicUrl}" style="width:100%; height:100%; object-fit:cover;" />`;
+        avatarBtn.innerHTML = framedAvatarHTML(`<img src="${publicUrl}" style="width:100%; height:100%; object-fit:cover;" />`, useStore.getState().equipped.frame_id, 76);
         if (optRemove) optRemove.style.display = 'block';
         props.onToast('Profile photo updated');
       } catch (err) {
@@ -340,7 +341,7 @@ ${ic.notes(26)}
       }
       avatarGrid.querySelectorAll('.avatar-cell').forEach((c) => c.classList.remove('selected'));
       cell.classList.add('selected');
-      avatarBtn.innerHTML = avatarArtHTML(emoji, 76);
+      avatarBtn.innerHTML = framedAvatarHTML(avatarArtHTML(emoji, 76), isGuest ? null : useStore.getState().equipped.frame_id, 76);
       const newAvatar = itemId ? { item_id: itemId } : { emoji };
       if (isGuest) saveGuestIdentity({ ...getGuestIdentity(), emoji });
       closePicker();
