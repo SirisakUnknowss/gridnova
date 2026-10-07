@@ -10,7 +10,6 @@ with Image.open(source) as original:
         'public/icons/icon-1024.png': 1024,
         'public/icons/icon-512.png': 512,
         'public/icons/icon-192.png': 192,
-        'public/icons/favicon-16.png': 16,
     }.items():
         image.resize((size, size), Image.Resampling.LANCZOS).save(root / relative, optimize=True)
     # Keep the full board inside the central maskable safe area.
@@ -23,6 +22,9 @@ with Image.open(source) as original:
 
 with Image.open(root / 'assets/space/generated/illustrations/app-logo-transparent.png') as cutout:
     cutout = cutout.convert('RGBA')
+    for size in (16, 32):
+        cutout.resize((size, size), Image.Resampling.LANCZOS).save(
+            root / f'public/icons/favicon-{size}-transparent.png', optimize=True)
     cutout.thumbnail((320, 320), Image.Resampling.LANCZOS)
     for relative in ('src/images/logo.png', 'public/icons/logo.png'):
         cutout.save(root / relative, optimize=True)
