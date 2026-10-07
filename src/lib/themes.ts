@@ -1,5 +1,4 @@
 import { THEME_BACKGROUNDS } from './theme-backgrounds';
-import { updateThemeLogo } from './theme-logo';
 // =====================================================================
 // Theme system — applies a set of CSS custom properties on <html>
 // Themes correspond to shop_items where category='theme'
@@ -241,7 +240,6 @@ export function applyTheme(themeId: string | null | undefined): void {
     '--numpad-btn-bg': surface,
   };
   for (const [key, value] of Object.entries(appTokens)) root.style.setProperty(key, value);
-  void updateThemeLogo(theme.id, primary);
   try { localStorage.setItem(ACTIVE_THEME_KEY, id); } catch { /* private */ }
 }
 
