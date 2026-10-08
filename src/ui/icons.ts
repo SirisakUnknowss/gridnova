@@ -63,6 +63,7 @@ function img(src: string, size = 18): string {
 }
 
 export const ic = {
+  search: (s?: number) => svg('<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>', s),
   shop: (s?: number) => img(shopIcon, s),
   close: (s?: number) => img(closeControl, s),
   back: (s?: number) => img(backControl, s),

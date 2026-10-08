@@ -75,13 +75,26 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
     dismissThemePreview?.();
     const overlay = document.createElement('div');
     overlay.className = 'modal-bg active';
-    overlay.innerHTML = `<div class="modal theme-preview-modal" role="dialog" aria-modal="true" aria-labelledby="theme-preview-title"><button class="modal-close" aria-label="Close preview">${ic.close(24)}</button><h2 id="theme-preview-title">${escapeHtml(item.name)}</h2><p>Home preview</p><div class="theme-preview-home"><div class="theme-preview-content"></div></div></div>`;
+    overlay.innerHTML = `<div class="modal theme-preview-modal" role="dialog" aria-modal="true" aria-labelledby="theme-preview-title"><button class="modal-close" aria-label="Close preview">${ic.close(24)}</button><h2 id="theme-preview-title">${escapeHtml(item.name)}</h2><div class="theme-preview-viewport"><div class="theme-preview-home"><div class="theme-preview-content"></div></div></div></div>`;
     const scene = overlay.querySelector<HTMLElement>('.theme-preview-home')!;
     applyTheme(item.id, scene);
     const content = scene.querySelector<HTMLElement>('.theme-preview-content')!;
     content.innerHTML = homeViewHTML();
     content.inert = true;
+    const viewport = overlay.querySelector<HTMLElement>('.theme-preview-viewport')!;
+    const fitScene = () => {
+      const height = content.offsetHeight;
+      if (!height) return;
+      const scale = Math.min(viewport.clientWidth / 390, viewport.clientHeight / height, 1);
+      scene.style.width = `${390 * scale}px`;
+      scene.style.height = `${height * scale}px`;
+      content.style.transform = `scale(${scale})`;
+    };
+    const resize = new ResizeObserver(fitScene);
+    resize.observe(viewport);
+    resize.observe(content);
     const close = () => {
+      resize.disconnect();
       overlay.remove();
       dismissThemePreview = null;
       if (trigger.isConnected) trigger.focus();
@@ -94,6 +107,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       if (e.key === 'Tab') { e.preventDefault(); overlay.querySelector<HTMLButtonElement>('button')?.focus(); }
     });
     document.body.appendChild(overlay);
+    fitScene();
     overlay.querySelector<HTMLButtonElement>('button')?.focus();
   }
 
@@ -201,7 +215,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
           <div class="shop-name">${escapeHtml(item.name)}</div>
           ${item.description ? `<div class="shop-desc">${escapeHtml(item.description)}</div>` : ''}
           <div class="shop-price">${item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? escapeHtml(rarity)}</div>
-          ${item.category === 'theme' ? `<button class="frame-preview-button" data-theme-preview="${escapeHtml(item.id)}">Preview</button>` : ''}
+          ${item.category === 'theme' ? `<button class="theme-preview-button" data-theme-preview="${escapeHtml(item.id)}" aria-label="Preview ${escapeHtml(item.name)}">${ic.search(20)}</button>` : ''}
           ${item.category === 'avatar_frame' ? `<button class="frame-preview-button" data-frame-preview="${escapeHtml(item.id)}">Preview</button>` : ''}
           <div class="shop-action">${action}</div>
         </div>
