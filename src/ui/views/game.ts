@@ -192,7 +192,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
                   <span>Daily Puzzle</span>
                 </div>
                 <button class="topbar-icon-btn" id="game-share-btn" title="Invite friends" style="color:var(--brand-primary);">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                  ${ic.share(20)}
                 </button>
                </div>`
             : `<button class="mode-pill" id="mode-pill-btn">
@@ -218,7 +218,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
               </div>
             </div>
             <button class="topbar-icon-btn" id="menu-btn" title="Menu">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+              ${ic.notes(22)}
             </button>
           </div>
         </div>
@@ -679,7 +679,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     } else if (mode !== 'daily' && !BOOK && paidHintsUsed < 3) {
       const cost = PAID_HINT_COSTS[paidHintsUsed];
       const coins = useStore.getState().coins ?? 0;
-      hintCountEl.textContent = `🪙${cost}`;
+      hintCountEl.innerHTML = `${ic.coin(14)} ${cost}`;
       hintBtn.disabled = coins < cost;
       hintBtn.title = coins < cost ? 'Not enough coins' : `Buy hint for ${cost} coins`;
     } else {

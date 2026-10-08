@@ -1,5 +1,9 @@
+import dailyIcon from '@images/space/dailyIcon.webp';
+import trophyIcon from '@images/space/trophyIcon.webp';
+import streakIcon from '@images/space/streakIcon.webp';
+import playIcon from '@images/space/playIcon.webp';
 // Card E — Monthly Recap Card (600×1000 portrait)
-import { fillRoundRect, canvasToBlob, monthName } from './helpers';
+import { fillRoundRect, canvasToBlob, monthName, loadImage } from './helpers';
 
 const W = 600;
 const H = 1000;
@@ -18,6 +22,7 @@ export interface RecapCardData {
 export async function renderRecapCard(data: RecapCardData): Promise<Blob | null> {
   const { year, month, daysPlayed, totalDays, bestScore, longestStreak, wins, displayName } = data;
 
+  const icons = await Promise.all([dailyIcon, trophyIcon, streakIcon, playIcon].map(loadImage));
   const canvas = document.createElement('canvas');
   canvas.width = W;
   canvas.height = H;
@@ -86,10 +91,10 @@ export async function renderRecapCard(data: RecapCardData): Promise<Blob | null>
 
   // Stats 2×2 grid
   const statsData = [
-    { emoji: '📅', value: `${daysPlayed}/${totalDays}`, label: 'Days Played' },
-    { emoji: '🏆', value: bestScore > 0 ? bestScore.toLocaleString() : '—', label: 'Best Score' },
-    { emoji: '🔥', value: `${longestStreak}d`, label: 'Longest Streak' },
-    { emoji: '✅', value: String(wins), label: 'Games Won' },
+    { value: `${daysPlayed}/${totalDays}`, label: 'Days Played' },
+    { value: bestScore > 0 ? bestScore.toLocaleString() : '—', label: 'Best Score' },
+    { value: `${longestStreak}d`, label: 'Longest Streak' },
+    { value: String(wins), label: 'Games Won' },
   ];
 
   const startY = 340;
@@ -97,7 +102,7 @@ export async function renderRecapCard(data: RecapCardData): Promise<Blob | null>
   const cellH = 160;
   const gap = 16;
 
-  statsData.forEach(({ emoji, value, label }, i) => {
+  statsData.forEach(({ value, label }, i) => {
     const col = i % 2;
     const row = Math.floor(i / 2);
     const cx = 40 + col * (cellW + gap);
@@ -113,10 +118,9 @@ export async function renderRecapCard(data: RecapCardData): Promise<Blob | null>
     fillRoundRect(ctx, cx, cy, cellW, cellH, 20);
     ctx.stroke();
 
-    // Emoji
     ctx.font = '36px "Inter", system-ui, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(emoji, cx + 22, cy + 52);
+    if (icons[i]) ctx.drawImage(icons[i]!, cx + 22, cy + 16, 36, 36);
 
     // Value
     ctx.font = '700 34px "Inter", system-ui, sans-serif';
@@ -155,10 +159,10 @@ export async function renderRecapCard(data: RecapCardData): Promise<Blob | null>
 
   // Motivational line
   const motivLines: Record<number, string> = {
-    100: "Perfect month! You're unstoppable 🏆",
-    75: "Great month! Keep the momentum going 💪",
+    100: "Perfect month! You're unstoppable",
+    75: "Great month! Keep the momentum going",
     50: "Solid effort — halfway there next month!",
-    0: "New month, fresh start — let's go! 🚀",
+    0: "New month, fresh start — let's go!",
   };
   const motivKey = pct >= 1 ? 100 : pct >= 0.75 ? 75 : pct >= 0.5 ? 50 : 0;
   ctx.font = '500 15px "Inter", system-ui, sans-serif';

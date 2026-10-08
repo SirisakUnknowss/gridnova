@@ -1,3 +1,4 @@
+import { avatarArtHTML } from '../components/avatar-art';
 import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Leaderboard view — Members (Today/Yesterday) + Guests tab
@@ -32,7 +33,7 @@ interface MemberRow {
   display_name: string | null;
   username: string | null;
   country: string | null;
-  avatar: { emoji?: string } | null;
+  avatar: { emoji?: string; item_id?: string } | null;
   custom_avatar_url: string | null;
   total_players: number;
 }
@@ -177,9 +178,9 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
       const rankBadge = rankBadgeHtml(r.rank);
       const avatarHtml = r.custom_avatar_url
         ? `<img src="${escapeHtml(r.custom_avatar_url)}" class="lb-avatar-img" referrerpolicy="no-referrer" alt="">`
-        : r.avatar?.emoji
-          ? `<span class="lb-avatar-emoji">${r.avatar.emoji}</span>`
-          : `<span class="lb-avatar-emoji">👤</span>`;
+        : r.avatar?.item_id || r.avatar?.emoji
+          ? `<span class="lb-avatar-emoji">${avatarArtHTML(r.avatar.item_id ?? r.avatar.emoji, 32)}</span>`
+          : `<span class="lb-avatar-emoji">${ic.guest(32)}</span>`;
       return `
         <div class="lb-row${isMe ? ' is-me' : ''}" data-uid="${escapeHtml(r.user_id)}">
           <span class="lb-rank">${rankBadge}</span>

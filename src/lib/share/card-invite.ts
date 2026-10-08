@@ -12,13 +12,6 @@ const DIFF_COLORS: Record<string, string> = {
   expert: '#4a2d9e',
 };
 
-const DIFF_EMOJI: Record<string, string> = {
-  easy: '🟢',
-  medium: '🟡',
-  hard: '🔴',
-  'extra-hard': '🟣',
-  expert: '⚫',
-};
 
 // Sparse but realistic-looking sudoku clues
 const CLUES: { r: number; c: number; v: string }[] = [
@@ -91,13 +84,12 @@ export async function renderInviteCard(data: InviteCardData): Promise<Blob | nul
   // Difficulty badge in header
   const diffColor = DIFF_COLORS[difficulty] ?? '#6c5ce7';
   const diffLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1).replace(/-/g, ' ');
-  const diffEmoji = DIFF_EMOJI[difficulty] ?? '🟣';
   ctx.fillStyle = 'rgba(255,255,255,0.15)';
   fillRoundRect(ctx, W / 2 - 68, 130, 136, 28, 14);
   ctx.font = '600 13px "Inter", system-ui, sans-serif';
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'center';
-  ctx.fillText(`${diffEmoji} ${diffLabel}`, W / 2, 148);
+  ctx.fillText(diffLabel, W / 2, 148);
 
   // ── White sudoku grid card ─────────────────────────────────────────
   const cardPad = 24;

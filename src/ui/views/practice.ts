@@ -82,7 +82,7 @@ export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): 
     continueBanner.innerHTML = `
       <div class="continue-banner">
         <div class="continue-banner-info">
-          <span class="continue-banner-title">▶ Game in progress</span>
+          <span class="continue-banner-title">${ic.play(16)} Game in progress</span>
           <span class="continue-banner-sub">${saved.level ?? ''} · ${formatTime(saved.elapsed_seconds ?? 0)} elapsed</span>
         </div>
         <button class="btn btn--primary btn--small" id="practice-continue-btn">Continue</button>

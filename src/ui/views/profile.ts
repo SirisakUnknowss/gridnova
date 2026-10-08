@@ -70,11 +70,11 @@ ${ic.notes(26)}
         </div>
         <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;flex-wrap:wrap;">
           <div class="badge-tag">${isGuest ? 'GUEST' : 'MEMBER'}</div>
-          ${!isGuest && isPremium() ? '<div class="badge-tag badge-tag--premium">✨ PREMIUM</div>' : ''}
+          ${!isGuest && isPremium() ? `<div class="badge-tag badge-tag--premium">${ic.sparkle(16)} PREMIUM</div>` : ''}
         </div>
         ${isGuest ? `
           <button class="btn btn--primary btn--small" id="prof-upgrade" style="margin-top:10px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            ${ic.stats(16)}
             Save progress
           </button>
         ` : `
@@ -107,43 +107,43 @@ ${ic.notes(26)}
             ${ic.stats(16)}
             <span><span style="color:var(--app-text)">Stats</span><br><small>Detailed game history</small></span>
           </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          ${ic.chevronRight(16)}
         </button>
         <button class="profile-row" id="prof-ach">
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.badge(16)}
             <span><span style="color:var(--app-text)">Medals</span><br><small>Unlock badges</small></span>
           </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          ${ic.chevronRight(16)}
         </button>
         <button class="profile-row" id="prof-recap">
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.daily(16)}
             <span><span style="color:var(--app-text)">Weekly Recap</span><br><small>This week's highlights</small></span>
           </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          ${ic.chevronRight(16)}
         </button>
         <button class="profile-row" id="prof-ledger">
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.coin(16)}
             <span><span style="color:var(--app-text)">Coin Ledger</span><br><small>Earned and spent</small></span>
           </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          ${ic.chevronRight(16)}
         </button>
         <button class="profile-row" id="prof-settings">
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.puzzle(16)}
             <span><span style="color:var(--app-text)">Settings</span><br><small>Game options, community, help</small></span>
           </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          ${ic.chevronRight(16)}
         </button>
         ${isSignedIn ? `
           <button class="profile-row danger" id="prof-signout">
             <span style="display:flex;align-items:center;gap:10px;">
-              <svg class="row-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              ${ic.back(20)}
               <span style="color:#ef4444">Sign out</span>
             </span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            ${ic.chevronRight(16)}
           </button>
         ` : ''}
       </div>
@@ -184,15 +184,15 @@ ${ic.notes(26)}
         <h2 style="margin: 0 0 16px 0; font-size: 18px; text-align: center;">Edit Profile Picture</h2>
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <button class="btn btn--primary" id="avatar-opt-upload" style="width: 100%;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            ${ic.share(18)}
             Upload Photo
           </button>
           <button class="btn btn--secondary" id="avatar-opt-emoji" style="width: 100%;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            ${ic.member(18)}
             Choose Avatar
           </button>
           <button class="btn btn--danger" id="avatar-opt-remove" style="width: 100%; display: ${profile.avatar_url && !state.equipped.avatar?.item_id ? 'block' : 'none'};">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            ${ic.erase(18)}
             Remove Photo
           </button>
           <button class="btn btn--ghost" id="avatar-opt-cancel" style="width: 100%; border: 1px solid var(--app-border);">Cancel</button>
@@ -424,6 +424,7 @@ ${ic.notes(26)}
       profile: {
         displayName: profile.display_name || profile.username || 'Player',
         avatarUrl: profile.avatar_url,
+        avatarId: st.equipped.avatar?.item_id as string | undefined,
         avatarEmoji: (st.equipped.avatar?.emoji as string) || '👤',
         level: st.level,
         bestStreak: st.currentStreak,

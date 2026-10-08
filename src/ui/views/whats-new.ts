@@ -8,36 +8,36 @@ import { escapeHtml } from '@lib/format';
 import { ic } from '@ui/icons';
 
 const releaseIcons: Record<string, (size?: number) => string> = {
-  '✅': ic.heart,
-  '♾️': ic.repeat,
-  '🚫': ic.warning,
-  '❌': ic.close,
-  '❤️': ic.heart,
-  '🔄': ic.repeat,
-  '📖': ic.bookMode,
-  '📈': ic.stats,
-  '⚡': ic.zap,
-  '🪙': ic.coin,
-  '⏱️': ic.timeAttack,
-  '🧪': ic.brain,
-  '🏆': ic.trophy,
-  '📅': ic.daily,
-  '✨': ic.sparkle,
-  '🔢': ic.puzzle,
-  '📋': ic.notes,
-  '👆': ic.target,
-  '🔇': ic.soundOff,
-  '🗓️': ic.quests,
-  '💰': ic.coin,
-  '📊': ic.chart,
-  '📱': ic.gamepad,
-  '🐛': ic.warning,
-  '⚙️': ic.brain,
-  '🎵': ic.soundOn,
-  '📳': ic.wave,
-  '🔔': ic.bell,
-  '🎁': ic.gift,
-  '🎯': ic.target,
+  'heart': ic.heart,
+  'repeat': ic.repeat,
+  'warning': ic.warning,
+  'close': ic.close,
+
+
+  'bookMode': ic.bookMode,
+  'stats': ic.stats,
+  'zap': ic.zap,
+  'coin': ic.coin,
+  'timeAttack': ic.timeAttack,
+  'brain': ic.brain,
+  'trophy': ic.trophy,
+  'daily': ic.daily,
+  'sparkle': ic.sparkle,
+  'puzzle': ic.puzzle,
+  'notes': ic.notes,
+  'target': ic.target,
+  'soundOff': ic.soundOff,
+  'quests': ic.quests,
+
+  'chart': ic.chart,
+  'gamepad': ic.gamepad,
+
+
+  'soundOn': ic.soundOn,
+  'wave': ic.wave,
+  'bell': ic.bell,
+  'gift': ic.gift,
+
 };
 
 const SEEN_KEY = 'sudoku_whatsnew_seen_v1';

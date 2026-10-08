@@ -76,7 +76,7 @@ function linkRow(id: string, icon: string, label: string, sub: string): string {
         <div class="settings-title">${label}</div>
         ${sub ? `<div class="settings-sub">${sub}</div>` : ''}
       </span>
-      <span class="settings-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+      <span class="settings-chev">${ic.chevronRight(16)}</span>
     </button>
   `;
 }

@@ -8,7 +8,7 @@ import redoIcon from '@images/space/redoIcon.webp';
 import undoIcon from '@images/space/undoIcon.webp';
 import homeIcon from '@images/space/homeIcon.webp';
 // =====================================================================
-// Icon library — inline SVG (Lucide-compatible paths)
+// Icon library — space artwork and shared navigation chevron
 // =====================================================================
 
 import coinIcon from '@images/space/replacements/coin.webp';

@@ -55,26 +55,25 @@ interface UserAchievement {
   unlocked_at: string;
 }
 
-// icon: real PNG asset (preferred). emoji: temporary fallback until real art exists.
-const BADGE_GROUP_META: Record<string, { label: string; emoji: string; icon?: string }> = {
-  play: { label: 'Play', emoji: '🎮', icon: playIcon },
-  player: { label: 'Play', emoji: '🎮', icon: playIcon }, // legacy fallback
-  daily: { label: 'Daily', emoji: '📅', icon: dailyIcon },
-  streak: { label: 'Streak', emoji: '🔥', icon: streakIcon },
-  flawless: { label: 'Flawless', emoji: '⭐', icon: flawlessIcon },
-  speedster: { label: 'Speedster', emoji: '⚡', icon: speedsterIcon },
-  pure: { label: 'Clean Solve', emoji: '🧠', icon: pureIcon },
-  leaderboard: { label: 'Leaderboard', emoji: '🏆', icon: trophyIcon },
-  progression: { label: 'Level', emoji: '📈', icon: levelUpIcon },
-  quest: { label: 'Quest', emoji: '📋', icon: questIcon },
-  collection: { label: 'Collection', emoji: '🏆', icon: trophyIcon },
-  special: { label: 'Special', emoji: '✨', icon: badgeIcon },
+const BADGE_GROUP_META: Record<string, { label: string; icon?: string }> = {
+  play: { label: 'Play', icon: playIcon },
+  player: { label: 'Play', icon: playIcon }, // legacy fallback
+  daily: { label: 'Daily', icon: dailyIcon },
+  streak: { label: 'Streak', icon: streakIcon },
+  flawless: { label: 'Flawless', icon: flawlessIcon },
+  speedster: { label: 'Speedster', icon: speedsterIcon },
+  pure: { label: 'Clean Solve', icon: pureIcon },
+  leaderboard: { label: 'Leaderboard', icon: trophyIcon },
+  progression: { label: 'Level', icon: levelUpIcon },
+  quest: { label: 'Quest', icon: questIcon },
+  collection: { label: 'Collection', icon: trophyIcon },
+  special: { label: 'Special', icon: badgeIcon },
 };
 
-function groupIconHtml(meta: { label: string; emoji: string; icon?: string }): string {
+function groupIconHtml(meta: { label: string; icon?: string }): string {
   return meta.icon
     ? `<img src="${meta.icon}" alt="" class="ach-group-ic-img" />`
-    : `<span>${meta.emoji}</span>`;
+    : `${ic.badge(24)}`;
 }
 
 
@@ -482,7 +481,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     filterEl.innerHTML = [
       `<button class="ach-chip${activeGroup === 'all' ? ' on' : ''}" data-cat="all">All</button>`,
       ...groups.map((g) => {
-        const m = BADGE_GROUP_META[g] ?? { label: g, emoji: '📌' };
+        const m = BADGE_GROUP_META[g] ?? { label: g, icon: badgeIcon };
         return `<button class="ach-chip${activeGroup === g ? ' on' : ''}" data-cat="${escapeHtml(g)}">${groupIconHtml(m)} ${m.label}</button>`;
       }),
     ].join('');
@@ -597,7 +596,7 @@ export function mountAchievementsView(root: HTMLElement, props: AchievementsProp
     }
 
     bodyEl.innerHTML = Object.entries(groups).map(([group, items]) => {
-      const meta = BADGE_GROUP_META[group] ?? { label: group, emoji: '📌' };
+      const meta = BADGE_GROUP_META[group] ?? { label: group, icon: badgeIcon };
       const doneInGroup = items.filter((d) => unlocked.has(d.id)).length;
       const allDone = doneInGroup === items.length;
 

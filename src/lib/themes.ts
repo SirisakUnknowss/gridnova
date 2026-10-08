@@ -25,7 +25,6 @@ export interface ThemeTokens {
 export interface ThemeMeta {
   id: string;
   name: string;
-  preview: string; // emoji shown in shop card
   tokens: Partial<ThemeTokens>;
 }
 
@@ -49,11 +48,11 @@ const CLASSIC: Partial<ThemeTokens> = {
 
 export const THEMES: Record<string, ThemeMeta> = {
   theme_classic: {
-    id: 'theme_classic', name: 'Classic', preview: '💎',
+    id: 'theme_classic', name: 'Classic',
     tokens: CLASSIC,
   },
   theme_paper: {
-    id: 'theme_paper', name: 'Paper', preview: '📜',
+    id: 'theme_paper', name: 'Paper',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #f4e3c1, #d7b88f)',
       '--cell-bg': '#fef9ef',
@@ -63,7 +62,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_dark: {
-    id: 'theme_dark', name: 'Dark Mode', preview: '🌙',
+    id: 'theme_dark', name: 'Dark Mode',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #1a1a2e, #16213e)',
       '--cell-bg': '#222244',
@@ -79,7 +78,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_pastel: {
-    id: 'theme_pastel', name: 'Pastel Dream', preview: '🌸',
+    id: 'theme_pastel', name: 'Pastel Dream',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #ffd6e8, #d6e8ff)',
       '--cell-bg': '#fff5fa',
@@ -90,7 +89,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_ocean: {
-    id: 'theme_ocean', name: 'Ocean', preview: '🌊',
+    id: 'theme_ocean', name: 'Ocean',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #2196f3, #006064)',
       '--cell-bg': '#e1f5fe',
@@ -100,7 +99,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_forest: {
-    id: 'theme_forest', name: 'Forest', preview: '🌲',
+    id: 'theme_forest', name: 'Forest',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #66bb6a, #1b5e20)',
       '--cell-bg': '#f1f8e9',
@@ -110,7 +109,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_sunset: {
-    id: 'theme_sunset', name: 'Sunset', preview: '🌅',
+    id: 'theme_sunset', name: 'Sunset',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #ff7043, #ab47bc)',
       '--cell-bg': '#fff3e0',
@@ -120,7 +119,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_neon: {
-    id: 'theme_neon', name: 'Sky Citadel', preview: '🏛️',
+    id: 'theme_neon', name: 'Sky Citadel',
     tokens: {
       '--brand-primary': '#007f86',
       '--brand-secondary': '#b7e6ea',
@@ -137,7 +136,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_sakura: {
-    id: 'theme_sakura', name: 'Sakura', preview: '🌸',
+    id: 'theme_sakura', name: 'Sakura',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #ffb7c5, #d76d8e)',
       '--cell-bg': '#fff0f5',
@@ -147,7 +146,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_thai: {
-    id: 'theme_thai', name: 'Thai Heritage', preview: '🇹🇭',
+    id: 'theme_thai', name: 'Thai Heritage',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #b71c1c, #ffc107)',
       '--cell-bg': '#fff8e1',
@@ -157,7 +156,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     },
   },
   theme_mono: {
-    id: 'theme_mono', name: 'Mono Pro', preview: '⬛',
+    id: 'theme_mono', name: 'Mono Pro',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #424242, #000000)',
       '--cell-bg': '#fafafa',
@@ -245,8 +244,4 @@ export function applyTheme(themeId: string | null | undefined): void {
 
 export function loadCachedThemeId(): string | null {
   try { return localStorage.getItem(ACTIVE_THEME_KEY); } catch { return null; }
-}
-
-export function themePreview(themeId: string): string {
-  return THEMES[themeId]?.preview ?? '🎨';
 }

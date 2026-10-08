@@ -62,7 +62,7 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
       <div class="cal-nav">
         <button class="cal-nav-btn" id="cal-prev" aria-label="Previous month">${ic.back(26)}</button>
         <span class="cal-nav-label" id="cal-nav-label"></span>
-        <button class="cal-nav-btn" id="cal-next" aria-label="Next month"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        <button class="cal-nav-btn" id="cal-next" aria-label="Next month">${ic.chevronRight(18)}</button>
       </div>
 
       <div class="cal-summary" id="cal-summary"></div>
@@ -162,7 +162,7 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
         <div class="share-sheet-header">
           <span class="share-sheet-title">${dateStr}</span>
           <button class="icon-btn" id="cal-sheet-close" aria-label="Close">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            ${ic.close(24)}
           </button>
         </div>
         <div class="cal-sheet-body">

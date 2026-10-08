@@ -39,15 +39,3 @@ export function applyBackground(bgId: string | null | undefined): void {
 export function loadCachedBgId(): string | null {
   try { return localStorage.getItem(ACTIVE_BG_KEY); } catch { return null; }
 }
-
-export function bgPreviewIcon(id: string): string {
-  if (id.includes('anim_rain')) return '🌧';
-  if (id.includes('anim_stars')) return '✨';
-  if (id.includes('anim_aurora')) return '🌌';
-  if (id.includes('pattern_dots')) return '⚬';
-  if (id.includes('pattern_waves')) return '〰️';
-  if (id.includes('navy')) return '🌃';
-  if (id.includes('forest')) return '🌲';
-  if (id.includes('blank')) return '⬜';
-  return '🖼';
-}

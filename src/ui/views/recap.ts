@@ -57,10 +57,10 @@ async function loadRecap(): Promise<Recap> {
 function buildShareText(r: Recap): string {
   const lines = [
     'GridNova — Weekly Recap',
-    `📅 ${r.daysPlayed} / 7 days played`,
-    `🎮 ${r.totalGames} games · 🏆 ${r.totalScore.toLocaleString()} pts`,
-    r.bestTime != null && isFinite(r.bestTime) ? `⚡ Best: ${formatTime(r.bestTime)}` : '',
-    `❌ ${r.totalMistakes} mistakes`,
+    `${r.daysPlayed} / 7 days played`,
+    `${r.totalGames} games · ${r.totalScore.toLocaleString()} pts`,
+    r.bestTime != null && isFinite(r.bestTime) ? `Best: ${formatTime(r.bestTime)}` : '',
+    `${r.totalMistakes} mistakes`,
     '',
     `Play: ${SITE_URL}`,
   ].filter(Boolean);

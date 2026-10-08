@@ -175,7 +175,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         action = `<button class="btn btn--small" data-buy="${escapeHtml(item.id)}" ${canAfford ? '' : 'disabled'}>${ic.coin(12)} ${item.price_coin}</button>`;
       }
 
-      let preview = '🎁';
+      let preview = ic.gift(48);
       if (item.category === 'theme') preview = themePreview(item.id);
       else if (item.category === 'avatar') preview = avatarPreviewIcon(item.id);
       else if (item.category === 'avatar_frame') preview = framePreviewHTML(item.id, state.equipped.avatar.item_id as string ?? state.equipped.avatar.emoji);
@@ -188,7 +188,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
           <div class="shop-preview">${preview}</div>
           <div class="shop-name">${escapeHtml(item.name)}</div>
           ${item.description ? `<div class="shop-desc">${escapeHtml(item.description)}</div>` : ''}
-          <div class="shop-price">${item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? `⚪ ${escapeHtml(rarity)}`}</div>
+          <div class="shop-price">${item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? escapeHtml(rarity)}</div>
           ${item.category === 'avatar_frame' ? `<button class="frame-preview-button" data-frame-preview="${escapeHtml(item.id)}">Preview</button>` : ''}
           <div class="shop-action">${action}</div>
         </div>

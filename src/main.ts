@@ -1,3 +1,4 @@
+import { ic } from '@ui/icons';
 import { mountCollectionView } from './ui/views/collection';
 import { mountShopView } from './ui/views/shop';
 import { getGuestIdentity } from '@lib/guest-identity';
@@ -939,10 +940,10 @@ async function refreshStreakAndToast() {
     if (newStreak > prevStreak) {
       if (STREAK_MILESTONES.has(newStreak)) {
         sfxStreakMilestone();
-        toast(`🔥 ${newStreak}-day streak! Keep it up!`, 4000);
+        toast(`${newStreak}-day streak! Keep it up!`, 4000);
       } else {
         sfxCoin();
-        toast(`🔥 Streak saved — ${newStreak} day${newStreak === 1 ? '' : 's'}!`);
+        toast(`Streak saved — ${newStreak} day${newStreak === 1 ? '' : 's'}!`);
       }
     }
   } catch (err) {
@@ -1174,5 +1175,5 @@ async function boot() {
 
 boot().catch((err) => {
   console.error('Boot failed:', err);
-  root.innerHTML = `<div class="loading-screen"><h1>⚠️ Error</h1><p>${err.message}</p></div>`;
+  root.innerHTML = `<div class="loading-screen"><h1>${ic.warning(32)} Error</h1><p>${err.message}</p></div>`;
 });
