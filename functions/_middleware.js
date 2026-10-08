@@ -84,7 +84,7 @@ function loginPage(hasError, redirectTo) {
 </head>
 <body>
   <form class="card" method="POST" action="${LOGIN_PATH}">
-    <h1>🔒 GridNova Staging</h1>
+    <h1>GridNova Staging</h1>
     <p class="sub">Admin access only</p>
     ${hasError ? '<div class="error">Username or password incorrect</div>' : ''}
     <input type="hidden" name="redirect" value="${redirectTo.replace(/"/g, '&quot;')}" />

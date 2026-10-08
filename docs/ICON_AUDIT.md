@@ -4,6 +4,9 @@
 
 Reviewed all 90 TypeScript source files, player UI templates, icon imports,
 CSS generated content, inline SVG and Canvas/share renderers.
+Also reviewed the staging access page and static admin HTML/JavaScript.
+Removed their decorative emoji; admin error/mistake/banned states retain
+explicit text labels. Authentication and admin actions are unchanged.
 
 Replaced remaining visible legacy pictographs in paid hints, default/member
 leaderboard avatars, premium badges, streak/error messages, recap text and

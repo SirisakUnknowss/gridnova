@@ -35,5 +35,8 @@ it('keeps pictographic emoji out of player UI templates and share drawing', () =
     }
   }
   scan(root);
+  for (const file of ['index.html', 'functions/_middleware.js', 'public/admin/index.html']) {
+    if (/\p{Extended_Pictographic}/u.test(readFileSync(file, 'utf8'))) findings.push(file);
+  }
   expect(findings).toEqual([]);
 });
