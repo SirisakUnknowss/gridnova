@@ -8,7 +8,9 @@ import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 declare const self: ServiceWorkerGlobalScope;
 
 cleanupOutdatedCaches();
-precacheAndRoute(self.__WB_MANIFEST);
+// Staging navigations must reach the session gate rather than cached HTML.
+const staging = self.location.hostname.includes('staging');
+precacheAndRoute(self.__WB_MANIFEST.filter(entry => !staging || !/\.html(?:\?|$)/.test(typeof entry === 'string' ? entry : entry.url)));
 
 // Skip waiting so the new SW activates immediately on install
 self.addEventListener('install', (event) => {

@@ -105,18 +105,22 @@ export async function onRequest(context) {
   const isStaging = url.hostname.includes('staging');
   if (!isStaging) return next();
 
+  const noStore = { 'Cache-Control': 'no-store, private', Vary: 'Cookie' };
+  const redirect = location => new Response(null, { status: 303, headers: { ...noStore, Location: location } });
+
   const user = env.STAGING_BASIC_USER;
   const pass = env.STAGING_BASIC_PASS;
 
   // Fail closed: if credentials aren't configured yet, block access rather than leave it open.
   if (!user || !pass) {
-    return new Response('Staging access is not configured yet.', { status: 503 });
+    return new Response('Staging access is not configured yet.', { status: 503, headers: noStore });
   }
 
   if (url.pathname === LOGOUT_PATH) {
     return new Response(null, {
-      status: 302,
+      status: 303,
       headers: {
+        ...noStore,
         Location: LOGIN_PATH,
         'Set-Cookie': `${SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`,
       },
@@ -137,8 +141,9 @@ export async function onRequest(context) {
         const expiry = Date.now() + SESSION_TTL_SECONDS * 1000;
         const sig = await hmac(pass, String(expiry));
         return new Response(null, {
-          status: 302,
+          status: 303,
           headers: {
+            ...noStore,
             Location: redirectTo,
             'Set-Cookie': `${SESSION_COOKIE}=${expiry}.${sig}; Path=/; Max-Age=${SESSION_TTL_SECONDS}; HttpOnly; Secure; SameSite=Lax`,
           },
@@ -147,23 +152,27 @@ export async function onRequest(context) {
 
       return new Response(loginPage(true, redirectTo), {
         status: 401,
-        headers: { 'content-type': 'text/html; charset=utf-8' },
+        headers: { ...noStore, 'content-type': 'text/html; charset=utf-8' },
       });
     }
 
     // GET /login — already signed in? send them on. Otherwise show the form.
     const redirectTo = safeRedirectTarget(url.searchParams.get('redirect') || '/');
     if (alreadyLoggedIn) {
-      return Response.redirect(url.origin + redirectTo, 302);
+      return redirect(url.origin + redirectTo);
     }
     return new Response(loginPage(false, redirectTo), {
       status: 200,
-      headers: { 'content-type': 'text/html; charset=utf-8' },
+      headers: { ...noStore, 'content-type': 'text/html; charset=utf-8' },
     });
   }
 
-  if (alreadyLoggedIn) return next();
-
-  const dest = url.pathname + url.search;
-  return Response.redirect(`${url.origin}${LOGIN_PATH}?redirect=${encodeURIComponent(dest)}`, 302);
+  if (alreadyLoggedIn) {
+    const response = await next();
+    const result = new Response(response.body, response);
+    result.headers.set('Cache-Control', noStore['Cache-Control']);
+    result.headers.append('Vary', 'Cookie');
+    return result;
+  }
+  return redirect(url.origin + LOGIN_PATH);
 }
