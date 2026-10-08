@@ -1,3 +1,4 @@
+import { homeViewHTML } from './home';
 import { RARE_AVATAR_CATALOG } from '@lib/rare-avatar-catalog';
 import { THEME_BACKGROUNDS } from '@lib/theme-backgrounds';
 import { avatarArtHTML, shopAvatarName } from '../components/avatar-art';
@@ -68,6 +69,33 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   let loading = true;
   let errorMsg: string | null = null;
   let framePreview: HTMLElement | null = null;
+  let dismissThemePreview: (() => void) | null = null;
+
+  function showThemePreview(item: ShopItem, trigger: HTMLButtonElement) {
+    dismissThemePreview?.();
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-bg active';
+    overlay.innerHTML = `<div class="modal theme-preview-modal" role="dialog" aria-modal="true" aria-labelledby="theme-preview-title"><button class="modal-close" aria-label="Close preview">${ic.close(24)}</button><h2 id="theme-preview-title">${escapeHtml(item.name)}</h2><p>Home preview</p><div class="theme-preview-home"><div class="theme-preview-content"></div></div></div>`;
+    const scene = overlay.querySelector<HTMLElement>('.theme-preview-home')!;
+    applyTheme(item.id, scene);
+    const content = scene.querySelector<HTMLElement>('.theme-preview-content')!;
+    content.innerHTML = homeViewHTML();
+    content.inert = true;
+    const close = () => {
+      overlay.remove();
+      dismissThemePreview = null;
+      if (trigger.isConnected) trigger.focus();
+    };
+    dismissThemePreview = close;
+    overlay.querySelector('button')?.addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    overlay.addEventListener('keydown', e => {
+      if (e.key === 'Escape') close();
+      if (e.key === 'Tab') { e.preventDefault(); overlay.querySelector<HTMLButtonElement>('button')?.focus(); }
+    });
+    document.body.appendChild(overlay);
+    overlay.querySelector<HTMLButtonElement>('button')?.focus();
+  }
 
   root.innerHTML = `
     <section class="view view--shop">
@@ -104,22 +132,6 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       countUp(pill, prev, now, 600, (n) => formatNumber(Math.round(n)));
     } else {
       pill.textContent = formatNumber(now);
-    }
-  }
-
-  // Theme preview: hover/touch a card to preview, leave to restore
-  let previewSavedTheme: string | null = null;
-  function previewIn(itemId: string) {
-    if (!THEMES[itemId]) return;
-    if (previewSavedTheme === null) {
-      previewSavedTheme = useStore.getState().equipped.theme_id || 'theme_classic';
-    }
-    applyTheme(itemId);
-  }
-  function previewOut() {
-    if (previewSavedTheme !== null) {
-      applyTheme(previewSavedTheme);
-      previewSavedTheme = null;
     }
   }
 
@@ -183,12 +195,13 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       const previewable = item.category === 'theme';
       const matchedTheme = previewable ? item.id : typeof item.metadata?.theme_id === 'string' ? item.metadata.theme_id : null;
       return `
-        <div class="shop-card shop-rarity-${rarity}${previewable ? ' previewable' : ''}" data-shop-item="${escapeHtml(item.id)}" data-preview="${previewable ? escapeHtml(item.id) : ''}" ${matchedTheme ? `style="--shop-card-image:url(&quot;${escapeHtml(THEME_BACKGROUNDS[matchedTheme])}&quot;)"` : ''}>
+        <div class="shop-card shop-rarity-${rarity}${previewable ? ' shop-card--theme' : ''}" data-shop-item="${escapeHtml(item.id)}" data-preview="${previewable ? escapeHtml(item.id) : ''}" ${matchedTheme ? `style="--shop-card-image:url(&quot;${escapeHtml(THEME_BACKGROUNDS[matchedTheme])}&quot;)"` : ''}>
           ${isPremiumGated ? `<div class="shop-premium-badge" title="Premium-only">${ic.sparkle(12)}</div>` : ''}
           <div class="shop-preview">${preview}</div>
           <div class="shop-name">${escapeHtml(item.name)}</div>
           ${item.description ? `<div class="shop-desc">${escapeHtml(item.description)}</div>` : ''}
           <div class="shop-price">${item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? escapeHtml(rarity)}</div>
+          ${item.category === 'theme' ? `<button class="frame-preview-button" data-theme-preview="${escapeHtml(item.id)}">Preview</button>` : ''}
           ${item.category === 'avatar_frame' ? `<button class="frame-preview-button" data-frame-preview="${escapeHtml(item.id)}">Preview</button>` : ''}
           <div class="shop-action">${action}</div>
         </div>
@@ -232,19 +245,11 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         showPaywall({ source: `shop_premium_item:${btn.dataset.premium}`, onClose: () => {} });
       });
     });
-    // Theme preview on hover (desktop) + on tap (mobile)
-    // touchmove / touchcancel / scroll all restore the theme immediately
-    gridEl.querySelectorAll<HTMLElement>('.shop-card.previewable').forEach((card) => {
-      const id = card.dataset.preview!;
-      card.addEventListener('mouseenter', () => previewIn(id));
-      card.addEventListener('mouseleave', () => previewOut());
-      card.addEventListener('touchstart', () => previewIn(id), { passive: true });
-      card.addEventListener('touchend',    () => previewOut());
-      card.addEventListener('touchmove',   () => previewOut(), { passive: true });
-      card.addEventListener('touchcancel', () => previewOut());
-    });
+    gridEl.querySelectorAll<HTMLButtonElement>('[data-theme-preview]').forEach(btn => btn.addEventListener('click', () => {
+      const item = items.find(candidate => candidate.id === btn.dataset.themePreview);
+      if (item) showThemePreview(item, btn);
+    }));
   }
-
 
   let dismissPurchase: (() => void) | null = null;
   function confirmPurchase(item: ShopItem): Promise<boolean> {
@@ -311,7 +316,6 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
     const state = useStore.getState();
     if (!state.user || state.user.is_anonymous) {
       if (item.category !== 'theme' || !THEMES[itemId]) return;
-      previewSavedTheme = null;
       state.setEquipped({ theme_id: itemId });
       applyTheme(itemId);
       sfxThemeChange();
@@ -388,18 +392,13 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
 
   root.querySelector('#shop-back')?.addEventListener('click', props.onBack);
 
-  // Cancel any active preview when the page scrolls (mobile safety net)
-  const onScroll = () => previewOut();
-  window.addEventListener('scroll', onScroll, { passive: true });
-
   void load();
 
   return {
     unmount() {
       dismissPurchase?.();
       framePreview?.remove();
-      previewOut();
-      window.removeEventListener('scroll', onScroll);
+      dismissThemePreview?.();
     },
   };
 }

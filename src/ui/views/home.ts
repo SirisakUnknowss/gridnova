@@ -49,7 +49,7 @@ function fmtCount(n: number): string {
   return String(n);
 }
 
-export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmount: () => void } {
+export function homeViewHTML(): string {
   const state = useStore.getState();
   const visitorStats = useVisitorStore.getState();
   const isAnonymous = !!state.user?.is_anonymous;
@@ -68,7 +68,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   const today = todayUtc();
   const todayDifficulty = difficultyForDayOfWeek(new Date(today + 'T00:00:00Z').getUTCDay());
 
-  root.innerHTML = `
+  return `
     <section class="view view--home">
 
       <!-- Header -->
@@ -202,6 +202,13 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     </section>
     ${bottomNavHTML('home')}
   `;
+
+}
+
+export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmount: () => void } {
+  const state = useStore.getState();
+  const today = todayUtc();
+  root.innerHTML = homeViewHTML();
 
   root.querySelector('#enter-play-mode')?.addEventListener('click', props.onEnterPlayMode);
   root.querySelector('#open-practice')?.addEventListener('click', props.onOpenPractice);

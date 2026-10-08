@@ -4498,12 +4498,12 @@ h3 {
   font-weight: 700;
 }
 
-.shop-card.previewable {
+.shop-card.shop-card--theme {
   cursor: pointer;
   position: relative;
 }
 
-.shop-card.previewable:hover {
+.shop-card.shop-card--theme:hover {
   transform: translateY(-2px);
   transition: transform var(--duration-fast);
 }
@@ -6069,12 +6069,12 @@ html body:is(.bg-default, :not([class*="bg-"])) .view--game {
 .view--shop .shop-action .btn:active,
 .view--shop .shop-tab:active { transform: translateY(2px); box-shadow: inset 0 1px 3px color-mix(in srgb, var(--brand-primary) 18%, transparent); }
 .view--shop .shop-action .btn:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 3px; }
-.view--shop .shop-card.previewable {
+.view--shop .shop-card.shop-card--theme {
   background-image: linear-gradient(180deg, color-mix(in srgb, var(--app-card-bg) 10%, transparent), color-mix(in srgb, var(--app-card-bg) 82%, transparent) 48%, color-mix(in srgb, var(--app-card-bg) 94%, transparent)), var(--shop-card-image);
   background-size: cover;
   background-position: center;
 }
-.view--shop .shop-card.previewable .shop-theme-sample { background-image: none !important; background-color: color-mix(in srgb, var(--app-card-bg) 45%, transparent); }
+.view--shop .shop-card.shop-card--theme .shop-theme-sample { background-image: none !important; background-color: color-mix(in srgb, var(--app-card-bg) 45%, transparent); }
 .view--home .daily-hero {
   position: relative;
   overflow: hidden;
@@ -6350,3 +6350,12 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .win-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 18px 0; }
 .win-stat { background: color-mix(in srgb, var(--brand-primary) 10%, var(--app-card-bg)); border: 1px solid var(--app-border); padding: 8px; border-radius: 12px; }
 .win-modal .ui-art-icon { vertical-align: middle; }
+.theme-preview-modal { width: min(520px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 18px; overflow: hidden; }
+.theme-preview-modal h2 { margin: 0; padding-right: 32px; }
+.theme-preview-modal > p { margin: 4px 0 12px; color: var(--app-text-secondary); }
+.theme-preview-home { height: min(620px, calc(100dvh - 140px)); overflow: auto; border: 1px solid var(--app-border); border-radius: 20px; background: linear-gradient(color-mix(in srgb, var(--app-bg) 36%, transparent), color-mix(in srgb, var(--app-bg) 55%, transparent)), var(--theme-background) center / cover; color: var(--app-text); }
+.theme-preview-content { position: relative; }
+.theme-preview-home .view--home { padding: 16px 12px 20px; max-width: none; }
+.theme-preview-home .bottom-nav { position: sticky; bottom: 0; width: 100%; max-width: none; transform: none; left: auto; border-radius: 0; }
+.theme-preview-home .home-user-btn { min-width: 0; }
+.theme-preview-home .home-user-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; }

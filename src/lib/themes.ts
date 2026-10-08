@@ -171,10 +171,9 @@ export const THEMES: Record<string, ThemeMeta> = {
 
 const ACTIVE_THEME_KEY = 'sudoku_active_theme_v1';
 
-export function applyTheme(themeId: string | null | undefined): void {
+export function applyTheme(themeId: string | null | undefined, root: HTMLElement = document.documentElement): void {
   const id = themeId || 'theme_classic';
   const theme = THEMES[id] ?? THEMES['theme_classic'];
-  const root = document.documentElement;
   root.dataset.theme = theme.id;
   root.style.setProperty('--theme-background', `url("${THEME_BACKGROUNDS[theme.id]}")`);
 
@@ -239,7 +238,9 @@ export function applyTheme(themeId: string | null | undefined): void {
     '--numpad-btn-bg': surface,
   };
   for (const [key, value] of Object.entries(appTokens)) root.style.setProperty(key, value);
-  try { localStorage.setItem(ACTIVE_THEME_KEY, id); } catch { /* private */ }
+  if (root === document.documentElement) {
+    try { localStorage.setItem(ACTIVE_THEME_KEY, id); } catch { /* private */ }
+  }
 }
 
 export function loadCachedThemeId(): string | null {
