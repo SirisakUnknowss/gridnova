@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   const { data: tokens, error } = await supabase.rpc('claim_staging_daily_reminders');
   if (error) return Response.json({ error: 'Could not select reminders' }, { status: 500 });
   let sent = 0, failed = 0;
-  for (const token of tokens ?? []) {
+  try { await Promise.all((tokens ?? []).map(async (token: { id: string; token: string; p256dh: string; auth: string; reminder_date: string }) => {
     let status = 0;
     try {
       if (!allowedPushEndpoint(token.token)) throw new Error('Unsupported push endpoint');
@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
       if (status === 404 || status === 410) await supabase.from('push_tokens').delete().eq('id', token.id).eq('token', token.token);
     } catch { failed++; }
     const { error: finishError } = await supabase.rpc('finish_staging_daily_reminder', { p_token_id: token.id, p_date: token.reminder_date, p_status: status });
-    if (finishError) return Response.json({ sent, failed, error: 'Could not record delivery' }, { status: 500 });
-  }
+    if (finishError) throw new Error('Could not record delivery');
+  })); } catch { return Response.json({ sent, failed, error: 'Could not record delivery' }, { status: 500 }); }
   return Response.json({ sent, failed, total: tokens?.length ?? 0 });
 });
