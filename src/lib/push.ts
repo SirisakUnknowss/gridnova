@@ -14,6 +14,10 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
   return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
 }
 
+function encodeKey(key: ArrayBuffer): string {
+  return btoa(String.fromCharCode(...new Uint8Array(key))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+
 export function isPushSupported(): boolean {
   return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
 }
@@ -42,7 +46,12 @@ export async function enablePushNotifications(): Promise<boolean> {
     if (!user || user.is_anonymous) return false;
     const reg = await navigator.serviceWorker.getRegistration();
     if (!reg?.active) return false;
-    const subscription = await reg.pushManager.getSubscription() ?? await reg.pushManager.subscribe({
+    let previous = await reg.pushManager.getSubscription();
+    if (previous?.options?.applicationServerKey && encodeKey(previous.options.applicationServerKey) !== VAPID_PUBLIC_KEY) {
+      await previous.unsubscribe();
+      previous = null;
+    }
+    const subscription = previous ?? await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as unknown as ArrayBuffer,
     });
@@ -64,6 +73,8 @@ export async function enablePushNotifications(): Promise<boolean> {
 
     if (error) throw error;
 
+    const { error: preferenceError } = await supabase.from('user_settings').upsert({ user_id: user.id, notifications_daily: true }, { onConflict: 'user_id' });
+    if (preferenceError) throw preferenceError;
     return true;
   } catch (err) {
     console.warn('[push] subscribe failed:', err);
@@ -75,12 +86,15 @@ export async function disablePushNotifications(): Promise<void> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.from('push_tokens').delete().eq('user_id', user.id).eq('platform', 'web');
-
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.getSubscription();
+    const { error: preferenceError } = await supabase.from('user_settings').upsert({ user_id: user.id, notifications_daily: false }, { onConflict: 'user_id' });
+    if (preferenceError) throw preferenceError;
+    const { error: tokenError } = await supabase.from('push_tokens').delete().eq('user_id', user.id).eq('platform', 'web');
+    if (tokenError) throw tokenError;
+    const reg = await navigator.serviceWorker.getRegistration();
+    const sub = await reg?.pushManager.getSubscription();
     if (sub) await sub.unsubscribe();
   } catch (err) {
     console.warn('[push] unsubscribe failed:', err);
+    throw err;
   }
 }

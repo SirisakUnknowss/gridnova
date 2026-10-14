@@ -95,7 +95,7 @@ function countSolutions(puzzle: Board, cap = 2): number {
   }
   let count = 0;
   function findBest(): { r: number; c: number; used: number } | null {
-    let best: any = null, bestCount = 10;
+    let best: { r: number; c: number; used: number } | null = null, bestCount = 10;
     for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
       if (board[r][c] !== 0) continue;
       const b = Math.floor(r/3)*3 + Math.floor(c/3);
@@ -186,13 +186,18 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  if (!serviceKey || req.headers.get('Authorization') !== `Bearer ${serviceKey}`) {
+  if (Deno.env.get('SUPABASE_URL') !== 'https://xrtgcxofjisqaigaaboy.supabase.co') return new Response('Staging only', { status: 403 });
+  const schedulerClient = createClient(Deno.env.get('SUPABASE_URL')!, serviceKey!);
+  const { data: schedulerConfig, error: schedulerError } = await schedulerClient.rpc('staging_automation_config');
+  if (!serviceKey || schedulerError || !schedulerConfig?.scheduler_token || req.headers.get('x-gridnova-scheduler') !== schedulerConfig.scheduler_token) {
     return new Response('Unauthorized', { status: 401, headers: corsHeaders });
   }
 
   const body = await req.json().catch(() => ({}));
-  const days = Math.max(1, Math.min(30, body.days ?? 30));
+  const days = Number.isInteger(body.days) ? Math.max(1, Math.min(30, body.days)) : 30;
   const startDate = body.start_date ? new Date(body.start_date + 'T00:00:00Z') : new Date();
+
+  if (!Number.isFinite(startDate.getTime())) return new Response('Invalid date', { status: 400 });
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -230,7 +235,8 @@ Deno.serve(async (req) => {
         generation_seed: seed,
       });
       if (error) {
-        errors.push({ date: dateStr, error: error.message });
+        if (error.code === '23505') skipped.push(dateStr);
+        else errors.push({ date: dateStr, error: error.message });
       } else {
         generated.push(dateStr);
       }
@@ -241,6 +247,6 @@ Deno.serve(async (req) => {
 
   return new Response(
     JSON.stringify({ generated, skipped, errors, total: days }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    { status: errors.length ? 500 : 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
   );
 });

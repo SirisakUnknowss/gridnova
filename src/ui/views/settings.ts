@@ -260,7 +260,8 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
         : 'Could not enable reminders. Please try again later');
       return ok;
     } else {
-      await disablePushNotifications();
+      try { await disablePushNotifications(); }
+      catch { props.onToast('Could not disable reminders. Please try again'); return true; }
       setPushPref(false);
       return false;
     }

@@ -38,3 +38,6 @@ Local Vite-served client contains only the new Supabase URL. Email signup, actua
 `scripts/staging-smoke.mjs` requires the exact staging URL and local test credentials. `signup` sends a confirmation email; `shop` spends only test coins and is intentionally a first-run scenario, not safe to rerun against already-owned items. `game` creates test Practice/Time Attack results. Never point it at production.
 
 54 tests, TypeScript, ESLint, and production build passed. Deployment and final remote URL verification are recorded in HANDOFF.md after completion.
+
+## Daily automation update — 2026-10-15
+Staging generator/reminder cron now installed using a separate Vault scheduler token. Credentials are created separately before the append-only staging_daily_automation migration. This migration is staging-only and must be excluded from any future production replay. VAPID private JWK is service-role-only in Vault; public key is the staging Environment variable STAGING_VAPID_PUBLIC_KEY. No Supabase CLI credentials or production secrets were required. See HANDOFF.md for schedules, validation and outstanding device receipt check.

@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
-const { getUser, upsert } = vi.hoisted(() => ({ getUser: vi.fn(), upsert: vi.fn() }));
+const { getUser, upsert, remove, eq } = vi.hoisted(() => ({ getUser: vi.fn(), upsert: vi.fn(), remove: vi.fn(), eq: vi.fn() }));
 vi.mock('../../src/lib/supabase', () => ({
-  supabase: { auth: { getUser }, from: () => ({ upsert }) },
+  supabase: { auth: { getUser }, from: () => ({ upsert, delete: remove }) },
 }));
 
 beforeEach(() => {
@@ -11,7 +11,9 @@ beforeEach(() => {
   vi.stubGlobal('window', { Notification: {}, PushManager: {} });
   vi.stubGlobal('Notification', { requestPermission: vi.fn().mockResolvedValue('granted') });
   getUser.mockResolvedValue({ data: { user: { id: 'test-member', is_anonymous: false } } });
-  upsert.mockResolvedValue({ error: null });
+  upsert.mockReset().mockResolvedValue({ error: null });
+  eq.mockReset().mockReturnValue({ eq, error: null });
+  remove.mockReturnValue({ eq });
   vi.stubGlobal('navigator', { serviceWorker: {
     getRegistration: vi.fn().mockResolvedValue({ active: {}, pushManager: {
       getSubscription: vi.fn().mockResolvedValue({ endpoint: 'https://push.example/test',
@@ -40,4 +42,23 @@ it('enables an existing subscription only after saving it', async () => {
   expect(await enablePushNotifications()).toBe(true);
   expect(upsert).toHaveBeenCalledWith(expect.objectContaining({ user_id: 'test-member' }),
     { onConflict: 'user_id,platform' });
+});
+
+it('persists opt-in and refuses success when that write fails', async () => {
+  upsert.mockResolvedValueOnce({error:null}).mockResolvedValueOnce({error:{message:'denied'}});
+  const { enablePushNotifications } = await import('../../src/lib/push');
+  expect(await enablePushNotifications()).toBe(false);
+  expect(upsert).toHaveBeenLastCalledWith({user_id:'test-member',notifications_daily:true},{onConflict:'user_id'});
+});
+it('disables server preference and removes token even without a registered worker', async () => {
+  vi.stubGlobal('navigator',{serviceWorker:{getRegistration:vi.fn().mockResolvedValue(undefined)}});
+  const { disablePushNotifications } = await import('../../src/lib/push');
+  await disablePushNotifications();
+  expect(upsert).toHaveBeenCalledWith({user_id:'test-member',notifications_daily:false},{onConflict:'user_id'});
+  expect(remove).toHaveBeenCalled();
+});
+it('reports disabling failure rather than displaying an off switch', async () => {
+  upsert.mockResolvedValue({error:{message:'denied'}});
+  const { disablePushNotifications } = await import('../../src/lib/push');
+  await expect(disablePushNotifications()).rejects.toBeDefined();
 });
