@@ -41,6 +41,8 @@ import { mountStatsView } from './ui/views/stats';
 import { mountGlobalStatsView } from './ui/views/global-stats';
 import { mountRecapView } from './ui/views/recap';
 import { mountCalendarView } from './ui/views/calendar';
+import { mountMonthlyChallengeView } from './ui/views/monthly-challenge';
+import { startMonthlyPuzzle, submitMonthlyPuzzle } from './lib/monthly-challenge';
 import { mountLedgerView } from './ui/views/ledger';
 import { mountSettingsView } from './ui/views/settings';
 import { mountHowToPlayView } from './ui/views/how-to-play';
@@ -157,6 +159,7 @@ const navCb = {
 };
 
 async function playDailyResume(saved: GameInProgress) {
+  if (saved.origin === 'monthly') { await playMonthly(saved.date!); return; }
   const date = saved.date!;
   let puzzleData: { puzzle: number[][]; solution: number[][]; difficulty: import('./engine/types').Difficulty };
   try {
@@ -215,6 +218,7 @@ function showHome() {
     onEnterPlayMode: showPlayMode,
     onOpenPractice: showPractice,
     onOpenQuests: showQuests,
+    onOpenMonthly: showMonthlyChallenge,
     onPlayDaily: playDaily,
     onContinueDaily: (saved) => void playDailyResume(saved),
     onOpenDailyDetail: () => { dailyDetailBack = showHome; showDailyDetail(); },
@@ -609,6 +613,55 @@ function openAuthAction() {
 }
 
 // (profile menu now lives in mountProfileView)
+
+function showMonthlyChallenge() {
+  clearView('monthly_challenge');
+  const view = mountMonthlyChallengeView(root, {
+    onBack: showHome,
+    onPlay: playMonthly,
+    onSignIn: () => showAuthModal({ mode: 'signin', onSuccess: showMonthlyChallenge, onCancel: showMonthlyChallenge }),
+    onCollection: showCollection,
+    onToast: toast,
+    nav: navCb,
+  });
+  currentUnmount = view.unmount;
+}
+
+async function playMonthly(date: string) {
+  const ticket = await startMonthlyPuzzle(date);
+  const saved = (await listGames()).find(game => game.origin === 'monthly' && game.date === date && game.monthly_ticket === ticket.ticket_id);
+  const puzzle = stringToBoard(ticket.puzzle);
+  const solution = solve(puzzle);
+  if (!solution) throw new Error('Puzzle is unavailable');
+  const gate = saved ? { allowed: true, consumed: saved.heart_consumed ?? false } : await gateHeart('daily', () => void playMonthly(date));
+  if (!gate.allowed) return;
+  clearView('game_monthly');
+  const view = mountGameView(root, {
+    mode: 'daily', origin: 'monthly', monthlyTicket: ticket.ticket_id, heartConsumed: gate.consumed,
+    difficulty: 'medium', puzzle, solution, date, resume: saved,
+    onExit: showMonthlyChallenge,
+    onWin: result => { void finishMonthly(result,ticket.ticket_id,gate.consumed); },
+  });
+  currentUnmount = view.unmount;
+}
+
+async function finishMonthly(result: GameResult, ticket: string, consumed: boolean) {
+  const hide = showLoadingOverlay('Saving Monthly Challenge...');
+  try {
+    const response = await submitMonthlyPuzzle(ticket,result.timeSeconds,result.moves);
+    useStore.setState({ coins: response.balance });
+    if (consumed && !response.duplicate) await refundForWin();
+    showWinModal({ result, coinsEarned: response.coins, xpEarned: 0, isGuest: false, onContinue: showMonthlyChallenge });
+  } catch (error) {
+    captureError(error,{ feature: 'monthly-challenge' });
+    toast('Puzzle not saved. Tap Retry to submit again.');
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-bg active';
+    overlay.innerHTML = '<div class="modal"><h2>Puzzle not saved</h2><p>Your solution is ready. Reconnect and retry to receive your reward.</p><button class="btn btn--primary">Retry</button></div>';
+    overlay.querySelector('button')!.addEventListener('click',() => { overlay.remove(); void finishMonthly(result,ticket,consumed); });
+    document.body.append(overlay);
+  } finally { hide(); }
+}
 
 async function playDaily() {
   const gate = await gateHeart('daily', () => void playDaily());

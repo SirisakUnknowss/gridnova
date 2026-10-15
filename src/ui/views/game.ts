@@ -18,7 +18,9 @@ import { getBoardPrefs, vibrateTap } from '@lib/prefs';
 
 export interface GameViewProps {
   mode: 'daily' | 'practice';
-  origin?: 'random' | 'book' | 'time-attack';
+  origin?: 'random' | 'book' | 'time-attack' | 'monthly';
+  monthlyTicket?: string;
+  heartConsumed?: boolean;
   /**
    * Time Attack: the clock counts DOWN to the deadline the server set when it
    * issued the ticket. Timing is measured against issued_at rather than local
@@ -140,7 +142,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   // Unique key for this game session (used for save/load)
   const gameId = mode === 'daily'
-    ? `daily-${props.date ?? new Date().toISOString().slice(0, 10)}`
+    ? `${props.origin === 'monthly' ? 'monthly' : 'daily'}-${props.date ?? new Date().toISOString().slice(0, 10)}`
     : BOOK ? `book-${difficulty}`
     : TA ? `time-attack-${TA.ticketId}`
     : `practice-${difficulty}`;
@@ -160,8 +162,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       (r as GameInProgress & { notes?: number[][] }).notes?.forEach((bits, i) => {
         bits.forEach(n => noteMask[Math.floor(i / 9)][i % 9].add(n));
       });
-      mistakes = Math.max(0, Math.min(r.mistakes ?? 0, 2));
-      livesLost = mistakes; // no continues purchased yet this session
+      mistakes = Math.max(0, r.mistakes ?? 0);
+      livesLost = Math.max(0, Math.min(r.lives_lost ?? mistakes, 2));
+      continuesUsed = Math.max(0,Math.min(r.continues_used ?? 0,3));
       hintsLeft = Math.max(0, Math.min(r.hints_left ?? FREE_HINTS, FREE_HINTS));
       moves.push(...(r.moves as Move[]));
       const savedElapsed = r.elapsed_seconds ?? 0;
@@ -189,7 +192,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
             ? `<div style="display:flex;align-items:center;gap:8px;">
                 <div class="mode-pill no-click">
                   <span class="game-mode-art" aria-hidden="true">${modeArt}</span>
-                  <span>Daily Puzzle</span>
+                  <span>${props.origin === 'monthly' ? 'Monthly Challenge' : 'Daily Puzzle'}</span>
                 </div>
                 <button class="topbar-icon-btn" id="game-share-btn" title="Invite friends" style="color:var(--brand-primary);">
                   ${ic.share(20)}
@@ -381,6 +384,10 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       game_id: gameId,
       mode,
       origin: props.origin,
+      monthly_ticket: props.monthlyTicket,
+      heart_consumed: props.heartConsumed,
+      lives_lost: livesLost,
+      continues_used: continuesUsed,
       date: props.date,
       level: difficulty,
       stage: props.stage,
@@ -1044,9 +1051,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   rerender();
   syncUndoRedo();
+  if (props.origin === 'monthly') saveProgress();
 
   return {
     unmount() {
+      if (props.origin === 'monthly' && !gameWon) saveProgress();
       if (timerHandle) clearInterval(timerHandle);
       if (autosaveHandle) clearInterval(autosaveHandle);
       if (winTimeout) clearTimeout(winTimeout);

@@ -1,7 +1,7 @@
-export interface CollectionItem { id: string; category: string; rarity: string | null; price_coin: number; available: boolean }
+export interface CollectionItem { id: string; category: string; rarity: string | null; price_coin: number; available: boolean; unlock_type?: string }
 export function collectionMedals(items: CollectionItem[], inventory: string[]) {
   const owned = new Set(inventory);
-  const paid = items.filter(item => item.available && item.price_coin > 0);
+  const paid = items.filter(item => item.available && item.price_coin > 0 && item.unlock_type !== 'monthly');
   const themes = paid.filter(item => item.category === 'theme' && item.rarity === 'rare');
   const avatars = paid.filter(item => item.category === 'avatar' && item.rarity === 'rare');
   const count = (pool: CollectionItem[]) => pool.filter(item => owned.has(item.id)).length;

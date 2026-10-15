@@ -47,6 +47,8 @@ const CLASSIC: Partial<ThemeTokens> = {
 };
 
 export const THEMES: Record<string, ThemeMeta> = {
+  theme_moonlit_river: { id: 'theme_moonlit_river', name: 'Moonlit River', tokens: { '--brand-primary': '#8178cd', '--border-thick': '#605487', '--border-thin': '#d5cdee' } },
+  theme_river_of_stars: { id: 'theme_river_of_stars', name: 'River of Stars', tokens: { '--brand-primary': '#a69be5', '--border-thick': '#aca2d2', '--border-thin': '#535373', '--cell-bg': '#202247', '--cell-bg-given': '#292b53', '--cell-bg-selected': '#62558f', '--cell-bg-related': '#343459', '--cell-bg-same': '#51456f', '--cell-text': '#eeecff', '--cell-text-user': '#d1bdff', '--cell-text-hint': '#b9dfeb' } },
   theme_classic: {
     id: 'theme_classic', name: 'Classic',
     tokens: CLASSIC,
@@ -190,6 +192,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     theme_pastel: '#c2185b', theme_ocean: '#0288d1', theme_forest: '#388e3c',
     theme_sunset: '#d96528', theme_neon: '#007f86', theme_sakura: '#c74878',
     theme_thai: '#a66b17', theme_mono: '#424242',
+    theme_moonlit_river: '#8178cd', theme_river_of_stars: '#a69be5',
   };
   const primary = bases[theme.id] ?? '#667eea';
   const white = '#ffffff';
@@ -238,6 +241,9 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     '--numpad-btn-bg': surface,
   };
   for (const [key, value] of Object.entries(appTokens)) root.style.setProperty(key, value);
+  if (id === 'theme_river_of_stars') {
+    for (const [key,value] of Object.entries(theme.tokens)) root.style.setProperty(key,value);
+  }
   if (root === document.documentElement) {
     try { localStorage.setItem(ACTIVE_THEME_KEY, id); } catch { /* private */ }
   }

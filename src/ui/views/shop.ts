@@ -183,7 +183,9 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
 
       const isPremiumGated = PREMIUM_THEMES.has(item.id) && !isOwned && !isPremium();
       let action = '';
-      if ((!state.user || state.user.is_anonymous) && item.category === 'theme') {
+      if (item.unlock_type === 'monthly' && !isOwned) {
+        action = '<span class="quest-tag">Monthly Challenge</span>';
+      } else if ((!state.user || state.user.is_anonymous) && item.category === 'theme') {
         action = isEquipped ? '<span class="quest-tag">✓ Equipped</span>' : `<button class="btn btn--small" data-equip="${escapeHtml(item.id)}">Try theme</button>`;
       } else if (!isOwned && themeLocked) {
         action = `<button class="btn btn--small" disabled>${ic.lock(14)} Unlock theme first</button>`;
@@ -214,7 +216,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
           <div class="shop-preview">${preview}</div>
           <div class="shop-name">${escapeHtml(item.name)}</div>
           ${item.description ? `<div class="shop-desc">${escapeHtml(item.description)}</div>` : ''}
-          <div class="shop-price">${item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? escapeHtml(rarity)}</div>
+          <div class="shop-price">${item.unlock_type === 'monthly' ? 'Monthly reward' : item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? escapeHtml(rarity)}</div>
           ${item.category === 'theme' ? `<button class="theme-preview-button" data-theme-preview="${escapeHtml(item.id)}" aria-label="Preview ${escapeHtml(item.name)}">${ic.search(20)}</button>` : ''}
           ${item.category === 'avatar_frame' ? `<button class="frame-preview-button" data-frame-preview="${escapeHtml(item.id)}">Preview</button>` : ''}
           <div class="shop-action">${action}</div>
@@ -366,7 +368,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         api.getInventory().catch(() => []),
         api.getEquipped().catch(() => null),
       ]);
-      items = ((shopItems ?? []) as ShopItem[]).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_')))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
+      items = ((shopItems ?? []) as ShopItem[]).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_') || item.unlock_type === 'monthly'))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
       useStore.getState().setInventory((inventory ?? []).map((r: { item_id: string }) => r.item_id));
       if (equipped) {
         useStore.getState().setEquipped({
@@ -379,7 +381,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         if (equipped.theme_id) applyTheme(equipped.theme_id);
       }
       if (import.meta.env.DEV) {
-        items = items.map(item => item.category === 'theme' && item.price_coin > 0 && item.price_coin !== 5000 ? { ...item, price_coin: 5000, catalogPending: true } : item);
+        items = items.map(item => item.category === 'theme' && item.unlock_type !== 'monthly' && item.price_coin > 0 && item.price_coin !== 5000 ? { ...item, price_coin: 5000, catalogPending: true } : item);
         for (const rare of RARE_AVATAR_CATALOG) {
           if (!items.some(item => item.id === rare.id)) items.push({ ...rare, catalogPending: true });
         }

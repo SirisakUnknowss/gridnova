@@ -158,7 +158,7 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
   // player actually made a move; a save with 0 moves is a phantom from
   // opening then leaving immediately, so treat that as fresh instead.
   void listGames().then(async (games) => {
-    const saved = games.find((g) => g.mode === 'daily' && g.date === today);
+    const saved = games.find((g) => g.mode === 'daily' && g.origin !== 'monthly' && g.date === today);
     if (!saved) return;
     if (alreadyCompleted || !saved.moves || saved.moves.length === 0) {
       await deleteGame(saved.game_id);

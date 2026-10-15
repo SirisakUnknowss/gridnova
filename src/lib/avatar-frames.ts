@@ -19,7 +19,12 @@ import frameArt17 from '@images/space/frames/comet-trail.webp';
 import frameArt18 from '@images/space/frames/aurora-ribbon.webp';
 import frameArt19 from '@images/space/frames/galaxy-sovereign.webp';
 
+import lotusOrbit from '@images/space/monthly/lotus-orbit.webp';
+import fullMoonHalo from '@images/space/monthly/full-moon-halo.webp';
+
 export const AVATAR_FRAMES = [
+  { id: 'frame_monthly_lotus_orbit', style: 'illustrated', name: 'Lotus Orbit', price: 0, art: lotusOrbit },
+  { id: 'frame_monthly_full_moon_halo', style: 'illustrated', name: 'Full Moon Halo', price: 0, art: fullMoonHalo },
   { id: 'frame_star_halo', style: 'star', name: 'Star Halo', price: 800 },
   { id: 'frame_ocean_bubbles', style: 'ocean', name: 'Ocean Bubbles', price: 1200 },
   { id: 'frame_sakura_bloom', style: 'sakura', name: 'Sakura Bloom', price: 1600 },

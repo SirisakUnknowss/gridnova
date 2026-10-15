@@ -9,8 +9,12 @@ import sakura from '@images/space/themes/sakura.webp';
 import thai from '@images/space/themes/thai.webp';
 import mono from '@images/space/themes/mono.webp';
 import classic from '@images/space/bg-home.webp';
+import moonlitRiver from '@images/space/monthly/moonlit-river.webp';
+import riverOfStars from '@images/space/monthly/river-of-stars.webp';
 
 export const THEME_BACKGROUNDS: Record<string, string> = {
+  theme_moonlit_river: moonlitRiver,
+  theme_river_of_stars: riverOfStars,
   theme_classic: classic,
   theme_paper: paper,
   theme_dark: dark,

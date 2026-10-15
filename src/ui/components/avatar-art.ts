@@ -9,6 +9,8 @@ import avatar5 from '@images/space/avatars/astra-knight.webp';
 import avatar6 from '@images/space/avatars/orbit-bunny.webp';
 import avatar7 from '@images/space/avatars/solar-lion.webp';
 import { ic } from '@ui/icons';
+import lotusOtter from '@images/space/monthly/lotus-otter.webp';
+import moonRabbit from '@images/space/monthly/moon-rabbit.webp';
 
 
 function portrait(src: string, size = 48): string {
@@ -45,6 +47,8 @@ export const AVATAR_OPTIONS = [
 const SHOP_AVATAR_ART: Record<string, string> = {"avatar_face_happy": "space_orbit-bunny", "avatar_face_cool": "space_astra-knight", "avatar_face_nerd": "space_cosmo-owl", "avatar_face_lion": "space_solar-lion", "avatar_hat_cap": "space_comet-panda", "avatar_hat_top": "space_lunar-fox", "avatar_hat_crown": "🧑", "avatar_pet_dog": "space_lunar-fox", "avatar_pet_cat": "space_nebula-cat", "avatar_pet_dragon": "space_nova-dragon", "avatar_frame_bronze": "🦁", "avatar_frame_gold": "🧑", "avatar_frame_rainbow": "🦉"};
 
 export function avatarArtHTML(id: string | null | undefined, size: number): string {
+  if (id === 'avatar_monthly_lotus_otter') return portrait(lotusOtter,size);
+  if (id === 'avatar_monthly_moon_rabbit') return portrait(moonRabbit,size);
   if (id && RARE_AVATAR_ART[id]) return portrait(RARE_AVATAR_ART[id], size);
   return (AVATAR_OPTIONS.find(option => option.id === (id ? SHOP_AVATAR_ART[id] ?? id : id))?.art ?? ic.guest)(size);
 }

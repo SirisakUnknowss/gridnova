@@ -25,6 +25,7 @@ export interface HomeViewProps {
   onPlayDaily: () => void;
   onContinueDaily: (saved: GameInProgress) => void;
   onOpenDailyDetail: () => void;
+  onOpenMonthly: () => void;
   onAuthAction: () => void;
   nav: BottomNavCallbacks;
 }
@@ -125,6 +126,12 @@ export function homeViewHTML(): string {
         <button class="daily-hero-link" id="home-daily-more">View leaderboard <span aria-hidden="true">›</span></button>
       </div>
 
+      <button class="pm-row monthly-home-entry" id="open-monthly">
+        <span class="pm-row-icon">${ic.daily(40)}</span>
+        <span class="pm-row-body"><span class="pm-row-title">Monthly Challenge</span><span class="pm-row-sub">Moonlit Wishes · November collection</span></span>
+        <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
+      </button>
+
       <!-- Other modes -->
       <button class="pm-row" id="enter-play-mode">
         <span class="pm-row-icon">${ic.gamepad(40)}</span>
@@ -213,6 +220,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   root.querySelector('#enter-play-mode')?.addEventListener('click', props.onEnterPlayMode);
   root.querySelector('#open-practice')?.addEventListener('click', props.onOpenPractice);
   root.querySelector('#open-quests')?.addEventListener('click', props.onOpenQuests);
+  root.querySelector('#open-monthly')?.addEventListener('click', props.onOpenMonthly);
   root.querySelector('#home-daily-more')?.addEventListener('click', props.onOpenDailyDetail);
 
   // --- Daily hero: countdown + rank + play/continue state ---
@@ -264,7 +272,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   // A save with no moves is a phantom from opening and leaving straight away —
   // don't offer "Continue" for it.
   void listGames().then((games) => {
-    const saved = games.find((g) => g.mode === 'daily' && g.date === today);
+    const saved = games.find((g) => g.mode === 'daily' && g.origin !== 'monthly' && g.date === today);
     if (!saved || alreadyCompleted || !saved.moves || saved.moves.length === 0) return;
     savedGame = saved;
     playBtn.textContent = 'Continue Daily';
