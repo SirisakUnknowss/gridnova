@@ -6387,7 +6387,7 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .monthly-day { position: relative; display: grid; place-items: center; width: 100%; min-height: 44px; aspect-ratio: 1; border: 1px solid transparent; border-radius: 50%; font: inherit; font-size: 15px; color: var(--app-text); background: transparent; cursor: pointer; padding: 0; }
 .monthly-day--available { border-color: var(--brand-secondary); }
 .monthly-day--completed { background: color-mix(in srgb,var(--brand-primary) 16%,var(--app-card)); }
-.monthly-day small { position: absolute; right: 1px; bottom: 3px; font-size: 10px; color: var(--brand-primary); }
+.monthly-day small { position: absolute; right: -1px; bottom: -1px; z-index: 1; display: grid; place-items: center; width: 24px; height: 24px; border: 2px solid var(--app-card); border-radius: 50%; background: var(--brand-primary); color: var(--app-card); font-size: 20px; line-height: 1; font-weight: 900; box-shadow: var(--app-card-shadow); pointer-events: none; }
 .monthly-day--today, .monthly-day.is-selected:not(:disabled) { background: var(--brand-primary); color: var(--app-card); }
 .monthly-day--future { color: var(--app-text-secondary); opacity: .8; cursor: default; }
 .monthly-day:focus-visible, .monthly-claim:focus-visible { outline: 3px solid var(--brand-secondary); outline-offset: 2px; }

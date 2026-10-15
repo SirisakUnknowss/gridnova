@@ -4,10 +4,10 @@ import type { Move } from '@engine/types';
 export const MONTHLY_START = '2026-11-01';
 export const MONTHLY_END = '2026-11-30';
 export const MONTHLY_REWARDS = [
-  { days: 5, id: 'avatar_monthly_lotus_otter', name: 'Lotus Otter', type: 'Avatar', art: 'lotus-otter' },
+  { days: 5, id: 'avatar_monthly_lotus_otter', name: 'Lotus Girl', type: 'Avatar', art: 'thai-lotus-girl' },
   { days: 10, id: 'frame_monthly_lotus_orbit', name: 'Lotus Orbit', type: 'Frame', art: 'lotus-orbit' },
   { days: 15, id: 'theme_moonlit_river', name: 'Moonlit River', type: 'Theme', art: 'moonlit-river' },
-  { days: 20, id: 'avatar_monthly_moon_rabbit', name: 'Moon Rabbit', type: 'Avatar', art: 'moon-rabbit' },
+  { days: 20, id: 'avatar_monthly_moon_rabbit', name: 'Moonlit Boy', type: 'Avatar', art: 'thai-moonlit-boy' },
   { days: 25, id: 'frame_monthly_full_moon_halo', name: 'Full Moon Halo', type: 'Frame', art: 'full-moon-halo' },
   { days: 30, id: 'theme_river_of_stars', name: 'River of Stars', type: 'Theme', art: 'river-of-stars' },
 ] as const;

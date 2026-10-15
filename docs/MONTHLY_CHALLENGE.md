@@ -6,7 +6,7 @@ November 1–30, 2026 (UTC). Entry: Home → Monthly Challenge. Existing four na
 - Members earn exactly 100 Coins per completed puzzle date, with atomic replay validation, completion and wallet credit. No Monthly XP or leaderboard is awarded.
 - Daily game rules apply: three free hints, no coin hints, normal Daily continues. Starting spends one global heart, a win refunds it, and resuming the saved monthly game does not charge again.
 - Claim cumulative cosmetics at 5/10/15/20/25/30 dates. Claims are idempotent and remain available after the event. Rewards can be equipped in Shop/My Collection. They cannot be purchased or equipped without ownership. The nonzero internal catalog price is an ownership safeguard, never a displayed purchase price; monthly items do not count as paid-purchase medals.
-- Avatar rewards: Lotus Otter and Moon Rabbit. Frames: Lotus Orbit and Full Moon Halo, with transparent centers. Themes: Moonlit River and River of Stars, including a dark Sudoku board.
+- Avatar rewards: Lotus Girl (girl in lavender Thai sabai) and Moonlit Boy (boy in a pearl-white Thai jacket), both holding lotus krathongs. Original reward IDs remain stable to preserve existing ownership. Frames: Lotus Orbit and Full Moon Halo, with transparent centers. Themes: Moonlit River and River of Stars, including a dark Sudoku board.
 
 ## Staging
 
@@ -39,3 +39,12 @@ Prompt set:
 1. **Collectibles atlas:** Three columns × two rows, square panels without gutters/text. Glossy pearlescent pastel lavender-blue cosmic Loy Krathong art. Top: cream-brown otter holding lotus krathong; lotus orbital frame; light moonlit river scenery. Bottom: white rabbit astronaut holding lotus krathong; elaborate full-moon water-ripple frame; midnight indigo river-of-stars observatory scenery. Each panel independently framed with padding, no UI or numbers.
 2. **Transparent frames:** Two square cells side by side, genuinely transparent backgrounds and open centers. Left: Lotus Orbit with pearl lavender rings, pink lotus petals and candle glows. Right: Full Moon Halo with silver-blue ripple rings, pearl moon ornament and purple filigree. Complete circles, no text or backdrop.
 3. **Hero:** Wide 2:1 landscape, friendly pearl-white robot on the right floating a pink lotus krathong with candle on a lavender cosmic river; pearl full moon and delicate distant Thai temple silhouettes. Left side pale blue-lavender low-detail negative space for dark text. Gentle pearlescent 3D, no text or UI.
+
+## Thai avatar update
+
+The original animal portraits are superseded by `thai-lotus-girl.webp` and `thai-moonlit-boy.webp` in `src/images/space/monthly/`. New originals are preserved alongside the original atlas as `thai-lotus-girl.png` and `thai-moonlit-boy.png`. The built-in imagegen prompt set for these replacements:
+
+- **Lotus Girl:** Square game avatar portrait, cute young Thai girl in a lavender and pearl-white traditional silk sabai and pink patterned sinh, black hair in a bun with a lotus flower, small gold jewelry, holding a pink lotus krathong with a glowing candle. Human childlike chibi proportions; prominent friendly face; pearlescent soft 3D; blue-lavender moonlit river and stars. No animal features, robot, spacesuit, text or watermark.
+- **Moonlit Boy:** Square game avatar portrait, cute young Thai boy in a pearl-white raj pattern jacket with standing collar and gold buttons, lavender-blue chong kraben and gold sash, short black hair, holding a pink lotus krathong with a glowing candle. Human childlike chibi proportions; prominent friendly face; pearlescent soft 3D; midnight-blue lavender moonlit river and full moon. No animal features, robot, spacesuit, text or watermark.
+
+The append-only `monthly_thai_avatars` migration updates catalog display names while preserving existing IDs, ownership and equipment. Completed calendar dates now have a 24px contrasting check badge overlapping the date circle, including the selected date.

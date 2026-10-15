@@ -25,3 +25,8 @@ hero = Image.open(source / 'exec-b2e05e75-d8ad-4a7a-ad15-ba6c01913ed6.png')
 hero.save(originals / 'hero.png')
 hero.resize((1024, 512), Image.Resampling.LANCZOS).save(runtime / 'moonlit-wishes.webp', quality=85)
 print('Prepared seven runtime WebP assets; originals preserved in', originals)
+for image_path, name in zip(sys.argv[2:4], ['thai-lotus-girl', 'thai-moonlit-boy']):
+    image = Image.open(image_path)
+    image.save(originals / f'{name}.png')
+    image.resize((512, 512), Image.Resampling.LANCZOS).save(runtime / f'{name}.webp', quality=85)
+    print('Prepared', name)
