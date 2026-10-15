@@ -21,8 +21,12 @@ import frameArt19 from '@images/space/frames/galaxy-sovereign.webp';
 
 import lotusOrbit from '@images/space/monthly/lotus-orbit.webp';
 import fullMoonHalo from '@images/space/monthly/full-moon-halo.webp';
+import candyCaneOrbit from '@images/space/monthly/candy-cane-orbit.webp';
+import starlightWreath from '@images/space/monthly/starlight-wreath.webp';
 
 export const AVATAR_FRAMES = [
+  { id: 'frame_monthly_candy_cane_orbit', style: 'illustrated', name: 'Candy Cane Orbit', price: 0, art: candyCaneOrbit },
+  { id: 'frame_monthly_starlight_wreath', style: 'illustrated', name: 'Starlight Wreath', price: 0, art: starlightWreath },
   { id: 'frame_monthly_lotus_orbit', style: 'illustrated', name: 'Lotus Orbit', price: 0, art: lotusOrbit },
   { id: 'frame_monthly_full_moon_halo', style: 'illustrated', name: 'Full Moon Halo', price: 0, art: fullMoonHalo },
   { id: 'frame_star_halo', style: 'star', name: 'Star Halo', price: 800 },

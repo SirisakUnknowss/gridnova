@@ -128,7 +128,7 @@ export function homeViewHTML(): string {
 
       <button class="pm-row monthly-home-entry" id="open-monthly">
         <span class="pm-row-icon">${ic.daily(40)}</span>
-        <span class="pm-row-body"><span class="pm-row-title">Monthly Challenge</span><span class="pm-row-sub">Moonlit Wishes · November collection</span></span>
+        <span class="pm-row-body"><span class="pm-row-title">Monthly Challenge</span><span class="pm-row-sub">Explore monthly puzzles &amp; collections</span></span>
         <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
       </button>
 

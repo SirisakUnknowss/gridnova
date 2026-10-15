@@ -1,16 +1,10 @@
 import { supabase } from './supabase';
 import type { Move } from '@engine/types';
+import { MONTHLY_COLLECTIONS } from './monthly-catalog';
 
 export const MONTHLY_START = '2026-11-01';
 export const MONTHLY_END = '2026-11-30';
-export const MONTHLY_REWARDS = [
-  { days: 5, id: 'avatar_monthly_lotus_otter', name: 'Lotus Girl', type: 'Avatar', art: 'thai-lotus-girl' },
-  { days: 10, id: 'frame_monthly_lotus_orbit', name: 'Lotus Orbit', type: 'Frame', art: 'lotus-orbit' },
-  { days: 15, id: 'theme_moonlit_river', name: 'Moonlit River', type: 'Theme', art: 'moonlit-river' },
-  { days: 20, id: 'avatar_monthly_moon_rabbit', name: 'Moonlit Boy', type: 'Avatar', art: 'thai-moonlit-boy' },
-  { days: 25, id: 'frame_monthly_full_moon_halo', name: 'Full Moon Halo', type: 'Frame', art: 'full-moon-halo' },
-  { days: 30, id: 'theme_river_of_stars', name: 'River of Stars', type: 'Theme', art: 'river-of-stars' },
-] as const;
+export const MONTHLY_REWARDS = MONTHLY_COLLECTIONS[0].rewards;
 
 export function monthCells(year: number, month: number): (string | null)[] {
   const prefix = `${year}-${String(month).padStart(2, '0')}`;
@@ -34,8 +28,10 @@ export function rewardState(days: number, completed: number, claimed: boolean) {
 
 export interface MonthlyStatus { today: string; preview: boolean; completed: string[]; claimed: string[] }
 export interface MonthlyTicket { ticket_id: string; puzzle: string; date: string }
-export async function getMonthlyStatus(): Promise<MonthlyStatus> {
-  const { data, error } = await supabase.rpc('get_monthly_challenge');
+export async function getMonthlyStatus(month?: string): Promise<MonthlyStatus> {
+  const { data, error } = month
+    ? await supabase.rpc('get_monthly_collection', { p_month: month })
+    : await supabase.rpc('get_monthly_challenge');
   if (error) throw error;
   return data as MonthlyStatus;
 }

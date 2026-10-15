@@ -47,6 +47,8 @@ const CLASSIC: Partial<ThemeTokens> = {
 };
 
 export const THEMES: Record<string, ThemeMeta> = {
+  theme_winter_wonderland: { id: 'theme_winter_wonderland', name: 'Winter Wonderland', tokens: { '--brand-primary': '#6386b3', '--border-thick': '#58749c', '--border-thin': '#c9dced' } },
+  theme_christmas_eve: { id: 'theme_christmas_eve', name: 'Christmas Eve', tokens: { '--brand-primary': '#b29edb', '--border-thick': '#c8b9e4', '--border-thin': '#53516c', '--cell-bg': '#20253c', '--cell-bg-given': '#292e48', '--cell-bg-selected': '#635775', '--cell-bg-related': '#333a54', '--cell-bg-same': '#655337', '--cell-text': '#f0edff', '--cell-text-user': '#d9c4ff', '--cell-text-hint': '#afdcd8' } },
   theme_moonlit_river: { id: 'theme_moonlit_river', name: 'Moonlit River', tokens: { '--brand-primary': '#8178cd', '--border-thick': '#605487', '--border-thin': '#d5cdee' } },
   theme_river_of_stars: { id: 'theme_river_of_stars', name: 'River of Stars', tokens: { '--brand-primary': '#a69be5', '--border-thick': '#aca2d2', '--border-thin': '#535373', '--cell-bg': '#202247', '--cell-bg-given': '#292b53', '--cell-bg-selected': '#62558f', '--cell-bg-related': '#343459', '--cell-bg-same': '#51456f', '--cell-text': '#eeecff', '--cell-text-user': '#d1bdff', '--cell-text-hint': '#b9dfeb' } },
   theme_classic: {
@@ -193,6 +195,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     theme_sunset: '#d96528', theme_neon: '#007f86', theme_sakura: '#c74878',
     theme_thai: '#a66b17', theme_mono: '#424242',
     theme_moonlit_river: '#8178cd', theme_river_of_stars: '#a69be5',
+    theme_winter_wonderland: '#6386b3', theme_christmas_eve: '#b29edb',
   };
   const primary = bases[theme.id] ?? '#667eea';
   const white = '#ffffff';
@@ -241,7 +244,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     '--numpad-btn-bg': surface,
   };
   for (const [key, value] of Object.entries(appTokens)) root.style.setProperty(key, value);
-  if (id === 'theme_river_of_stars') {
+  if (id === 'theme_river_of_stars' || id === 'theme_christmas_eve') {
     for (const [key,value] of Object.entries(theme.tokens)) root.style.setProperty(key,value);
   }
   if (root === document.documentElement) {

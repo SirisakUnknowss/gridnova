@@ -11,6 +11,9 @@ import avatar7 from '@images/space/avatars/solar-lion.webp';
 import { ic } from '@ui/icons';
 import lotusGirl from '@images/space/monthly/thai-lotus-girl.webp';
 import moonlitBoy from '@images/space/monthly/thai-moonlit-boy.webp';
+import snowflakeGirl from '@images/space/monthly/snowflake-girl.webp';
+import christmasBoy from '@images/space/monthly/christmas-boy.webp';
+import { MONTHLY_COLLECTIONS } from '@lib/monthly-catalog';
 
 
 function portrait(src: string, size = 48): string {
@@ -49,13 +52,15 @@ const SHOP_AVATAR_ART: Record<string, string> = {"avatar_face_happy": "space_orb
 export function avatarArtHTML(id: string | null | undefined, size: number): string {
   if (id === 'avatar_monthly_lotus_otter') return portrait(lotusGirl,size);
   if (id === 'avatar_monthly_moon_rabbit') return portrait(moonlitBoy,size);
+  if (id === 'avatar_monthly_snowflake_girl') return portrait(snowflakeGirl,size);
+  if (id === 'avatar_monthly_christmas_boy') return portrait(christmasBoy,size);
   if (id && RARE_AVATAR_ART[id]) return portrait(RARE_AVATAR_ART[id], size);
   return (AVATAR_OPTIONS.find(option => option.id === (id ? SHOP_AVATAR_ART[id] ?? id : id))?.art ?? ic.guest)(size);
 }
 
 export function shopAvatarName(id: string): string | undefined {
-  if (id === 'avatar_monthly_lotus_otter') return 'Lotus Girl';
-  if (id === 'avatar_monthly_moon_rabbit') return 'Moonlit Boy';
+  const monthly = MONTHLY_COLLECTIONS.flatMap(collection => collection.rewards).find(item => item.id === id && item.type === 'Avatar');
+  if (monthly) return monthly.name;
   const rare = RARE_AVATAR_CATALOG.find(item => item.id === id);
   if (rare) return rare.name;
   return AVATAR_OPTIONS.find(option => option.id === SHOP_AVATAR_ART[id])?.name;
@@ -76,9 +81,6 @@ export function avatarItemId(id: string): string | null {
 }
 
 export function avatarPickerOptions(inventory: readonly string[], isGuest: boolean) {
-  const monthly = [
-    { id: 'avatar_monthly_lotus_otter', name: 'Lotus Girl' },
-    { id: 'avatar_monthly_moon_rabbit', name: 'Moonlit Boy' },
-  ].filter(item => !isGuest && inventory.includes(item.id));
+  const monthly = MONTHLY_COLLECTIONS.flatMap(collection => collection.rewards).filter(item => item.type === 'Avatar' && !isGuest && inventory.includes(item.id));
   return [...AVATAR_OPTIONS, ...[...RARE_AVATAR_CATALOG, ...monthly].map(item => ({ id: item.id, name: item.name, art: (size = 48) => avatarArtHTML(item.id,size) }))];
 }

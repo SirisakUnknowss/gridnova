@@ -56,6 +56,11 @@ describe('Monthly Challenge calendar and rewards',() => {
 
 describe('Monthly Challenge server API',() => {
   beforeEach(() => rpc.mockReset());
+  it('requests the selected month explicitly so progress cannot carry across collections',async () => {
+    rpc.mockResolvedValue({data: {today: '2026-12-15',preview: true,completed: [],claimed: []},error: null});
+    await getMonthlyStatus('2026-12');
+    expect(rpc).toHaveBeenCalledWith('get_monthly_collection',{p_month:'2026-12'});
+  });
   it('uses server-issued dates, progress, tickets and wallet balances',async () => {
     const status = { today: '2026-11-15',preview: true,completed: ['2026-11-01'],claimed: [] };
     rpc.mockResolvedValueOnce({ data: status,error: null });

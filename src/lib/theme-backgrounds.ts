@@ -11,8 +11,12 @@ import mono from '@images/space/themes/mono.webp';
 import classic from '@images/space/bg-home.webp';
 import moonlitRiver from '@images/space/monthly/moonlit-river.webp';
 import riverOfStars from '@images/space/monthly/river-of-stars.webp';
+import winterWonderland from '@images/space/monthly/winter-wonderland.webp';
+import christmasEve from '@images/space/monthly/christmas-eve.webp';
 
 export const THEME_BACKGROUNDS: Record<string, string> = {
+  theme_winter_wonderland: winterWonderland,
+  theme_christmas_eve: christmasEve,
   theme_moonlit_river: moonlitRiver,
   theme_river_of_stars: riverOfStars,
   theme_classic: classic,

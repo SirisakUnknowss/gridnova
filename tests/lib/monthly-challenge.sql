@@ -25,7 +25,7 @@ begin
   begin perform public.complete_monthly_puzzle((v_ticket->>'ticket_id')::uuid,100,'[]'); raise exception 'FAILED: guest ticket accepted'; exception when raise_exception then if sqlerrm like 'FAILED:%' then raise; end if; end;
   perform set_config('request.jwt.claim.sub',v_user::text,true);
   update monthly_private.config set preview_today='2026-11-30';
-  for v_date in select date from monthly_private.puzzles order by date desc loop
+  for v_date in select date from monthly_private.puzzles where date between '2026-11-01' and '2026-11-30' order by date desc loop
     v_ticket := public.start_monthly_puzzle(v_date);
     update monthly_private.tickets set issued_at=now()-interval '120 seconds' where id=(v_ticket->>'ticket_id')::uuid;
     select jsonb_agg(jsonb_build_object('r',(i-1)/9,'c',(i-1)%9,'n',substr(solution,i,1)::integer,'t',i*1000) order by i)
@@ -37,11 +37,11 @@ begin
   end loop;
   select coins into v_balance from public.user_wallet where user_id=v_user;
   if v_balance-v_initial<>3000 then raise exception 'FAILED: total payout'; end if;
-  for v_item in select id from public.shop_items where unlock_type='monthly' loop
+  for v_item in select item_id from monthly_private.rewards where collection_id='2026-11' loop
     perform public.claim_monthly_reward(v_item);
     perform public.claim_monthly_reward(v_item);
   end loop;
-  select count(*) into v_count from public.user_inventory where user_id=v_user and item_id in (select id from public.shop_items where unlock_type='monthly');
+  select count(*) into v_count from public.user_inventory where user_id=v_user and item_id in (select item_id from monthly_private.rewards where collection_id='2026-11');
   if v_count<>6 then raise exception 'FAILED: cosmetics count %',v_count; end if;
   perform public.equip_item(v_user,'theme_river_of_stars',null,null,'{"item_id":"avatar_monthly_lotus_otter"}'::jsonb);
   perform public.equip_avatar_frame('frame_monthly_full_moon_halo');

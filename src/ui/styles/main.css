@@ -6420,6 +6420,8 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .monthly-help form { margin-top: 18px; }
 .monthly-help .btn { width: 100%; min-height: 44px; }
 .monthly-help::backdrop { background: color-mix(in srgb,var(--app-text) 35%,transparent); }
+.monthly-month-nav { display: flex; gap: 8px; }
+.monthly-month-nav .btn { flex: 1; min-height: 44px; }
 .monthly-theme-preview { position: relative; width: 100%; height: 100%; display: grid; place-items: center; --monthly-board-bg: var(--cell-bg); --monthly-board-ink: var(--cell-text); }
 .monthly-theme-preview > img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
 .monthly-mini-board { position: relative; display: grid; grid-template-columns: repeat(9,1fr); width: 78%; aspect-ratio: 1; border: 1px solid var(--monthly-board-ink); background: var(--monthly-board-bg); color: var(--monthly-board-ink); }

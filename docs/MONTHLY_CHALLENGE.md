@@ -12,13 +12,13 @@ November 1–30, 2026 (UTC). Entry: Home → Monthly Challenge. Existing four na
 
 Only `gridnova-staging` (`xrtgcxofjisqaigaaboy`) was changed. The append-only migration is `20261015114034_monthly_challenge.sql`; staging's existing consolidated migration history must not be replayed through CLI db push.
 
-Staging's private config has `preview_today = '2026-11-15'` to allow testing before November. The screen visibly labels this as a staging preview. This override is provisioned separately and is not seeded by the migration. Clear it to use the real UTC clock:
+Staging's private config has `preview_today = '2026-12-15'` to allow testing before November. The screen visibly labels this as a staging preview. This override is provisioned separately and is not seeded by the migration. Clear it to use the real UTC clock:
 
 ```sql
 update monthly_private.config set preview_today = null where id;
 ```
 
-Production remains unchanged. A future production deployment needs the normal explicit release approval and this migration; its default config has no date override and starts November 1 UTC. This release contains only the November collection, with no automatic December collection.
+Production remains unchanged. A future production deployment needs the normal explicit release approval and this migration; its default config has no date override and starts November 1 UTC. The catalog now contains November and December collections, with independent completion counts and claims.
 
 ## Verification
 
@@ -56,3 +56,11 @@ The active Thai avatar WebPs now use a zoomed head-and-shoulders portrait for cl
 Imagegen edit prompt, applied separately to each original full portrait: zoom the camera to a close-up head-and-shoulders portrait while preserving the character identity, eyes, smile, hair and pearlescent 3D style. Show the complete hair, full neck, both shoulders and upper chest at the lower edge, with a naturally connected body extending beyond the canvas. The girl retains her bun, lotus accessory, Thai earrings and lavender sabai; the boy retains his pearl-white Thai standing-collar jacket. Face/hair occupy the upper 70%, neck/shoulders the lower 25–30%. Hands and krathong fall outside the camera crop. No floating or detached heads. Quiet lavender-blue moonlit bokeh background, no text or watermark.
 
 Profile's Choose your avatar picker includes owned monthly avatars and equips them through the same server-validated item path as Shop avatars. Guests and members without ownership do not receive these reward options. Two regression tests cover picker visibility and item-ID resolution (84 total tests passed). The challenge header uses the shared information artwork; its native rules dialog has explicit centered positioning and bounded scrolling for desktop/mobile viewports.
+
+## December 2026 — Christmas Day
+
+Migration `20261015154840_december_christmas_collection.sql` adds 31 uniquely solvable Medium puzzles and a private collection/reward registry. `get_monthly_collection` scopes progress and claims by month; default status uses the server clock. The UI supports switching November/December. Playable dates must belong to the active month; past rewards remain claimable.
+
+Rewards at 5/10/15/20/25/30 dates: Snowflake Girl (Avatar), Candy Cane Orbit (Frame), Winter Wonderland (Theme), Christmas Boy (Avatar), Starlight Wreath (Frame), Christmas Eve (Theme). Avatars show head and shoulders; frames have transparent open centers. Originals: `assets/space/monthly/christmas-day/`. Export: `scripts/prepare-december-art.py`.
+
+Staging preview: December 15. November ownership and progress remain intact. No December rewards were retained from QA. All 31 server solutions, duplicate payouts, month isolation, six idempotent claims and equipment passed transactional tests rolled back through intentional PASS_ROLLED_BACK exceptions. Vitest: 90 tests passed; ESLint, TypeScript and Vite/PWA build passed. January–October 2027 are design mockups only.
