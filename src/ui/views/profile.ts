@@ -1,6 +1,5 @@
-import { RARE_AVATAR_CATALOG } from '@lib/rare-avatar-catalog';
 import { framedAvatarHTML } from '../components/avatar-frame';
-import { AVATAR_OPTIONS, PAID_AVATAR_ITEMS, avatarArtHTML } from '../components/avatar-art';
+import { avatarPickerOptions, avatarItemId, avatarArtHTML } from '../components/avatar-art';
 import { getGuestIdentity, saveGuestIdentity } from '@lib/guest-identity';
 // =====================================================================
 // Profile view — avatar picker, editable display name, stats summary
@@ -41,7 +40,7 @@ export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmo
   const isGuest = !isSignedIn;
   const currentEmoji = isGuest ? getGuestIdentity().emoji : (state.equipped.avatar?.item_id as string) ?? (state.equipped.avatar?.emoji as string) ?? '👤';
   const avatarLocked = (id: string) => {
-    const itemId = PAID_AVATAR_ITEMS[id] ?? (id.startsWith('avatar_rare_') ? id : null);
+    const itemId = avatarItemId(id);
     return !!itemId && (isGuest || !state.inventory.includes(itemId));
   };
   const displayName = profile.display_name || profile.username || (isGuest ? 'Guest' : 'Player');
@@ -158,8 +157,8 @@ ${ic.notes(26)}
         <button class="modal-close" id="avatar-picker-close" aria-label="Close avatar picker">${ic.close(24)}</button>
         <h2 id="avatar-picker-title">Choose your avatar</h2>
       <div id="avatar-grid" class="avatar-grid">
-        ${[...AVATAR_OPTIONS, ...RARE_AVATAR_CATALOG.map(item => ({ id: item.id, name: item.name, art: (size = 48) => avatarArtHTML(item.id, size) }))].sort((a, b) => Number(avatarLocked(a.id)) - Number(avatarLocked(b.id))).map(option => {
-          const itemId = PAID_AVATAR_ITEMS[option.id] ?? (option.id.startsWith('avatar_rare_') ? option.id : null);
+        ${avatarPickerOptions(state.inventory,isGuest).sort((a, b) => Number(avatarLocked(a.id)) - Number(avatarLocked(b.id))).map(option => {
+          const itemId = avatarItemId(option.id);
           const locked = !!itemId && (isGuest || !state.inventory.includes(itemId));
           return `<button class="avatar-cell${(option.id === currentEmoji || itemId === currentEmoji) ? ' selected' : ''}${locked ? ' avatar-cell--locked' : ''}" data-emoji="${option.id}" ${itemId ? `data-item-id="${itemId}"` : ''} aria-label="${option.name}${locked ? ' — Locked, available in Shop' : ''}"><span class="avatar-cell-art">${option.art(48)}</span>${locked ? `<span class="avatar-cell-lock" aria-hidden="true">${ic.lock(14)}</span>` : ''}</button>`;
         }).join('')}

@@ -70,3 +70,15 @@ export const PAID_AVATAR_ITEMS: Record<string, string> = {
   'space_astra-knight': 'avatar_face_cool',
   'space_solar-lion': 'avatar_face_lion',
 };
+
+export function avatarItemId(id: string): string | null {
+  return PAID_AVATAR_ITEMS[id] ?? (id.startsWith('avatar_rare_') || id.startsWith('avatar_monthly_') ? id : null);
+}
+
+export function avatarPickerOptions(inventory: readonly string[], isGuest: boolean) {
+  const monthly = [
+    { id: 'avatar_monthly_lotus_otter', name: 'Lotus Girl' },
+    { id: 'avatar_monthly_moon_rabbit', name: 'Moonlit Boy' },
+  ].filter(item => !isGuest && inventory.includes(item.id));
+  return [...AVATAR_OPTIONS, ...[...RARE_AVATAR_CATALOG, ...monthly].map(item => ({ id: item.id, name: item.name, art: (size = 48) => avatarArtHTML(item.id,size) }))];
+}

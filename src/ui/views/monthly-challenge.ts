@@ -1,4 +1,5 @@
 import { ic } from '@ui/icons';
+import infoIcon from '@images/space/replacements/information.webp';
 import { useStore } from '@state/store';
 import { todayUtc } from '@lib/format';
 import { MONTHLY_REWARDS, monthCells, monthlyDayState, rewardState, getMonthlyStatus, claimMonthlyReward, type MonthlyStatus } from '@lib/monthly-challenge';
@@ -21,7 +22,7 @@ export function mountMonthlyChallengeView(root: HTMLElement, props: { onBack: ()
     const ended = status.today > '2026-11-30';
     const done = status.completed.includes(selected);
     root.innerHTML = `<section class="view view--monthly">
-      <header class="monthly-topbar"><button class="icon-btn" id="monthly-back" aria-label="Back">${ic.back(26)}</button><h1>Monthly Challenge</h1><button class="icon-btn" id="monthly-help" aria-label="Challenge rules">?</button></header>
+      <header class="monthly-topbar"><button class="icon-btn" id="monthly-back" aria-label="Back">${ic.back(26)}</button><h1>Monthly Challenge</h1><button class="icon-btn" id="monthly-help" aria-label="Challenge rules"><img src="${infoIcon}" width="22" height="22" alt=""></button></header>
       <div class="monthly-hero"><img src="${MONTHLY_ART.hero}" alt="A friendly space robot floating a lotus krathong under the moon"><div class="monthly-hero-copy"><p>November 2026</p><h2>Moonlit Wishes</h2><span>Little lights. Cosmic wishes.</span></div></div>
       ${status.preview ? '<p class="monthly-notice">Staging preview · November 15</p>' : ''}
       <div class="monthly-surface monthly-progress"><strong>${count} / 30 days completed</strong><progress max="30" value="${count}" aria-label="Completed puzzle dates"></progress><p>Missed a day? Play it later.</p></div>
