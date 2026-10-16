@@ -6462,7 +6462,7 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .monthly-theme-preview { position: relative; width: 100%; height: 100%; display: grid; place-items: center; --monthly-board-bg: var(--cell-bg); --monthly-board-ink: var(--cell-text); }
 .monthly-theme-preview > img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
 .monthly-mini-board { position: relative; display: grid; grid-template-columns: repeat(9,1fr); width: 78%; aspect-ratio: 1; border: 1px solid var(--monthly-board-ink); background: var(--monthly-board-bg); color: var(--monthly-board-ink); }
-.monthly-mini-board span { display: grid; place-items: center; min-width: 0; border-right: 1px solid var(--app-border); border-bottom: 1px solid var(--app-border); font-size: clamp(5px,1.4vw,9px); line-height: 1; }
+.monthly-mini-board span { display: grid; place-items: center; min-width: 0; border-right: 1px solid var(--monthly-board-grid, var(--app-border)); border-bottom: 1px solid var(--monthly-board-grid, var(--app-border)); font-size: clamp(5px,1.4vw,9px); line-height: 1; }
 .monthly-mini-board span:nth-child(3n) { border-right-color: var(--monthly-board-ink); }
 .monthly-mini-board span:nth-child(n+19):nth-child(-n+27), .monthly-mini-board span:nth-child(n+46):nth-child(-n+54) { border-bottom-color: var(--monthly-board-ink); }
 .monthly-theme-preview--dark { --monthly-board-bg: #202247; --monthly-board-ink: #eeecff; }
