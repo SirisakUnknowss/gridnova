@@ -42,6 +42,8 @@ Apply the following reviewed append-only files to the verified production projec
 
 Explicitly exclude `20261014175634_staging_daily_automation.sql`. Never provision a staging scheduler marker in production to make that guard pass. Do not copy staging Vault values, accounts, inventory, wallets or preview overrides.
 
+Also exclude `20261016160636_retire_staging_monthly_test_grants.sql`: it only retires six items explicitly labelled `staging_monthly_qa_grant` in isolated staging. A local rollback backup was saved outside Git, affected equipped slots were reset before retirement, and unrelated inventory/wallet data was preserved. Staging is now on the real server date (`preview_today IS NULL`), not the earlier December preview.
+
 Verify default monthly config has `preview_today IS NULL`. Validate the available collections and puzzle counts without completing puzzles or issuing rewards to live players. Run ownership/reward SQL regression scripts on staging only, with rollback, before release. Production returning-player ownership must remain intact.
 
 Review changed Edge Functions individually before promotion; retain the live production scheduler/reminder behavior until its separate production rollout is prepared. A deploy-all command is not an acceptable promotion plan for staging-specific functions.

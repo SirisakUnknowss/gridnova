@@ -1,5 +1,6 @@
 ## 2.0.0 — 2026-10-16 (staging)
 
+- Keep all five My Collection categories visible in two rows on mobile; prevent the category bar collapsing into a scrollbar. Retire six explicitly tagged staging-only monthly test grants and restore their equipped defaults.
 - Limit Monthly Challenge to the current server month. Remove the month selector and block past/future collection reads and expired claims; keep already-owned cosmetics.
 - Hide Monthly Challenge until the server date reaches November 1, 2026 UTC. Add a two-step monthly collection welcome with six real reward previews, shown once per account/month on each device after acknowledgement.
 - Show only the tappable circular profile portrait in the Home header, without the username or guest ID.

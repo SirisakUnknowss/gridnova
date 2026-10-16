@@ -6486,8 +6486,9 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
   .view--home .daily-hero-link { min-height: 44px; margin-top: 4px; font-size: 14px; }
 }
 
-.collection-tabs { overflow-x: auto; justify-content: flex-start; max-width: 100%; }
-.view--shop .collection-tabs .shop-tab { flex: 0 0 auto; min-height: 44px; padding-inline: 14px; }
+.collection-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); flex: 0 0 auto; gap: 8px; overflow: visible; max-width: 100%; }
+.view--shop .collection-tabs .shop-tab { grid-column: span 2; min-height: 44px; padding-inline: 6px; font-size: 12px; }
+.view--shop .collection-tabs .shop-tab:nth-child(n+4) { grid-column: span 3; }
 .collection-background-preview { width: 100%; height: 100px; border-radius: 16px; border: 1px solid var(--app-border); }
 .collection-board-preview { display: grid; grid-template-columns: repeat(3, 1fr); width: 100px; aspect-ratio: 1; gap: 2px; background: var(--border-thick); border: 2px solid var(--border-thick); }
 .collection-board-preview span { display: grid; place-items: center; background: var(--board-cell-bg, var(--cell-bg)); color: var(--cell-text); }
