@@ -8,7 +8,7 @@ import { pageArtHTML } from '../components/page-art';
 // Shop view — browse / purchase / equip items
 // =====================================================================
 import * as api from '@lib/api';
-import { useStore } from '@state/store';
+import { useStore, accountScope } from '@state/store';
 import { escapeHtml, formatNumber } from '@lib/format';
 import { applyTheme, THEMES } from '@lib/themes';
 import { countUp, floatReward } from '@lib/animate';
@@ -151,6 +151,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   }
 
   function render() {
+    if (!alive) return;
     if (loading) {
       gridEl.innerHTML = `<div class="shop-loading">Loading items…</div>`;
       return;
@@ -298,6 +299,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   }
 
   async function buy(itemId: string, btn: HTMLButtonElement) {
+    const currentAccount = accountScope();
     const item = items.find((i) => i.id === itemId);
     if (!item || item.catalogPending) return;
     const requiredTheme = item.category === 'avatar' && typeof item.metadata?.theme_id === 'string' ? item.metadata.theme_id : null;
@@ -308,9 +310,11 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
     if (!useStore.getState().user || useStore.getState().user?.is_anonymous) { props.nav.onProfile(); return; }
     btn.disabled = true;
     if (!await confirmPurchase(item)) { btn.disabled = false; return; }
+    if (!alive || !currentAccount()) return;
     btn.disabled = true; btn.textContent = '…';
     try {
       const { data, error } = await api.purchaseItem(itemId);
+      if (!currentAccount()) return;
       if (error || !data?.success || typeof data.new_balance !== 'number') throw error ?? new Error('Purchase failed');
       const prevCoins = useStore.getState().coins;
       useStore.setState({ coins: data.new_balance });
@@ -328,6 +332,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   }
 
   async function equip(itemId: string, btn: HTMLButtonElement) {
+    const currentAccount = accountScope();
     const item = items.find((i) => i.id === itemId);
     if (!item) return;
     const state = useStore.getState();
@@ -349,6 +354,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
 
     try {
       const { error } = await api.equipItem(payload);
+      if (!currentAccount()) return;
       if (error) throw error;
       useStore.getState().setEquipped(payload);
       if (item.category === 'theme' && THEMES[itemId]) { applyTheme(itemId); sfxThemeChange(); }
@@ -362,16 +368,17 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   }
 
   async function load() {
+    const currentAccount = accountScope();
     const userId = useStore.getState().user?.id;
     const member = !!userId && !useStore.getState().user?.is_anonymous;
     loading = true; errorMsg = null; render();
     try {
       const [shopItems, inventory, equipped] = await Promise.all([
         api.getShopItems(),
-        member ? api.getInventory().catch(() => []) : Promise.resolve([]),
-        member ? api.getEquipped().catch(() => null) : Promise.resolve(null),
+        member ? api.getInventory() : Promise.resolve([]),
+        member ? api.getEquipped() : Promise.resolve(null),
       ]);
-      if (!alive || useStore.getState().user?.id !== userId) return;
+      if (!alive || !currentAccount()) return;
       items = ((shopItems ?? []) as ShopItem[]).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_') || item.unlock_type === 'monthly'))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
       useStore.getState().setInventory((inventory ?? []).map((r: { item_id: string }) => r.item_id));
       if (equipped) {

@@ -376,7 +376,10 @@ export async function getShopItems(category?: string) {
 }
 
 export async function getInventory() {
-  const { data, error } = await supabase.from('user_inventory').select('*');
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user || user.is_anonymous) return [];
+  const { data, error } = await supabase.from('user_inventory').select('*').eq('user_id', user.id);
   if (error) throw error;
   return data ?? [];
 }

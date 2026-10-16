@@ -8,7 +8,7 @@ import loadingArt from '@images/space/loading.webp';
 // =====================================================================
 import './ui/styles/main.css';
 import { getCurrentUser, onAuthChange } from './lib/auth';
-import { useStore } from './state/store';
+import { useStore, accountScope } from './state/store';
 import * as api from './lib/api';
 import { initAnalytics, captureError } from './lib/analytics';
 import { migrateFromV1, shouldMigrate } from './lib/migrate-v1';
@@ -98,16 +98,16 @@ function clearView(view?: string) {
 }
 
 async function loadUserData(): Promise<void> {
-  const loadingUserId = useStore.getState().user?.id;
+  const currentAccount = accountScope();
   try {
     const [wallet, progression, profile, equipped, inventory] = await Promise.all([
       api.getWallet(),
       api.getProgression(),
       useStore.getState().user ? api.getProfile(useStore.getState().user!.id) : Promise.resolve(null),
       api.getEquipped().catch(() => null),
-      api.getInventory().catch(() => []),
+      api.getInventory().catch(() => null),
     ]);
-    if (useStore.getState().user?.id !== loadingUserId) return;
+    if (!currentAccount()) return;
     const set = useStore.setState;
     if (wallet) set({ coins: wallet.coins });
     if (progression) set({

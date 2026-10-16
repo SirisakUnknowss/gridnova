@@ -15,6 +15,7 @@ interface Equipped {
 }
 
 interface AppState {
+  accountRevision: number;
   user: User | null;
   profile: { username?: string; display_name?: string; avatar_url?: string; country?: string; bio?: string } | null;
   coins: number;
@@ -55,6 +56,7 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set, get) => ({
+  accountRevision: 0,
   user: null,
   profile: null,
   coins: 0,
@@ -74,6 +76,7 @@ export const useStore = create<AppState>((set, get) => ({
   heartsInfiniteUntil: null,
 
   setUser: (user) => set(get().user?.id === user?.id ? { user } : {
+    accountRevision: get().accountRevision + 1,
     user, profile: null, inventory: [],
     equipped: { theme_id: null, background_id: null, board_color_id: null, frame_id: null, avatar: { emoji: '👤' } },
   }),
@@ -95,3 +98,8 @@ export const useStore = create<AppState>((set, get) => ({
     heartsInfiniteUntil: h.infinite_until,
   }),
 }));
+
+export function accountScope(): () => boolean {
+  const { accountRevision, user } = useStore.getState();
+  return () => useStore.getState().accountRevision === accountRevision && useStore.getState().user?.id === user?.id;
+}

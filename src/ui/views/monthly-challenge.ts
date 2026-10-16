@@ -1,6 +1,6 @@
 import { ic } from '@ui/icons';
 import infoIcon from '@images/space/replacements/information.webp';
-import { useStore } from '@state/store';
+import { useStore, accountScope } from '@state/store';
 import { todayUtc } from '@lib/format';
 import { monthCells, monthlyDayState, rewardState, getMonthlyStatus, claimMonthlyReward, type MonthlyStatus } from '@lib/monthly-challenge';
 import { MONTHLY_COLLECTIONS, activeMonthlyCollection, monthlyCollection } from '@lib/monthly-catalog';
@@ -8,6 +8,7 @@ import { MONTHLY_ART, monthlyThemePreview } from '../components/monthly-art';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 
 export function mountMonthlyChallengeView(root: HTMLElement, props: { onBack: () => void; onPlay: (date: string) => Promise<void>; onSignIn: () => void; onCollection: () => void; onToast: (message: string) => void; nav: BottomNavCallbacks }) {
+  const currentAccount = accountScope();
   let alive = true;
   let loading = true;
   let failed = false;
@@ -18,7 +19,7 @@ export function mountMonthlyChallengeView(root: HTMLElement, props: { onBack: ()
   let selected = status.today.startsWith(collection.month) ? status.today : collection.start;
   const member = !!useStore.getState().user && !useStore.getState().user?.is_anonymous;
   function render() {
-    if (!alive) return;
+    if (!alive || !currentAccount()) return;
     const count = status.completed.filter(date => date.startsWith(collection.month)).length;
     const before = status.today < collection.start;
     const ended = status.today > collection.end;
@@ -64,6 +65,7 @@ export function mountMonthlyChallengeView(root: HTMLElement, props: { onBack: ()
       busy = true; render();
       try {
         await claimMonthlyReward(button.dataset.claim!);
+        if (!currentAccount()) return;
         useStore.getState().addToInventory(button.dataset.claim!);
         props.onToast('Reward added to My Collection');
         await load();
@@ -79,7 +81,7 @@ export function mountMonthlyChallengeView(root: HTMLElement, props: { onBack: ()
         collection = activeMonthlyCollection(clock.today);
       }
       const next = await getMonthlyStatus(collection.month);
-      if (!alive) return;
+      if (!alive || !currentAccount()) return;
       status = next;
       if ((!initialized || selected > status.today) && status.today.startsWith(collection.month)) selected = status.today;
       initialized = true;

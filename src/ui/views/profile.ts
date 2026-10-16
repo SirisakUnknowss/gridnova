@@ -4,7 +4,7 @@ import { getGuestIdentity, saveGuestIdentity } from '@lib/guest-identity';
 // =====================================================================
 // Profile view — avatar picker, editable display name, stats summary
 // =====================================================================
-import { useStore } from '@state/store';
+import { useStore, accountScope } from '@state/store';
 import * as api from '@lib/api';
 import { showShareModal } from './share-modal';
 import { escapeHtml, formatNumber } from '@lib/format';
@@ -30,6 +30,7 @@ export interface ProfileProps {
 
 
 export function mountProfileView(root: HTMLElement, props: ProfileProps): { unmount: () => void } {
+  const currentAccount = accountScope();
   const state = useStore.getState();
   const user = state.user;
   const profile = state.profile ?? {};
@@ -254,6 +255,7 @@ ${ic.notes(26)}
       `;
       try {
         await api.updateProfile({ avatar_url: null });
+        if (!currentAccount()) return;
         useStore.setState({
           profile: { ...(useStore.getState().profile ?? {}), avatar_url: undefined }
         });
@@ -288,7 +290,9 @@ ${ic.notes(26)}
 
       try {
         const publicUrl = await api.uploadAvatar(file);
+        if (!currentAccount()) return;
         await api.updateProfile({ avatar_url: publicUrl });
+        if (!currentAccount()) return;
         useStore.setState({
           profile: { ...(useStore.getState().profile ?? {}), avatar_url: publicUrl }
         });
@@ -326,11 +330,16 @@ ${ic.notes(26)}
         overlay.querySelector<HTMLButtonElement>('[data-open-shop]')?.focus();
         return;
       }
-      if (itemId) {
+      const newAvatar = itemId ? { item_id: itemId } : { emoji };
+      if (!isGuest) {
         cell.disabled = true;
         try {
-          const { error } = await api.equipItem({ avatar: { item_id: itemId } });
+          const { error } = await api.equipItem({ avatar: newAvatar });
           if (error) throw error;
+          if (!currentAccount()) return;
+          await api.updateProfile({ avatar_url: null });
+          if (!currentAccount()) return;
+          useStore.setState({ profile: { ...useStore.getState().profile, avatar_url: undefined } });
         } catch {
           props.onToast('Unable to equip avatar');
           return;
@@ -341,23 +350,11 @@ ${ic.notes(26)}
       avatarGrid.querySelectorAll('.avatar-cell').forEach((c) => c.classList.remove('selected'));
       cell.classList.add('selected');
       avatarBtn.innerHTML = framedAvatarHTML(avatarArtHTML(emoji, 76), isGuest ? null : useStore.getState().equipped.frame_id, 76);
-      const newAvatar = itemId ? { item_id: itemId } : { emoji };
       if (isGuest) saveGuestIdentity({ ...getGuestIdentity(), emoji });
       closePicker();
       useStore.getState().setEquipped({ avatar: newAvatar });
 
-      try {
-        if (!isGuest) {
-          await api.updateProfile({ avatar_url: null });
-          useStore.setState({
-            profile: { ...(useStore.getState().profile ?? {}), avatar_url: undefined }
-          });
-          if (optRemove) optRemove.style.display = 'none';
-        }
-        if (!isGuest && !itemId) await api.equipItem({ avatar: newAvatar });
-      } catch {
-        // local-only fallback
-      }
+      if (optRemove) optRemove.style.display = 'none';
       props.onToast('Avatar updated');
     });
   });

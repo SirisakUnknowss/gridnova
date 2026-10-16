@@ -1,6 +1,6 @@
 import * as api from '@lib/api';
 import { framePreviewHTML } from '../components/avatar-frame';
-import { useStore } from '@state/store';
+import { useStore, accountScope } from '@state/store';
 import { applyTheme, THEMES } from '@lib/themes';
 import { THEME_BACKGROUNDS } from '@lib/theme-backgrounds';
 import { escapeHtml } from '@lib/format';
@@ -10,6 +10,7 @@ import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../compon
 import { ic } from '@ui/icons';
 interface Item { id: string; category: string; name: string; price_coin: number; emoji?: string }
 export function mountCollectionView(root: HTMLElement, props: { onBack: () => void; onShop: () => void; onToast: (message: string) => void; nav: BottomNavCallbacks }) {
+  const currentAccount = accountScope();
   let category = 'theme';
   let items: Item[] = [];
   let alive = true;
@@ -23,7 +24,7 @@ export function mountCollectionView(root: HTMLElement, props: { onBack: () => vo
     render();
   }));
   function render() {
-    if (!alive) return;
+    if (!alive || !currentAccount()) return;
     const state = useStore.getState();
     const grid = root.querySelector<HTMLElement>('#collection-grid')!;
     const visible = items.filter(item => item.category === category);
@@ -40,16 +41,18 @@ export function mountCollectionView(root: HTMLElement, props: { onBack: () => vo
       try {
         if (state.user && !state.user.is_anonymous) {
           const { error } = await api.equipItem(payload);
+          if (!currentAccount()) return;
           if (error) throw error;
           if (item.category === 'avatar') {
             await api.updateProfile({ avatar_url: null });
+            if (!currentAccount()) return;
             useStore.setState({ profile: { ...useStore.getState().profile, avatar_url: undefined } });
           }
         } else if (item.category === 'avatar') {
           if (!item.emoji) return;
           saveGuestIdentity({ ...getGuestIdentity(), emoji: item.emoji });
         }
-        if (!alive) return;
+        if (!alive || !currentAccount()) return;
         useStore.getState().setEquipped(payload);
         if (item.category === 'theme') applyTheme(item.id);
         props.onToast(item.id === 'frame_none' ? 'Frame removed' : `${item.name} equipped`);
@@ -62,7 +65,7 @@ export function mountCollectionView(root: HTMLElement, props: { onBack: () => vo
       const state = useStore.getState();
       const member = !!state.user && !state.user.is_anonymous;
       const [catalog, inventory] = await Promise.all([api.getShopItems(), member ? api.getInventory() : Promise.resolve([])]);
-      if (!alive) return;
+      if (!alive || !currentAccount()) return;
       if (member) state.setInventory((inventory ?? []).map((row: { item_id: string }) => row.item_id));
       items = (catalog as Item[]).filter(item => ['theme', 'avatar', 'avatar_frame'].includes(item.category) && (item.price_coin === 0 || (member && useStore.getState().inventory.includes(item.id)))).map(item => ({ ...item, emoji: item.id === 'avatar_face_happy' ? 'space_orbit-bunny' : undefined, name: item.category === 'avatar' ? shopAvatarName(item.id) ?? item.name : item.id === 'theme_neon' ? 'Sky Citadel' : item.name }));
       if (member) items.unshift({ id: 'frame_none', category: 'avatar_frame', name: 'No frame', price_coin: 0 });
