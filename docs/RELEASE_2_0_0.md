@@ -38,6 +38,7 @@ Apply the following reviewed append-only files to the verified production projec
 7. `20261016033721_monthly_collections_january_october_2027.sql`
 8. `20261016034814_enforce_equipped_cosmetic_ownership.sql`
 9. `20261016081559_owned_retired_collection_visibility.sql`
+10. `20261016151310_monthly_current_collection_only.sql`
 
 Explicitly exclude `20261014175634_staging_daily_automation.sql`. Never provision a staging scheduler marker in production to make that guard pass. Do not copy staging Vault values, accounts, inventory, wallets or preview overrides.
 
@@ -67,5 +68,7 @@ Record the pre-release production deployment ID and commit before deployment. Ro
 ## Monthly discovery
 
 Home starts with the Monthly entry hidden and reveals it only after a successful server-clock response at or after November 1, 2026 UTC (07:00 Thailand). No device-clock fallback can reveal it. Home checks again every minute and when returning to the app; late responses from a previous view/account are discarded. Opening the Monthly page has the same server-clock gate.
+
+Only the active catalog month can be opened. There is no month selector or archive, no preview of future collections, and no post-month puzzle play or reward claiming. The server enforces collection read and claim windows; already-owned cosmetics remain usable. Apply migration 20261016151310_monthly_current_collection_only.sql before promoting this client.
 
 The first Home visit for each catalog month offers a two-step introduction: current collection announcement, then six actual rewards with milestones and a button into Monthly Challenge. It does not teach Sudoku. Existing onboarding and What's New take priority. Acknowledgement is local, keyed by account and month, with a session fallback if browser storage is blocked. Another device/browser can show the introduction again; no server ownership or reward data is changed. Future collections beyond October 2027 need catalog entries before they can be announced.

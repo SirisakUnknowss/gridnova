@@ -28,10 +28,8 @@ export function rewardState(days: number, completed: number, claimed: boolean) {
 
 export interface MonthlyStatus { today: string; preview: boolean; completed: string[]; claimed: string[] }
 export interface MonthlyTicket { ticket_id: string; puzzle: string; date: string }
-export async function getMonthlyStatus(month?: string): Promise<MonthlyStatus> {
-  const { data, error } = month
-    ? await supabase.rpc('get_monthly_collection', { p_month: month })
-    : await supabase.rpc('get_monthly_challenge');
+export async function getMonthlyStatus(): Promise<MonthlyStatus> {
+  const { data, error } = await supabase.rpc('get_monthly_challenge');
   if (error) throw error;
   return data as MonthlyStatus;
 }

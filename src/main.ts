@@ -43,7 +43,7 @@ import { mountRecapView } from './ui/views/recap';
 import { mountCalendarView } from './ui/views/calendar';
 import { mountMonthlyChallengeView } from './ui/views/monthly-challenge';
 import { startMonthlyPuzzle, submitMonthlyPuzzle, getMonthlyStatus } from './lib/monthly-challenge';
-import { currentMonthly, launchedMonthly, monthlyWelcomeSeen } from './lib/monthly-discovery';
+import { currentMonthly, monthlyWelcomeSeen } from './lib/monthly-discovery';
 import { showMonthlyWelcome } from './ui/views/monthly-welcome';
 import { mountLedgerView } from './ui/views/ledger';
 import { mountSettingsView } from './ui/views/settings';
@@ -633,7 +633,7 @@ async function showMonthlyChallenge() {
   try {
     const status = await getMonthlyStatus();
     if (!sameAccount() || screen !== root.firstElementChild) return;
-    if (!launchedMonthly(status.today)) { showHome(); return; }
+    if (!currentMonthly(status.today)) { showHome(); return; }
   } catch {
     if (sameAccount() && screen === root.firstElementChild) toast('Could not load Monthly Challenge. Please try again.');
     return;

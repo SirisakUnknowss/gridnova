@@ -7,7 +7,7 @@ import { framedAvatarHTML } from '../components/avatar-frame';
 // =====================================================================
 import { useStore, accountScope } from '@state/store';
 import { getMonthlyStatus } from '@lib/monthly-challenge';
-import { launchedMonthly } from '@lib/monthly-discovery';
+import { currentMonthly } from '@lib/monthly-discovery';
 import { formatCompact, todayUtc } from '@lib/format';
 import { levelProgress } from '@lib/level';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
@@ -125,7 +125,7 @@ export function homeViewHTML(): string {
 
       <button class="pm-row monthly-home-entry" id="open-monthly" hidden>
         <span class="pm-row-icon">${ic.daily(40)}</span>
-        <span class="pm-row-body"><span class="pm-row-title">Monthly Challenge</span><span class="pm-row-sub">Explore monthly puzzles &amp; collections</span></span>
+        <span class="pm-row-body"><span class="pm-row-title">Monthly Challenge</span><span class="pm-row-sub">This month’s puzzles &amp; rewards</span></span>
         <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
       </button>
 
@@ -220,7 +220,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   const monthlyEntry = root.querySelector<HTMLButtonElement>('#open-monthly')!;
   const notifyMonth = () => {
     if (!alive || !sameAccount()) return;
-    monthlyEntry.hidden = !launchedMonthly(monthlyToday);
+    monthlyEntry.hidden = !currentMonthly(monthlyToday);
     if (!monthlyEntry.hidden && monthlyToday) props.onMonthlyReady?.(monthlyToday);
   };
   const refreshMonth = async () => {
