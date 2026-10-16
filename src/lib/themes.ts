@@ -246,7 +246,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
   if (dark) {
     for (const [key,value] of Object.entries(theme.tokens)) root.style.setProperty(key,value);
   }
-  if (root === document.documentElement) {
+  if (root === document.documentElement && themeId) {
     try { localStorage.setItem(ACTIVE_THEME_KEY, id); } catch { /* private */ }
   }
 }
