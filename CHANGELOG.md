@@ -1,5 +1,7 @@
 ## 2.0.0 — 2026-10-16 (staging)
 
+- Use simple, high-contrast functional symbols for 22–40px UI icons. Preserve all 35 detailed art sets and use their calendars only as larger hero illustrations.
+
 - Replace icon decorations with 35 complete nine-icon art sets for all Shop and monthly themes. Theme packs load on demand, remain available offline after use, and previews stay isolated from equipped themes.
 
 - Restore Dark Mode contrast, Daily/Monthly labels and Leaderboard & recap navigation.

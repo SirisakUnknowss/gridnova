@@ -33,14 +33,15 @@ it('switches complete packs with the equipped theme while keeping a preview isol
   expect(themeIconProperties('unknown-theme')).toEqual(themeIconProperties('theme_classic'));
 });
 
-it('replaces complete navigation and mode icons but preserves currency, identity and game controls', () => {
+it('uses functional vector symbols for small controls and preserves currency, identity and game controls', () => {
   for (const icon of [ic.home, ic.profile, ic.shop, ic.achievements, ic.daily, ic.practice, ic.gamepad, ic.quests, ic.trophy, ic.clock]) {
-    expect(icon(32)).toContain('theme-icon-picture');
+    expect(icon(32)).toContain('class="functional-icon"');
+    expect(icon(32)).not.toContain('theme-icon-picture');
     expect(icon(32)).not.toContain('theme-icon-ornament');
     expect(icon(32)).not.toContain('<img');
     expect(icon(32)).toContain('aria-hidden="true"');
   }
   for (const icon of [ic.coin, ic.heart, ic.guest, ic.member, ic.back, ic.close, ic.undo, ic.redo, ic.erase, ic.notes, ic.hint, ic.soundOff]) {
-    expect(icon(24)).not.toContain('theme-icon-picture');
+    expect(icon(24)).not.toContain('functional-icon');
   }
 });

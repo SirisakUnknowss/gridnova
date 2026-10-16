@@ -207,6 +207,9 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
   const surface = dark ? theme.tokens['--cell-bg'] ?? '#222244' : `color-mix(in srgb, ${white} 97%, ${primary})`;
   const text = dark ? theme.tokens['--cell-text'] ?? '#e0e0e0' : `color-mix(in srgb, ${primary} 25%, #182033)`;
   const appTokens: Record<string, string> = {
+    '--icon-ink': `color-mix(in srgb, ${primary} ${dark ? 25 : 35}%, ${text})`,
+    '--icon-paper': `color-mix(in srgb, ${surface} 88%, ${primary})`,
+    '--icon-accent': `color-mix(in srgb, ${primary} ${dark ? 50 : 65}%, ${white})`,
     '--brand-primary': primary,
     '--brand-secondary': `color-mix(in srgb, ${primary} 55%, ${white})`,
     '--brand-gradient': `linear-gradient(135deg, ${primary}, color-mix(in srgb, ${primary} 45%, ${white}))`,

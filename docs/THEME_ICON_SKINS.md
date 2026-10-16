@@ -1,41 +1,39 @@
-# Full-object theme icon sets — staging 2.0.0
+# Functional small icons — staging 2.0.0
 
-The earlier small accessory overlays were rejected as too subtle at navigation size. This implementation replaces the whole illustrated object for every theme, rather than placing a motif over an existing icon.
+The detailed 35-theme art collection is preserved unchanged. Small controls now use simple, familiar vector silhouettes rather than shrinking ornate miniatures. Detail is reserved for the large Home illustration.
 
-## Nine full objects per theme
+| Function | Small symbol |
+|---|---|
+| Home | House with roof and doorway |
+| Medals / Rank | Two-handled trophy |
+| Shop | Shopping bag with handle |
+| Profile navigation | Person, head and shoulders |
+| Daily / Monthly | Calendar with binding and four date marks |
+| Practice | Sudoku grid and pencil |
+| Play Mode | Game controller with D-pad and buttons |
+| Quests | Clipboard and large check |
+| Time / Reset | Clock face and hands |
 
-Each square transparent sheet uses three columns and three rows in this exact order:
+All symbols use a 24-unit viewBox and 2-unit strokes, no textures, decorative badges, particles or raster detail. The shape for a function stays consistent across all 35 themes. Theme-derived ink, surface and accent colors supply the palette. Navigation renders at 30px, Home statistics at 22px, mode entries at 40px; button targets and labels remain in place. Actual player avatars, coins/hearts, collectible item previews and Sudoku tools are unchanged.
 
-| Row | Left | Center | Right |
-|---|---|---|---|
-| 1 | Home: house | Medals: trophy | Shop: market |
-| 2 | Profile menu: astronaut helmet | Daily / Monthly: Sudoku calendar | Practice: Sudoku book |
-| 3 | Play Mode: ringed planet | Quests: checked scroll | Time / Reset: observatory clock |
+## New source
 
-The larger Daily hero uses the same newly drawn calendar. Actual player avatars, cosmetic previews, coins, hearts, sound/back/close and Sudoku controls retain their identity. All 35 theme IDs have different image sheets and object designs, including distinct light/dark monthly rewards. The equipped theme controls the active art; the current month does not silently override it.
+- `src/ui/components/functional-icon.ts`: nine functional vector symbols.
+- `src/ui/components/theme-art.ts`: small vector controls; detailed artwork only for the `hero` role.
+- `src/lib/themes.ts`: contrasting icon color tokens for light/dark themes.
+- `src/ui/styles/main.css`: all presentation rules.
 
-## Files and generation
+## Preserved detailed artwork
 
-- `src/images/space/theme-icons/full/skin-<theme_id>.webp`: selected complete icon sheets, encoded with alpha preserved; no recoloring or accessories composited onto old icons.
-- `assets/space/theme-icons/full-icon-prompts.json`: per-theme art direction and complete built-in image_gen prompts. Christmas uses the separately recorded initial full-object prompt.
-- `assets/space/theme-icons/full-icon-assets.json`: exact asset paths, dimensions, byte sizes, hashes and nonempty-cell checks.
-- `scripts/prepare-theme-icon-packs.py`: validates square transparent sheets and encodes them as WebP without cropping or changing the artwork.
-- `src/lib/theme-icons.ts`: complete ID-to-sheet registry, inherited independently inside Shop previews.
-- `src/ui/components/theme-art.ts`: renders one full sprite per role, with no decorative overlay or visible old icon underneath. Navigation icons are 36px.
+- `src/images/space/theme-icons/full/skin-<theme_id>.webp`: all 35 original nine-icon sheets, unchanged (315 full illustrations).
+- `assets/space/theme-icons/full-icon-assets.json`: original file hashes, sizes and cell validation.
+- `assets/space/theme-icons/full-icon-prompts.json`: original built-in image_gen prompts; initial Christmas prompt in `christmas-full-source-prompt.txt`.
+- `scripts/prepare-theme-icon-packs.py`: original encoding/validation helper.
 
-Generation used built-in image_gen, one separate generation call per theme, with a transparent background. Raw outputs remain in Codex generated_images; all selected runtime images are saved in the workspace paths above. No new npm dependencies, backend changes, item ID changes or ownership changes.
-
-## Loading and offline behavior
-
-The 35 packs are excluded from Workbox precaching. A user downloads the selected/viewed sheet, not every theme on first launch. The service worker caches viewed same-origin `/assets/skin-*.webp` images, cache-first, capped at 40 sheets. A cached sheet works offline; failed responses are not stored. Cache write failure does not suppress a successful network response.
+The large Home hero can still show the detailed themed calendar. Pack loading remains on demand and service-worker caching remains bounded. No new npm dependencies or ownership/purchase changes.
 
 ## Verification
 
-Unit tests cover all theme IDs and distinct image files, nine nonempty transparent cells, complete-object rendering without old overlays, unchanged currency/identity/control icons, isolated previews, Classic reset, and on-demand cache behavior. Local browser preview is `/assets/space/qa/theme-icons-preview.html` while Vite is running. It changes only a scene root and does not equip items or persist a theme.
+Unit tests retain checks for all original artwork hashes and cover functional-vector rendering, preserved resource/control icons, and keeping detailed images out of 22/30/40px controls. Browser QA uses the actual Home and navigation layout, including light and dark themes and all 35 theme variants. Local manual preview remains `/assets/space/qa/theme-icons-preview.html` while Vite is running. Visual inspection is not a substitute for testing with unfamiliar players; the intent is to make every function identifiable from its conventional silhouette before decorative styling.
 
-### Verified result
-
-- 35 selected WebP packs, 315 complete icons, total 18,789,258 bytes across all packs (only the viewed pack is fetched).
-- Production build precache remains 169 entries, approximately 8.24 MB; no icon pack appears in the precache manifest.
-- 111 unit tests pass; lint and build pass.
-- Browser QA at 390px exercised all 35 theme IDs: 35 unique sheet URLs, no old overlay elements, no old images underneath sprites, four 36px navigation icons, readable Play text, no horizontal overflow.
+Verified in the browser across all 35 themes: the same nine semantic symbols, no raster art in small controls, one preserved large hero illustration, 30px navigation, no horizontal overflow at 390px. Measured outline-to-symbol-surface contrast is at least 6.43:1. Manual light/dark screenshots also cover the 22px statistics and 40px mode entries. Tests: 113 passing; lint and build pass. The preserved original image hashes continue to pass unchanged.
