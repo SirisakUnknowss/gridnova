@@ -1,6 +1,6 @@
 # GridNova 2.0.0 production preparation
 
-Status: staging candidate; production deployment requires the owner's final confirmation under AGENTS.md. Version 2.0.0 is the prepared bump from production 1.12.2. Do not increment it again merely for staging builds.
+Status: production release authorized by the owner on 2026-10-16 after the required final confirmation. Version 2.0.0 is the prepared bump from production 1.12.2. Do not increment it again merely for staging builds.
 
 ## Player-facing release notes (Thai)
 
@@ -19,7 +19,7 @@ The existing 2.0.0 candidate includes the fantasy UI refresh, illustrated frames
 Checked 2026-10-16 with account-scoped Supabase connectors:
 
 - Production: `sqjllqilozhxbzvfjhra` in the Supabase account. Migration history ends at `20261006093112_staging_access_hardening`; `monthly_private.config` does not exist.
-- Staging: `xrtgcxofjisqaigaaboy` in the Unknowss account. Monthly/ownership migrations are installed under consolidated history. `monthly_private.config.preview_today` is `2026-12-15` for staging QA only.
+- Staging: `xrtgcxofjisqaigaaboy` in the Unknowss account. Monthly/ownership migrations are installed under consolidated history. `monthly_private.config.preview_today` is NULL (real date); earlier December QA override was removed.
 - Production has not been mutated by this preparation.
 - A read-only aggregate check found zero equipped theme/background/board-color slots missing their catalog entry, and zero paid slots missing an inventory ownership row. This check does not cover every avatar/frame or replace post-release verification.
 
@@ -76,3 +76,11 @@ Only the active catalog month can be opened. There is no month selector or archi
 The first Home visit for each catalog month offers a two-step introduction: current collection announcement, then six actual rewards with milestones and a button into Monthly Challenge. It does not teach Sudoku. Existing onboarding and What's New take priority. Acknowledgement is local, keyed by account and month, with a session fallback if browser storage is blocked. Another device/browser can show the introduction again; no server ownership or reward data is changed. Future collections beyond October 2027 need catalog entries before they can be announced.
 
 Classic uses its original individual menu images and Daily calendar. Other themes retain their fantasy packs; generated Classic atlases remain archived.
+
+## Production execution — 2026-10-16
+
+Owner confirmed production deployment. Pre-release web commit: fa17d408e31205b4f3650050617b0d58dbab982e; GitHub deployment 6497464681. Tested staging commit: d66e64471f51597b480888f38033c4446f4db85f (118 tests, lint/build, CI and Deploy Web passed).
+
+Applied the ten allowlisted backend migrations sequentially to sudoku-daily, excluding both staging-only migrations. Production now has 12 collections, 365 puzzles and 72 reward definitions. preview_today remains NULL; get_monthly_challenge returns the real 2026-10-16 clock and no active collection. Inventory rows (4), equipped rows (2) and wallet total (1,952,234) were unchanged across migration checks. Deployed only purchase-item (v20, JWT verification retained); equip-item source was unchanged, and scheduler/reminder functions were preserved.
+
+Security advisor still reports existing public views/functions and Auth configuration findings. The monthly status/collection getters are intentionally public and date-gated; reward mutations require membership. No newly exposed monthly table lacks RLS. Existing findings are not a clean security audit and require separate review: https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view and https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable.

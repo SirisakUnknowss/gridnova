@@ -1,4 +1,4 @@
-## 2.0.0 — 2026-10-16 (staging)
+## 2.0.0 — 2026-10-16
 
 - Restore original Classic menu artwork and Daily calendar; retain fantasy packs for other themes.
 
@@ -13,7 +13,7 @@
 
 - Restore Dark Mode contrast, Daily/Monthly labels and Leaderboard & recap navigation.
 - Restore classic cosmetics in My Collection, including retired purchases.
-- Add English returning-player release notes. Production remains unchanged.
+- Add English returning-player release notes. 
 
 # Changelog
 
