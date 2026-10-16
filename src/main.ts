@@ -54,7 +54,7 @@ import { mountTermsOfServiceView } from './ui/views/terms-of-service';
 import { showWhatsNew, shouldAutoShowWhatsNew } from './ui/views/whats-new';
 import { showLevelUpModal } from './ui/views/level-up';
 import { applyTheme, loadCachedThemeId } from './lib/themes';
-import { applyBackground, loadCachedBgId } from './lib/backgrounds';
+import { applyBackground } from './lib/backgrounds';
 import { applyBoardColorFromItem } from './lib/board-colors';
 import { initPurchases, isPremiumEntitled } from './lib/purchases';
 import { setPremium } from './lib/premium';
@@ -130,8 +130,8 @@ async function loadUserData(): Promise<void> {
       });
       const hasExplicitThemeSelection = !!loadCachedThemeId();
       if (equipped.theme_id && hasExplicitThemeSelection) applyTheme(equipped.theme_id);
-      if (equipped.theme_id === 'theme_classic' || equipped.theme_id === 'theme_classic_v1') applyBackground('bg_default');
-      else if (equipped.background_id) applyBackground(equipped.background_id);
+      // Background is shared across themes; themes only change the colour system.
+      applyBackground('bg_default');
       if ((equipped as any).board_color_id) {
         api.getShopItem((equipped as any).board_color_id)
           .then((item) => applyBoardColorFromItem(item))
@@ -1125,8 +1125,7 @@ async function boot() {
   // Apply cached theme + background before first paint to avoid flicker
   const cachedTheme = loadCachedThemeId();
   applyTheme(cachedTheme);
-  const cachedBg = loadCachedBgId();
-  if (cachedBg) applyBackground(cachedBg);
+  applyBackground('bg_default');
 
   // Init sound (loads mute + volume preferences), then start looping
   // background music — autoplay policy is handled inside (retries on first
