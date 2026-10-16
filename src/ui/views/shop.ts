@@ -1,5 +1,6 @@
 import { homeViewHTML } from './home';
 import { RARE_AVATAR_CATALOG } from '@lib/rare-avatar-catalog';
+import { isShopListing } from '@lib/shop-catalog';
 import { THEME_BACKGROUNDS } from '@lib/theme-backgrounds';
 import { avatarArtHTML, shopAvatarName } from '../components/avatar-art';
 import { framePreviewHTML } from '../components/avatar-frame';
@@ -185,9 +186,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
 
       const isPremiumGated = PREMIUM_THEMES.has(item.id) && !isOwned && !isPremium();
       let action = '';
-      if (item.unlock_type === 'monthly' && !isOwned) {
-        action = '<span class="quest-tag">Monthly Challenge</span>';
-      } else if ((!state.user || state.user.is_anonymous) && item.category === 'theme') {
+      if ((!state.user || state.user.is_anonymous) && item.category === 'theme') {
         action = isEquipped ? '<span class="quest-tag">✓ Equipped</span>' : `<button class="btn btn--small" data-equip="${escapeHtml(item.id)}">Try theme</button>`;
       } else if (!isOwned && themeLocked) {
         action = `<button class="btn btn--small" disabled>${ic.lock(14)} Unlock theme first</button>`;
@@ -218,7 +217,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
           <div class="shop-preview">${preview}</div>
           <div class="shop-name">${escapeHtml(item.name)}</div>
           ${item.description ? `<div class="shop-desc">${escapeHtml(item.description)}</div>` : ''}
-          <div class="shop-price">${item.unlock_type === 'monthly' ? 'Monthly reward' : item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? escapeHtml(rarity)}</div>
+          <div class="shop-price">${item.price_coin === 0 ? 'Free' : ic.coin(16) + ' ' + formatNumber(item.price_coin)}</div><div class="shop-rarity">${RARITY_LABEL[rarity] ?? escapeHtml(rarity)}</div>
           ${item.category === 'theme' ? `<button class="theme-preview-button" data-theme-preview="${escapeHtml(item.id)}" aria-label="Preview ${escapeHtml(item.name)}">${ic.search(20)}</button>` : ''}
           ${item.category === 'avatar_frame' ? `<button class="frame-preview-button" data-frame-preview="${escapeHtml(item.id)}">Preview</button>` : ''}
           <div class="shop-action">${action}</div>
@@ -379,7 +378,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         member ? api.getEquipped() : Promise.resolve(null),
       ]);
       if (!alive || !currentAccount()) return;
-      items = ((shopItems ?? []) as ShopItem[]).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_') || item.unlock_type === 'monthly'))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
+      items = ((shopItems ?? []) as ShopItem[]).filter(isShopListing).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_') || item.unlock_type === 'monthly'))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
       useStore.getState().setInventory((inventory ?? []).map((r: { item_id: string }) => r.item_id));
       if (equipped) {
         useStore.getState().setEquipped({

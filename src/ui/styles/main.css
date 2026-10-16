@@ -5851,6 +5851,12 @@ button[aria-label="Back"]:focus-visible { outline: 2px solid var(--brand-primary
 .view--shop .shop-tab { flex: 1; min-height: 44px; justify-content: center; font-weight: 600; }
 .view--shop .shop-preview { min-height: 90px; display: grid; place-items: center; width: 100%; }
 .view--shop .shop-name { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.view--shop .shop-card { min-width: 0; }
+.view--shop .shop-name { width: 100%; min-height: 2.8em; display: flex; align-items: center; justify-content: center; text-align: center; overflow-wrap: anywhere; }
+.view--shop .shop-desc { width: 100%; min-height: 4.5em; display: flex; align-items: center; justify-content: center; text-align: center; }
+.view--shop .shop-price { width: 100%; min-height: 24px; justify-content: center; }
+.view--shop .shop-action { display: flex; align-items: center; justify-content: center; min-height: 44px; text-align: center; }
+.view--shop .shop-action .btn, .view--shop .shop-tab { display: inline-flex; align-items: center; justify-content: center; gap: 4px; line-height: 1.25; }
 .view--shop .shop-desc { font-size: 12px; line-height: 1.5; }
 .shop-price { display: flex; gap: 4px; align-items: center; color: var(--app-text); font-size: 13px; }
 .view--shop .shop-action { margin-top: auto; width: 100%; }
