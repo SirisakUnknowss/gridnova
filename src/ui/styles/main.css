@@ -6433,4 +6433,6 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .monthly-mini-board span:nth-child(3n) { border-right-color: var(--monthly-board-ink); }
 .monthly-mini-board span:nth-child(n+19):nth-child(-n+27), .monthly-mini-board span:nth-child(n+46):nth-child(-n+54) { border-bottom-color: var(--monthly-board-ink); }
 .monthly-theme-preview--dark { --monthly-board-bg: #202247; --monthly-board-ink: #eeecff; }
+.monthly-month-nav select { min-width: 0; width: 100%; min-height: 44px; padding: 10px; border-radius: 14px; color: var(--app-text); background: var(--app-card-bg); border: 1px solid var(--app-border); font: inherit; }
+.monthly-month-nav label { font-size: 12px; align-self: center; }
 @media(max-width: 350px) { .view--monthly { padding-left: 10px; padding-right: 10px; } .monthly-dates { gap: 0; } .monthly-rewards { gap: 5px; } .monthly-coins { font-size: 11px; } }

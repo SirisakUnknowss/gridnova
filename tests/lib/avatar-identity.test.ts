@@ -59,12 +59,14 @@ it('clears previous account cosmetics but preserves them on token refresh', () =
   useStore.getState().setUser(user);
   useStore.getState().setEquipped({ avatar: { item_id: 'avatar_monthly_moon_rabbit' }, frame_id: 'frame_monthly_lotus_orbit' });
   useStore.getState().setInventory(['avatar_monthly_moon_rabbit']);
+  useStore.getState().setCoins(500);
   useStore.getState().setUser({ ...user });
   expect(useStore.getState().equipped.avatar.item_id).toBe('avatar_monthly_moon_rabbit');
   useStore.getState().setUser({ id: 'second' } as User);
   expect(useStore.getState().equipped.avatar).toEqual({ emoji: '👤' });
   expect(useStore.getState().equipped.frame_id).toBeNull();
   expect(useStore.getState().inventory).toEqual([]);
+  expect(useStore.getState().coins).toBe(0);
 });
 
 it('always wraps unframed avatars in a circular default ring', () => {

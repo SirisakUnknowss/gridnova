@@ -14,6 +14,7 @@ import moonlitBoy from '@images/space/monthly/thai-moonlit-boy.webp';
 import snowflakeGirl from '@images/space/monthly/snowflake-girl.webp';
 import christmasBoy from '@images/space/monthly/christmas-boy.webp';
 import { MONTHLY_COLLECTIONS } from '@lib/monthly-catalog';
+import { YEAR_AVATARS } from '@lib/monthly-2027-art';
 
 
 function portrait(src: string, size = 48): string {
@@ -50,6 +51,7 @@ export const AVATAR_OPTIONS = [
 const SHOP_AVATAR_ART: Record<string, string> = {"avatar_face_happy": "space_orbit-bunny", "avatar_face_cool": "space_astra-knight", "avatar_face_nerd": "space_cosmo-owl", "avatar_face_lion": "space_solar-lion", "avatar_hat_cap": "space_comet-panda", "avatar_hat_top": "space_lunar-fox", "avatar_hat_crown": "🧑", "avatar_pet_dog": "space_lunar-fox", "avatar_pet_cat": "space_nebula-cat", "avatar_pet_dragon": "space_nova-dragon", "avatar_frame_bronze": "🦁", "avatar_frame_gold": "🧑", "avatar_frame_rainbow": "🦉"};
 
 export function avatarArtHTML(id: string | null | undefined, size: number): string {
+  if (id && YEAR_AVATARS[id]) return portrait(YEAR_AVATARS[id],size);
   if (id === 'avatar_monthly_lotus_otter') return portrait(lotusGirl,size);
   if (id === 'avatar_monthly_moon_rabbit') return portrait(moonlitBoy,size);
   if (id === 'avatar_monthly_snowflake_girl') return portrait(snowflakeGirl,size);

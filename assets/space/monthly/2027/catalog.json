@@ -1,0 +1,572 @@
+[
+  {
+    "month": "2027-01",
+    "label": "January 2027",
+    "monthName": "January",
+    "title": "New Year Nova",
+    "subtitle": "A bright start among the stars.",
+    "palette": "champagne gold, ice blue and pearl; fireworks and a clock planet",
+    "start": "2027-01-01",
+    "end": "2027-01-31",
+    "days": 31,
+    "hero": "2027-01-hero",
+    "heroAlt": "A friendly robot in the New Year Nova cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_01_nova_girl",
+        "name": "Nova Girl",
+        "type": "Avatar",
+        "art": "2027-01-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_01_spark_orbit",
+        "name": "Spark Orbit",
+        "type": "Frame",
+        "art": "2027-01-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_01_dawn_horizon",
+        "name": "Dawn Horizon",
+        "type": "Theme",
+        "art": "2027-01-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_01_countdown_boy",
+        "name": "Countdown Boy",
+        "type": "Avatar",
+        "art": "2027-01-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_01_countdown_halo",
+        "name": "Countdown Halo",
+        "type": "Frame",
+        "art": "2027-01-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_01_midnight_celebration",
+        "name": "Midnight Celebration",
+        "type": "Theme",
+        "art": "2027-01-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-02",
+    "label": "February 2027",
+    "monthName": "February",
+    "title": "Hearts in Orbit",
+    "subtitle": "Little hearts. Infinite skies.",
+    "palette": "rose pink, pearl and lavender; heart planets and floating roses",
+    "start": "2027-02-01",
+    "end": "2027-02-28",
+    "days": 28,
+    "hero": "2027-02-hero",
+    "heroAlt": "A friendly robot in the Hearts in Orbit cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_02_cupid_girl",
+        "name": "Cupid Girl",
+        "type": "Avatar",
+        "art": "2027-02-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_02_rose_orbit",
+        "name": "Rose Orbit",
+        "type": "Frame",
+        "art": "2027-02-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_02_cloud_valentine",
+        "name": "Cloud Valentine",
+        "type": "Theme",
+        "art": "2027-02-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_02_starlight_boy",
+        "name": "Starlight Boy",
+        "type": "Avatar",
+        "art": "2027-02-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_02_heart_halo",
+        "name": "Heart Halo",
+        "type": "Frame",
+        "art": "2027-02-5"
+      },
+      {
+        "days": 28,
+        "id": "theme_2027_02_velvet_galaxy",
+        "name": "Velvet Galaxy",
+        "type": "Theme",
+        "art": "2027-02-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-03",
+    "label": "March 2027",
+    "monthName": "March",
+    "title": "Sakura Skies",
+    "subtitle": "Let your wishes bloom.",
+    "palette": "cherry blossom pink, pearl and soft blue; sakura trees floating among stars",
+    "start": "2027-03-01",
+    "end": "2027-03-31",
+    "days": 31,
+    "hero": "2027-03-hero",
+    "heroAlt": "A friendly robot in the Sakura Skies cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_03_blossom_girl",
+        "name": "Blossom Girl",
+        "type": "Avatar",
+        "art": "2027-03-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_03_petal_orbit",
+        "name": "Petal Orbit",
+        "type": "Frame",
+        "art": "2027-03-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_03_blossom_breeze",
+        "name": "Blossom Breeze",
+        "type": "Theme",
+        "art": "2027-03-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_03_spring_boy",
+        "name": "Spring Boy",
+        "type": "Avatar",
+        "art": "2027-03-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_03_sakura_halo",
+        "name": "Sakura Halo",
+        "type": "Frame",
+        "art": "2027-03-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_03_moonlit_sakura",
+        "name": "Moonlit Sakura",
+        "type": "Theme",
+        "art": "2027-03-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-04",
+    "label": "April 2027",
+    "monthName": "April",
+    "title": "Cosmic Songkran",
+    "subtitle": "Splash into a new adventure.",
+    "palette": "aqua, jasmine pearl and gold; gentle Thai water festival and cosmic lagoon",
+    "start": "2027-04-01",
+    "end": "2027-04-30",
+    "days": 30,
+    "hero": "2027-04-hero",
+    "heroAlt": "A friendly robot in the Cosmic Songkran cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_04_splash_girl",
+        "name": "Splash Girl",
+        "type": "Avatar",
+        "art": "2027-04-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_04_jasmine_splash",
+        "name": "Jasmine Splash",
+        "type": "Frame",
+        "art": "2027-04-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_04_crystal_lagoon",
+        "name": "Crystal Lagoon",
+        "type": "Theme",
+        "art": "2027-04-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_04_splash_boy",
+        "name": "Splash Boy",
+        "type": "Avatar",
+        "art": "2027-04-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_04_water_halo",
+        "name": "Water Halo",
+        "type": "Frame",
+        "art": "2027-04-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_04_moonlit_festival",
+        "name": "Moonlit Festival",
+        "type": "Theme",
+        "art": "2027-04-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-05",
+    "label": "May 2027",
+    "monthName": "May",
+    "title": "Enchanted Garden",
+    "subtitle": "Small wonders. Endless growth.",
+    "palette": "mint, pearl and lilac; luminous flowers and a secret fairy garden planet",
+    "start": "2027-05-01",
+    "end": "2027-05-31",
+    "days": 31,
+    "hero": "2027-05-hero",
+    "heroAlt": "A friendly robot in the Enchanted Garden cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_05_petal_fairy",
+        "name": "Petal Fairy",
+        "type": "Avatar",
+        "art": "2027-05-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_05_bloom_orbit",
+        "name": "Bloom Orbit",
+        "type": "Frame",
+        "art": "2027-05-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_05_dewdrop_meadow",
+        "name": "Dewdrop Meadow",
+        "type": "Theme",
+        "art": "2027-05-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_05_garden_keeper",
+        "name": "Garden Keeper",
+        "type": "Avatar",
+        "art": "2027-05-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_05_emerald_halo",
+        "name": "Emerald Halo",
+        "type": "Frame",
+        "art": "2027-05-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_05_secret_moon_garden",
+        "name": "Secret Moon Garden",
+        "type": "Theme",
+        "art": "2027-05-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-06",
+    "label": "June 2027",
+    "monthName": "June",
+    "title": "Ocean Odyssey",
+    "subtitle": "Dive into a sea of stars.",
+    "palette": "turquoise, coral pink and pearl; underwater cosmic coral reef and whales",
+    "start": "2027-06-01",
+    "end": "2027-06-30",
+    "days": 30,
+    "hero": "2027-06-hero",
+    "heroAlt": "A friendly robot in the Ocean Odyssey cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_06_coral_girl",
+        "name": "Coral Girl",
+        "type": "Avatar",
+        "art": "2027-06-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_06_pearl_tide",
+        "name": "Pearl Tide",
+        "type": "Frame",
+        "art": "2027-06-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_06_crystal_reef",
+        "name": "Crystal Reef",
+        "type": "Theme",
+        "art": "2027-06-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_06_reef_boy",
+        "name": "Reef Boy",
+        "type": "Avatar",
+        "art": "2027-06-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_06_ocean_crown",
+        "name": "Ocean Crown",
+        "type": "Frame",
+        "art": "2027-06-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_06_abyssal_starlight",
+        "name": "Abyssal Starlight",
+        "type": "Theme",
+        "art": "2027-06-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-07",
+    "label": "July 2027",
+    "monthName": "July",
+    "title": "Stellar Explorers",
+    "subtitle": "Adventure beyond the familiar.",
+    "palette": "ice blue, pearl and gold; friendly space explorers and ancient star temples",
+    "start": "2027-07-01",
+    "end": "2027-07-31",
+    "days": 31,
+    "hero": "2027-07-hero",
+    "heroAlt": "A friendly robot in the Stellar Explorers cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_07_star_pilot",
+        "name": "Star Pilot",
+        "type": "Avatar",
+        "art": "2027-07-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_07_rocket_orbit",
+        "name": "Rocket Orbit",
+        "type": "Frame",
+        "art": "2027-07-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_07_cloud_outpost",
+        "name": "Cloud Outpost",
+        "type": "Theme",
+        "art": "2027-07-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_07_orbit_scout",
+        "name": "Orbit Scout",
+        "type": "Avatar",
+        "art": "2027-07-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_07_explorer_halo",
+        "name": "Explorer Halo",
+        "type": "Frame",
+        "art": "2027-07-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_07_ancient_star_temple",
+        "name": "Ancient Star Temple",
+        "type": "Theme",
+        "art": "2027-07-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-08",
+    "label": "August 2027",
+    "monthName": "August",
+    "title": "Meteor Wishes",
+    "subtitle": "Catch a little wonder.",
+    "palette": "violet, pearl and champagne gold; meteor showers and glowing wish comets",
+    "start": "2027-08-01",
+    "end": "2027-08-31",
+    "days": 31,
+    "hero": "2027-08-hero",
+    "heroAlt": "A friendly robot in the Meteor Wishes cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_08_wish_girl",
+        "name": "Wish Girl",
+        "type": "Avatar",
+        "art": "2027-08-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_08_comet_ribbon",
+        "name": "Comet Ribbon",
+        "type": "Frame",
+        "art": "2027-08-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_08_stardust_valley",
+        "name": "Stardust Valley",
+        "type": "Theme",
+        "art": "2027-08-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_08_meteor_boy",
+        "name": "Meteor Boy",
+        "type": "Avatar",
+        "art": "2027-08-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_08_celestial_halo",
+        "name": "Celestial Halo",
+        "type": "Frame",
+        "art": "2027-08-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_08_meteor_observatory",
+        "name": "Meteor Observatory",
+        "type": "Theme",
+        "art": "2027-08-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-09",
+    "label": "September 2027",
+    "monthName": "September",
+    "title": "Harvest Moon",
+    "subtitle": "Gather moments under the moon.",
+    "palette": "amber, cream and lavender; golden autumn leaves and moonlit orchards",
+    "start": "2027-09-01",
+    "end": "2027-09-30",
+    "days": 30,
+    "hero": "2027-09-hero",
+    "heroAlt": "A friendly robot in the Harvest Moon cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_09_harvest_girl",
+        "name": "Harvest Girl",
+        "type": "Avatar",
+        "art": "2027-09-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_09_amber_orbit",
+        "name": "Amber Orbit",
+        "type": "Frame",
+        "art": "2027-09-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_09_golden_meadow",
+        "name": "Golden Meadow",
+        "type": "Theme",
+        "art": "2027-09-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_09_moon_keeper",
+        "name": "Moon Keeper",
+        "type": "Avatar",
+        "art": "2027-09-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_09_harvest_halo",
+        "name": "Harvest Halo",
+        "type": "Frame",
+        "art": "2027-09-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_09_moonlit_orchard",
+        "name": "Moonlit Orchard",
+        "type": "Theme",
+        "art": "2027-09-6"
+      }
+    ]
+  },
+  {
+    "month": "2027-10",
+    "label": "October 2027",
+    "monthName": "October",
+    "title": "Friendly Frights",
+    "subtitle": "A little spooky. A little cosmic.",
+    "palette": "lavender, midnight blue, pearl and soft pumpkin orange; friendly pumpkins and little ghosts",
+    "start": "2027-10-01",
+    "end": "2027-10-31",
+    "days": 31,
+    "hero": "2027-10-hero",
+    "heroAlt": "A friendly robot in the Friendly Frights cosmic world",
+    "rewards": [
+      {
+        "days": 5,
+        "id": "avatar_monthly_2027_10_witch_girl",
+        "name": "Witch Girl",
+        "type": "Avatar",
+        "art": "2027-10-1"
+      },
+      {
+        "days": 10,
+        "id": "frame_monthly_2027_10_pumpkin_orbit",
+        "name": "Pumpkin Orbit",
+        "type": "Frame",
+        "art": "2027-10-2"
+      },
+      {
+        "days": 15,
+        "id": "theme_2027_10_twilight_spell",
+        "name": "Twilight Spell",
+        "type": "Theme",
+        "art": "2027-10-3"
+      },
+      {
+        "days": 20,
+        "id": "avatar_monthly_2027_10_lantern_boy",
+        "name": "Lantern Boy",
+        "type": "Avatar",
+        "art": "2027-10-4"
+      },
+      {
+        "days": 25,
+        "id": "frame_monthly_2027_10_haunted_halo",
+        "name": "Haunted Halo",
+        "type": "Frame",
+        "art": "2027-10-5"
+      },
+      {
+        "days": 30,
+        "id": "theme_2027_10_midnight_observatory",
+        "name": "Midnight Observatory",
+        "type": "Theme",
+        "art": "2027-10-6"
+      }
+    ]
+  }
+]

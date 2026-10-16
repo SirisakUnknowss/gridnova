@@ -9,10 +9,10 @@ import { avatarPickerOptions } from '../../src/ui/components/avatar-art';
 it('changes collection at the UTC month boundary and keeps November available',() => {
   expect(activeMonthlyCollection('2026-11-30').month).toBe('2026-11');
   expect(activeMonthlyCollection('2026-12-01').month).toBe('2026-12');
-  expect(activeMonthlyCollection('2027-01-01').month).toBe('2026-12');
+  expect(activeMonthlyCollection('2027-01-01').month).toBe('2027-01');
   expect(monthlyCollection('2026-11').days).toBe(30);
   expect(monthlyCollection('2026-12').days).toBe(31);
-  expect(() => monthlyCollection('2027-01')).toThrow('Unknown monthly collection');
+  expect(() => monthlyCollection('2028-01')).toThrow('Unknown monthly collection');
 });
 it('places December 1 on Tuesday and December 31 on Thursday',() => {
   const cells = monthCells(2026,12);
@@ -24,9 +24,9 @@ it('places December 1 on Tuesday and December 31 on Thursday',() => {
 });
 it('has independent cosmetics and reachable milestones in each collection',() => {
   const ids = MONTHLY_COLLECTIONS.flatMap(collection => collection.rewards.map(item => item.id));
-  expect(new Set(ids).size).toBe(12);
+  expect(new Set(ids).size).toBe(72);
   for (const collection of MONTHLY_COLLECTIONS) {
-    expect(collection.rewards.map(item => item.days)).toEqual([5,10,15,20,25,30]);
+    expect(collection.rewards.map(item => item.days)).toEqual([5,10,15,20,25,Math.min(30,collection.days)]);
     expect(collection.rewards.every(item => item.days <= collection.days)).toBe(true);
     expect(collection.rewards.map(item => item.type)).toEqual(['Avatar','Frame','Theme','Avatar','Frame','Theme']);
   }

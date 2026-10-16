@@ -26,7 +26,7 @@ export function mountMonthlyChallengeView(root: HTMLElement, props: { onBack: ()
     const done = status.completed.includes(selected);
     root.innerHTML = `<section class="view view--monthly">
       <header class="monthly-topbar"><button class="icon-btn" id="monthly-back" aria-label="Back">${ic.back(26)}</button><h1>Monthly Challenge</h1><button class="icon-btn" id="monthly-help" aria-label="Challenge rules"><img src="${infoIcon}" width="22" height="22" alt=""></button></header>
-      <nav class="monthly-month-nav" aria-label="Collection month">${MONTHLY_COLLECTIONS.map(item => `<button class="btn btn--small ${item.month === collection.month ? 'btn--primary' : 'btn--secondary'}" data-month="${item.month}" aria-pressed="${item.month === collection.month}" ${busy || loading ? 'disabled' : ''}>${item.label}</button>`).join('')}</nav>
+      <nav class="monthly-month-nav" aria-label="Collection month"><label for="monthly-month">Collection</label><select id="monthly-month" aria-label="Collection month" ${busy || loading ? 'disabled' : ''}>${MONTHLY_COLLECTIONS.map(item => `<option value="${item.month}" ${item.month === collection.month ? 'selected' : ''}>${item.label} · ${item.title}</option>`).join('')}</select></nav>
       <div class="monthly-hero"><img src="${MONTHLY_ART[collection.hero]}" alt="${collection.heroAlt}"><div class="monthly-hero-copy"><p>${collection.label}</p><h2>${collection.title}</h2><span>${collection.subtitle}</span></div></div>
       ${status.preview ? `<p class="monthly-notice">Staging preview · ${status.today}</p>` : ''}
       <div class="monthly-surface monthly-progress"><strong>${count} / ${collection.days} days completed</strong><progress max="${collection.days}" value="${count}" aria-label="Completed puzzle dates"></progress><p>Missed a day? Play it later.</p></div>
@@ -37,7 +37,7 @@ export function mountMonthlyChallengeView(root: HTMLElement, props: { onBack: ()
       <div class="monthly-rewards">${collection.rewards.map(reward => {
         const state = rewardState(reward.days,count,status.claimed.includes(reward.id));
         return `<article class="monthly-reward monthly-surface"><strong class="monthly-milestone">${reward.days} DAYS</strong><div class="monthly-reward-preview">${reward.type === 'Theme' ? monthlyThemePreview(reward.id) : `<img src="${MONTHLY_ART[reward.art]}" alt="${reward.name}" loading="lazy">`}</div><small>${reward.type.toUpperCase()}</small><h3>${reward.name}</h3>${state === 'locked' ? `<div class="monthly-reward-progress"><progress max="${reward.days}" value="${count}" aria-label="${reward.name} progress"></progress><span>${count} / ${reward.days}</span></div>` : `<button class="monthly-claim" data-claim="${reward.id}" ${state === 'claimed' || busy || loading || failed ? 'disabled' : ''}>${state === 'claimed' ? '✓ Claimed' : 'Claim'}</button>`}</article>`;
-      }).join('')}</div><p class="monthly-footer">Days don’t need to be consecutive.</p><button class="btn btn--secondary" id="monthly-collection">My Collection</button><p class="monthly-footer">${before ? `Starts ${collection.monthName} 1, 2026 · ` : ''}Puzzle dates reset at 00:00 UTC.</p>
+      }).join('')}</div><p class="monthly-footer">Days don’t need to be consecutive.</p><button class="btn btn--secondary" id="monthly-collection">My Collection</button><p class="monthly-footer">${before ? `Starts ${collection.monthName} 1, ${collection.month.slice(0,4)} · ` : ''}Puzzle dates reset at 00:00 UTC.</p>
     </section>${bottomNavHTML('home')}`;
     wireBottomNav(root,props.nav,'home');
     root.querySelector('#monthly-back')?.addEventListener('click',props.onBack);
@@ -46,12 +46,12 @@ export function mountMonthlyChallengeView(root: HTMLElement, props: { onBack: ()
     root.querySelector('#monthly-help')?.addEventListener('click',() => {
       const dialog = document.createElement('dialog');
       dialog.className = 'monthly-help';
-      dialog.innerHTML = `<h2>Monthly Challenge</h2><p>Complete one puzzle for each date in ${collection.monthName}. Missed dates stay playable until ${collection.monthName} ${collection.days} (UTC). Future dates unlock at 00:00 UTC.</p><p>Earn 100 Coins once per date. Collect cosmetics at 5, 10, 15, 20, 25 and 30 completed dates. Days don’t need to be consecutive. Claim your cosmetics here and equip them in My Collection.</p><form method="dialog"><button class="btn btn--primary">Got it</button></form>`;
+      dialog.innerHTML = `<h2>Monthly Challenge</h2><p>Complete one puzzle for each date in ${collection.monthName}. Missed dates stay playable until ${collection.monthName} ${collection.days} (UTC). Future dates unlock at 00:00 UTC.</p><p>Earn 100 Coins once per date. Collect cosmetics at ${collection.rewards.map(reward => reward.days).join(", ")} completed dates. Days don’t need to be consecutive. Claim your cosmetics here and equip them in My Collection.</p><form method="dialog"><button class="btn btn--primary">Got it</button></form>`;
       document.body.append(dialog); dialog.addEventListener('close',() => dialog.remove()); dialog.showModal();
     });
-    root.querySelectorAll<HTMLButtonElement>('[data-month]').forEach(button => button.addEventListener('click',() => {
-      collection = monthlyCollection(button.dataset.month!); selected = collection.start; status = { ...status, completed: [], claimed: [] }; void load(true);
-    }));
+    root.querySelector<HTMLSelectElement>('#monthly-month')?.addEventListener('change',event => {
+      collection = monthlyCollection((event.target as HTMLSelectElement).value); selected = status.today.startsWith(collection.month) ? status.today : collection.start; status = { ...status, completed: [], claimed: [] }; void load(true);
+    });
     root.querySelectorAll<HTMLButtonElement>('[data-date]').forEach(button => button.addEventListener('click',() => { selected = button.dataset.date!; render(); }));
     root.querySelector('#monthly-play')?.addEventListener('click',async () => {
       if (!member) { props.onSignIn(); return; }

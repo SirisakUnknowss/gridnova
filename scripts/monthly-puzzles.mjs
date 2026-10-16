@@ -6,9 +6,9 @@ const { outputText } = ts.transpileModule(source,{ compilerOptions: { target: ts
 const engine = await import('data:text/javascript;base64,' + Buffer.from(outputText).toString('base64'));
 const rows = [];
 const month = process.argv[3] ?? '2026-11';
-if (!/^2026-(11|12)$/.test(month)) throw new Error('Unsupported collection month');
-const days = month === '2026-12' ? 31 : 30;
-const collection = month === '2026-12' ? 'christmas-day' : 'moonlit-wishes';
+if (!/^(2026-(11|12)|2027-(0[1-9]|10))$/.test(month)) throw new Error('Unsupported collection month');
+const days = new Date(Date.UTC(Number(month.slice(0,4)),Number(month.slice(5)),0)).getUTCDate();
+const collection = month === '2026-12' ? 'christmas-day' : month === '2026-11' ? 'moonlit-wishes' : month;
 for (let day=1; day<=days; day++) {
   const date = `${month}-${String(day).padStart(2,'0')}`;
   const puzzle = engine.generatePuzzle('medium',`monthly:${collection}:${date}`);

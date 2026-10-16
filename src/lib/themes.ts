@@ -1,4 +1,5 @@
 import { THEME_BACKGROUNDS } from './theme-backgrounds';
+import { YEAR_THEMES, YEAR_DARK_THEMES } from './monthly-2027-themes';
 // =====================================================================
 // Theme system — applies a set of CSS custom properties on <html>
 // Themes correspond to shop_items where category='theme'
@@ -47,6 +48,7 @@ const CLASSIC: Partial<ThemeTokens> = {
 };
 
 export const THEMES: Record<string, ThemeMeta> = {
+  ...YEAR_THEMES,
   theme_winter_wonderland: { id: 'theme_winter_wonderland', name: 'Winter Wonderland', tokens: { '--brand-primary': '#6386b3', '--border-thick': '#58749c', '--border-thin': '#c9dced' } },
   theme_christmas_eve: { id: 'theme_christmas_eve', name: 'Christmas Eve', tokens: { '--brand-primary': '#b29edb', '--border-thick': '#c8b9e4', '--border-thin': '#53516c', '--cell-bg': '#20253c', '--cell-bg-given': '#292e48', '--cell-bg-selected': '#635775', '--cell-bg-related': '#333a54', '--cell-bg-same': '#655337', '--cell-text': '#f0edff', '--cell-text-user': '#d9c4ff', '--cell-text-hint': '#afdcd8' } },
   theme_moonlit_river: { id: 'theme_moonlit_river', name: 'Moonlit River', tokens: { '--brand-primary': '#8178cd', '--border-thick': '#605487', '--border-thin': '#d5cdee' } },
@@ -197,7 +199,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     theme_moonlit_river: '#8178cd', theme_river_of_stars: '#a69be5',
     theme_winter_wonderland: '#6386b3', theme_christmas_eve: '#b29edb',
   };
-  const primary = bases[theme.id] ?? '#667eea';
+  const primary = bases[theme.id] ?? theme.tokens['--brand-primary'] ?? '#667eea';
   const white = '#ffffff';
   const surface = `color-mix(in srgb, ${white} 97%, ${primary})`;
   const text = `color-mix(in srgb, ${primary} 25%, #182033)`;
@@ -244,7 +246,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     '--numpad-btn-bg': surface,
   };
   for (const [key, value] of Object.entries(appTokens)) root.style.setProperty(key, value);
-  if (id === 'theme_river_of_stars' || id === 'theme_christmas_eve') {
+  if (id === 'theme_river_of_stars' || id === 'theme_christmas_eve' || YEAR_DARK_THEMES.has(id)) {
     for (const [key,value] of Object.entries(theme.tokens)) root.style.setProperty(key,value);
   }
   if (root === document.documentElement) {

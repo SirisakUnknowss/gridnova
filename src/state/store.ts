@@ -77,7 +77,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   setUser: (user) => set(get().user?.id === user?.id ? { user } : {
     accountRevision: get().accountRevision + 1,
-    user, profile: null, inventory: [],
+    user, profile: null, inventory: [], coins: 0, xp: 0, level: 1, currentStreak: 0, longestStreak: 0,
     equipped: { theme_id: null, background_id: null, board_color_id: null, frame_id: null, avatar: { emoji: '👤' } },
   }),
   setProfile: (profile) => set({ profile }),

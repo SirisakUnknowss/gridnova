@@ -1,3 +1,4 @@
+import { MONTHLY_2027 } from './monthly-2027';
 export interface MonthlyReward { days: number; id: string; name: string; type: 'Avatar' | 'Frame' | 'Theme'; art: string }
 export interface MonthlyCollection { month: string; label: string; monthName: string; title: string; subtitle: string; start: string; end: string; days: number; hero: string; heroAlt: string; rewards: readonly MonthlyReward[] }
 
@@ -18,6 +19,7 @@ export const MONTHLY_COLLECTIONS: readonly MonthlyCollection[] = [
     { days: 25, id: 'frame_monthly_starlight_wreath', name: 'Starlight Wreath', type: 'Frame', art: 'starlight-wreath' },
     { days: 30, id: 'theme_christmas_eve', name: 'Christmas Eve', type: 'Theme', art: 'christmas-eve' },
   ] },
+  ...MONTHLY_2027,
 ];
 
 export function monthlyCollection(month: string): MonthlyCollection {

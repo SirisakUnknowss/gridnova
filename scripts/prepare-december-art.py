@@ -25,3 +25,8 @@ square_portrait = originals / 'snowflake-girl-square-v2.png'
 if square_portrait.exists():
     Image.open(square_portrait).resize((512, 512), Image.Resampling.LANCZOS).save(runtime / 'snowflake-girl.webp', quality=85)
 print('Prepared seven Christmas Day runtime assets')
+child_pair = originals / 'christmas-child-portraits-v3.png'
+if child_pair.exists():
+    pair = Image.open(child_pair)
+    for half, name in enumerate(['snowflake-girl', 'christmas-boy']):
+        pair.crop((half*pair.width//2, 0, (half+1)*pair.width//2, pair.height)).resize((512,512), Image.Resampling.LANCZOS).save(runtime / f'{name}.webp', quality=85)
