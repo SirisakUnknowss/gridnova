@@ -14,3 +14,10 @@ it('equips monthly avatars through the inventory item path used by purchased ava
   expect(avatarItemId('space_lunar-fox')).toBe('avatar_pet_dog');
   expect(avatarItemId('👤')).toBeNull();
 });
+
+it('preserves legacy purchased avatar IDs without giving them to other accounts', () => {
+  expect(avatarPickerOptions(['avatar_frame_gold'], false).find(item => item.id === 'avatar_frame_gold')?.name).toBe('Gold Frame');
+  expect(avatarPickerOptions([], false).some(item => item.id === 'avatar_frame_gold')).toBe(false);
+  expect(avatarPickerOptions(['avatar_frame_gold'], true).some(item => item.id === 'avatar_frame_gold')).toBe(false);
+  expect(avatarItemId('avatar_frame_gold')).toBe('avatar_frame_gold');
+});

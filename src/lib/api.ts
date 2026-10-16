@@ -375,6 +375,15 @@ export async function getShopItems(category?: string) {
   return data ?? [];
 }
 
+export async function getCollectionItems(ownedIds: readonly string[]) {
+  const available = await getShopItems();
+  if (!ownedIds.length) return available;
+  // Retired purchases remain usable after they leave the shop.
+  const { data, error } = await supabase.from('shop_items').select('*').in('id', [...ownedIds]);
+  if (error) throw error;
+  return [...new Map([...available, ...(data ?? [])].map(item => [item.id, item])).values()];
+}
+
 export async function getInventory() {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;

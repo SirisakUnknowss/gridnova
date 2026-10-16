@@ -8,6 +8,8 @@ import avatar4 from '@images/space/avatars/nova-dragon.webp';
 import avatar5 from '@images/space/avatars/astra-knight.webp';
 import avatar6 from '@images/space/avatars/orbit-bunny.webp';
 import avatar7 from '@images/space/avatars/solar-lion.webp';
+import legacyGold from '@images/space/replacements/gold-lv-1.webp';
+import legacyBronze from '@images/space/replacements/bronze-lv-1.webp';
 import { ic } from '@ui/icons';
 import lotusGirl from '@images/space/monthly/thai-lotus-girl.webp';
 import moonlitBoy from '@images/space/monthly/thai-moonlit-boy.webp';
@@ -51,6 +53,9 @@ export const AVATAR_OPTIONS = [
 const SHOP_AVATAR_ART: Record<string, string> = {"avatar_face_happy": "space_orbit-bunny", "avatar_face_cool": "space_astra-knight", "avatar_face_nerd": "space_cosmo-owl", "avatar_face_lion": "space_solar-lion", "avatar_hat_cap": "space_comet-panda", "avatar_hat_top": "space_lunar-fox", "avatar_hat_crown": "🧑", "avatar_pet_dog": "space_lunar-fox", "avatar_pet_cat": "space_nebula-cat", "avatar_pet_dragon": "space_nova-dragon", "avatar_frame_bronze": "🦁", "avatar_frame_gold": "🧑", "avatar_frame_rainbow": "🦉"};
 
 export function avatarArtHTML(id: string | null | undefined, size: number): string {
+  if (id === 'avatar_frame_gold') return portrait(legacyGold, size);
+  if (id === 'avatar_frame_bronze') return portrait(legacyBronze, size);
+  if (id === 'avatar_frame_rainbow') return `<span class="legacy-avatar-frame legacy-${id.slice(13)}" style="width:${size}px;height:${size}px">${ic.guest(Math.round(size * .72))}</span>`;
   if (id && YEAR_AVATARS[id]) return portrait(YEAR_AVATARS[id],size);
   if (id === 'avatar_monthly_lotus_otter') return portrait(lotusGirl,size);
   if (id === 'avatar_monthly_moon_rabbit') return portrait(moonlitBoy,size);
@@ -61,6 +66,7 @@ export function avatarArtHTML(id: string | null | undefined, size: number): stri
 }
 
 export function shopAvatarName(id: string): string | undefined {
+  if (id in LEGACY_AVATARS) return LEGACY_AVATARS[id as keyof typeof LEGACY_AVATARS];
   const monthly = MONTHLY_COLLECTIONS.flatMap(collection => collection.rewards).find(item => item.id === id && item.type === 'Avatar');
   if (monthly) return monthly.name;
   const rare = RARE_AVATAR_CATALOG.find(item => item.id === id);
@@ -78,11 +84,14 @@ export const PAID_AVATAR_ITEMS: Record<string, string> = {
   'space_solar-lion': 'avatar_face_lion',
 };
 
+const LEGACY_AVATARS = { avatar_frame_bronze: 'Bronze Frame', avatar_frame_gold: 'Gold Frame', avatar_frame_rainbow: 'Rainbow Frame', avatar_hat_top: 'Top Hat', avatar_hat_crown: 'Crown' };
+
 export function avatarItemId(id: string): string | null {
-  return PAID_AVATAR_ITEMS[id] ?? (id.startsWith('avatar_rare_') || id.startsWith('avatar_monthly_') ? id : null);
+  return PAID_AVATAR_ITEMS[id] ?? (id in LEGACY_AVATARS || id.startsWith('avatar_rare_') || id.startsWith('avatar_monthly_') ? id : null);
 }
 
 export function avatarPickerOptions(inventory: readonly string[], isGuest: boolean) {
   const monthly = MONTHLY_COLLECTIONS.flatMap(collection => collection.rewards).filter(item => item.type === 'Avatar' && !isGuest && inventory.includes(item.id));
-  return [...AVATAR_OPTIONS, ...[...RARE_AVATAR_CATALOG, ...monthly].map(item => ({ id: item.id, name: item.name, art: (size = 48) => avatarArtHTML(item.id,size) }))];
+  const legacy = Object.entries(LEGACY_AVATARS).filter(([id]) => !isGuest && inventory.includes(id)).map(([id, name]) => ({ id, name, art: (size = 48) => avatarArtHTML(id, size) }));
+  return [...AVATAR_OPTIONS, ...legacy, ...[...RARE_AVATAR_CATALOG, ...monthly].map(item => ({ id: item.id, name: item.name, art: (size = 48) => avatarArtHTML(item.id,size) }))];
 }

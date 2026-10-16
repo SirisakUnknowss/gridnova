@@ -37,6 +37,8 @@ const releaseIcons: Record<string, (size?: number) => string> = {
   'wave': ic.wave,
   'bell': ic.bell,
   'gift': ic.gift,
+  'shop': ic.shop,
+  'settings': ic.sparkle,
 
 };
 

@@ -6485,3 +6485,20 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
   .view--home .daily-hero-stat-label, .view--home .daily-hero-stat-value { font-size: 13px; }
   .view--home .daily-hero-link { min-height: 44px; margin-top: 4px; font-size: 14px; }
 }
+
+.collection-tabs { overflow-x: auto; justify-content: flex-start; max-width: 100%; }
+.view--shop .collection-tabs .shop-tab { flex: 0 0 auto; min-height: 44px; padding-inline: 14px; }
+.collection-background-preview { width: 100%; height: 100px; border-radius: 16px; border: 1px solid var(--app-border); }
+.collection-board-preview { display: grid; grid-template-columns: repeat(3, 1fr); width: 100px; aspect-ratio: 1; gap: 2px; background: var(--border-thick); border: 2px solid var(--border-thick); }
+.collection-board-preview span { display: grid; place-items: center; background: var(--board-cell-bg, var(--cell-bg)); color: var(--cell-text); }
+.collection-board-preview span:nth-child(odd) { background: var(--board-cell-given, var(--cell-bg-given)); }
+.collection-background-preview.bg-default { background: var(--brand-gradient); }
+.collection-background-preview.bg-blank-white { background: var(--legacy-background-white); }
+.collection-background-preview.bg-solid-navy { background: var(--legacy-background-navy); }
+.collection-background-preview.bg-solid-forest { background: var(--legacy-background-forest); }
+:root { --legacy-background-white: #fff; --legacy-background-navy: #0d1b2a; --legacy-background-forest: #1b4332; }
+
+:root { --legacy-gold: #d5a438; --legacy-bronze: #ad7545; }
+.legacy-avatar-frame { display: inline-grid; place-items: center; box-sizing: border-box; border: 3px solid var(--legacy-gold); border-radius: 50%; background: var(--app-card-bg); }
+.legacy-avatar-frame.legacy-bronze { border-color: var(--legacy-bronze); }
+.legacy-avatar-frame.legacy-rainbow { border-color: var(--brand-secondary); box-shadow: 0 0 0 2px var(--brand-primary); }

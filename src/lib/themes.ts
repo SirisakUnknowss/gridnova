@@ -201,8 +201,9 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
   };
   const primary = bases[theme.id] ?? theme.tokens['--brand-primary'] ?? '#667eea';
   const white = '#ffffff';
-  const surface = `color-mix(in srgb, ${white} 97%, ${primary})`;
-  const text = `color-mix(in srgb, ${primary} 25%, #182033)`;
+  const dark = theme.id === 'theme_dark' || theme.id === 'theme_river_of_stars' || theme.id === 'theme_christmas_eve' || YEAR_DARK_THEMES.has(theme.id);
+  const surface = dark ? theme.tokens['--cell-bg'] ?? '#222244' : `color-mix(in srgb, ${white} 97%, ${primary})`;
+  const text = dark ? theme.tokens['--cell-text'] ?? '#e0e0e0' : `color-mix(in srgb, ${primary} 25%, #182033)`;
   const appTokens: Record<string, string> = {
     '--calendar-filter': {
       theme_classic: 'hue-rotate(190deg) saturate(.75)',
@@ -246,7 +247,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     '--numpad-btn-bg': surface,
   };
   for (const [key, value] of Object.entries(appTokens)) root.style.setProperty(key, value);
-  if (id === 'theme_river_of_stars' || id === 'theme_christmas_eve' || YEAR_DARK_THEMES.has(id)) {
+  if (dark) {
     for (const [key,value] of Object.entries(theme.tokens)) root.style.setProperty(key,value);
   }
   if (root === document.documentElement) {

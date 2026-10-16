@@ -123,7 +123,7 @@ export function homeViewHTML(): string {
           <div class="daily-hero-stat"><div class="daily-stat-icon" aria-hidden="true">${ic.trophy(22)}</div><div class="daily-hero-stat-label">Rank</div><div class="daily-hero-stat-value" id="home-daily-rank">—</div></div>
           <div class="daily-hero-stat"><div class="daily-stat-icon" aria-hidden="true">${ic.clock(22)}</div><div class="daily-hero-stat-label">Reset</div><div class="daily-hero-stat-value" id="home-daily-countdown">--:--:--</div></div>
         </div>
-        <button class="daily-hero-link" id="home-daily-more">View leaderboard <span aria-hidden="true">›</span></button>
+        <button class="daily-hero-link" id="home-daily-more">Leaderboard &amp; recap <span aria-hidden="true">›</span></button>
       </div>
 
       <button class="pm-row monthly-home-entry" id="open-monthly">

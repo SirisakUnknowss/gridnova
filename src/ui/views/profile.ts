@@ -101,7 +101,7 @@ ${ic.notes(26)}
       </div>
 
       <div class="card">
-        <button class="profile-row" id="prof-collection"><span>${ic.shop(24)} My Collection<br><small>Themes, avatars, and frames you own</small></span><span>›</span></button>
+        <button class="profile-row" id="prof-collection"><span>${ic.shop(24)} My Collection<br><small>Your cosmetics and classic items</small></span><span>›</span></button>
         <button class="profile-row" id="prof-stats">
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.stats(16)}

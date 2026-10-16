@@ -27,6 +27,6 @@ export function resetBoardColor(): void {
 }
 
 /** Parse metadata.css_vars from a shop_item row and apply */
-export function applyBoardColorFromItem(item: { metadata?: any } | null): void {
+export function applyBoardColorFromItem(item: { metadata?: { css_vars?: Partial<BoardColorVars> } } | null): void {
   applyBoardColor(item?.metadata?.css_vars ?? null);
 }

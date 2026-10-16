@@ -14,6 +14,15 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '2.0.0', date: '2026-10-16', title: 'Welcome to Your New Cosmic Home',
+    changes: [
+      { icon: 'daily', text: 'Daily Puzzle is still your daily competition. Open Leaderboard & recap to find your ranking and calendar.' },
+      { icon: 'gift', text: 'Monthly Challenge opens November 1 (UTC), with separate puzzles and collectible cosmetics. Completed dates do not need to be consecutive.' },
+      { icon: 'shop', text: 'Find your owned cosmetics, including classic backgrounds and board colors, in Profile → My Collection. Monthly rewards are earned in Monthly Challenge.' },
+      { icon: 'settings', text: 'Explore the refreshed space design, with readable Dark Mode boards and clearer mobile layouts.' },
+    ],
+  },
+  {
     version: '1.12.0',
     date: '2026-09-08',
     title: 'Heart Check',
