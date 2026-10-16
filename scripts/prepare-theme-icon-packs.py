@@ -10,9 +10,10 @@ from PIL import Image
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('sources', type=Path)
+    parser.add_argument('--readable', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    destination = root / 'src/images/space/theme-icons/full'
+    destination = root / ('src/images/space/theme-icons/readable' if args.readable else 'src/images/space/theme-icons/full')
     destination.mkdir(parents=True, exist_ok=True)
     report = []
     for item in json.loads(args.sources.read_text(encoding='utf-8')):
@@ -31,13 +32,13 @@ def main() -> None:
                 if not .05 < occupancy < .95:
                     raise ValueError(f"Empty or opaque-background cell: {item['id']} {row},{column}")
                 occupancies.append(round(occupancy, 3))
-        output = destination / f"skin-{item['id']}.webp"
+        output = destination / f"skin-{'readable-' if args.readable else ''}{item['id']}.webp"
         image.save(output, 'WEBP', quality=88, method=4)
         report.append({'id': item['id'], 'file': str(output.relative_to(root)).replace('\\', '/'),
                        'bytes': output.stat().st_size, 'width': image.width, 'height': image.height,
                        'sha256': hashlib.sha256(output.read_bytes()).hexdigest(), 'cell_occupancy': occupancies})
     report.sort(key=lambda item: item['id'])
-    (root / 'assets/space/theme-icons/full-icon-assets.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+    (root / ('assets/space/theme-icons/readable-icon-assets.json' if args.readable else 'assets/space/theme-icons/full-icon-assets.json')).write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(json.dumps({'packs': len(report), 'bytes': sum(item['bytes'] for item in report)}))
 
 

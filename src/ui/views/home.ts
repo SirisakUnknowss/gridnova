@@ -188,7 +188,7 @@ export function homeViewHTML(): string {
 
       <!-- Quests entry -->
       <button class="pm-row" id="open-quests">
-        <span class="pm-row-icon">${ic.quests(22)}</span>
+        <span class="pm-row-icon">${ic.quests(30)}</span>
         <div class="pm-row-body">
           <div class="pm-row-title-line">
             <span class="pm-row-title">Quests</span>

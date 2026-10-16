@@ -1,6 +1,7 @@
 ## 2.0.0 — 2026-10-16 (staging)
 
-- Use simple, high-contrast functional symbols for 22–40px UI icons. Preserve all 35 detailed art sets and use their calendars only as larger hero illustrations.
+- Use simplified 3D fantasy artwork for all 35 themes, with stronger silhouettes at mobile sizes. Status images use 30px, navigation 36px and mode entries 40px. Preserve all detailed originals and load theme packs on demand.
+- Prepare the 2.0.0 production promotion plan. Backend deployment now requires a manual choice of reviewed functions; it cannot blindly replay staging-only migrations or replace production scheduler functions.
 
 - Replace icon decorations with 35 complete nine-icon art sets for all Shop and monthly themes. Theme packs load on demand, remain available offline after use, and previews stay isolated from equipped themes.
 

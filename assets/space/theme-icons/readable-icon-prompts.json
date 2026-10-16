@@ -1,0 +1,186 @@
+{
+  "base": "Create one production 3x3 transparent bitmap atlas of nine simplified fantasy 3D game images. Reference image 1 is the APPROVED complexity and chunky rendering benchmark (Moonlit River). Reference image 2 is the original multi-theme contact sheet: locate the group named THEME below and preserve that group's color, material and architecture identity. Render only THIS THEME, not the contact sheet.\nKeep rich rendered fantasy gold/beveled dimensional image art, NOT outlines, NOT flat vectors, NOT generic plastic toy pictograms. Simplify to broad thick contrasting edges and big surfaces that remain visible at 30/36/40px. Delete micro filigree, hanging decorations, sparkles, tiny flowers and tiny water scenery. One large recognizable theme motif per object, no small sticker overlay.\nEXACT 3 columns x3 rows, square image, identical square cells. Every object entirely inside its cell, centered, fills 86%, 7% transparent margin, no touching neighbors. Consistent front view, broad shading, real alpha transparent background.\nOrder: row1 HOME simple fantasy cottage single roof/big doorway; MEDALS large two-handle trophy with simple stem; SHOP clear striped awning and big open doorway. Row2 PROFILE large astronaut helmet with huge dark visor; DAILY upright calendar with bright page and four LARGE dark date marks; PRACTICE thick Sudoku book with large 3x3 grid and only three numbers. Row3 PLAY MODE one fantasy planet and one broad tilted ring; QUESTS unfurled scroll and one huge contrasting checkmark; CLOCK large dark face, two thick bright hands, four ticks.\nKeep each category unmistakable and silhouettes separated. No captions, no watermark, no extra objects. Aim for same reduction of detail and same rich fantasy finish as reference1. Use THEME identity, not Moonlit River lotus unless theme requires it.\n",
+  "themes": [
+    {
+      "id": "theme_classic",
+      "name": "Classic",
+      "brief": "Pearl-white and lavender cosmic toy architecture, broad star-shaped roofs, gold orbit rings built into pedestals, luminous violet helmet visor."
+    },
+    {
+      "id": "theme_paper",
+      "name": "Paper",
+      "brief": "Entire icons are thick folded cream origami and warm kraft-paper constructions with copper edges, amber translucent windows, visible broad paper folds. House is an origami house, trophy a folded paper cup, shop folded-paper stall, helmet sculpted folded cream paper."
+    },
+    {
+      "id": "theme_dark",
+      "name": "Dark Mode",
+      "brief": "Entire icons are midnight obsidian and brushed silver lunar architecture, broad crescent shapes, large icy-blue illuminated windows, elegant bright silver edges on dark sculpted bodies. Ensure strong readable silhouettes on dark UI."
+    },
+    {
+      "id": "theme_pastel",
+      "name": "Pastel Dream",
+      "brief": "Whole objects are soft pink, baby-blue and lavender macaron ceramics with chunky cloud roofs, rounded cushion-like bodies, broad pink bows integrated into construction, not pasted decorations."
+    },
+    {
+      "id": "theme_ocean",
+      "name": "Ocean",
+      "brief": "Entire aqua glass and pearlescent ocean architecture: coral cottage, shell-shaped trophy bowl, seashell market, diving astronaut helmet, wave-shaped calendar base, shell-bound puzzle book, water globe, pearl scroll and tide clock."
+    },
+    {
+      "id": "theme_forest",
+      "name": "Forest",
+      "brief": "Entire objects are enchanted forest wood and moss: tree-trunk cottage, carved leaf-shaped trophy, forest mushroom shop, emerald wooden astronaut helmet, carved-wood calendar, leaf-bound book, forest globe and acorn clock."
+    },
+    {
+      "id": "theme_sunset",
+      "name": "Sunset",
+      "brief": "Entire warm peach-amber and rose-gold desert sunset miniatures: terracotta sun-roof house, broad rising-sun trophy bowl, sunset caravan market, rose-gold helmet, solar calendar pedestal and amber-glass clock."
+    },
+    {
+      "id": "theme_neon",
+      "name": "Sky Citadel",
+      "brief": "Entire pearl-white and icy-teal floating-sky-citadel objects: cloud castle house, winged crystal trophy, skyport market, silver-wing astronaut helmet, cloud-supported calendar, floating book and cloud observatory clock."
+    },
+    {
+      "id": "theme_sakura",
+      "name": "Sakura",
+      "brief": "Entire pink porcelain spring blossom architecture: petal-shaped roofs, cherry-blossom trophy bowl, blossom tea-market shop, rounded pink petal helmet, pale pink calendar, blossom-bound book and sakura clock. Broad pink petal silhouettes."
+    },
+    {
+      "id": "theme_thai",
+      "name": "Thai Heritage",
+      "brief": "Entire gold and warm red Thai-inspired miniature architecture, sweeping pavilion roofs, lotus-shaped trophy bowl, Thai floating-market shop, gold lotus astronaut helmet, gold carved calendar and red-and-gold observatory clock. No religious figures."
+    },
+    {
+      "id": "theme_mono",
+      "name": "Mono Pro",
+      "brief": "Entire black, white and silver ceramic modernist miniatures. Strong black-and-white sculpted planes, geometric house, angular trophy, minimalist white shop, glossy black astronaut visor, black binding calendar and monochrome clock. No colored decorations."
+    },
+    {
+      "id": "theme_moonlit_river",
+      "name": "Moonlit River",
+      "brief": "Entire pearl-pink lotus and lavender Thai river festival miniatures: lotus-roof riverside house, lotus flower-shaped trophy bowl, floating lotus market, pearl-pink lotus astronaut helmet, candlelit lotus calendar pedestal and warm moon-water clock."
+    },
+    {
+      "id": "theme_river_of_stars",
+      "name": "River of Stars",
+      "brief": "Entire midnight-violet and luminous silver lotus river festival architecture: moonlit lotus-roof house, violet lotus trophy, floating lantern market, dark-violet moon astronaut helmet, luminous lotus calendar and crescent observatory clock. Broad silver and violet masses."
+    },
+    {
+      "id": "theme_winter_wonderland",
+      "name": "Winter Wonderland",
+      "brief": "Entire translucent icy-blue and pearl-white snow architecture: rounded igloo cottage, carved-ice trophy, winter snow market, glacier astronaut helmet, frosted blue calendar pedestal, ice-bound puzzle book, snow globe and crystal clock. Broad snow caps form the object silhouettes."
+    },
+    {
+      "id": "theme_christmas_eve",
+      "name": "Christmas Eve",
+      "brief": "Entire pearl-white, rich-red, pine-green and gold Christmas winter architecture: snow cottage with candy-cane chimney, snowy pearl trophy with broad red ribbon pedestal, Christmas market stall, red winter astronaut helmet, red bound calendar on snowy gold pedestal, green frosted puzzle book and winter observatory clock."
+    },
+    {
+      "id": "theme_2027_01_dawn_horizon",
+      "name": "Dawn Horizon",
+      "brief": "Entire champagne-gold and pearl sunrise celebration miniatures with broad radiant star shapes and golden ribbon architecture. Dawn house, star cup, celebration market and champagne astronaut helmet."
+    },
+    {
+      "id": "theme_2027_01_midnight_celebration",
+      "name": "Midnight Celebration",
+      "brief": "Entire midnight-navy and silver New Year celebration miniatures with large silver star architecture and luminous gold windows, fireworks-inspired sculpted roof lines. Midnight house, midnight star trophy and midnight celebration market."
+    },
+    {
+      "id": "theme_2027_02_cloud_valentine",
+      "name": "Cloud Valentine",
+      "brief": "Entire soft-pink and pearl-white Valentine heart-cloud architecture: heart-shaped cottage roof, large heart-shaped trophy bowl, rose market, pink heart-visor astronaut helmet, heart-bound calendar and rose-pink puzzle book."
+    },
+    {
+      "id": "theme_2027_02_velvet_galaxy",
+      "name": "Velvet Galaxy",
+      "brief": "Entire deep-violet velvet and ruby-red rose architecture: rose-petal house, velvet heart trophy, violet rose market, ruby-and-violet astronaut helmet, velvet calendar base and dark rose clock. Broad folded satin forms are the actual object bodies."
+    },
+    {
+      "id": "theme_2027_03_blossom_breeze",
+      "name": "Blossom Breeze",
+      "brief": "Entire blush-pink and mint porcelain spring blossom architecture: airy petal-roof cottage, pink blossom trophy bowl, pastel flower market, pink petal astronaut helmet and floral calendar base. Lighter and airier than the base Sakura theme."
+    },
+    {
+      "id": "theme_2027_03_moonlit_sakura",
+      "name": "Moonlit Sakura",
+      "brief": "Entire midnight-lavender and silver moonlit cherry blossom architecture: flowing silver petal roofs, violet blossom trophy, night blossom market, moon-petal astronaut helmet and dark sakura clock."
+    },
+    {
+      "id": "theme_2027_04_crystal_lagoon",
+      "name": "Crystal Lagoon",
+      "brief": "Entire clear-aqua and pearl glass Songkran water-festival architecture: splash-crown cottage roof, water-splash trophy bowl, lagoon market, clear-water astronaut helmet, flowing splash calendar base and transparent water clock. White jasmine forms integrated into structure."
+    },
+    {
+      "id": "theme_2027_04_moonlit_festival",
+      "name": "Moonlit Festival",
+      "brief": "Entire deep-indigo luminous water-festival architecture: sapphire splash roofs, moonwater trophy, night-lagoon market, indigo glass astronaut helmet and blue moonlit water clock. Bright blue translucent structural silhouettes."
+    },
+    {
+      "id": "theme_2027_05_dewdrop_meadow",
+      "name": "Dewdrop Meadow",
+      "brief": "Entire mint-green leaf and dew architecture: leaf-fold cottage, broad leaf trophy cup, dewdrop garden market, jade leaf astronaut helmet, leaf-bound puzzle book and dewdrop clock."
+    },
+    {
+      "id": "theme_2027_05_secret_moon_garden",
+      "name": "Secret Moon Garden",
+      "brief": "Entire emerald and midnight-green magical mushroom architecture: glowing mushroom cottage, emerald moon trophy, secret mushroom market, dark green astronaut helmet with moon visor, and mushroom-rim clock."
+    },
+    {
+      "id": "theme_2027_06_crystal_reef",
+      "name": "Crystal Reef",
+      "brief": "Entire light-aqua pearl and peach coral reef architecture: coral cottage, shell-and-pearl trophy bowl, reef market, pearl diving astronaut helmet, coral calendar pedestal, shell-bound book and reef clock."
+    },
+    {
+      "id": "theme_2027_06_abyssal_starlight",
+      "name": "Abyssal Starlight",
+      "brief": "Entire deep-cobalt bioluminescent abyss architecture: glowing jellyfish-roof cottage, luminous aqua coral trophy, dark undersea market, deep-blue pearl diving astronaut helmet and luminous abyss clock. Broad glowing blue forms."
+    },
+    {
+      "id": "theme_2027_07_cloud_outpost",
+      "name": "Cloud Outpost",
+      "brief": "Entire cream-white and pale-blue explorer sky-outpost architecture: winged space cottage, silver wing trophy, cloud spaceport shop, white pilot astronaut helmet, aerodynamic calendar base and cloud clock."
+    },
+    {
+      "id": "theme_2027_07_ancient_star_temple",
+      "name": "Ancient Star Temple",
+      "brief": "Entire indigo stone and antique gold ancient SPACE ruin architecture: geometric stepped outpost house, carved star relic trophy, ancient star market, indigo explorer astronaut helmet, carved-stone calendar base and ancient observatory clock. No religious figures."
+    },
+    {
+      "id": "theme_2027_08_stardust_valley",
+      "name": "Stardust Valley",
+      "brief": "Entire lavender and pearl stardust glass architecture with long flowing comet-shaped forms: comet-roof cottage, shooting-star trophy bowl, stardust market, comet-visored astronaut helmet, tail-shaped calendar base and glass meteor clock."
+    },
+    {
+      "id": "theme_2027_08_meteor_observatory",
+      "name": "Meteor Observatory",
+      "brief": "Entire midnight-purple crystalline meteor observatory architecture: angular meteor crystal roofs, silver comet trophy, domed meteor market, dark crystal astronaut helmet, angular observatory calendar pedestal and cosmic meteor clock."
+    },
+    {
+      "id": "theme_2027_09_golden_meadow",
+      "name": "Golden Meadow",
+      "brief": "Entire warm wheat-gold and peach harvest architecture: woven wheat cottage, golden grain trophy bowl, harvest basket market, amber astronaut helmet, wheat-carved calendar base and peach harvest clock. Broad woven forms form the objects."
+    },
+    {
+      "id": "theme_2027_09_moonlit_orchard",
+      "name": "Moonlit Orchard",
+      "brief": "Entire midnight-blue and amber moonlit orchard architecture: apple-tree cottage, crescent harvest trophy, orchard basket market, dark amber astronaut helmet, glowing apple calendar base and harvest moon clock."
+    },
+    {
+      "id": "theme_2027_10_twilight_spell",
+      "name": "Twilight Spell",
+      "brief": "Entire soft-pumpkin orange and lavender friendly Halloween architecture: pumpkin cottage with witch-hat roof, pumpkin trophy bowl, friendly witch market, lavender witch astronaut helmet, pumpkin calendar pedestal, spell puzzle book and friendly pumpkin clock."
+    },
+    {
+      "id": "theme_2027_10_midnight_observatory",
+      "name": "Midnight Observatory",
+      "brief": "Entire midnight-indigo and pearl ghostly Halloween observatory architecture: friendly haunted dome cottage, pearl ghost-shaped trophy bowl, ghost observatory market, ghost-patterned astronaut helmet, haunted observatory calendar base and midnight ghost clock. Cute luminous silhouettes, never scary."
+    }
+  ],
+  "moonlitPromptFile": "readable-moonlit-v1-prompt.txt",
+  "tool": "built-in imagegen",
+  "references": [
+    "approved Moonlit River pilot",
+    "original 35-theme contact sheet"
+  ]
+}

@@ -1,18 +1,23 @@
 name: Deploy Supabase
 
 on:
-  push:
-    branches: [main, staging]
-    paths:
-      - 'supabase/**'
+  workflow_dispatch:
+    inputs:
+      function:
+        description: Reviewed production function to deploy after release approval
+        type: choice
+        required: true
+        options:
+          - equip-item
+          - purchase-item
 
 jobs:
   deploy:
-    # Staging has consolidated migration history and must use its account-scoped connector.
-    if: github.ref == 'refs/heads/main'
+    # Database promotion is reviewed separately; staging scheduler code must never deploy with main.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    environment: production
     steps:
       - uses: actions/checkout@v4
 
@@ -20,18 +25,16 @@ jobs:
         with:
           version: latest
 
-      - name: Link project
-        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+      - name: Deploy reviewed Edge Function
+        shell: bash
+        run: |
+          test "$PROJECT_REF" = "sqjllqilozhxbzvfjhra" || { echo "Unexpected production project"; exit 1; }
+          case "$FUNCTION_NAME" in
+            equip-item|purchase-item) ;;
+            *) echo "Function is outside the reviewed release scope"; exit 1 ;;
+          esac
+          supabase functions deploy "$FUNCTION_NAME" --project-ref "$PROJECT_REF"
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Push DB migrations
-        run: supabase db push
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-
-      - name: Deploy Edge Functions
-        run: supabase functions deploy
-        env:
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_ID }}
+          FUNCTION_NAME: ${{ inputs.function }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

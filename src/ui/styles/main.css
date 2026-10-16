@@ -6509,7 +6509,19 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .theme-icon-picture { display: block; width: 100%; height: 100%; background-image: var(--theme-icon-atlas, var(--icon-fallback)); background-size: var(--theme-icon-grid, contain); background-position: var(--skin-position, center); background-repeat: no-repeat; }
 .theme-icon--hero { --skin-position: 50% 50%; width: min(75%, 230px); height: 180px; }
 .theme-icon--hero .theme-icon-picture { width: auto; height: 100%; aspect-ratio: 1; }
-.bottom-nav .theme-icon { width: 30px; height: 30px; }
+.bottom-nav .theme-icon { width: 36px; height: 36px; }
+.theme-icon:not(.theme-icon--hero) .theme-icon-picture { background-image: var(--theme-control-atlas, var(--icon-fallback)); }
+.theme-icon--home { --skin-position: 0% 0%; }
+.theme-icon--medals { --skin-position: 50% 0%; }
+.theme-icon--shop { --skin-position: 100% 0%; }
+.theme-icon--profile { --skin-position: 0% 50%; }
+.theme-icon--daily { --skin-position: 50% 50%; }
+.theme-icon--practice { --skin-position: 100% 50%; }
+.theme-icon--mode { --skin-position: 0% 100%; }
+.theme-icon--quests { --skin-position: 50% 100%; }
+.theme-icon--clock { --skin-position: 100% 100%; }
+.theme-icon--daily .theme-icon-picture, .theme-icon--practice .theme-icon-picture { clip-path: inset(5% 0 0); }
+.daily-stat-icon .theme-icon { width: 30px; height: 30px; }
 @media (max-width: 600px) {
   .view--home .theme-icon--hero { --skin-position: 50% 50%; width: min(65%, 180px); height: 116px; }
 }
@@ -6522,3 +6534,8 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .functional-icon-surface { fill: var(--icon-paper, var(--app-card-bg)); }
 .functional-icon-accent { fill: var(--icon-accent, var(--brand-secondary)); }
 .functional-icon-dots { fill: currentColor; stroke: none; }
+
+.fantasy-image-qa[data-artwork="new"] .theme-icon:not(.theme-icon--hero) .theme-icon-picture { background-image: var(--preview-icon-atlas); }
+.fantasy-image-qa[data-artwork="old"] .theme-icon:not(.theme-icon--hero) .theme-icon-picture { background-image: var(--theme-icon-atlas); }
+.fantasy-image-qa .bottom-nav .theme-icon { width: 36px; height: 36px; }
+.fantasy-image-qa .daily-stat-icon .theme-icon { width: 30px; height: 30px; }

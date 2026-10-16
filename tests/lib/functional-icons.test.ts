@@ -14,12 +14,13 @@ it('keeps nine distinct functional silhouettes without raster art, tiny decorati
   }
 });
 
-it('keeps the detailed collection available as a large illustration instead of shrinking it into controls', () => {
+it('renders themed control bitmaps while retaining the archived vector alternative', () => {
   expect(themeArtHTML('/calendar.webp', 180, 'hero')).toContain('theme-icon-picture');
   for (const size of [22, 30, 40]) {
     const control = themeArtHTML('/archived-detailed-art.webp', size, 'shop');
     expect(control).toContain(`--icon-size:${size}px`);
-    expect(control).toContain('data-icon="shop"');
-    expect(control).not.toContain('archived-detailed-art');
+    expect(control).toContain('theme-icon--shop');
+    expect(control).toContain('theme-icon-picture');
+    expect(control).not.toContain('<svg');
   }
 });
