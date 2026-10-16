@@ -67,8 +67,9 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
 
       <div class="cal-summary" id="cal-summary"></div>
 
+      <div class="cal-calendar">
       <div class="cal-weekdays">
-        ${['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d) => `<span>${d}</span>`).join('')}
+        ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => `<span>${d}</span>`).join('')}
       </div>
       <div class="cal-grid" id="cal-grid"><div class="ach-loading">Loading…</div></div>
 
@@ -77,6 +78,7 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
         <span><i class="cal-dot cal-dot--mistakes"></i>With mistakes</span>
         <span><i class="cal-dot cal-dot--missed"></i>Missed</span>
         <span><i class="cal-dot cal-dot--upcoming"></i>Upcoming</span>
+      </div>
       </div>
     </section>
     ${bottomNavHTML('home')}
@@ -129,7 +131,7 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
       const icon = status === 'solved' ? '✓' : status === 'mistakes' ? '★' : '';
 
       cells.push(`
-        <button class="${cls}" data-date="${dateStr}" ${isFuture ? 'disabled' : ''}>
+        <button class="${cls}" data-date="${dateStr}" aria-label="${MONTH_NAMES[viewMonth - 1]} ${d}, ${viewYear}, ${status}${isToday ? ', today' : ''}" ${isFuture ? 'disabled' : ''}>
           <span class="cal-cell-day">${d}</span>
           ${icon ? `<span class="cal-cell-icon">${icon}</span>` : ''}
         </button>

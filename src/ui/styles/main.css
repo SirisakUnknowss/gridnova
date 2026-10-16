@@ -2380,6 +2380,33 @@ h3 {
 .cal-dot--missed { background: #ef4444; }
 .cal-dot--upcoming { background: #d1d5db; }
 
+.cal-calendar { --recap-solved: #087f63; --recap-mistakes: #a56409; --recap-missed: #c44254; width: 100%; min-width: 0; padding: 14px 10px; border-radius: 22px; border: 1px solid var(--app-border); background: var(--app-card-bg); box-shadow: var(--app-card-shadow); }
+.cal-calendar .cal-weekdays { grid-template-columns: repeat(7,minmax(0,1fr)); gap: 4px; padding-bottom: 10px; color: var(--app-text); font-weight: 600; letter-spacing: 0; text-transform: none; }
+.cal-calendar .cal-grid { grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px 4px; }
+.cal-calendar .cal-cell { min-width: 0; min-height: 44px; aspect-ratio: auto; font: inherit; font-size: 14px; border: 1px solid transparent; }
+.cal-calendar .cal-cell--upcoming { opacity: 1; color: var(--app-text-secondary); background: color-mix(in srgb,var(--app-text) 4%,var(--app-card-bg)); }
+.cal-calendar .cal-cell--solved { color: var(--recap-solved); background: color-mix(in srgb,var(--recap-solved) 13%,var(--app-card-bg)); }
+.cal-calendar .cal-cell--mistakes { color: var(--recap-mistakes); background: color-mix(in srgb,var(--recap-mistakes) 14%,var(--app-card-bg)); }
+.cal-calendar .cal-cell--missed { color: var(--recap-missed); background: color-mix(in srgb,var(--recap-missed) 12%,var(--app-card-bg)); }
+.cal-calendar .cal-cell--today { border-color: var(--brand-primary); box-shadow: inset 0 0 0 1px var(--brand-primary); }
+.cal-calendar .cal-cell-icon { position: absolute; right: 3px; bottom: 2px; font-size: 13px; }
+.cal-calendar .cal-legend { gap: 8px 12px; padding: 14px 0 0; font-size: 11px; color: var(--app-text); }
+.cal-calendar .cal-dot--solved { background: var(--recap-solved); }
+.cal-calendar .cal-dot--mistakes { background: var(--recap-mistakes); }
+.cal-calendar .cal-dot--missed { background: var(--recap-missed); }
+.cal-calendar .cal-dot--upcoming { background: var(--app-text-secondary); }
+@media (max-width: 600px) {
+  .view--calendar { gap: 8px; }
+  .view--calendar .cal-streak-banner { padding: 10px 14px; }
+  .view--calendar .cal-streak-icon { width: 42px; height: 42px; }
+  .view--calendar .cal-stat { padding: 8px; }
+  .view--calendar .cal-nav { padding: 0 4px; }
+  .view--calendar .cal-nav-btn { width: 44px; height: 44px; }
+  .cal-calendar { padding-top: 12px; padding-bottom: 12px; }
+  .cal-calendar .cal-legend { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px 8px; }
+  .cal-calendar .cal-legend span { justify-content: center; }
+}
+
 .cal-sheet { max-height: 85vh; overflow-y: auto; }
 .cal-sheet-body { padding: 4px 20px 24px; }
 .cal-sheet-warning {
