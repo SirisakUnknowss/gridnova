@@ -1,3 +1,4 @@
+import { themeArtHTML } from './components/theme-art';
 import shopIcon from '@images/space/shop-capsule.webp';
 import closeControl from '@images/space/controls/close.webp';
 import backControl from '@images/space/controls/back.webp';
@@ -64,12 +65,12 @@ function img(src: string, size = 18): string {
 
 export const ic = {
   search: (s?: number) => svg('<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>', s),
-  shop: (s?: number) => img(shopIcon, s),
+  shop: (s?: number) => themeArtHTML(shopIcon, s, 'shop'),
   close: (s?: number) => img(closeControl, s),
   back: (s?: number) => img(backControl, s),
-  home: (s?: number) => img(homeIcon, s),
-  profile: (s?: number) => img(userIcon, s),
-  achievements: (s?: number) => img(badgeIcon, s),
+  home: (s?: number) => themeArtHTML(homeIcon, s, 'home'),
+  profile: (s?: number) => themeArtHTML(userIcon, s, 'profile'),
+  achievements: (s?: number) => themeArtHTML(badgeIcon, s, 'medals'),
   undo: (s?: number) => img(undoIcon, s),
   redo: (s?: number) => img(redoIcon, s),
   erase: (s?: number) => img(eraseIcon, s),
@@ -82,10 +83,10 @@ export const ic = {
   expert: (s?: number) => img(expertIcon, s),
 
   // Navigation / sections
-  practice: (s?: number) => img(puzzleIcon, s),
-  daily: (s?: number) => img(dailyIcon, s),
+  practice: (s?: number) => themeArtHTML(puzzleIcon, s, 'practice'),
+  daily: (s?: number) => themeArtHTML(dailyIcon, s, 'daily'),
   play: (s?: number) => img(playIcon, s),
-  quests: (s?: number) => img(questIcon, s),
+  quests: (s?: number) => themeArtHTML(questIcon, s, 'quests'),
 
   // User
   guest: (s?: number) => img(guestIcon, s),
@@ -97,7 +98,7 @@ export const ic = {
   coin: (s?: number) => img(coinIcon, s),
   badge: (s?: number) => img(badgeIcon, s),
   star: (s?: number) => img(starIcon, s),
-  trophy: (s?: number) => img(trophyIcon, s),
+  trophy: (s?: number) => themeArtHTML(trophyIcon, s, 'medals'),
   medal: (s?: number) => img(badgeIcon, s),
   chart: (s?: number) => img(statsIcon, s),
   target: (s?: number) => img(targetIcon, s),
@@ -114,17 +115,17 @@ export const ic = {
   warning: (s?: number) => img(warningIcon, s),
   empty: (s?: number) => img(emptyIcon, s),
   puzzle: (s?: number) => img(puzzleIcon, s),
-  gamepad: (s?: number) => img(gamepadIcon, s),
+  gamepad: (s?: number) => themeArtHTML(gamepadIcon, s, 'mode'),
   share: (s?: number) => img(sharingIcon, s),
   celebrate: (s?: number) => img(celebrateIcon, s),
-  clock: (s?: number) => img(clockIcon, s),
+  clock: (s?: number) => themeArtHTML(clockIcon, s, 'clock'),
   lock: (s?: number) => img(lockIcon, s),
   chevronRight: (s?: number) => svg(`<path d="m9 18 6-6-6-6"/>`, s),
-  dice: (s?: number) => img(diceIcon, s),
+  dice: (s?: number) => themeArtHTML(diceIcon, s, 'mode'),
   gift: (s?: number) => img(giftIcon, s),
   stats: (s?: number) => img(statsIcon, s),
-  bookMode: (s?: number) => img(bookModeIcon, s),
-  timeAttack: (s?: number) => img(chronometerIcon, s),
+  bookMode: (s?: number) => themeArtHTML(bookModeIcon, s, 'practice'),
+  timeAttack: (s?: number) => themeArtHTML(chronometerIcon, s, 'clock'),
 
   // Sound
   soundOn: (s?: number) => img(soundOnIcon, s),

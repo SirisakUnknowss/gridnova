@@ -1,5 +1,7 @@
 ## 2.0.0 — 2026-10-16 (staging)
 
+- Add coordinated icon materials and 35 distinct 3D accessory skins for all Shop and monthly themes; previews remain isolated from equipped themes.
+
 - Restore Dark Mode contrast, Daily/Monthly labels and Leaderboard & recap navigation.
 - Restore classic cosmetics in My Collection, including retired purchases.
 - Add English returning-player release notes. Production remains unchanged.

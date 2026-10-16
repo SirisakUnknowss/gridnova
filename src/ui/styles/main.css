@@ -6504,3 +6504,23 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .legacy-avatar-frame.legacy-rainbow { border-color: var(--brand-secondary); box-shadow: 0 0 0 2px var(--brand-primary); }
 
 :root { --daily-play-text: #24213f; }
+
+.theme-icon { position: relative; display: inline-flex; align-items: center; justify-content: center; width: var(--icon-size); height: var(--icon-size); flex: 0 0 auto; vertical-align: middle; isolation: isolate; pointer-events: none; }
+.theme-icon > .ui-art-icon { display: block; width: 100%; height: 100%; object-fit: contain; filter: var(--theme-icon-filter, none); }
+.theme-icon-ornament { position: absolute; width: 54%; aspect-ratio: 1; top: -8%; right: -9%; background-image: var(--theme-icon-atlas); background-size: 600% 600%; background-position: var(--theme-icon-position, 0% 0%); background-repeat: no-repeat; filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--brand-primary) 30%, transparent)); }
+.theme-icon--daily .theme-icon-ornament { top: -3%; right: -8%; }
+.theme-icon--medals .theme-icon-ornament { top: auto; bottom: -5%; right: -9%; width: 48%; }
+.theme-icon--clock .theme-icon-ornament { width: 44%; }
+.theme-icon--hero { width: min(75%, 230px); height: 180px; }
+.theme-icon--hero > .daily-fantasy-calendar { width: 100%; height: 100%; object-fit: contain; }
+.theme-icon--hero .theme-icon-ornament { width: 39%; top: 6%; right: 0; }
+.bottom-nav .theme-icon { width: 30px; height: 30px; }
+.theme-preview-home .theme-icon-ornament { pointer-events: none; }
+@media (max-width: 600px) {
+  .view--home .theme-icon--hero { width: min(65%, 180px); height: 116px; }
+  .view--home .theme-icon--hero > .daily-fantasy-calendar { width: 100%; height: 100%; }
+}
+
+.theme-qa-picker { display: flex; gap: 8px; align-items: center; justify-content: center; padding: 8px; color: var(--app-text); background: var(--app-card-bg); }
+.theme-qa-picker select { max-width: 70vw; min-height: 44px; font: inherit; color: var(--app-text); background: var(--app-card-bg); border: 1px solid var(--app-border); border-radius: 10px; }
+#theme-scene { padding-top: 12px; min-height: 100vh; color: var(--app-text); background-image: linear-gradient(color-mix(in srgb, var(--app-bg) 20%, transparent), color-mix(in srgb, var(--app-bg) 40%, transparent)), var(--theme-background); background-size: cover; background-position: center; }

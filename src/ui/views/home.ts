@@ -1,3 +1,4 @@
+import { themeArtHTML } from '../components/theme-art';
 import dailyCalendar from '@images/space/daily-calendar-fantasy.webp';
 import { avatarArtHTML } from '../components/avatar-art';
 import { framedAvatarHTML } from '../components/avatar-frame';
@@ -112,7 +113,7 @@ export function homeViewHTML(): string {
       <!-- Daily Puzzle — the hero. Same puzzle for everyone, ranked. -->
       <div class="playmode-card-v2 daily-hero">
         <div class="daily-hero-top">
-          <div class="daily-calendar-scene"><img class="daily-fantasy-calendar" src="${dailyCalendar}" width="230" height="180" alt="" decoding="async"></div>
+          <div class="daily-calendar-scene">${themeArtHTML(dailyCalendar, 180, 'hero')}</div>
           <div class="playmode-card-v2-title">Daily Puzzle</div>
           <span class="daily-hero-diff">${todayDifficulty.charAt(0).toUpperCase() + todayDifficulty.slice(1)}</span>
         </div>

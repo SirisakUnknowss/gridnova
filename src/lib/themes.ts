@@ -1,3 +1,4 @@
+import { themeIconProperties } from './theme-icons';
 import { THEME_BACKGROUNDS } from './theme-backgrounds';
 import { YEAR_THEMES, YEAR_DARK_THEMES } from './monthly-2027-themes';
 // =====================================================================
@@ -181,6 +182,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
   const id = themeId || 'theme_classic';
   const theme = THEMES[id] ?? THEMES['theme_classic'];
   root.dataset.theme = theme.id;
+  for (const [key, value] of Object.entries(themeIconProperties(theme.id))) root.style.setProperty(key, value);
   root.style.setProperty('--theme-background', `url("${THEME_BACKGROUNDS[theme.id]}")`);
 
   // Reset to classic first to clear any leftover overrides
@@ -205,19 +207,6 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
   const surface = dark ? theme.tokens['--cell-bg'] ?? '#222244' : `color-mix(in srgb, ${white} 97%, ${primary})`;
   const text = dark ? theme.tokens['--cell-text'] ?? '#e0e0e0' : `color-mix(in srgb, ${primary} 25%, #182033)`;
   const appTokens: Record<string, string> = {
-    '--calendar-filter': {
-      theme_classic: 'hue-rotate(190deg) saturate(.75)',
-      theme_paper: 'saturate(.65)',
-      theme_dark: 'grayscale(.65) hue-rotate(175deg) saturate(.55)',
-      theme_pastel: 'hue-rotate(285deg) saturate(.65)',
-      theme_ocean: 'hue-rotate(145deg) saturate(.75)',
-      theme_forest: 'hue-rotate(65deg) saturate(.7)',
-      theme_sunset: 'hue-rotate(345deg) saturate(.9)',
-      theme_neon: 'hue-rotate(120deg) saturate(.8)',
-      theme_sakura: 'hue-rotate(290deg) saturate(.7)',
-      theme_thai: 'none',
-      theme_mono: 'grayscale(1)',
-    }[theme.id] ?? 'none',
     '--brand-primary': primary,
     '--brand-secondary': `color-mix(in srgb, ${primary} 55%, ${white})`,
     '--brand-gradient': `linear-gradient(135deg, ${primary}, color-mix(in srgb, ${primary} 45%, ${white}))`,
