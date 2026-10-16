@@ -6442,3 +6442,19 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .monthly-month-nav select { min-width: 0; width: 100%; min-height: 44px; padding: 10px; border-radius: 14px; color: var(--app-text); background: var(--app-card-bg); border: 1px solid var(--app-border); font: inherit; }
 .monthly-month-nav label { font-size: 12px; align-self: center; }
 @media(max-width: 350px) { .view--monthly { padding-left: 10px; padding-right: 10px; } .monthly-dates { gap: 0; } .monthly-rewards { gap: 5px; } .monthly-coins { font-size: 11px; } }
+
+@media (max-width: 600px) {
+  .view--home .daily-hero { padding: 14px 18px 8px; }
+  .view--home .daily-hero-top { gap: 5px; margin-bottom: 10px; }
+  .view--home .daily-calendar-scene { height: 116px; margin: -14px -18px 4px; width: calc(100% + 36px); }
+  .view--home .daily-fantasy-calendar { height: 116px; width: min(65%, 180px); }
+  .view--home .daily-hero .playmode-card-v2-title { font-size: 28px; }
+  .view--home .daily-hero-diff { font-size: 13px; padding: 3px 16px; }
+  .view--home #home-daily-play { min-height: 48px; font-size: 22px; }
+  .view--home #home-daily-play span { font-size: 28px; }
+  .view--home .daily-entry-note { font-size: 12px; margin: 8px 0 12px; }
+  .view--home .daily-hero-stats { padding: 12px 0 8px; }
+  .view--home .daily-stat-icon { margin-bottom: 4px; }
+  .view--home .daily-hero-stat-label, .view--home .daily-hero-stat-value { font-size: 13px; }
+  .view--home .daily-hero-link { min-height: 44px; margin-top: 4px; font-size: 14px; }
+}
