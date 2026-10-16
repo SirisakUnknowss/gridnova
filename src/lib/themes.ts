@@ -72,16 +72,16 @@ export const THEMES: Record<string, ThemeMeta> = {
     id: 'theme_dark', name: 'Dark Mode',
     tokens: {
       '--brand-gradient': 'linear-gradient(135deg, #1a1a2e, #16213e)',
-      '--cell-bg': '#222244',
-      '--cell-bg-given': '#1a1a2e',
-      '--cell-bg-selected': '#3949ab',
-      '--cell-bg-related': '#2c2c54',
-      '--cell-bg-same': 'rgba(120, 80, 10, 0.5)',   // dark amber — distinct from dark purple related
-      '--cell-text': '#e0e0e0',
+      '--cell-bg': '#34385f',
+      '--cell-bg-given': '#2b3052',
+      '--cell-bg-selected': '#5266c4',
+      '--cell-bg-related': '#424a79',
+      '--cell-bg-same': 'rgba(156, 116, 28, 0.62)',   // warm highlight — distinct from blue related cells
+      '--cell-text': '#f5f6ff',
       '--cell-text-user': '#82b1ff',
       '--cell-text-hint': '#69f0ae',
-      '--border-thick': '#0a0a18',
-      '--border-thin': '#3a3a5a',
+      '--border-thick': '#aeb8e3',
+      '--border-thin': '#6874a5',
     },
   },
   theme_pastel: {
