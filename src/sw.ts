@@ -4,6 +4,8 @@
 // Handles workbox precaching + Web Push notification events
 // =====================================================================
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import { registerRoute } from 'workbox-routing';
+import { cachedThemeIcon, isThemeIconRequest, THEME_ICON_CACHE } from './lib/theme-icon-cache';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -11,6 +13,12 @@ cleanupOutdatedCaches();
 // Staging navigations must reach the session gate rather than cached HTML.
 const staging = self.location.hostname.includes('staging');
 precacheAndRoute(self.__WB_MANIFEST.filter(entry => !staging || !/\.html(?:\?|$)/.test(typeof entry === 'string' ? entry : entry.url)));
+
+// Fetch only viewed themes, rather than precaching every cosmetic pack.
+registerRoute(
+  ({ url, request }) => isThemeIconRequest(url, self.location.origin, request.destination),
+  async ({ request }) => cachedThemeIcon(request, await caches.open(THEME_ICON_CACHE)),
+);
 
 // Skip waiting so the new SW activates immediately on install
 self.addEventListener('install', (event) => {

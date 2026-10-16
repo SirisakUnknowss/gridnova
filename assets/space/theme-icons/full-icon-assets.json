@@ -1,0 +1,667 @@
+[
+  {
+    "id": "theme_2027_01_dawn_horizon",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_01_dawn_horizon.webp",
+    "bytes": 489474,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "8fa6b1db6a8ac60f4f5a10bc10c4519d17095d7c8b20aa8fe3b0d178c46c34a4",
+    "cell_occupancy": [
+      0.573,
+      0.395,
+      0.64,
+      0.619,
+      0.577,
+      0.619,
+      0.447,
+      0.572,
+      0.462
+    ]
+  },
+  {
+    "id": "theme_2027_01_midnight_celebration",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_01_midnight_celebration.webp",
+    "bytes": 508192,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "41362e4a123f91c390dacda4f4375546bc772dc7482a1ad3e9995822b8362244",
+    "cell_occupancy": [
+      0.591,
+      0.393,
+      0.573,
+      0.592,
+      0.585,
+      0.558,
+      0.602,
+      0.588,
+      0.598
+    ]
+  },
+  {
+    "id": "theme_2027_02_cloud_valentine",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_02_cloud_valentine.webp",
+    "bytes": 481340,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "4e345c5acd0586b5e01515d61d784493ea0b7224103d0f3798eace278ea9fe09",
+    "cell_occupancy": [
+      0.628,
+      0.498,
+      0.646,
+      0.626,
+      0.608,
+      0.628,
+      0.532,
+      0.585,
+      0.526
+    ]
+  },
+  {
+    "id": "theme_2027_02_velvet_galaxy",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_02_velvet_galaxy.webp",
+    "bytes": 605922,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "146180b93da19aaf2cd2615cddf8d9a65912732efb725d49b35490f84c4e97b5",
+    "cell_occupancy": [
+      0.611,
+      0.462,
+      0.595,
+      0.641,
+      0.652,
+      0.572,
+      0.543,
+      0.56,
+      0.553
+    ]
+  },
+  {
+    "id": "theme_2027_03_blossom_breeze",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_03_blossom_breeze.webp",
+    "bytes": 474548,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "7d8a12318ba0a0c440275c344bc3b1e93cd63d5233d2ea3f9763cd5804a6cba9",
+    "cell_occupancy": [
+      0.553,
+      0.451,
+      0.582,
+      0.579,
+      0.541,
+      0.564,
+      0.54,
+      0.507,
+      0.49
+    ]
+  },
+  {
+    "id": "theme_2027_03_moonlit_sakura",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_03_moonlit_sakura.webp",
+    "bytes": 615380,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "0efaa5b89b32bf9532520395debba391060d777c2a3e8706096c1bbaca97f51d",
+    "cell_occupancy": [
+      0.617,
+      0.445,
+      0.628,
+      0.648,
+      0.614,
+      0.657,
+      0.598,
+      0.575,
+      0.558
+    ]
+  },
+  {
+    "id": "theme_2027_04_crystal_lagoon",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_04_crystal_lagoon.webp",
+    "bytes": 663162,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "adc1d2b41fcb8c6efaf6f97baaa634040d708abcc59be4bbe8701c2b9a7d2743",
+    "cell_occupancy": [
+      0.585,
+      0.412,
+      0.583,
+      0.571,
+      0.554,
+      0.59,
+      0.5,
+      0.562,
+      0.513
+    ]
+  },
+  {
+    "id": "theme_2027_04_moonlit_festival",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_04_moonlit_festival.webp",
+    "bytes": 674258,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "9967d41f20a1d49ea8eba9e16dd0cd07e43ce9328d44b974b662534353ec1fe0",
+    "cell_occupancy": [
+      0.647,
+      0.463,
+      0.607,
+      0.638,
+      0.579,
+      0.67,
+      0.594,
+      0.589,
+      0.592
+    ]
+  },
+  {
+    "id": "theme_2027_05_dewdrop_meadow",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_05_dewdrop_meadow.webp",
+    "bytes": 530180,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "1e7fdb85fd0c754a0c644139df51cab0ebcf47ba5aa62bf6a32467e4171b0194",
+    "cell_occupancy": [
+      0.562,
+      0.467,
+      0.599,
+      0.609,
+      0.57,
+      0.648,
+      0.526,
+      0.581,
+      0.546
+    ]
+  },
+  {
+    "id": "theme_2027_05_secret_moon_garden",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_05_secret_moon_garden.webp",
+    "bytes": 550112,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "c3faa35e34a6d1d61316e76cb41cb44bec730ae1f41bf991d1a1a4e0bff894ad",
+    "cell_occupancy": [
+      0.645,
+      0.403,
+      0.661,
+      0.622,
+      0.584,
+      0.631,
+      0.556,
+      0.599,
+      0.63
+    ]
+  },
+  {
+    "id": "theme_2027_06_abyssal_starlight",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_06_abyssal_starlight.webp",
+    "bytes": 639190,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "1c5cb06eb4d8944a8b576aa4ae586080dbbc1657f18882d6c4aeb76c60cea80c",
+    "cell_occupancy": [
+      0.615,
+      0.465,
+      0.601,
+      0.63,
+      0.59,
+      0.563,
+      0.558,
+      0.546,
+      0.562
+    ]
+  },
+  {
+    "id": "theme_2027_06_crystal_reef",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_06_crystal_reef.webp",
+    "bytes": 531006,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "96ea25074e5f2b8c8d445455df90a02b33bdc1d2164b0f3a102bc8766f097a71",
+    "cell_occupancy": [
+      0.564,
+      0.442,
+      0.597,
+      0.541,
+      0.567,
+      0.51,
+      0.464,
+      0.506,
+      0.498
+    ]
+  },
+  {
+    "id": "theme_2027_07_ancient_star_temple",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_07_ancient_star_temple.webp",
+    "bytes": 544994,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "b11c04ccf5c41eb234b824efc2aa49ef4d679248457840c37e81dce662fd057f",
+    "cell_occupancy": [
+      0.552,
+      0.414,
+      0.58,
+      0.578,
+      0.566,
+      0.583,
+      0.583,
+      0.52,
+      0.564
+    ]
+  },
+  {
+    "id": "theme_2027_07_cloud_outpost",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_07_cloud_outpost.webp",
+    "bytes": 460960,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "c1971bf26066883e7581cd23e061f24661cbbae51b2ffc4e5a0efbe6c1249cb0",
+    "cell_occupancy": [
+      0.53,
+      0.414,
+      0.571,
+      0.579,
+      0.537,
+      0.577,
+      0.54,
+      0.489,
+      0.546
+    ]
+  },
+  {
+    "id": "theme_2027_08_meteor_observatory",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_08_meteor_observatory.webp",
+    "bytes": 577264,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "d9eed5056e4afaa74f7bdb8ff1e56cc9ff32913e0e3d7d057379d428922ff433",
+    "cell_occupancy": [
+      0.568,
+      0.395,
+      0.621,
+      0.583,
+      0.594,
+      0.599,
+      0.527,
+      0.517,
+      0.544
+    ]
+  },
+  {
+    "id": "theme_2027_08_stardust_valley",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_08_stardust_valley.webp",
+    "bytes": 530204,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "50f7d7b3e5cc55c70213bde43603a01a5ccfb5413def5e884f6f3d6ef2052dd2",
+    "cell_occupancy": [
+      0.539,
+      0.407,
+      0.543,
+      0.533,
+      0.606,
+      0.549,
+      0.536,
+      0.504,
+      0.563
+    ]
+  },
+  {
+    "id": "theme_2027_09_golden_meadow",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_09_golden_meadow.webp",
+    "bytes": 515488,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "0bb094e45aafdeea50b3ea4eccbe88a8234ab4add7f1c59aff7eae6dcdeee7e2",
+    "cell_occupancy": [
+      0.667,
+      0.496,
+      0.665,
+      0.591,
+      0.62,
+      0.594,
+      0.519,
+      0.536,
+      0.578
+    ]
+  },
+  {
+    "id": "theme_2027_09_moonlit_orchard",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_09_moonlit_orchard.webp",
+    "bytes": 562000,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "2c9ffd2e556fcf2a0725d9f9cab0a9eb692579cd46c601231b212986a468112e",
+    "cell_occupancy": [
+      0.703,
+      0.494,
+      0.667,
+      0.623,
+      0.653,
+      0.602,
+      0.562,
+      0.625,
+      0.674
+    ]
+  },
+  {
+    "id": "theme_2027_10_midnight_observatory",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_10_midnight_observatory.webp",
+    "bytes": 553474,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "7811f45c09148c5fbca13a6dbf401399609436d26ee030518f518059fb578b67",
+    "cell_occupancy": [
+      0.604,
+      0.418,
+      0.632,
+      0.612,
+      0.564,
+      0.602,
+      0.569,
+      0.574,
+      0.552
+    ]
+  },
+  {
+    "id": "theme_2027_10_twilight_spell",
+    "file": "src/images/space/theme-icons/full/skin-theme_2027_10_twilight_spell.webp",
+    "bytes": 500200,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "b04cd6665e4991f46c84a2370207474f0b035b655f2bf43a9664157fa9c4249a",
+    "cell_occupancy": [
+      0.594,
+      0.472,
+      0.59,
+      0.583,
+      0.561,
+      0.619,
+      0.515,
+      0.523,
+      0.533
+    ]
+  },
+  {
+    "id": "theme_christmas_eve",
+    "file": "src/images/space/theme-icons/full/skin-theme_christmas_eve.webp",
+    "bytes": 510018,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "90b5b2c78f66b114f9c53521462e6787d7cde919f11940ccd7780fc4060092a1",
+    "cell_occupancy": [
+      0.668,
+      0.537,
+      0.656,
+      0.625,
+      0.667,
+      0.613,
+      0.527,
+      0.581,
+      0.588
+    ]
+  },
+  {
+    "id": "theme_classic",
+    "file": "src/images/space/theme-icons/full/skin-theme_classic.webp",
+    "bytes": 524808,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "90ddceac44784069d74a3bbd03734ebc3be4ecd7b0197fae7a9b264baf98b76f",
+    "cell_occupancy": [
+      0.574,
+      0.416,
+      0.585,
+      0.558,
+      0.573,
+      0.617,
+      0.614,
+      0.533,
+      0.527
+    ]
+  },
+  {
+    "id": "theme_dark",
+    "file": "src/images/space/theme-icons/full/skin-theme_dark.webp",
+    "bytes": 485702,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "46a5987504e043114cbd2de992024894839662330810e8edf21fdd76a727d9ac",
+    "cell_occupancy": [
+      0.581,
+      0.406,
+      0.596,
+      0.593,
+      0.562,
+      0.638,
+      0.51,
+      0.514,
+      0.537
+    ]
+  },
+  {
+    "id": "theme_forest",
+    "file": "src/images/space/theme-icons/full/skin-theme_forest.webp",
+    "bytes": 608438,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "4ec3eaf71299ebd98ac03ab0afaa66ee2d4c19195cd946c792dec6c7c520e6eb",
+    "cell_occupancy": [
+      0.643,
+      0.488,
+      0.681,
+      0.6,
+      0.635,
+      0.61,
+      0.662,
+      0.557,
+      0.547
+    ]
+  },
+  {
+    "id": "theme_mono",
+    "file": "src/images/space/theme-icons/full/skin-theme_mono.webp",
+    "bytes": 359108,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "72872d6d4adcb78217a05ed8f6a9945d4086e38e40c58c7b07dd79bd372d0495",
+    "cell_occupancy": [
+      0.576,
+      0.428,
+      0.596,
+      0.576,
+      0.571,
+      0.585,
+      0.561,
+      0.538,
+      0.548
+    ]
+  },
+  {
+    "id": "theme_moonlit_river",
+    "file": "src/images/space/theme-icons/full/skin-theme_moonlit_river.webp",
+    "bytes": 602990,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "4cbc105df07d39784048b10a0500d1cde68fabdc9c8caa9276f932dbcb3fde42",
+    "cell_occupancy": [
+      0.552,
+      0.415,
+      0.573,
+      0.566,
+      0.58,
+      0.586,
+      0.505,
+      0.567,
+      0.548
+    ]
+  },
+  {
+    "id": "theme_neon",
+    "file": "src/images/space/theme-icons/full/skin-theme_neon.webp",
+    "bytes": 546868,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "2c26f5f682ef130daa1a1c58a0a264bb2e8e338abd3062cdc968b3d5824e6aec",
+    "cell_occupancy": [
+      0.538,
+      0.443,
+      0.547,
+      0.637,
+      0.522,
+      0.634,
+      0.524,
+      0.567,
+      0.519
+    ]
+  },
+  {
+    "id": "theme_ocean",
+    "file": "src/images/space/theme-icons/full/skin-theme_ocean.webp",
+    "bytes": 598404,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "902156921e88961476cbbefd0b15b2a962c21be5c063656955b49cdc851edfb1",
+    "cell_occupancy": [
+      0.584,
+      0.449,
+      0.631,
+      0.646,
+      0.621,
+      0.604,
+      0.594,
+      0.543,
+      0.601
+    ]
+  },
+  {
+    "id": "theme_paper",
+    "file": "src/images/space/theme-icons/full/skin-theme_paper.webp",
+    "bytes": 439454,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "2fa33ee3fe60f8070f0acdbf48befb0297d4f3668ffdf44f7571475438a28952",
+    "cell_occupancy": [
+      0.555,
+      0.41,
+      0.643,
+      0.591,
+      0.517,
+      0.636,
+      0.418,
+      0.546,
+      0.508
+    ]
+  },
+  {
+    "id": "theme_pastel",
+    "file": "src/images/space/theme-icons/full/skin-theme_pastel.webp",
+    "bytes": 391976,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "a8e9e3f57d45a60dd4a98fb24e5e38becf796ca87e4bfe415d457e9d413450d5",
+    "cell_occupancy": [
+      0.603,
+      0.436,
+      0.627,
+      0.602,
+      0.624,
+      0.62,
+      0.499,
+      0.516,
+      0.525
+    ]
+  },
+  {
+    "id": "theme_river_of_stars",
+    "file": "src/images/space/theme-icons/full/skin-theme_river_of_stars.webp",
+    "bytes": 606250,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "158e95e61420e9f09715bf893e0f40f9a5cdde8cd63dbaeeb56e3daaec880952",
+    "cell_occupancy": [
+      0.591,
+      0.46,
+      0.619,
+      0.604,
+      0.61,
+      0.583,
+      0.568,
+      0.545,
+      0.6
+    ]
+  },
+  {
+    "id": "theme_sakura",
+    "file": "src/images/space/theme-icons/full/skin-theme_sakura.webp",
+    "bytes": 489504,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "829acb44dab3c7c1f56119d69dda1fe6bd0650a4f7f41e8aa45d52b9c6053970",
+    "cell_occupancy": [
+      0.542,
+      0.459,
+      0.555,
+      0.615,
+      0.565,
+      0.588,
+      0.483,
+      0.535,
+      0.468
+    ]
+  },
+  {
+    "id": "theme_sunset",
+    "file": "src/images/space/theme-icons/full/skin-theme_sunset.webp",
+    "bytes": 485758,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "00b08b27e2e6c29ba397c832ded20c169c914f463ae3b4626873bef164fe1459",
+    "cell_occupancy": [
+      0.613,
+      0.414,
+      0.608,
+      0.679,
+      0.563,
+      0.68,
+      0.584,
+      0.607,
+      0.53
+    ]
+  },
+  {
+    "id": "theme_thai",
+    "file": "src/images/space/theme-icons/full/skin-theme_thai.webp",
+    "bytes": 564158,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "a3693b8616a3bedb3bdfd37f14fbb32dbb244d18ff52bfb685d32b378fc6ef59",
+    "cell_occupancy": [
+      0.517,
+      0.421,
+      0.545,
+      0.561,
+      0.535,
+      0.602,
+      0.485,
+      0.558,
+      0.504
+    ]
+  },
+  {
+    "id": "theme_winter_wonderland",
+    "file": "src/images/space/theme-icons/full/skin-theme_winter_wonderland.webp",
+    "bytes": 568474,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "c6ebca63aa75d11a545cc7efef4f95277dfd3f9f955c1d33e34fe425e19d5b4c",
+    "cell_occupancy": [
+      0.659,
+      0.424,
+      0.635,
+      0.658,
+      0.647,
+      0.638,
+      0.49,
+      0.544,
+      0.603
+    ]
+  }
+]

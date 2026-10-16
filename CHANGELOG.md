@@ -1,6 +1,6 @@
 ## 2.0.0 — 2026-10-16 (staging)
 
-- Add coordinated icon materials and 35 distinct 3D accessory skins for all Shop and monthly themes; previews remain isolated from equipped themes.
+- Replace icon decorations with 35 complete nine-icon art sets for all Shop and monthly themes. Theme packs load on demand, remain available offline after use, and previews stay isolated from equipped themes.
 
 - Restore Dark Mode contrast, Daily/Monthly labels and Leaderboard & recap navigation.
 - Restore classic cosmetics in My Collection, including retired purchases.
