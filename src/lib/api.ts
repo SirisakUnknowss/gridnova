@@ -382,7 +382,10 @@ export async function getInventory() {
 }
 
 export async function getEquipped() {
-  const { data, error } = await supabase.from('user_equipped').select('*').maybeSingle();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user || user.is_anonymous) return null;
+  const { data, error } = await supabase.from('user_equipped').select('*').eq('user_id', user.id).maybeSingle();
   if (error) throw error;
   return data;
 }

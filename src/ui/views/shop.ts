@@ -68,6 +68,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   let items: ShopItem[] = [];
   let loading = true;
   let errorMsg: string | null = null;
+  let alive = true;
   let framePreview: HTMLElement | null = null;
   let dismissThemePreview: (() => void) | null = null;
 
@@ -361,13 +362,16 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
   }
 
   async function load() {
+    const userId = useStore.getState().user?.id;
+    const member = !!userId && !useStore.getState().user?.is_anonymous;
     loading = true; errorMsg = null; render();
     try {
       const [shopItems, inventory, equipped] = await Promise.all([
         api.getShopItems(),
-        api.getInventory().catch(() => []),
-        api.getEquipped().catch(() => null),
+        member ? api.getInventory().catch(() => []) : Promise.resolve([]),
+        member ? api.getEquipped().catch(() => null) : Promise.resolve(null),
       ]);
+      if (!alive || useStore.getState().user?.id !== userId) return;
       items = ((shopItems ?? []) as ShopItem[]).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_') || item.unlock_type === 'monthly'))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
       useStore.getState().setInventory((inventory ?? []).map((r: { item_id: string }) => r.item_id));
       if (equipped) {
@@ -412,6 +416,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
 
   return {
     unmount() {
+      alive = false;
       dismissPurchase?.();
       framePreview?.remove();
       dismissThemePreview?.();

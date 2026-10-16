@@ -21,4 +21,7 @@ for name, filename in files.items():
     image.save(originals / f'{name}.png')
     size = (1024, 512) if name == 'christmas-hero' else (512, 512)
     image.resize(size, Image.Resampling.LANCZOS).save(runtime / f'{name}.webp', quality=85)
+square_portrait = originals / 'snowflake-girl-square-v2.png'
+if square_portrait.exists():
+    Image.open(square_portrait).resize((512, 512), Image.Resampling.LANCZOS).save(runtime / 'snowflake-girl.webp', quality=85)
 print('Prepared seven Christmas Day runtime assets')

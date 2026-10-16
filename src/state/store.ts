@@ -73,7 +73,10 @@ export const useStore = create<AppState>((set, get) => ({
   heartsInfinite: false,
   heartsInfiniteUntil: null,
 
-  setUser: (user) => set({ user }),
+  setUser: (user) => set(get().user?.id === user?.id ? { user } : {
+    user, profile: null, inventory: [],
+    equipped: { theme_id: null, background_id: null, board_color_id: null, frame_id: null, avatar: { emoji: '👤' } },
+  }),
   setProfile: (profile) => set({ profile }),
   setCoins: (coins) => set({ coins }),
   setXp: (xp) => set({ xp }),

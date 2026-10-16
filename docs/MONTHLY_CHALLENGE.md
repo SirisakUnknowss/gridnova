@@ -64,3 +64,11 @@ Migration `20261015154840_december_christmas_collection.sql` adds 31 uniquely so
 Rewards at 5/10/15/20/25/30 dates: Snowflake Girl (Avatar), Candy Cane Orbit (Frame), Winter Wonderland (Theme), Christmas Boy (Avatar), Starlight Wreath (Frame), Christmas Eve (Theme). Avatars show head and shoulders; frames have transparent open centers. Originals: `assets/space/monthly/christmas-day/`. Export: `scripts/prepare-december-art.py`.
 
 Staging preview: December 15. November ownership and progress remain intact. No December rewards were retained from QA. All 31 server solutions, duplicate payouts, month isolation, six idempotent claims and equipment passed transactional tests rolled back through intentional PASS_ROLLED_BACK exceptions. Vitest: 90 tests passed; ESLint, TypeScript and Vite/PWA build passed. January–October 2027 are design mockups only.
+
+## Avatar identity and shape fix
+
+Equipment reads now authenticate the current member and filter `user_equipped.user_id` explicitly. That table intentionally permits public profile reads, so an unfiltered `maybeSingle()` could previously return the sole staging test member's equipment to a guest/new account. Shop skips personal equipment reads for guests and discards results after unmount/account changes. Auth account changes reset previous cosmetics while same-account token refresh preserves them.
+
+All equipped profile portraits use circular clipping. Missing/unknown frames use a neutral gray circular ring; catalog/picker artwork uses rounded square corners. The Snowflake Girl square source is `assets/space/monthly/christmas-day/snowflake-girl-square-v2.png`; the original circular source is preserved. Built-in imagegen edit prompt: preserve character identity, hat, scarf, neck and shoulders; remove the baked-in circular boundary and white corners by extending the snowy cosmic background and clothing into a complete square; no frame, border, mask, text or watermark.
+
+Verification: 94 unit tests, including member-scoped equipment reads, no guest reads, account switching versus token refresh, and default frame rendering.

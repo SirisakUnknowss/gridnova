@@ -98,6 +98,7 @@ function clearView(view?: string) {
 }
 
 async function loadUserData(): Promise<void> {
+  const loadingUserId = useStore.getState().user?.id;
   try {
     const [wallet, progression, profile, equipped, inventory] = await Promise.all([
       api.getWallet(),
@@ -106,6 +107,7 @@ async function loadUserData(): Promise<void> {
       api.getEquipped().catch(() => null),
       api.getInventory().catch(() => []),
     ]);
+    if (useStore.getState().user?.id !== loadingUserId) return;
     const set = useStore.setState;
     if (wallet) set({ coins: wallet.coins });
     if (progression) set({
@@ -1122,7 +1124,7 @@ async function boot() {
   if (hasSupabase) {
     try {
       onAuthChange((user) => {
-        useStore.setState({ user });
+        useStore.getState().setUser(user);
       });
       // Use getCurrentUser() only — never auto-sign-in anonymously at boot.
       // signInAnonymously() on a project without anonymous auth enabled
@@ -1144,7 +1146,7 @@ async function boot() {
       }
 
       if (user) {
-        useStore.setState({ user });
+        useStore.getState().setUser(user);
         // Run v1 migration if applicable
         if (shouldMigrate()) {
           const result = await migrateFromV1();
