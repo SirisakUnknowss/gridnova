@@ -74,3 +74,5 @@ Home starts with the Monthly entry hidden and reveals it only after a successful
 Only the active catalog month can be opened. There is no month selector or archive, no preview of future collections, and no post-month puzzle play or reward claiming. The server enforces collection read and claim windows; already-owned cosmetics remain usable. Apply migration 20261016151310_monthly_current_collection_only.sql before promoting this client.
 
 The first Home visit for each catalog month offers a two-step introduction: current collection announcement, then six actual rewards with milestones and a button into Monthly Challenge. It does not teach Sudoku. Existing onboarding and What's New take priority. Acknowledgement is local, keyed by account and month, with a session fallback if browser storage is blocked. Another device/browser can show the introduction again; no server ownership or reward data is changed. Future collections beyond October 2027 need catalog entries before they can be announced.
+
+Classic uses its original individual menu images and Daily calendar. Other themes retain their fantasy packs; generated Classic atlases remain archived.

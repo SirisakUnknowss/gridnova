@@ -12,7 +12,8 @@ it('covers every shop and monthly theme with its own full-object icon pack', () 
   expect(new Set(Object.values(THEME_CONTROL_SKINS)).size).toBe(35);
   const atlases = new Set(Object.keys(THEMES).map(id => themeIconProperties(id)['--theme-icon-atlas']));
   expect(atlases.size).toBe(35);
-  for (const atlas of atlases) expect(atlas).toContain('skin-theme_');
+  expect(themeIconProperties('theme_classic')['--theme-icon-atlas']).toBe('initial');
+  for (const atlas of atlases) if (atlas !== 'initial') expect(atlas).toContain('skin-theme_');
 });
 
 it('switches complete packs with the equipped theme while keeping a preview isolated', () => {

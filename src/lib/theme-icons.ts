@@ -147,10 +147,21 @@ export const THEME_CONTROL_SKINS: Record<string, string> = {
 
 
 export function themeIconProperties(themeId: string): Record<string, string> {
+  if (themeId === 'theme_classic' || !THEME_ICON_SKINS[themeId]) {
+    return {
+      '--theme-icon-atlas': 'initial',
+      '--theme-control-atlas': 'initial',
+      '--theme-icon-grid': 'contain',
+      '--theme-icon-position': 'center',
+      '--theme-icon-trim': 'inset(0)',
+    };
+  }
   const atlas = THEME_ICON_SKINS[themeId] ?? THEME_ICON_SKINS.theme_classic;
   return {
     '--theme-icon-atlas': `url("${atlas}")`,
     '--theme-icon-grid': '300% 300%',
+    '--theme-icon-position': 'initial',
+    '--theme-icon-trim': 'inset(5% 0 0)',
     '--theme-control-atlas': `url("${THEME_CONTROL_SKINS[themeId] ?? THEME_CONTROL_SKINS.theme_classic}")`,
   };
 }
