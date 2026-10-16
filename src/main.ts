@@ -130,7 +130,8 @@ async function loadUserData(): Promise<void> {
       });
       const hasExplicitThemeSelection = !!loadCachedThemeId();
       if (equipped.theme_id && hasExplicitThemeSelection) applyTheme(equipped.theme_id);
-      if (equipped.background_id) applyBackground(equipped.background_id);
+      if (equipped.theme_id === 'theme_classic' || equipped.theme_id === 'theme_classic_v1') applyBackground('bg_default');
+      else if (equipped.background_id) applyBackground(equipped.background_id);
       if ((equipped as any).board_color_id) {
         api.getShopItem((equipped as any).board_color_id)
           .then((item) => applyBoardColorFromItem(item))

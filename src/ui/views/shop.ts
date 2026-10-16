@@ -18,6 +18,7 @@ import { showPaywall } from './paywall';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
 import { sfxThemeChange, sfxCoin } from '@lib/sound';
+import { applyBackground } from '@lib/backgrounds';
 
 export interface ShopProps {
   avatarItemId?: string;
@@ -52,7 +53,8 @@ function themePreview(id: string): string {
   const theme = THEMES[id] ?? THEMES.theme_classic;
   const tokens = { ...THEMES.theme_classic.tokens, ...theme.tokens };
   const style = Object.entries(tokens).map(([key, value]) => key + ':' + value).join(';');
-  return `<div class="shop-theme-sample" style="${escapeHtml(style)};background-image:url(&quot;${escapeHtml(THEME_BACKGROUNDS[id])}&quot;)" aria-hidden="true"><div class="shop-theme-top"></div><div class="shop-theme-board">${[1, '', 3, '', 5, '', 7, '', 9].map((value, i) => `<span class="${i === 4 ? 'selected' : ''}">${value}</span>`).join('')}</div></div>`;
+  const background = THEME_BACKGROUNDS[id] ? `background-image:url(&quot;${escapeHtml(THEME_BACKGROUNDS[id])}&quot;)` : 'background-image:none';
+  return `<div class="shop-theme-sample" style="${escapeHtml(style)};${background}" aria-hidden="true"><div class="shop-theme-top"></div><div class="shop-theme-board">${[1, '', 3, '', 5, '', 7, '', 9].map((value, i) => `<span class="${i === 4 ? 'selected' : ''}">${value}</span>`).join('')}</div></div>`;
 }
 
 const AVATAR_SHOP_IDS = new Set(['avatar_face_happy', 'avatar_face_cool', 'avatar_face_nerd', 'avatar_face_lion', 'avatar_hat_cap', 'avatar_pet_dog', 'avatar_pet_cat', 'avatar_pet_dragon']);
@@ -212,7 +214,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       const previewable = item.category === 'theme';
       const matchedTheme = previewable ? item.id : typeof item.metadata?.theme_id === 'string' ? item.metadata.theme_id : null;
       return `
-        <div class="shop-card shop-rarity-${rarity}${previewable ? ' shop-card--theme' : ''}" data-shop-item="${escapeHtml(item.id)}" data-preview="${previewable ? escapeHtml(item.id) : ''}" ${matchedTheme ? `style="--shop-card-image:url(&quot;${escapeHtml(THEME_BACKGROUNDS[matchedTheme])}&quot;)"` : ''}>
+        <div class="shop-card shop-rarity-${rarity}${previewable ? ' shop-card--theme' : ''}" data-shop-item="${escapeHtml(item.id)}" data-preview="${previewable ? escapeHtml(item.id) : ''}" ${matchedTheme && THEME_BACKGROUNDS[matchedTheme] ? `style="--shop-card-image:url(&quot;${escapeHtml(THEME_BACKGROUNDS[matchedTheme])}&quot;)"` : ''}>
           ${isPremiumGated ? `<div class="shop-premium-badge" title="Premium-only">${ic.sparkle(12)}</div>` : ''}
           <div class="shop-preview">${preview}</div>
           <div class="shop-name">${escapeHtml(item.name)}</div>
@@ -356,7 +358,11 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
       if (!currentAccount()) return;
       if (error) throw error;
       useStore.getState().setEquipped(payload);
-      if (item.category === 'theme' && THEMES[itemId]) { applyTheme(itemId); sfxThemeChange(); }
+      if (item.category === 'theme' && THEMES[itemId]) {
+        applyTheme(itemId);
+        if (itemId === 'theme_classic' || itemId === 'theme_classic_v1') applyBackground('bg_default');
+        sfxThemeChange();
+      }
       props.onToast(`✓ ${item.name} equipped`);
       render();
     } catch (err) {

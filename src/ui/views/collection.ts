@@ -57,7 +57,10 @@ export function mountCollectionView(root: HTMLElement, props: { onBack: () => vo
         }
         if (!alive || !currentAccount()) return;
         useStore.getState().setEquipped(payload);
-        if (item.category === 'theme') applyTheme(item.id);
+        if (item.category === 'theme') {
+          applyTheme(item.id);
+          if (item.id === 'theme_classic' || item.id === 'theme_classic_v1') applyBackground('bg_default');
+        }
         if (item.category === 'background') applyBackground(item.id);
         if (item.category === 'board_color') applyBoardColorFromItem(item);
         props.onToast(item.id === 'frame_none' ? 'Frame removed' : `${item.name} equipped`);

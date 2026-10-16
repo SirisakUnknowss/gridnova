@@ -58,6 +58,10 @@ export const THEMES: Record<string, ThemeMeta> = {
     id: 'theme_classic', name: 'Classic',
     tokens: CLASSIC,
   },
+  theme_classic_v1: {
+    id: 'theme_classic_v1', name: 'Classic Version 1',
+    tokens: CLASSIC,
+  },
   theme_paper: {
     id: 'theme_paper', name: 'Paper',
     tokens: {
@@ -184,7 +188,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
   const theme = THEMES[id] ?? THEMES['theme_classic'];
   root.dataset.theme = theme.id;
   for (const [key, value] of Object.entries(themeIconProperties(theme.id))) root.style.setProperty(key, value);
-  root.style.setProperty('--theme-background', `url("${THEME_BACKGROUNDS[theme.id]}")`);
+  root.style.setProperty('--theme-background', THEME_BACKGROUNDS[theme.id] ? `url("${THEME_BACKGROUNDS[theme.id]}")` : 'none');
 
   // Reset to classic first to clear any leftover overrides
   for (const [k, v] of Object.entries(CLASSIC)) {
@@ -195,7 +199,7 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     root.style.setProperty(k, v as string);
   }
   const bases: Record<string, string> = {
-    theme_classic: '#667eea', theme_paper: '#a0522d', theme_dark: '#475569',
+    theme_classic: '#667eea', theme_classic_v1: '#667eea', theme_paper: '#a0522d', theme_dark: '#475569',
     theme_pastel: '#c2185b', theme_ocean: '#0288d1', theme_forest: '#388e3c',
     theme_sunset: '#d96528', theme_neon: '#007f86', theme_sakura: '#c74878',
     theme_thai: '#a66b17', theme_mono: '#424242',
