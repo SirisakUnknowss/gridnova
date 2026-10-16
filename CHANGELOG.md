@@ -1,5 +1,6 @@
 ## 2.0.0 — 2026-10-16 (staging)
 
+- Show only the tappable circular profile portrait in the Home header, without the username or guest ID.
 - Use simplified 3D fantasy artwork for all 35 themes, with stronger silhouettes at mobile sizes. Status images use 30px, navigation 36px and mode entries 40px. Preserve all detailed originals and load theme packs on demand.
 - Prepare the 2.0.0 production promotion plan. Backend deployment now requires a manual choice of reviewed functions; it cannot blindly replay staging-only migrations or replace production scheduler functions.
 

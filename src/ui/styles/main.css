@@ -1446,14 +1446,15 @@ h3 {
 .home-user-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 0 1 auto;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  flex: 0 0 auto;
   overflow: hidden;
   background: var(--app-card-bg);
   border: none;
-  border-radius: var(--radius-xl);
-  padding: 8px 14px 8px 8px;
+  border-radius: 50%;
+  padding: 8px;
   cursor: pointer;
   box-shadow: var(--app-card-shadow);
 }
@@ -1535,7 +1536,6 @@ h3 {
   .home-header-right { gap: 3px; }
   .home-header-right .stat-pill { padding: 6px 8px; font-size: 12px; }
   .home-icon-btn { width: 30px; height: 30px; }
-  .home-user-btn { gap: 8px; padding: 6px 10px 6px 6px; }
   .home-avatar { width: 30px; height: 30px; }
 }
 
@@ -5624,8 +5624,8 @@ html:is(:not([data-theme]), [data-theme="theme_classic"]) .view--game .action-ba
 
 .home-user-btn {
   border: 1px solid color-mix(in srgb, var(--brand-primary) 20%, var(--app-card-bg));
-  border-radius: 20px;
-  padding: 6px 14px 6px 6px;
+  border-radius: 50%;
+  padding: 6px;
   transition: transform var(--duration-fast), box-shadow var(--duration-fast);
 }
 .home-user-btn:hover {

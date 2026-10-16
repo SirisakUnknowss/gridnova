@@ -11,7 +11,6 @@ import { levelProgress } from '@lib/level';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { isMuted, toggleMute } from '@lib/sound';
 import { useVisitorStore } from '@state/visitor-store';
-import { getGuestDisplayId } from '@lib/api';
 import * as api from '@lib/api';
 import { difficultyForDayOfWeek } from '@engine/generator';
 import { listGames, type GameInProgress } from '@lib/local-db';
@@ -56,7 +55,6 @@ export function homeViewHTML(): string {
   const visitorStats = useVisitorStore.getState();
   const isAnonymous = !!state.user?.is_anonymous;
   const isGuest = !state.user || isAnonymous;
-  const displayName = state.profile?.display_name || state.profile?.username || (isGuest ? 'Guest' : 'Player');
   const equippedEmoji = (state.equipped.avatar?.item_id as string) ?? (state.equipped.avatar?.emoji as string) ?? null;
   const avatarUrl = state.profile?.avatar_url ?? null;
   const userIcon = avatarUrl && !state.equipped.avatar?.item_id
@@ -66,7 +64,6 @@ export function homeViewHTML(): string {
       : isGuest ? ic.guest(38) : ic.member(38);
   const lvl = levelProgress(state.level, state.xp);
   const muted = isMuted();
-  const guestId = getGuestDisplayId();
   const today = todayUtc();
   const todayDifficulty = difficultyForDayOfWeek(new Date(today + 'T00:00:00Z').getUTCDay());
 
@@ -75,12 +72,8 @@ export function homeViewHTML(): string {
 
       <!-- Header -->
       <div class="home-header">
-        <button class="home-user-btn" id="user-badge" type="button">
+        <button class="home-user-btn" id="user-badge" type="button" aria-label="${isGuest ? 'Sign in' : 'Open profile'}">
           <span class="home-avatar">${framedAvatarHTML(userIcon, isGuest ? null : state.equipped.frame_id, 38)}</span>
-          <div class="home-user-info">
-            <span class="home-user-name">${displayName}</span>
-            ${isGuest ? `<span class="home-user-id">${guestId}</span>` : ''}
-          </div>
         </button>
         <div class="home-header-right">
           ${heartsPillHTML()}
