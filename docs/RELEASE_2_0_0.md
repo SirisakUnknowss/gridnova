@@ -59,7 +59,13 @@ Record the pre-release production deployment ID and commit before deployment. Ro
 ## Verification record
 
 - All 35 readable atlases exported (315 images, 16,710,904 bytes), alongside all 35 unchanged detailed originals. Asset manifests verify unique file hashes, transparency and nine nonempty cells.
-- 114 unit tests across 26 files pass; ESLint, TypeScript and Vite/PWA build pass. Icon atlases remain outside precache (169 entries, approximately 8.05 MiB) and load on demand.
+- 118 unit tests across 27 files pass; ESLint, TypeScript and Vite/PWA build pass. Icon atlases remain outside precache (169 entries, approximately 8.06 MiB) and load on demand.
 - Mobile Home renderer checked all 35 theme choices: 35 distinct control atlases, no horizontal overflow, no SVG replacements, four navigation buttons, rendered image sizes 30/36/40px. Navigation touch targets are 65px tall. Light Crystal Lagoon, dark Midnight Observatory and Christmas Eve screenshots are in `assets/space/qa/`.
 - Manual production workflow YAML parsed and checked for production project, explicit function allowlist, no push trigger and no automatic migration replay.
 - Before promotion, confirm CI and Deploy Web success for the final staging commit; run links and the deployed screenshot are supplied with the delivery. Production backend promotion and production smoke checks happen only after final approval.
+
+## Monthly discovery
+
+Home starts with the Monthly entry hidden and reveals it only after a successful server-clock response at or after November 1, 2026 UTC (07:00 Thailand). No device-clock fallback can reveal it. Home checks again every minute and when returning to the app; late responses from a previous view/account are discarded. Opening the Monthly page has the same server-clock gate.
+
+The first Home visit for each catalog month offers a two-step introduction: current collection announcement, then six actual rewards with milestones and a button into Monthly Challenge. It does not teach Sudoku. Existing onboarding and What's New take priority. Acknowledgement is local, keyed by account and month, with a session fallback if browser storage is blocked. Another device/browser can show the introduction again; no server ownership or reward data is changed. Future collections beyond October 2027 need catalog entries before they can be announced.

@@ -6539,3 +6539,19 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .fantasy-image-qa[data-artwork="old"] .theme-icon:not(.theme-icon--hero) .theme-icon-picture { background-image: var(--theme-icon-atlas); }
 .fantasy-image-qa .bottom-nav .theme-icon { width: 36px; height: 36px; }
 .fantasy-image-qa .daily-stat-icon .theme-icon { width: 30px; height: 30px; }
+
+.monthly-home-entry[hidden] { display: none; }
+.monthly-welcome { position: fixed; inset: 0; margin: auto; width: min(460px, calc(100vw - 24px)); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--app-border); border-radius: 24px; color: var(--app-text); background: var(--app-card-bg); box-shadow: var(--app-card-shadow); overflow: hidden; }
+.monthly-welcome[open] { display: flex; flex-direction: column; }
+.monthly-welcome::backdrop { background: color-mix(in srgb, var(--app-text) 40%, transparent); backdrop-filter: blur(6px); }
+.monthly-welcome-content { padding: 20px 18px 8px; overflow-y: auto; min-height: 0; text-align: center; }
+.monthly-welcome-kicker { color: var(--brand-primary); font-size: 12px; font-weight: 700; }
+.monthly-welcome h2 { font-size: 23px; line-height: 1.2; margin: 10px 0; }
+.monthly-welcome p { font-size: 13px; line-height: 1.5; margin: 10px 0; }
+.monthly-welcome-hero { display: block; width: 100%; aspect-ratio: 2; object-fit: cover; border-radius: 18px; margin-top: 16px; }
+.monthly-welcome-actions { display: grid; gap: 8px; padding: 12px 18px 18px; flex-shrink: 0; }
+.monthly-welcome-actions .btn { width: 100%; min-height: 44px; }
+.monthly-welcome-rewards { gap: 8px; margin: 16px 0; }
+.monthly-welcome-rewards .monthly-reward { padding: 8px 4px; }
+.monthly-welcome-rewards .monthly-reward h3 { font-size: 11px; line-height: 1.25; }
+.monthly-welcome-rewards .monthly-reward-preview { height: 64px; }

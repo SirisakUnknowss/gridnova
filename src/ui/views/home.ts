@@ -5,7 +5,9 @@ import { framedAvatarHTML } from '../components/avatar-frame';
 // =====================================================================
 // Home view — main hub
 // =====================================================================
-import { useStore } from '@state/store';
+import { useStore, accountScope } from '@state/store';
+import { getMonthlyStatus } from '@lib/monthly-challenge';
+import { launchedMonthly } from '@lib/monthly-discovery';
 import { formatCompact, todayUtc } from '@lib/format';
 import { levelProgress } from '@lib/level';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
@@ -26,6 +28,7 @@ export interface HomeViewProps {
   onContinueDaily: (saved: GameInProgress) => void;
   onOpenDailyDetail: () => void;
   onOpenMonthly: () => void;
+  onMonthlyReady?: (today: string) => void;
   onAuthAction: () => void;
   nav: BottomNavCallbacks;
 }
@@ -120,7 +123,7 @@ export function homeViewHTML(): string {
         <button class="daily-hero-link" id="home-daily-more">Leaderboard &amp; recap <span aria-hidden="true">›</span></button>
       </div>
 
-      <button class="pm-row monthly-home-entry" id="open-monthly">
+      <button class="pm-row monthly-home-entry" id="open-monthly" hidden>
         <span class="pm-row-icon">${ic.daily(40)}</span>
         <span class="pm-row-body"><span class="pm-row-title">Monthly Challenge</span><span class="pm-row-sub">Explore monthly puzzles &amp; collections</span></span>
         <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
@@ -207,9 +210,34 @@ export function homeViewHTML(): string {
 }
 
 export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmount: () => void } {
+  const sameAccount = accountScope();
+  let alive = true;
+  let monthlyToday: string | null = null;
+  let checkingMonth = false;
   const state = useStore.getState();
   const today = todayUtc();
   root.innerHTML = homeViewHTML();
+  const monthlyEntry = root.querySelector<HTMLButtonElement>('#open-monthly')!;
+  const notifyMonth = () => {
+    if (!alive || !sameAccount()) return;
+    monthlyEntry.hidden = !launchedMonthly(monthlyToday);
+    if (!monthlyEntry.hidden && monthlyToday) props.onMonthlyReady?.(monthlyToday);
+  };
+  const refreshMonth = async () => {
+    if (checkingMonth) return;
+    checkingMonth = true;
+    try {
+      const status = await getMonthlyStatus();
+      if (!alive || !sameAccount()) return;
+      monthlyToday = status.today;
+    } catch { monthlyToday = null; }
+    finally { checkingMonth = false; notifyMonth(); }
+  };
+  void refreshMonth();
+  const monthlyClock = window.setInterval(() => { void refreshMonth(); }, 60000);
+  const monthlyNotice = window.setInterval(notifyMonth, 3000);
+  const visible = () => { if (document.visibilityState === 'visible') void refreshMonth(); };
+  document.addEventListener('visibilitychange', visible);
 
   root.querySelector('#enter-play-mode')?.addEventListener('click', props.onEnterPlayMode);
   root.querySelector('#open-practice')?.addEventListener('click', props.onOpenPractice);
@@ -289,5 +317,5 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     btn.title = nowMuted ? 'Unmute' : 'Mute';
   });
 
-  return { unmount() { window.clearInterval(countdownHandle); unwireHearts(); } };
+  return { unmount() { alive = false; window.clearInterval(monthlyClock); window.clearInterval(monthlyNotice); document.removeEventListener('visibilitychange', visible); window.clearInterval(countdownHandle); unwireHearts(); } };
 }

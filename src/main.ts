@@ -42,7 +42,9 @@ import { mountGlobalStatsView } from './ui/views/global-stats';
 import { mountRecapView } from './ui/views/recap';
 import { mountCalendarView } from './ui/views/calendar';
 import { mountMonthlyChallengeView } from './ui/views/monthly-challenge';
-import { startMonthlyPuzzle, submitMonthlyPuzzle } from './lib/monthly-challenge';
+import { startMonthlyPuzzle, submitMonthlyPuzzle, getMonthlyStatus } from './lib/monthly-challenge';
+import { currentMonthly, launchedMonthly, monthlyWelcomeSeen } from './lib/monthly-discovery';
+import { showMonthlyWelcome } from './ui/views/monthly-welcome';
 import { mountLedgerView } from './ui/views/ledger';
 import { mountSettingsView } from './ui/views/settings';
 import { mountHowToPlayView } from './ui/views/how-to-play';
@@ -84,6 +86,7 @@ if ('serviceWorker' in navigator) {
 
 const root = document.getElementById('app')!;
 let currentUnmount: (() => void) | null = null;
+let monthlyWelcomeReady = false;
 
 function clearView(view?: string) {
   if (currentUnmount) {
@@ -216,18 +219,26 @@ function playPracticeResume(saved: GameInProgress) {
 
 function showHome() {
   clearView('home');
+  let closeWelcome: (() => void) | null = null;
   const view = mountHomeView(root, {
     onEnterPlayMode: showPlayMode,
     onOpenPractice: showPractice,
     onOpenQuests: showQuests,
     onOpenMonthly: showMonthlyChallenge,
+    onMonthlyReady: today => {
+      const collection = currentMonthly(today);
+      const account = useStore.getState().user?.id ?? 'guest';
+      if (!monthlyWelcomeReady || !collection || closeWelcome || monthlyWelcomeSeen(account, collection.month)) return;
+      if (document.querySelector('dialog[open], .modal-bg.active')) return;
+      closeWelcome = showMonthlyWelcome(collection, account, showMonthlyChallenge, () => { closeWelcome = null; });
+    },
     onPlayDaily: playDaily,
     onContinueDaily: (saved) => void playDailyResume(saved),
     onOpenDailyDetail: () => { dailyDetailBack = showHome; showDailyDetail(); },
     onAuthAction: openAuthAction,
     nav: navCb,
   });
-  currentUnmount = view.unmount;
+  currentUnmount = () => { view.unmount(); closeWelcome?.(); };
 
   // Best-effort: fill in the Quests row progress once loaded, so the
   // row hints at what's waiting before the player taps into it.
@@ -616,7 +627,17 @@ function openAuthAction() {
 
 // (profile menu now lives in mountProfileView)
 
-function showMonthlyChallenge() {
+async function showMonthlyChallenge() {
+  const sameAccount = accountScope();
+  const screen = root.firstElementChild;
+  try {
+    const status = await getMonthlyStatus();
+    if (!sameAccount() || screen !== root.firstElementChild) return;
+    if (!launchedMonthly(status.today)) { showHome(); return; }
+  } catch {
+    if (sameAccount() && screen === root.firstElementChild) toast('Could not load Monthly Challenge. Please try again.');
+    return;
+  }
   clearView('monthly_challenge');
   const view = mountMonthlyChallengeView(root, {
     onBack: showHome,
@@ -1226,6 +1247,7 @@ async function boot() {
     // this release since coins/level were rebalanced under them).
     showWhatsNew();
   }
+  monthlyWelcomeReady = true;
 }
 
 boot().catch((err) => {
