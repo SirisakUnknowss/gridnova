@@ -66,3 +66,9 @@
 - Read-only production aggregate audit confirmed owned Gold Frame (avatar), Forest Solid/Navy Solid (background), Forest Green (board color). Restored collection tabs and equip paths; retired owned metadata is fetched separately from shop availability. Legacy Gold Frame keeps its item ID and medal identity in the picker. No production writes.
 - Added concise English What's New and set staging package/lockfile version to 2.0.0.
 - Broader release gates above (including slow-network/PWA upgrade QA) remain separate from these four requested fixes.
+
+### Database verification
+
+Applied owner-only retired-item SELECT policy to staging. Rollback-only SQL regression verified owner read/equip, non-owner denial and guest denial against the real RLS roles. No fixture ownership/equipment/catalog changes retained. See supabase/tests/owned_retired_collection_visibility.sql.
+
+The security advisor still reports existing schema-wide findings (definer views/functions, mutable search paths, password protection). This focused policy change adds no function/view or write privilege. These findings have not been remediated by this UI release: https://supabase.com/docs/guides/database/database-linter .
