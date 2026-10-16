@@ -136,6 +136,10 @@ async function loadUserData(): Promise<void> {
           .catch(() => {});
       }
     }
+    if (!equipped?.theme_id) {
+      // A new account has no equipped theme yet; do not carry a stale guest cache into it.
+      applyTheme('theme_classic');
+    }
     if (inventory) {
       useStore.getState().setInventory((inventory as any[]).map((r) => r.item_id));
     }

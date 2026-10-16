@@ -1,6 +1,6 @@
 {
   "name": "gridnova",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "Gridnova — engagement-focused puzzle game",
   "scripts": {

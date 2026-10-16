@@ -176,7 +176,8 @@ export const THEMES: Record<string, ThemeMeta> = {
   },
 };
 
-const ACTIVE_THEME_KEY = 'sudoku_active_theme_v1';
+// Versioned so older releases cannot make a first-time theme load look selected.
+const ACTIVE_THEME_KEY = 'sudoku_active_theme_v2';
 
 export function applyTheme(themeId: string | null | undefined, root: HTMLElement = document.documentElement): void {
   const id = themeId || 'theme_classic';
@@ -206,6 +207,9 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
   const dark = theme.id === 'theme_dark' || theme.id === 'theme_river_of_stars' || theme.id === 'theme_christmas_eve' || YEAR_DARK_THEMES.has(theme.id);
   const surface = dark ? theme.tokens['--cell-bg'] ?? '#222244' : `color-mix(in srgb, ${white} 97%, ${primary})`;
   const text = dark ? theme.tokens['--cell-text'] ?? '#e0e0e0' : `color-mix(in srgb, ${primary} 25%, #182033)`;
+  const secondaryText = dark
+    ? `color-mix(in srgb, ${text} 82%, ${surface})`
+    : `color-mix(in srgb, ${text} 65%, ${surface})`;
   const appTokens: Record<string, string> = {
     '--icon-ink': `color-mix(in srgb, ${primary} ${dark ? 25 : 35}%, ${text})`,
     '--icon-paper': `color-mix(in srgb, ${surface} 88%, ${primary})`,
@@ -225,8 +229,8 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     '--app-card-bg': surface,
     '--app-card': surface,
     '--app-text': text,
-    '--app-text-secondary': `color-mix(in srgb, ${text} 65%, ${surface})`,
-    '--app-section-label': `color-mix(in srgb, ${text} 60%, ${surface})`,
+    '--app-text-secondary': secondaryText,
+    '--app-section-label': dark ? `color-mix(in srgb, ${text} 76%, ${surface})` : `color-mix(in srgb, ${text} 60%, ${surface})`,
     '--app-border': `color-mix(in srgb, ${primary} 20%, ${surface})`,
     '--app-card-shadow': `0 2px 12px color-mix(in srgb, ${primary} 12%, transparent)`,
     '--game-bg': 'var(--app-bg)',
