@@ -128,13 +128,18 @@ async function loadUserData(): Promise<void> {
         avatar: equipped.avatar ?? { emoji: '👤' },
         frame_id: equipped.frame_id ?? null,
       });
-      if (equipped.theme_id) applyTheme(equipped.theme_id);
+      const hasExplicitThemeSelection = !!loadCachedThemeId();
+      if (equipped.theme_id && hasExplicitThemeSelection) applyTheme(equipped.theme_id);
       if (equipped.background_id) applyBackground(equipped.background_id);
       if ((equipped as any).board_color_id) {
         api.getShopItem((equipped as any).board_color_id)
           .then((item) => applyBoardColorFromItem(item))
           .catch(() => {});
       }
+    }
+    if (!equipped?.theme_id || !loadCachedThemeId()) {
+      // A new account has no equipped theme yet; do not carry a stale guest cache into it.
+      applyTheme(null);
     }
     if (inventory) {
       useStore.getState().setInventory((inventory as any[]).map((r) => r.item_id));
