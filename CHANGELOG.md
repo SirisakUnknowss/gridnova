@@ -1,3 +1,9 @@
+## 2.0.3 — 2026-10-18
+
+- Accept replay-verified Daily Puzzle results completed faster than the review threshold instead of silently rejecting them from the leaderboard.
+- Flag unusually fast Daily results for review while keeping a 20-second hard floor for impossible submissions.
+- Show an in-app error and report diagnostics when a Daily score submission fails.
+
 ## 2.0.0 — 2026-10-16
 
 - Restore original Classic menu artwork and Daily calendar; retain fantasy packs for other themes.
