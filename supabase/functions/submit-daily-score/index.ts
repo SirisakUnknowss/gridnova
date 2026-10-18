@@ -29,6 +29,8 @@ const MIN_TIME: Record<string, number> = {
   'medium-hard': 130, 'hard': 160, 'hard-expert': 200, 'expert': 240
 };
 
+const ABSOLUTE_MIN_TIME_SECONDS = 20;
+
 const BASE_SCORE: Record<string, number> = {
   'easy': 1000, 'easy-medium': 1500, 'medium': 2000,
   'medium-hard': 2800, 'hard': 3500, 'hard-expert': 4200, 'expert': 5000
@@ -122,7 +124,7 @@ Deno.serve(async (req) => {
   const endMs = new Date(payload.completed_at).getTime();
   const actualSec = Math.floor((endMs - startMs) / 1000);
   if (Math.abs(actualSec - payload.time_seconds) > 5) return reject('TIME_MISMATCH');
-  if (payload.time_seconds < (MIN_TIME[puzzle.difficulty] ?? 45)) return reject('TOO_FAST');
+  if (payload.time_seconds < ABSOLUTE_MIN_TIME_SECONDS) return reject('TOO_FAST');
   if (payload.time_seconds > 3 * 60 * 60) return reject('TOO_SLOW');
 
   // Replay moves
@@ -149,17 +151,34 @@ Deno.serve(async (req) => {
 
   const score = computeScore(puzzle.difficulty, payload.time_seconds, mistakeCount, hintCount);
 
-  const { error: insErr } = await supabaseAdmin.from('daily_leaderboard').insert({
+  const { data: submission, error: insErr } = await supabaseAdmin.from('daily_leaderboard').insert({
     date: payload.date,
     user_id: user.id,
     score,
     time_seconds: payload.time_seconds,
     mistakes: mistakeCount,
     hints_used: hintCount,
-  });
+  }).select('id').single();
   if (insErr) {
     if (insErr.code === '23505') return reject('ALREADY_SUBMITTED');
     return respond(500, { error: { code: 'INTERNAL_ERROR', message: insErr.message } });
+  }
+
+  const reviewThreshold = MIN_TIME[puzzle.difficulty] ?? 45;
+  if (payload.time_seconds < reviewThreshold) {
+    await supabaseAdmin.from('flagged_submissions').insert({
+      user_id: user.id,
+      submission_id: submission.id,
+      flag_reason: 'FAST_COMPLETION',
+      payload: {
+        date: payload.date,
+        difficulty: puzzle.difficulty,
+        time_seconds: payload.time_seconds,
+        review_threshold_seconds: reviewThreshold,
+        mistakes: mistakeCount,
+        hints_used: hintCount,
+      },
+    });
   }
 
   // Rank

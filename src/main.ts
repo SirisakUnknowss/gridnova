@@ -896,7 +896,7 @@ async function handleWin(result: GameResult, date?: string) {
     } else if (result.mode === 'daily' && date) {
       // Signed-in member — submit to real leaderboard
       try {
-        const { data } = await api.submitDailyScore({
+        const { data, error } = await api.submitDailyScore({
           date,
           started_at: result.startedAt,
           completed_at: result.completedAt,
@@ -905,6 +905,7 @@ async function handleWin(result: GameResult, date?: string) {
           hints_used: result.hintsUsed,
           moves: result.moves,
         });
+        if (error) throw error;
         if (data?.rank) {
           rank = data.rank;
           totalPlayers = data.total_players;
@@ -914,7 +915,8 @@ async function handleWin(result: GameResult, date?: string) {
         // always trust the server's post-submit level, never guess locally.
         maybeShowLevelUp(prevLevel, useStore.getState().level);
       } catch (err) {
-        console.warn('Submit failed (offline?):', err);
+        captureError(err, { operation: 'submit_daily_score', date });
+        toast('Score submission failed. Your Daily rank was not saved.', 5000);
       }
     } else if (result.mode === 'practice' && !isGuest) {
       try {
