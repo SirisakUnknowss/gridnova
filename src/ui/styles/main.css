@@ -637,7 +637,7 @@ h3 {
   position: absolute;
   inset: 0;
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.82);
+  background: color-mix(in srgb, var(--app-card-bg) 82%, transparent);
   backdrop-filter: blur(6px);
   display: none;
   align-items: center;
@@ -687,7 +687,7 @@ h3 {
 }
 
 .board-gameover {
-  background: rgba(255, 240, 240, 0.92);
+  background: color-mix(in srgb, var(--app-card-bg) 90%, #ef4444);
 }
 
 .gameover-title {
