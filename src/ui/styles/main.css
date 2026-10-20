@@ -998,9 +998,9 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(7px, 1.5vw, 10px);
-  font-weight: 600;
-  color: var(--brand-primary);
+  font-size: clamp(8px, 2.2vw, 11px);
+  font-weight: 700;
+  color: color-mix(in srgb, var(--cell-text) 80%, transparent);
   line-height: 1;
 }
 
