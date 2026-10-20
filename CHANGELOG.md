@@ -3,6 +3,7 @@
 - Accept replay-verified Daily Puzzle results completed faster than the review threshold instead of silently rejecting them from the leaderboard.
 - Flag unusually fast Daily results for review while keeping a 20-second hard floor for impossible submissions.
 - Show an in-app error and report diagnostics when a Daily score submission fails.
+- Fix text that was faint or invisible on dark themes (Medals, bottom nav, Shop loading, pause menu, pencil notes) and make the pause and game-over overlays follow the theme surface color.
 
 ## 2.0.0 — 2026-10-16
 

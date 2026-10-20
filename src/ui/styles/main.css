@@ -637,7 +637,7 @@ h3 {
   position: absolute;
   inset: 0;
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.82);
+  background: color-mix(in srgb, var(--app-card-bg) 82%, transparent);
   backdrop-filter: blur(6px);
   display: none;
   align-items: center;
@@ -687,7 +687,7 @@ h3 {
 }
 
 .board-gameover {
-  background: rgba(255, 240, 240, 0.92);
+  background: color-mix(in srgb, var(--app-card-bg) 90%, #ef4444);
 }
 
 .gameover-title {
@@ -998,9 +998,9 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(7px, 1.5vw, 10px);
-  font-weight: 600;
-  color: var(--brand-primary);
+  font-size: clamp(8px, 2.2vw, 11px);
+  font-weight: 700;
+  color: color-mix(in srgb, var(--cell-text) 80%, transparent);
   line-height: 1;
 }
 
@@ -1203,7 +1203,7 @@ h3 {
 }
 
 .bottom-nav button.active {
-  color: var(--brand-primary);
+  color: color-mix(in srgb, var(--brand-primary) 45%, var(--app-text));
 }
 
 .bottom-nav button.nav-coming-soon {
@@ -3569,8 +3569,9 @@ h3 {
 }
 
 .shop-loading {
+  grid-column: 1 / -1;
   padding: 30px;
-  color: var(--app-text-secondary);
+  color: var(--app-text);
   text-align: center;
 }
 
@@ -4087,7 +4088,7 @@ h3 {
 }
 
 .ach-row.locked {
-  background: #faf9fd;
+  background: color-mix(in srgb, var(--app-card-bg) 94%, var(--brand-primary));
 }
 
 .ach-row.rare::after,
@@ -4141,7 +4142,7 @@ h3 {
 .ach-row-ic--locked {
   filter: grayscale(1);
   opacity: .5;
-  background: #f0eef8;
+  background: color-mix(in srgb, var(--app-card-bg) 88%, var(--brand-primary));
 }
 
 .ach-row-body {
@@ -4222,7 +4223,7 @@ h3 {
   display: grid;
   place-items: center;
   background: rgba(108, 92, 231, .08);
-  color: #c4bfdf;
+  color: color-mix(in srgb, var(--app-text) 55%, var(--app-card-bg));
 }
 
 .ach-row-lock svg {
@@ -5990,9 +5991,9 @@ button[aria-label="Back"]:focus-visible { outline: 2px solid var(--brand-primary
 .view--game .board-menu-btn--leave { color: var(--cell-text-conflict); }
 .view--game .board-menu-btn--resume { color: var(--app-text); }
 
-.view--game .board-menu-btn--resume { background-image: url('../../images/space/buttons/resume-pastel.webp'); color: var(--app-text); }
-.view--game .board-menu-btn--new { background-image: url('../../images/space/buttons/new-game-pastel.webp'); color: var(--app-text); }
-.view--game .board-menu-btn--leave { background-image: url('../../images/space/buttons/leave-game-pastel.webp'); color: var(--app-text); }
+.view--game .board-menu-btn--resume { background-image: url('../../images/space/buttons/resume-pastel.webp'); color: var(--on-pastel); }
+.view--game .board-menu-btn--new { background-image: url('../../images/space/buttons/new-game-pastel.webp'); color: var(--on-pastel); }
+.view--game .board-menu-btn--leave { background-image: url('../../images/space/buttons/leave-game-pastel.webp'); color: var(--on-pastel); }
 .view--game .board-menu { width: min(72%, 280px); gap: 10px; align-items: center; }
 .view--game .board-menu-btn { width: 100%; aspect-ratio: 5 / 1; padding: 10px 16px; font-size: 16px; min-height: 48px; }
 .settings-heading { margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -6013,7 +6014,7 @@ button[aria-label="Back"]:focus-visible { outline: 2px solid var(--brand-primary
   box-shadow: inset 0 1px 0 var(--glass-highlight), 0 2px 5px var(--glass-shadow);
 }
 
-:root { --on-brand: #ffffff; }
+:root { --on-brand: #ffffff; --on-pastel: #1f2a44; }
 html body:is(.bg-default, :not([class*="bg-"])) {
   background-image: linear-gradient(color-mix(in srgb, var(--app-bg) 72%, transparent), color-mix(in srgb, var(--app-bg) 62%, transparent)), var(--theme-background);
   background-size: cover;
