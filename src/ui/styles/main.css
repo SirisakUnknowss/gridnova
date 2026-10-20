@@ -5991,9 +5991,9 @@ button[aria-label="Back"]:focus-visible { outline: 2px solid var(--brand-primary
 .view--game .board-menu-btn--leave { color: var(--cell-text-conflict); }
 .view--game .board-menu-btn--resume { color: var(--app-text); }
 
-.view--game .board-menu-btn--resume { background-image: url('../../images/space/buttons/resume-pastel.webp'); color: var(--app-text); }
-.view--game .board-menu-btn--new { background-image: url('../../images/space/buttons/new-game-pastel.webp'); color: var(--app-text); }
-.view--game .board-menu-btn--leave { background-image: url('../../images/space/buttons/leave-game-pastel.webp'); color: var(--app-text); }
+.view--game .board-menu-btn--resume { background-image: url('../../images/space/buttons/resume-pastel.webp'); color: var(--on-pastel); }
+.view--game .board-menu-btn--new { background-image: url('../../images/space/buttons/new-game-pastel.webp'); color: var(--on-pastel); }
+.view--game .board-menu-btn--leave { background-image: url('../../images/space/buttons/leave-game-pastel.webp'); color: var(--on-pastel); }
 .view--game .board-menu { width: min(72%, 280px); gap: 10px; align-items: center; }
 .view--game .board-menu-btn { width: 100%; aspect-ratio: 5 / 1; padding: 10px 16px; font-size: 16px; min-height: 48px; }
 .settings-heading { margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -6014,7 +6014,7 @@ button[aria-label="Back"]:focus-visible { outline: 2px solid var(--brand-primary
   box-shadow: inset 0 1px 0 var(--glass-highlight), 0 2px 5px var(--glass-shadow);
 }
 
-:root { --on-brand: #ffffff; }
+:root { --on-brand: #ffffff; --on-pastel: #1f2a44; }
 html body:is(.bg-default, :not([class*="bg-"])) {
   background-image: linear-gradient(color-mix(in srgb, var(--app-bg) 72%, transparent), color-mix(in srgb, var(--app-bg) 62%, transparent)), var(--theme-background);
   background-size: cover;
