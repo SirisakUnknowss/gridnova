@@ -1203,7 +1203,7 @@ h3 {
 }
 
 .bottom-nav button.active {
-  color: var(--brand-primary);
+  color: color-mix(in srgb, var(--brand-primary) 45%, var(--app-text));
 }
 
 .bottom-nav button.nav-coming-soon {
@@ -3569,8 +3569,9 @@ h3 {
 }
 
 .shop-loading {
+  grid-column: 1 / -1;
   padding: 30px;
-  color: var(--app-text-secondary);
+  color: var(--app-text);
   text-align: center;
 }
 
@@ -4087,7 +4088,7 @@ h3 {
 }
 
 .ach-row.locked {
-  background: #faf9fd;
+  background: color-mix(in srgb, var(--app-card-bg) 94%, var(--brand-primary));
 }
 
 .ach-row.rare::after,
@@ -4141,7 +4142,7 @@ h3 {
 .ach-row-ic--locked {
   filter: grayscale(1);
   opacity: .5;
-  background: #f0eef8;
+  background: color-mix(in srgb, var(--app-card-bg) 88%, var(--brand-primary));
 }
 
 .ach-row-body {
@@ -4222,7 +4223,7 @@ h3 {
   display: grid;
   place-items: center;
   background: rgba(108, 92, 231, .08);
-  color: #c4bfdf;
+  color: color-mix(in srgb, var(--app-text) 55%, var(--app-card-bg));
 }
 
 .ach-row-lock svg {
