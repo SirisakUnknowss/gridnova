@@ -631,6 +631,7 @@ h3 {
   align-items: center;
   justify-content: center;
   padding: 0 14px;
+  container-type: size;
 }
 
 .board-overlay {
@@ -712,8 +713,9 @@ h3 {
    #board's own aspect-ratio (definite width in, square height out), the same
    mechanism .board relied on by itself before this wrapper existed. */
 .board-coords {
-  width: 100%;
+  width: min(100%, 100cqh);
   max-width: 100%;
+  aspect-ratio: 1;
   display: grid;
   grid-template-columns: 16px 1fr;
   grid-template-rows: 16px auto;
