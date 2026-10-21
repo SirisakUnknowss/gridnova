@@ -6495,6 +6495,39 @@ html[data-theme="theme_classic_v1"] .view--game .numpad button {
   border-radius: 10px;
   background: var(--app-card-bg);
 }
+html[data-theme="theme_classic_v1"] .view--game {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+html[data-theme="theme_classic_v1"] .view--game .game-card {
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+html[data-theme="theme_classic_v1"] .view--game .game-topbar { padding: 8px 12px 10px; border-bottom: 0; }
+html[data-theme="theme_classic_v1"] .view--game .board-wrap { padding: 0 14px; }
+html[data-theme="theme_classic_v1"] .view--game .board-coords {
+  display: grid;
+  width: min(100%, 100cqh);
+  height: auto;
+  aspect-ratio: auto;
+  grid-template-columns: 16px 1fr;
+  grid-template-rows: 16px auto;
+  gap: 3px;
+}
+html[data-theme="theme_classic_v1"] .view--game :is(.board-col-labels, .board-row-labels) { display: grid; }
+html[data-theme="theme_classic_v1"] .view--game .board { width: 100%; height: auto; border-color: var(--border-thick); border-radius: var(--radius-lg); }
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(3n):not(:nth-child(9n)),
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(n+19):nth-child(-n+27),
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(n+46):nth-child(-n+54) { border-color: var(--border-thick); }
+html[data-theme="theme_classic_v1"] .view--game .action-bar { padding: 8px 12px; gap: 4px; }
+html[data-theme="theme_classic_v1"] .view--game .numpad { padding: 8px 10px 10px; gap: 0; }
+html[data-theme="theme_classic_v1"] .view--game .numpad button {
+  margin: 0 2px;
+  padding: 10px 2px;
+  border: 1.5px solid var(--app-border);
+  border-radius: var(--radius-md);
+  background: var(--app-card-bg);
+}
 
 :is(.btn, .btn.btn--primary, .btn.btn--secondary, .btn.btn--accent, .btn-google,
   .coin-hint-btn, .hearts-buy, .auth-tab, .share-tab, .shop-tab, .lb-tab, .lb-tab-sm,
