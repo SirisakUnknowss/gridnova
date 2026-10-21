@@ -6486,6 +6486,13 @@ html[data-theme="theme_classic_v1"] .view--game .action-btn--notes-on {
 }
 html[data-theme="theme_classic_v1"] .view--game .action-btn--erase,
 html[data-theme="theme_classic_v1"] .view--game .action-btn--notes-on { color: var(--brand-primary); }
+html[data-theme="theme_classic_v1"] .view--game .action-btn,
+html[data-theme="theme_classic_v1"] .view--game .action-btn--erase,
+html[data-theme="theme_classic_v1"] .view--game .action-btn--notes-on {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
 html[data-theme="theme_classic_v1"] .view--game .numpad { padding: 6px 20px 14px; gap: 4px; }
 html[data-theme="theme_classic_v1"] .view--game .numpad button {
   min-height: 58px;

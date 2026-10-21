@@ -48,6 +48,19 @@ const CLASSIC: Partial<ThemeTokens> = {
   '--border-thin': '#dddddd',
 };
 
+const CLASSIC_V1: Partial<ThemeTokens> = {
+  ...CLASSIC,
+  '--cell-bg': '#fbfaff',
+  '--cell-bg-given': '#f4f1ff',
+  '--cell-bg-selected': '#c5bbff',
+  '--cell-bg-related': '#e5e0ff',
+  '--cell-bg-same': '#ddd7ff',
+  '--cell-text': '#2e3761',
+  '--cell-text-user': '#6c5ce7',
+  '--border-thick': '#a998ed',
+  '--border-thin': '#d2caf8',
+};
+
 export const THEMES: Record<string, ThemeMeta> = {
   ...YEAR_THEMES,
   theme_winter_wonderland: { id: 'theme_winter_wonderland', name: 'Winter Wonderland', tokens: { '--brand-primary': '#6386b3', '--border-thick': '#58749c', '--border-thin': '#c9dced' } },
@@ -60,7 +73,7 @@ export const THEMES: Record<string, ThemeMeta> = {
   },
   theme_classic_v1: {
     id: 'theme_classic_v1', name: 'GridNova V1',
-    tokens: CLASSIC,
+    tokens: CLASSIC_V1,
   },
   theme_paper: {
     id: 'theme_paper', name: 'Paper',
@@ -246,6 +259,31 @@ export function applyTheme(themeId: string | null | undefined, root: HTMLElement
     '--action-btn-hover': 'var(--app-border)',
     '--numpad-btn-bg': surface,
   };
+  if (theme.id === 'theme_classic_v1') {
+    Object.assign(appTokens, {
+      '--app-bg': '#f3f1ff',
+      '--app-card-bg': '#ffffff',
+      '--app-card': '#ffffff',
+      '--app-text': '#2e3761',
+      '--app-text-secondary': '#74809e',
+      '--app-border': '#e1dcfa',
+      '--game-bg': '#f3f1ff',
+      '--game-card-bg': '#ffffff',
+      '--game-topbar-text': '#2e3761',
+      '--game-muted': '#74809e',
+      '--action-bar-bg': '#f3f1ff',
+      '--action-btn-text': '#2e3761',
+      '--action-btn-hover': '#e5e0ff',
+      '--numpad-btn-bg': '#ffffff',
+      '--cell-bg': '#fbfaff',
+      '--cell-bg-given': '#f4f1ff',
+      '--cell-bg-selected': '#c5bbff',
+      '--cell-bg-related': '#e5e0ff',
+      '--cell-bg-same': '#ddd7ff',
+      '--cell-text': '#2e3761',
+      '--cell-text-user': '#6c5ce7',
+    });
+  }
   for (const [key, value] of Object.entries(appTokens)) root.style.setProperty(key, value);
   if (dark) {
     for (const [key,value] of Object.entries(theme.tokens)) root.style.setProperty(key,value);
