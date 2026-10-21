@@ -327,6 +327,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   `;
 
   const boardEl    = root.querySelector('#board') as HTMLElement;
+  const boardWrapEl = root.querySelector('.board-wrap') as HTMLElement;
+  const boardCoordsEl = root.querySelector('.board-coords') as HTMLElement;
   const numpadEl   = root.querySelector('#numpad') as HTMLElement;
   const timerEl    = root.querySelector('#timer') as HTMLElement;
   const heartsEl   = root.querySelector('#hearts-display') as HTMLElement;
@@ -343,6 +345,20 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   const eraseBtn   = root.querySelector('#erase-btn') as HTMLButtonElement;
   const notesBtn   = root.querySelector('#notes-btn') as HTMLButtonElement;
   const notesBadge = root.querySelector('#notes-badge') as HTMLElement;
+
+  let boardSizeObserver: ResizeObserver | null = null;
+  if (isClassicV1) {
+    const resizeBoardToWholeCells = () => {
+      const labelSize = 19;
+      const borderSize = 4;
+      const available = Math.min(boardWrapEl.clientWidth, boardWrapEl.clientHeight);
+      const innerSize = Math.floor(Math.max(0, available - labelSize - borderSize) / 9) * 9;
+      if (innerSize > 0) boardCoordsEl.style.width = `${innerSize + labelSize + borderSize}px`;
+    };
+    boardSizeObserver = new ResizeObserver(resizeBoardToWholeCells);
+    boardSizeObserver.observe(boardWrapEl);
+    resizeBoardToWholeCells();
+  }
 
   const taIssuedAtMs = TA ? new Date(TA.issuedAt).getTime() : 0;
 
@@ -1075,6 +1091,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       if (timerHandle) clearInterval(timerHandle);
       if (autosaveHandle) clearInterval(autosaveHandle);
       if (winTimeout) clearTimeout(winTimeout);
+      boardSizeObserver?.disconnect();
       if (getBgVolume() > 0) void playBgMusic();
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('visibilitychange', onVisibilityChange);
