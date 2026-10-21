@@ -14,6 +14,15 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '2.1.0', date: '2026-10-22', title: 'The Original GridNova Is Back',
+    changes: [
+      { icon: 'puzzle', text: 'New: GridNova V1 restores the clean, distraction-free interface from before 2.0, across both Home and the game board.' },
+      { icon: 'notes', text: 'Desktop keyboard shortcuts now cover the full game toolbar: Z Undo, Y Redo, E Erase, N Notes, H Hint, and Esc Menu.' },
+      { icon: 'gamepad', text: 'The board and controls now fit reliably on shorter screens without overlapping.' },
+      { icon: 'sparkle', text: 'GridNova V1 now has its original soft-purple board palette, consistent grid lines, simple icons, and clean tool buttons.' },
+    ],
+  },
+  {
     version: '2.0.0', date: '2026-10-16', title: 'Welcome to Your New Cosmic Home',
     changes: [
       { icon: 'daily', text: 'Daily Puzzle is still your daily competition. Open Leaderboard & recap to find your ranking and calendar.' },
