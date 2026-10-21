@@ -220,7 +220,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
                 <span class="stat-value" id="timer">00:00</span>
               </div>
             </div>
-            <button class="topbar-icon-btn" id="menu-btn" title="Menu">
+            <button class="topbar-icon-btn" id="menu-btn" title="Menu (Esc)">
               ${ic.notes(22)}
             </button>
           </div>
@@ -250,15 +250,15 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         </div>
 
         <div class="action-bar">
-          <button class="action-btn" id="undo-btn" title="Undo (Ctrl/⌘+Z)" disabled>
+          <button class="action-btn" id="undo-btn" title="Undo (Z or Ctrl/⌘+Z)" disabled>
             ${ic.undo(30)}
             <span>Undo</span>
           </button>
-          <button class="action-btn" id="redo-btn" title="Redo (Ctrl/⌘+Y)" disabled>
+          <button class="action-btn" id="redo-btn" title="Redo (Y or Ctrl/⌘+Y)" disabled>
             ${ic.redo(30)}
             <span>Redo</span>
           </button>
-          <button class="action-btn action-btn--erase" id="erase-btn" title="Erase (Backspace)">
+          <button class="action-btn action-btn--erase" id="erase-btn" title="Erase (E or Backspace)">
             ${ic.erase(30)}
             <span>Erase</span>
           </button>
@@ -994,21 +994,28 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   redoBtn.addEventListener('click', redoMove);
   eraseBtn.addEventListener('click', eraseCell);
 
-  notesBtn.addEventListener('click', () => {
+  const toggleNotes = () => {
     noteMode = !noteMode;
     notesBtn.classList.toggle('action-btn--notes-on', noteMode);
     notesBadge.textContent = noteMode ? 'ON' : 'OFF';
     notesBadge.classList.toggle('on', noteMode);
-  });
+  };
+  notesBtn.addEventListener('click', toggleNotes);
 
   const onKey = (e: KeyboardEvent) => {
     if (gameWon || pauseStart !== null) return;
+    const target = e.target as HTMLElement | null;
+    if (target?.matches('input, textarea, select, [contenteditable="true"]')) return;
+
+    const hasModifier = e.ctrlKey || e.metaKey || e.altKey;
     if (e.key >= '1' && e.key <= '9') handleNumber(parseInt(e.key, 10));
     else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') eraseCell();
-    else if (e.key === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); undoMove(); }
-    else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); redoMove(); }
-    else if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); notesBtn.click(); }
-    else if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); hintBtn.click(); }
+    else if (e.code === 'KeyZ' && !e.altKey) { e.preventDefault(); undoMove(); }
+    else if (e.code === 'KeyY' && !e.altKey) { e.preventDefault(); redoMove(); }
+    else if (e.code === 'KeyE' && !hasModifier) { e.preventDefault(); eraseCell(); }
+    else if (e.code === 'KeyN' && !hasModifier) { e.preventDefault(); toggleNotes(); }
+    else if (e.code === 'KeyH' && !hasModifier && !e.repeat) { e.preventDefault(); useHint(); }
+    else if (e.key === 'Escape') { e.preventDefault(); openMenu(); }
     else if (selected) {
       const { r, c } = selected;
       if      (e.key === 'ArrowUp')    { selected = { r: Math.max(0, r - 1), c }; rerender(); }
