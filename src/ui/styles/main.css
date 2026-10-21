@@ -6350,7 +6350,6 @@ html body:is(.bg-default, :not([class*="bg-"])) .view--game {
 .collection-shop-button:active { transform: translateY(2px); }
 .collection-shop-button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 3px; }
 
-/* GridNova V1 keeps the pre-2.0 interface calm and distraction-free. */
 html[data-theme="theme_classic_v1"] body,
 html[data-theme="theme_classic_v1"] body:is(.bg-default, :not([class*="bg-"])) {
   background: var(--app-bg);
@@ -6440,6 +6439,62 @@ html[data-theme="theme_classic_v1"] .view--game :is(.action-btn, .numpad button)
   backdrop-filter: none;
 }
 html[data-theme="theme_classic_v1"] .view--game .action-btn { min-height: 58px; border-radius: var(--radius-md); }
+html[data-theme="theme_classic_v1"] .view--game {
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+  background: var(--app-bg) !important;
+}
+html[data-theme="theme_classic_v1"] .view--game .game-card {
+  border-radius: 20px;
+  background: var(--app-card-bg);
+  overflow: hidden;
+}
+html[data-theme="theme_classic_v1"] .view--game .game-topbar {
+  padding: 14px 24px 12px;
+  border-bottom: 0;
+}
+html[data-theme="theme_classic_v1"] .view--game .mode-pill,
+html[data-theme="theme_classic_v1"] .view--game .stat-block,
+html[data-theme="theme_classic_v1"] .view--game .topbar-icon-btn {
+  padding: 0;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+}
+html[data-theme="theme_classic_v1"] .view--game .mode-pill { font-size: 16px; font-weight: 600; }
+html[data-theme="theme_classic_v1"] .view--game .mode-dot { background: var(--brand-primary); }
+html[data-theme="theme_classic_v1"] .view--game .stat-block { gap: 2px; }
+html[data-theme="theme_classic_v1"] .view--game .stat-label { font-size: 10px; }
+html[data-theme="theme_classic_v1"] .view--game .stat-value { font-size: 22px; }
+html[data-theme="theme_classic_v1"] .view--game .topbar-icon-btn { width: 34px; height: 34px; color: var(--brand-primary); }
+html[data-theme="theme_classic_v1"] .view--game .board-wrap { padding: 8px 24px 0; }
+html[data-theme="theme_classic_v1"] .view--game .board-coords { display: block; width: 100%; aspect-ratio: 1; }
+html[data-theme="theme_classic_v1"] .view--game :is(.board-col-labels, .board-row-labels) { display: none; }
+html[data-theme="theme_classic_v1"] .view--game .board { width: 100%; height: 100%; border: 2px solid var(--border-thin); border-radius: 10px; }
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(3n):not(:nth-child(9n)),
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(n+19):nth-child(-n+27),
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(n+46):nth-child(-n+54) { border-color: var(--border-thin); }
+html[data-theme="theme_classic_v1"] .view--game .action-bar { padding: 10px 24px 6px; gap: 8px; }
+html[data-theme="theme_classic_v1"] .view--game .action-btn,
+html[data-theme="theme_classic_v1"] .view--game .action-btn--erase,
+html[data-theme="theme_classic_v1"] .view--game .action-btn--notes-on {
+  min-height: 58px;
+  padding: 4px 2px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--app-text);
+}
+html[data-theme="theme_classic_v1"] .view--game .action-btn--erase,
+html[data-theme="theme_classic_v1"] .view--game .action-btn--notes-on { color: var(--brand-primary); }
+html[data-theme="theme_classic_v1"] .view--game .numpad { padding: 6px 20px 14px; gap: 4px; }
+html[data-theme="theme_classic_v1"] .view--game .numpad button {
+  min-height: 58px;
+  margin: 0;
+  padding: 8px 2px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-card-bg);
+}
 
 :is(.btn, .btn.btn--primary, .btn.btn--secondary, .btn.btn--accent, .btn-google,
   .coin-hint-btn, .hearts-buy, .auth-tab, .share-tab, .shop-tab, .lb-tab, .lb-tab-sm,
