@@ -384,7 +384,7 @@ export function mountShopView(root: HTMLElement, props: ShopProps): { unmount: (
         member ? api.getEquipped() : Promise.resolve(null),
       ]);
       if (!alive || !currentAccount()) return;
-      items = ((shopItems ?? []) as ShopItem[]).filter(isShopListing).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_') || item.unlock_type === 'monthly'))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item);
+      items = ((shopItems ?? []) as ShopItem[]).filter(isShopListing).filter(item => item.category === 'theme' || item.category === 'avatar_frame' || (item.category === 'avatar' && (AVATAR_SHOP_IDS.has(item.id) || item.id.startsWith('avatar_rare_') || item.unlock_type === 'monthly'))).map(item => item.category === 'avatar' ? { ...item, name: shopAvatarName(item.id) ?? item.name } : item.id === 'theme_neon' ? { ...item, name: 'Sky Citadel', description: 'A serene city above the clouds' } : item.id === 'theme_classic_v1' ? { ...item, name: 'GridNova V1', description: 'The original pre-2.0 interface' } : item);
       useStore.getState().setInventory((inventory ?? []).map((r: { item_id: string }) => r.item_id));
       if (equipped) {
         useStore.getState().setEquipped({

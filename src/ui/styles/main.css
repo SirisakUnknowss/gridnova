@@ -6350,6 +6350,97 @@ html body:is(.bg-default, :not([class*="bg-"])) .view--game {
 .collection-shop-button:active { transform: translateY(2px); }
 .collection-shop-button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 3px; }
 
+/* GridNova V1 keeps the pre-2.0 interface calm and distraction-free. */
+html[data-theme="theme_classic_v1"] body,
+html[data-theme="theme_classic_v1"] body:is(.bg-default, :not([class*="bg-"])) {
+  background: var(--app-bg);
+  background-image: none !important;
+}
+html[data-theme="theme_classic_v1"] #app {
+  background: var(--app-bg);
+  background-image: none;
+}
+html[data-theme="theme_classic_v1"] :is(.top-bar, .header, .xp-bar, .ach-sticky, .bottom-nav) {
+  background: var(--app-card-bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: var(--app-border);
+  box-shadow: none;
+}
+html[data-theme="theme_classic_v1"] .view--home .daily-hero {
+  border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg);
+  background: var(--app-card-bg);
+  box-shadow: none;
+  padding: 16px;
+}
+html[data-theme="theme_classic_v1"] .view--home .daily-calendar-scene { display: none; }
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-top {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+html[data-theme="theme_classic_v1"] .view--home .daily-hero .playmode-card-v2-title,
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-diff,
+html[data-theme="theme_classic_v1"] .view--home #home-daily-play,
+html[data-theme="theme_classic_v1"] .view--home .daily-entry-note,
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-stat-label,
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-stat-value,
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-link {
+  font-family: var(--font-base);
+  font-weight: 400;
+}
+html[data-theme="theme_classic_v1"] .view--home .daily-hero .playmode-card-v2-title { font-size: 20px; }
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-diff { position: static; padding: 0; background: none; border: 0; font-size: 12px; }
+html[data-theme="theme_classic_v1"] .view--home #home-daily-play {
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--brand-primary);
+  box-shadow: none;
+  color: var(--on-brand);
+  font-size: 15px;
+}
+html[data-theme="theme_classic_v1"] .view--home #home-daily-play span { font-size: inherit; }
+html[data-theme="theme_classic_v1"] .view--home .daily-entry-note { margin: 8px 0 12px; font-size: 12px; }
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-stats { padding: 10px 0; border-bottom: 1px solid var(--app-border); }
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-stats::before { display: none; }
+html[data-theme="theme_classic_v1"] .view--home .daily-hero-link { margin-top: 6px; color: var(--brand-primary); text-decoration: none; }
+html[data-theme="theme_classic_v1"] .view--game {
+  background: var(--app-bg) !important;
+  background-image: none !important;
+}
+html[data-theme="theme_classic_v1"] .view--game .game-topbar {
+  background: var(--app-card-bg);
+  border-bottom: 1px solid var(--app-border);
+}
+html[data-theme="theme_classic_v1"] .view--game .game-topbar :is(.mode-pill, .stat-block, .topbar-icon-btn) {
+  background: var(--app-card-bg);
+  border-color: var(--app-border);
+  box-shadow: none;
+}
+html[data-theme="theme_classic_v1"] .view--game .board {
+  background: var(--cell-bg);
+  backdrop-filter: none;
+  box-shadow: none;
+  border-color: var(--border-thick);
+}
+html[data-theme="theme_classic_v1"] .view--game .cell { background: var(--cell-bg); border-color: var(--border-thin); }
+html[data-theme="theme_classic_v1"] .view--game .cell.given { background: var(--cell-bg-given); }
+html[data-theme="theme_classic_v1"] .view--game .cell.related { background: var(--cell-bg-related); }
+html[data-theme="theme_classic_v1"] .view--game .cell.same-num { background: var(--cell-bg-same); }
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(3n):not(:nth-child(9n)),
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(n+19):nth-child(-n+27),
+html[data-theme="theme_classic_v1"] .view--game .cell:nth-child(n+46):nth-child(-n+54) { border-color: var(--border-thick); }
+html[data-theme="theme_classic_v1"] .view--game :is(.action-btn, .numpad button) {
+  background: var(--app-card-bg);
+  border-color: var(--app-border);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+html[data-theme="theme_classic_v1"] .view--game .action-btn { min-height: 58px; border-radius: var(--radius-md); }
+
 :is(.btn, .btn.btn--primary, .btn.btn--secondary, .btn.btn--accent, .btn-google,
   .coin-hint-btn, .hearts-buy, .auth-tab, .share-tab, .shop-tab, .lb-tab, .lb-tab-sm,
   .mode-pill, .ta-tier, .ach-chip) {

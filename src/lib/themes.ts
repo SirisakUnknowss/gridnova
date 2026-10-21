@@ -59,7 +59,7 @@ export const THEMES: Record<string, ThemeMeta> = {
     tokens: CLASSIC,
   },
   theme_classic_v1: {
-    id: 'theme_classic_v1', name: 'Classic Version 1',
+    id: 'theme_classic_v1', name: 'GridNova V1',
     tokens: CLASSIC,
   },
   theme_paper: {
