@@ -418,6 +418,25 @@
     ]
   },
   {
+    "id": "theme_classic_v1",
+    "file": "src/images/space/theme-icons/full/skin-theme_classic.webp",
+    "bytes": 524808,
+    "width": 1254,
+    "height": 1254,
+    "sha256": "90ddceac44784069d74a3bbd03734ebc3be4ecd7b0197fae7a9b264baf98b76f",
+    "cell_occupancy": [
+      0.574,
+      0.416,
+      0.585,
+      0.558,
+      0.573,
+      0.617,
+      0.614,
+      0.533,
+      0.527
+    ]
+  },
+  {
     "id": "theme_dark",
     "file": "src/images/space/theme-icons/full/skin-theme_dark.webp",
     "bytes": 485702,

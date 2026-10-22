@@ -71,6 +71,7 @@ import pack34 from '@images/space/theme-icons/full/skin-theme_2027_10_midnight_o
 
 export const THEME_ICON_SKINS: Record<string, string> = {
   theme_classic: pack0,
+  theme_classic_v1: pack0,
   theme_paper: pack1,
   theme_dark: pack2,
   theme_pastel: pack3,
@@ -109,6 +110,7 @@ export const THEME_ICON_SKINS: Record<string, string> = {
 
 export const THEME_CONTROL_SKINS: Record<string, string> = {
   theme_classic: control0,
+  theme_classic_v1: control0,
   theme_paper: control1,
   theme_dark: control2,
   theme_pastel: control3,
@@ -147,7 +149,7 @@ export const THEME_CONTROL_SKINS: Record<string, string> = {
 
 
 export function themeIconProperties(themeId: string): Record<string, string> {
-  if (themeId === 'theme_classic' || !THEME_ICON_SKINS[themeId]) {
+  if (themeId === 'theme_classic' || themeId === 'theme_classic_v1' || !THEME_ICON_SKINS[themeId]) {
     return {
       '--theme-icon-atlas': 'initial',
       '--theme-control-atlas': 'initial',

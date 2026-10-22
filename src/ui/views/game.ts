@@ -221,7 +221,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
               <div class="stat-block"${BOOK ? ' hidden' : ''}>
                 <span class="stat-label">MISTAKES</span>
                 <span class="stat-value" id="hearts-display">
-                  ${isClassicV1 ? '<span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span>' : `<span class="heart">${ic.heart(18)}</span><span class="heart">${ic.heart(18)}</span><span class="heart">${ic.heart(18)}</span>`}
+                  <span class="heart">${ic.heart(18)}</span><span class="heart">${ic.heart(18)}</span><span class="heart">${ic.heart(18)}</span>
                 </span>
               </div>
               <div class="stat-block">
@@ -333,7 +333,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   function renderHearts(count: number) {
     heartsEl.innerHTML = [0, 1, 2]
-      .map(i => `<span class="heart${i < count ? ' heart--lost' : ''}">${isClassicV1 ? '♥' : ic.heart(18)}</span>`)
+      .map(i => `<span class="heart${i < count ? ' heart--lost' : ''}">${ic.heart(18)}</span>`)
       .join('');
   }
   const hintCountEl = root.querySelector('#hint-count') as HTMLElement;

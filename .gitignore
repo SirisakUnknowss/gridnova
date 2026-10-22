@@ -57,3 +57,13 @@ ios/App/App/public/
 # Generated database types
 src/lib/database.types.ts
 .env
+/assets/space/qa
+/output
+/outputs
+/.artifact-runtime/
+/assets/space/avatar-frames/gridnova-avatar-frames-20.zip
+/assets/space/theme-icons/readable-icon-sources.local.json
+/GRIDNOVA_OVERVIEW.md
+/scripts/build_v2_user_dashboard.mjs
+/scripts/inspect_analytics_template.mjs
+/scripts/verify-staging-collection-clean.mjs
