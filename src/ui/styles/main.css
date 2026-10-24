@@ -6713,9 +6713,9 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .view--game .numpad button { margin: 0 2px; padding: 10px 2px; border: 1.5px solid var(--app-border); border-radius: var(--radius-md); background: var(--app-card-bg); }
 
 .view--game .board-menu {
-  --menu-resume-bg: #168f68;
-  --menu-new-bg: #327dd0;
-  --menu-leave-bg: #c94667;
+  --menu-resume-bg: #46b69c;
+  --menu-new-bg: #73a4e6;
+  --menu-leave-bg: #df86a2;
   --menu-button-text: #ffffff;
 }
 .view--game .board-menu-btn {
