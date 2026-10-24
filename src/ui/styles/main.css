@@ -6713,23 +6713,24 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .view--game .numpad button { margin: 0 2px; padding: 10px 2px; border: 1.5px solid var(--app-border); border-radius: var(--radius-md); background: var(--app-card-bg); }
 
 .view--game .board-menu {
-  --menu-shade: #243047;
-  --menu-resume-base: #d9f2e6;
-  --menu-new-base: #daefff;
-  --menu-leave-base: #ffe4e4;
+  --menu-resume-bg: #168f68;
+  --menu-new-bg: #327dd0;
+  --menu-leave-bg: #c94667;
+  --menu-button-text: #ffffff;
 }
 .view--game .board-menu-btn {
   background-image: none !important;
-  background-color: color-mix(in srgb, var(--menu-button-base) 70%, var(--menu-shade));
-  border: 1px solid color-mix(in srgb, var(--menu-button-base) 50%, var(--menu-shade));
+  background-color: var(--menu-button-bg);
+  border: 1px solid var(--menu-button-bg);
   border-radius: 14px;
   box-shadow: none !important;
   filter: none !important;
-  color: var(--app-text);
+  color: var(--menu-button-text);
 }
-.view--game .board-menu-btn--resume { --menu-button-base: var(--menu-resume-base); }
-.view--game .board-menu-btn--new { --menu-button-base: var(--menu-new-base); }
-.view--game .board-menu-btn--leave { --menu-button-base: var(--menu-leave-base); }
+.view--game .board-menu-btn--resume { --menu-button-bg: var(--menu-resume-bg); }
+.view--game .board-menu-btn--new { --menu-button-bg: var(--menu-new-bg); }
+.view--game .board-menu-btn--leave { --menu-button-bg: var(--menu-leave-bg); }
+.view--game :is(.board-menu-btn--resume, .board-menu-btn--new, .board-menu-btn--leave) { color: var(--menu-button-text); }
 
 .btn.pm-random-cta {
   --random-button-bg: #dc8708;
