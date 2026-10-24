@@ -1,4 +1,5 @@
 import { avatarArtHTML } from '../components/avatar-art';
+import { framedAvatarHTML } from '../components/avatar-frame';
 import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 // Leaderboard view — Members (Today/Yesterday) + Guests tab
@@ -36,6 +37,7 @@ interface MemberRow {
   avatar: { emoji?: string; item_id?: string } | null;
   custom_avatar_url: string | null;
   total_players: number;
+  frame_id?: string | null;
 }
 
 interface GuestRow {
@@ -176,13 +178,14 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
       const isMe = r.user_id === currentUserId;
       const name = escapeHtml(r.display_name || r.username || 'Player');
       const rankBadge = rankBadgeHtml(r.rank);
-      const avatarHtml = r.avatar?.item_id
-        ? `<span class="lb-avatar-emoji">${avatarArtHTML(r.avatar.item_id, 32)}</span>`
+      const avatarContent = r.avatar?.item_id
+        ? avatarArtHTML(r.avatar.item_id, 36)
         : r.custom_avatar_url
           ? `<img src="${escapeHtml(r.custom_avatar_url)}" class="lb-avatar-img" referrerpolicy="no-referrer" alt="">`
           : r.avatar?.emoji
-            ? `<span class="lb-avatar-emoji">${avatarArtHTML(r.avatar.emoji, 32)}</span>`
-            : `<span class="lb-avatar-emoji">${ic.guest(32)}</span>`;
+            ? avatarArtHTML(r.avatar.emoji, 36)
+            : ic.guest(36);
+      const avatarHtml = framedAvatarHTML(avatarContent, r.frame_id, 36);
       return `
         <div class="lb-row${isMe ? ' is-me' : ''}" data-uid="${escapeHtml(r.user_id)}">
           <span class="lb-rank">${rankBadge}</span>
@@ -236,14 +239,25 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
   // -----------------------------------------------------------------------
   // Load
   // -----------------------------------------------------------------------
+  async function loadMemberRows(): Promise<MemberRow[]> {
+    const rows = await api.getLeaderboard(activeDate(), 100) as MemberRow[];
+    if (rows.length === 0) return rows;
+    const { data, error } = await supabase
+      .from('user_equipped')
+      .select('user_id, frame_id')
+      .in('user_id', rows.map((row) => row.user_id));
+    if (error) throw error;
+    const frames = new Map((data ?? []).map((item) => [item.user_id, item.frame_id as string | null]));
+    return rows.map((row) => ({ ...row, frame_id: frames.get(row.user_id) ?? null }));
+  }
+
   async function load() {
     loading = true;
     errorMsg = null;
     render();
     try {
       if (mainTab === 'members') {
-        const data = await api.getLeaderboard(activeDate(), 100);
-        memberRows = (data ?? []) as MemberRow[];
+        memberRows = await loadMemberRows();
       } else {
         const data = await api.getGuestLeaderboard(activeDate(), 100);
         guestRows = (data ?? []) as GuestRow[];
@@ -274,8 +288,7 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
   async function refetch() {
     try {
       if (mainTab === 'members') {
-        const data = await api.getLeaderboard(activeDate(), 100);
-        memberRows = (data ?? []) as MemberRow[];
+        memberRows = await loadMemberRows();
       } else {
         const data = await api.getGuestLeaderboard(activeDate(), 100);
         guestRows = (data ?? []) as GuestRow[];

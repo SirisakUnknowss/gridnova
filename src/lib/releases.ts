@@ -14,6 +14,12 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '2.1.3', date: '2026-10-25', title: 'Frames on the Leaderboard',
+    changes: [
+      { icon: 'trophy', text: 'Daily leaderboard now shows your equipped avatar frame.' },
+    ],
+  },
+  {
     version: '2.1.2', date: '2026-10-25', title: 'Your Avatar, Everywhere',
     changes: [
       { icon: 'trophy', text: 'Daily leaderboard and profile share cards now show your equipped avatar consistently.' },
