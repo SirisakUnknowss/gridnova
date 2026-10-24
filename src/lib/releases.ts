@@ -14,6 +14,12 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '2.1.2', date: '2026-10-25', title: 'Your Avatar, Everywhere',
+    changes: [
+      { icon: 'trophy', text: 'Daily leaderboard and profile share cards now show your equipped avatar consistently.' },
+    ],
+  },
+  {
     version: '2.1.1', date: '2026-10-24', title: 'A Softer Space Look',
     changes: [
       { icon: 'sparkle', text: 'Classic artwork and navigation icons now have a softer 2.5D style with clean edges.' },

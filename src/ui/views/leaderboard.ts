@@ -176,11 +176,13 @@ export function mountLeaderboardView(root: HTMLElement, props: LeaderboardProps)
       const isMe = r.user_id === currentUserId;
       const name = escapeHtml(r.display_name || r.username || 'Player');
       const rankBadge = rankBadgeHtml(r.rank);
-      const avatarHtml = r.custom_avatar_url
-        ? `<img src="${escapeHtml(r.custom_avatar_url)}" class="lb-avatar-img" referrerpolicy="no-referrer" alt="">`
-        : r.avatar?.item_id || r.avatar?.emoji
-          ? `<span class="lb-avatar-emoji">${avatarArtHTML(r.avatar.item_id ?? r.avatar.emoji, 32)}</span>`
-          : `<span class="lb-avatar-emoji">${ic.guest(32)}</span>`;
+      const avatarHtml = r.avatar?.item_id
+        ? `<span class="lb-avatar-emoji">${avatarArtHTML(r.avatar.item_id, 32)}</span>`
+        : r.custom_avatar_url
+          ? `<img src="${escapeHtml(r.custom_avatar_url)}" class="lb-avatar-img" referrerpolicy="no-referrer" alt="">`
+          : r.avatar?.emoji
+            ? `<span class="lb-avatar-emoji">${avatarArtHTML(r.avatar.emoji, 32)}</span>`
+            : `<span class="lb-avatar-emoji">${ic.guest(32)}</span>`;
       return `
         <div class="lb-row${isMe ? ' is-me' : ''}" data-uid="${escapeHtml(r.user_id)}">
           <span class="lb-rank">${rankBadge}</span>

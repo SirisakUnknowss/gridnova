@@ -79,7 +79,7 @@ export async function renderProfileCard(data: ProfileCardData): Promise<Blob | n
   let avatarImg: HTMLImageElement | null = null;
   const avatarElement = document.createElement('div');
   avatarElement.innerHTML = avatarArtHTML(data.avatarId ?? avatarEmoji, 96);
-  const avatarSource = avatarUrl ?? avatarElement.querySelector('img')?.src;
+  const avatarSource = data.avatarId ? avatarElement.querySelector('img')?.src : avatarUrl ?? avatarElement.querySelector('img')?.src;
   if (avatarSource) {
     try {
       avatarImg = await loadImage(avatarSource);
