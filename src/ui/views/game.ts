@@ -73,7 +73,6 @@ let visitorEngaged = false;
 
 export function mountGameView(root: HTMLElement, props: GameViewProps): { unmount: () => void } {
   const { puzzle, solution, mode, difficulty } = props;
-  const isClassicV1 = document.documentElement.dataset.theme === 'theme_classic_v1';
 
   // State
   const userBoard: Board = cloneBoard(puzzle);
@@ -181,8 +180,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   // cell is exactly the spoiler this mode exists to remove. It flips back on
   // only if the player asks to be shown after a failed check.
   const settings = { ...getBoardPrefs(), ...(BOOK ? { showConflict: false } : {}) };
-  const modeArt = mode === 'daily' ? ic.daily(30) : BOOK ? ic.bookMode(30) : TA ? ic.timeAttack(30) : difficulty.includes('expert') ? ic.expert(30) : difficulty.includes('hard') ? ic.hard(30) : difficulty.includes('medium') ? ic.medium(30) : ic.easy(30);
-  const classicV1Icons = {
+  const gameIcons = {
     undo: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3 13C5 8.3 9.1 5 14 5a9 9 0 0 1 0 18c-3.5 0-6.6-2-8.3-5"/></svg>',
     redo: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M21 13C19 8.3 14.9 5 10 5a9 9 0 0 0 0 18c3.5 0 6.6-2 8.3-5"/></svg>',
     erase: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16l13-13 5 5-2.5 2.5M6.5 17.5l5-5"/></svg>',
@@ -200,7 +198,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
           ${mode === 'daily'
             ? `<div style="display:flex;align-items:center;gap:8px;">
                 <div class="mode-pill no-click">
-                  ${isClassicV1 ? '<span class="mode-dot" aria-hidden="true"></span>' : `<span class="game-mode-art" aria-hidden="true">${modeArt}</span>`}
+                  <span class="mode-dot" aria-hidden="true"></span>
                   <span>${props.origin === 'monthly' ? 'Monthly Challenge' : 'Daily Puzzle'}</span>
                 </div>
                 <button class="topbar-icon-btn" id="game-share-btn" title="Invite friends" style="color:var(--brand-primary);">
@@ -208,7 +206,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
                 </button>
                </div>`
             : `<button class="mode-pill" id="mode-pill-btn">
-                ${isClassicV1 ? '<span class="mode-dot" aria-hidden="true"></span>' : `<span class="game-mode-art" aria-hidden="true">${modeArt}</span>`}
+                <span class="mode-dot" aria-hidden="true"></span>
                 <span id="mode-pill-label">${
                   BOOK ? `Book · ${diffLabel}`
                   : TA ? `${TA.tier.charAt(0).toUpperCase() + TA.tier.slice(1)} · ${diffLabel}`
@@ -225,12 +223,12 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
                 </span>
               </div>
               <div class="stat-block">
-                <span class="stat-label${isClassicV1 ? '' : ' game-time-label'}">${isClassicV1 ? 'TIME' : `${ic.clock(12)} TIME`}</span>
+                <span class="stat-label">TIME</span>
                 <span class="stat-value" id="timer">00:00</span>
               </div>
             </div>
             <button class="topbar-icon-btn" id="menu-btn" title="Menu (Esc)">
-              ${isClassicV1 ? classicV1Icons.menu : ic.notes(22)}
+              ${gameIcons.menu}
             </button>
           </div>
         </div>
@@ -260,27 +258,27 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
         <div class="action-bar">
           <button class="action-btn" id="undo-btn" title="Undo (Z or Ctrl/⌘+Z)" disabled>
-            ${isClassicV1 ? classicV1Icons.undo : ic.undo(30)}
+            ${gameIcons.undo}
             <span>Undo</span>
           </button>
           <button class="action-btn" id="redo-btn" title="Redo (Y or Ctrl/⌘+Y)" disabled>
-            ${isClassicV1 ? classicV1Icons.redo : ic.redo(30)}
+            ${gameIcons.redo}
             <span>Redo</span>
           </button>
           <button class="action-btn action-btn--erase" id="erase-btn" title="Erase (E or Backspace)">
-            ${isClassicV1 ? classicV1Icons.erase : ic.erase(30)}
+            ${gameIcons.erase}
             <span>Erase</span>
           </button>
           <button class="action-btn" id="notes-btn" title="Notes (N)">
             <div class="notes-btn-inner">
               <span class="notes-badge" id="notes-badge">OFF</span>
-              ${isClassicV1 ? classicV1Icons.notes : ic.notes(30)}
+              ${gameIcons.notes}
             </div>
             <span>Notes</span>
           </button>
           <button class="action-btn" id="hint-btn" title="Hint (H)">
             <div class="hint-btn-inner">
-              ${isClassicV1 ? classicV1Icons.hint : ic.hint(30)}
+              ${gameIcons.hint}
               <span class="hint-count-badge" id="hint-count">3</span>
             </div>
             <span>Hint</span>
