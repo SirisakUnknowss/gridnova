@@ -14,6 +14,14 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '2.1.1', date: '2026-10-24', title: 'A Softer Space Look',
+    changes: [
+      { icon: 'sparkle', text: 'Classic artwork and navigation icons now have a softer 2.5D style with clean edges.' },
+      { icon: 'puzzle', text: 'The puzzle board and controls now use the same clear layout across every theme.' },
+      { icon: 'gamepad', text: 'Pause menu buttons now use bright pastel colors and white labels.' },
+    ],
+  },
+  {
     version: '2.1.0', date: '2026-10-22', title: 'The Original GridNova Is Back',
     changes: [
       { icon: 'puzzle', text: 'New: GridNova V1 restores the clean, distraction-free interface from before 2.0, across both Home and the game board.' },
