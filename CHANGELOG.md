@@ -1,3 +1,8 @@
+## 2.1.4 — 2026-10-25
+
+### Fixed
+- อัปเดต metadata ของภาพ Classic และ Classic V1 ให้ตรงกับ artwork ปัจจุบัน เพื่อแก้ CI asset validation
+
 ## 2.1.3 — 2026-10-25
 
 ### Fixed

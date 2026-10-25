@@ -401,39 +401,39 @@
   {
     "id": "theme_classic",
     "file": "src/images/space/theme-icons/readable/skin-readable-theme_classic.webp",
-    "bytes": 474606,
+    "bytes": 354974,
     "width": 1254,
     "height": 1254,
-    "sha256": "35bbe293b336ad2895e61d62587c463952eff4be031a71c3c1686d2e5ba85624",
+    "sha256": "2d67a210ff703d80db01a9e1bc01f7888baa81c8a86d4c5d4cade16743d0ecc7",
     "cell_occupancy": [
-      0.626,
-      0.504,
-      0.641,
-      0.709,
-      0.696,
-      0.727,
-      0.657,
-      0.682,
-      0.601
+      0.607,
+      0.489,
+      0.64,
+      0.687,
+      0.66,
+      0.721,
+      0.627,
+      0.629,
+      0.59
     ]
   },
   {
     "id": "theme_classic_v1",
     "file": "src/images/space/theme-icons/readable/skin-readable-theme_classic.webp",
-    "bytes": 474606,
+    "bytes": 354974,
     "width": 1254,
     "height": 1254,
-    "sha256": "35bbe293b336ad2895e61d62587c463952eff4be031a71c3c1686d2e5ba85624",
+    "sha256": "2d67a210ff703d80db01a9e1bc01f7888baa81c8a86d4c5d4cade16743d0ecc7",
     "cell_occupancy": [
-      0.626,
-      0.504,
-      0.641,
-      0.709,
-      0.696,
-      0.727,
-      0.657,
-      0.682,
-      0.601
+      0.607,
+      0.489,
+      0.64,
+      0.687,
+      0.66,
+      0.721,
+      0.627,
+      0.629,
+      0.59
     ]
   },
   {

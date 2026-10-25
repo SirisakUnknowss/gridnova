@@ -14,6 +14,12 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '2.1.4', date: '2026-10-25', title: 'Classic Asset Maintenance',
+    changes: [
+      { icon: 'sparkle', text: 'Maintenance update for Classic theme assets. Gameplay and artwork are unchanged.' },
+    ],
+  },
+  {
     version: '2.1.3', date: '2026-10-25', title: 'Frames on the Leaderboard',
     changes: [
       { icon: 'trophy', text: 'Daily leaderboard now shows your equipped avatar frame.' },
