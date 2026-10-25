@@ -401,39 +401,39 @@
   {
     "id": "theme_classic",
     "file": "src/images/space/theme-icons/full/skin-theme_classic.webp",
-    "bytes": 524808,
+    "bytes": 374604,
     "width": 1254,
     "height": 1254,
-    "sha256": "90ddceac44784069d74a3bbd03734ebc3be4ecd7b0197fae7a9b264baf98b76f",
+    "sha256": "9afc0308f597160756742b67ff797e2e356a10d762aa130e2dc7b11a197f5113",
     "cell_occupancy": [
-      0.574,
-      0.416,
-      0.585,
-      0.558,
-      0.573,
-      0.617,
-      0.614,
-      0.533,
-      0.527
+      0.566,
+      0.396,
+      0.575,
+      0.595,
+      0.584,
+      0.676,
+      0.467,
+      0.501,
+      0.464
     ]
   },
   {
     "id": "theme_classic_v1",
     "file": "src/images/space/theme-icons/full/skin-theme_classic.webp",
-    "bytes": 524808,
+    "bytes": 374604,
     "width": 1254,
     "height": 1254,
-    "sha256": "90ddceac44784069d74a3bbd03734ebc3be4ecd7b0197fae7a9b264baf98b76f",
+    "sha256": "9afc0308f597160756742b67ff797e2e356a10d762aa130e2dc7b11a197f5113",
     "cell_occupancy": [
-      0.574,
-      0.416,
-      0.585,
-      0.558,
-      0.573,
-      0.617,
-      0.614,
-      0.533,
-      0.527
+      0.566,
+      0.396,
+      0.575,
+      0.595,
+      0.584,
+      0.676,
+      0.467,
+      0.501,
+      0.464
     ]
   },
   {
