@@ -7,6 +7,8 @@
 // URL by hand. See supabase/migrations/20260823110000_visitor_attribution.sql
 // =====================================================================
 
+import { IS_CRAZYGAMES } from './platform';
+
 const KEY = 'sudoku_attrib_v1';
 
 export interface Attribution {
@@ -21,6 +23,7 @@ export interface Attribution {
 }
 
 function appHintFromUA(ua: string): string {
+  if (IS_CRAZYGAMES) return 'crazygames';
   if (/FBAN|FBAV|FB_IAB/i.test(ua)) return 'facebook-app';
   if (/\bLine\//i.test(ua)) return 'line';
   if (/Instagram/i.test(ua)) return 'instagram';

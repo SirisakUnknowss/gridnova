@@ -11,6 +11,7 @@ import { escapeHtml, formatNumber } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
+import { ACCOUNTS_ENABLED } from '@lib/platform';
 import { isPremium } from '@lib/premium';
 
 export interface ProfileProps {
@@ -72,12 +73,12 @@ ${ic.notes(26)}
           <div class="badge-tag">${isGuest ? 'GUEST' : 'MEMBER'}</div>
           ${!isGuest && isPremium() ? `<div class="badge-tag badge-tag--premium">${ic.sparkle(16)} PREMIUM</div>` : ''}
         </div>
-        ${isGuest ? `
+        ${isGuest ? ACCOUNTS_ENABLED ? `
           <button class="btn btn--primary btn--small" id="prof-upgrade" style="margin-top:10px;">
             ${ic.stats(16)}
             Save progress
           </button>
-        ` : `
+        ` : '' : `
           <div style="font-size:12px;color:var(--app-text-secondary);margin-top:4px;">${escapeHtml(user?.email ?? '')}</div>
           <button class="btn btn--secondary btn--small" id="prof-share-card" style="margin-top:10px;">
           ${ic.share(14)} Share Profile
@@ -123,7 +124,7 @@ ${ic.notes(26)}
           </span>
           ${ic.chevronRight(16)}
         </button>
-        <button class="profile-row" id="prof-ledger">
+        <button class="profile-row" id="prof-ledger"${ACCOUNTS_ENABLED ? '' : ' hidden'}>
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.coin(16)}
             <span><span style="color:var(--app-text)">Coin Ledger</span><br><small>Earned and spent</small></span>

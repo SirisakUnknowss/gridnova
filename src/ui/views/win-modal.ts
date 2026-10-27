@@ -133,7 +133,7 @@ export function showWinModal(props: WinModalProps): void {
         ${ic.coin(14)} +${coinsEarned} coins · ${ic.star(14)} +${xpEarned} XP
       </p>
 
-      ${isGuest ? `
+      ${isGuest && props.onSignUp ? `
         <div class="win-guest-prompt">
           <p>Save your streak & see leaderboard ranks</p>
           <button class="btn btn--accent" id="win-signup">Create free account</button>

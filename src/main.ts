@@ -64,10 +64,13 @@ import { signOut } from './lib/auth';
 import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } from './engine/scoring';
 import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, logView } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
+import { ACCOUNTS_ENABLED, IS_CRAZYGAMES, initCrazyGames } from './lib/platform';
+
+initCrazyGames();
 import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
 
 // Show update banner when a new service worker takes control
-if ('serviceWorker' in navigator) {
+if (!IS_CRAZYGAMES && 'serviceWorker' in navigator) {
   let refreshing = false;
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -319,6 +322,8 @@ async function gateHeart(
   mode: string,
   onRetry: () => void,
 ): Promise<{ allowed: boolean; consumed: boolean }> {
+  // Without accounts there's no way to refill, so the gate would be a dead end.
+  if (!ACCOUNTS_ENABLED) return { allowed: true, consumed: false };
   await refreshHearts();
   const st = useStore.getState();
   const isGuest = !st.user || !!st.user.is_anonymous;
@@ -594,6 +599,7 @@ function showCalendar() {
 }
 
 function openAuthAction() {
+  if (!ACCOUNTS_ENABLED) { showProfile(); return; }
   const user = useStore.getState().user;
   if (user?.is_anonymous) {
     showAuthModal({
@@ -948,8 +954,8 @@ async function handleWin(result: GameResult, date?: string) {
     xpEarned: xp,
     isGuest,
     onContinue: showHome,
-    onShare: date ? () => shareResult(result, date, rank, totalPlayers) : undefined,
-    onSignUp: isGuest ? () => showAuthModal({ mode: 'signup', onSuccess: showHome, onCancel: showHome }) : undefined,
+    onShare: date && !IS_CRAZYGAMES ? () => shareResult(result, date, rank, totalPlayers) : undefined,
+    onSignUp: isGuest && ACCOUNTS_ENABLED ? () => showAuthModal({ mode: 'signup', onSuccess: showHome, onCancel: showHome }) : undefined,
   });
 }
 

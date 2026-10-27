@@ -3,6 +3,9 @@ node_modules/
 
 # Build output
 dist/
+dist-crazygames/
+gridnova-crazygames.zip
+crazygames-submission/
 build/
 
 # Env

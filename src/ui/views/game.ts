@@ -1,4 +1,5 @@
 import { ic } from '@ui/icons';
+import { IS_CRAZYGAMES, gameplayStart, gameplayStop } from '@lib/platform';
 // =====================================================================
 // Game view — plays a single Sudoku puzzle (daily or practice)
 // =====================================================================
@@ -287,7 +288,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
         <div id="numpad" class="numpad"></div>
       </div>
-      <a href="https://www.facebook.com/10Hands" target="_blank" rel="noopener noreferrer" class="game-footer">Developed by Unknowss</a>
+      ${IS_CRAZYGAMES ? '<span class="game-footer">Developed by Unknowss</span>' : '<a href="https://www.facebook.com/10Hands" target="_blank" rel="noopener noreferrer" class="game-footer">Developed by Unknowss</a>'}
 
       <div class="coin-hint-overlay" id="coin-hint-overlay" style="display:none;">
         <div class="coin-hint-dialog">
@@ -812,6 +813,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       return;
     }
     gameWon = true;
+    gameplayStop();
     if (timerHandle) clearInterval(timerHandle);
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
@@ -861,6 +863,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   /** Time Attack: the clock ran out. Nothing is submitted — the run is void. */
   function timeUp() {
     gameWon = true;
+    gameplayStop();
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
@@ -876,6 +879,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   function endGame() {
     gameWon = true;
+    gameplayStop();
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
@@ -940,6 +944,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
     pauseStart = Date.now();
     saveProgress();
+    gameplayStop();
     boardOverlay.classList.add('open');
   }
 
@@ -948,7 +953,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     boardOverlay.classList.remove('open');
     root.querySelectorAll<HTMLElement>('.action-bar, .numpad, #board').forEach(el => { el.inert = false; });
     root.querySelector('.view--game')?.classList.remove('game-paused');
-    if (!gameWon) startClock();
+    if (!gameWon) { startClock(); gameplayStart(); }
   }
 
   root.querySelector('#game-share-btn')?.addEventListener('click', async () => {
@@ -1067,9 +1072,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
   rerender();
   syncUndoRedo();
   if (props.origin === 'monthly') saveProgress();
+  if (!gameWon) gameplayStart();
 
   return {
     unmount() {
+      gameplayStop();
       if (props.origin === 'monthly' && !gameWon) saveProgress();
       if (timerHandle) clearInterval(timerHandle);
       if (autosaveHandle) clearInterval(autosaveHandle);

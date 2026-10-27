@@ -4,6 +4,7 @@ import { pageArtHTML } from '../components/page-art';
 // =====================================================================
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
+import { ACCOUNTS_ENABLED } from '@lib/platform';
 import { todayUtc } from '@lib/format';
 import { difficultyForDayOfWeek } from '@engine/generator';
 import { getRandomModeStats } from '@lib/api';
@@ -43,7 +44,7 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
           <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
         </div>
 
-        <div class="pm-row" id="pm-time-attack">
+        <div class="pm-row" id="pm-time-attack"${ACCOUNTS_ENABLED ? '' : ' hidden'}>
           <span class="pm-row-icon pm-row-icon--time">${ic.timeAttack(22)}</span>
           <div class="pm-row-body">
             <span class="pm-row-title">Time Attack</span>
