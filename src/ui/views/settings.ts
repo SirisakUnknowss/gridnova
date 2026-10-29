@@ -22,6 +22,7 @@ function pushPermission(): NotificationPermission {
   return isPushSupported() ? Notification.permission : 'denied';
 }
 import { showWhatsNew } from './whats-new';
+import { showCoffeeModal } from './coffee';
 
 // Official community links — the canonical home for these across the app.
 export const COMMUNITY_LINKS = {
@@ -134,6 +135,13 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
         <div class="card settings-card">
           ${linkRow('set-fb-group', ic.globe(18), 'Sudoku Thailand', 'Facebook group — daily battles with Thai players')}
           ${linkRow('set-fb-page', ic.star(18), 'GridNova', 'Official Facebook page — news and events')}
+        </div>
+      </div>
+
+      <div class="settings-group"${IS_CRAZYGAMES ? ' hidden' : ''}>
+        <div class="settings-group-label">Support GridNova</div>
+        <div class="card settings-card">
+          ${linkRow('set-coffee', ic.gift(18), 'Buy Me a Coffee', 'Tip the developer via PromptPay')}
         </div>
       </div>
 
@@ -284,6 +292,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
   root.querySelector('#set-privacy')?.addEventListener('click', props.onOpenPrivacyPolicy);
   root.querySelector('#set-terms')?.addEventListener('click', props.onOpenTermsOfService);
   root.querySelector('#set-whatsnew')?.addEventListener('click', () => showWhatsNew());
+  root.querySelector('#set-coffee')?.addEventListener('click', () => showCoffeeModal());
 
   wireBottomNav(root, props.nav, 'profile');
 
