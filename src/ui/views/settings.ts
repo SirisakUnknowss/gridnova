@@ -7,6 +7,7 @@ import { useStore } from '@state/store';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
+import { ACCOUNTS_ENABLED, IS_CRAZYGAMES } from '@lib/platform';
 import { getBgVolume, setBgVolume, getSfxVolume, setSfxVolume, sfxNav } from '@lib/sound';
 import {
   getBoardPrefs, setBoardPref, type BoardPrefs,
@@ -112,7 +113,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
         </div>
       </div>
 
-      <div class="settings-group">
+      <div class="settings-group"${ACCOUNTS_ENABLED ? '' : ' hidden'}>
         <div class="settings-group-label">Notifications</div>
         <div class="card settings-card">
           ${toggleRow('set-push', ic.bell(18), 'Daily Puzzle Reminder', pushSubtitle, pushOn)}
@@ -128,7 +129,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
         </div>
       </div>
 
-      <div class="settings-group">
+      <div class="settings-group"${IS_CRAZYGAMES ? ' hidden' : ''}>
         <div class="settings-group-label">Official Community</div>
         <div class="card settings-card">
           ${linkRow('set-fb-group', ic.globe(18), 'Sudoku Thailand', 'Facebook group — daily battles with Thai players')}
@@ -140,14 +141,14 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
         <div class="settings-group-label">Help & About</div>
         <div class="card settings-card">
           ${linkRow('set-how-to-play', ic.brain(18), 'How to Play', 'Rules & tips for Sudoku')}
-          ${linkRow('set-contact', ic.bell(18), 'Contact Support', 'We usually reply within a day')}
+          ${IS_CRAZYGAMES ? '' : linkRow('set-contact', ic.bell(18), 'Contact Support', 'We usually reply within a day')}
           ${linkRow('set-privacy', ic.lock(18), 'Privacy Policy', '')}
           ${linkRow('set-terms', ic.puzzle(18), 'Terms of Service', '')}
           ${linkRow('set-whatsnew', ic.sparkle(18), 'What’s New', 'See what changed in the latest update')}
         </div>
       </div>
 
-      <div class="settings-group">
+      <div class="settings-group"${ACCOUNTS_ENABLED ? '' : ' hidden'}>
         <div class="settings-group-label">Account</div>
         <div class="card settings-card">
           ${isSignedIn

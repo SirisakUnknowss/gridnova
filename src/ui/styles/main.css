@@ -6653,6 +6653,10 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .fantasy-image-qa .daily-stat-icon .theme-icon { width: 30px; height: 30px; }
 
 .monthly-home-entry[hidden] { display: none; }
+/* Rows the CrazyGames build hides (no accounts there); `display` above beats [hidden] */
+.pm-row[hidden],
+.profile-row[hidden],
+.settings-group[hidden] { display: none; }
 .monthly-welcome { position: fixed; inset: 0; margin: auto; width: min(460px, calc(100vw - 24px)); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--app-border); border-radius: 24px; color: var(--app-text); background: var(--app-card-bg); box-shadow: var(--app-card-shadow); overflow: hidden; }
 .monthly-welcome[open] { display: flex; flex-direction: column; }
 .monthly-welcome::backdrop { background: color-mix(in srgb, var(--app-text) 40%, transparent); backdrop-filter: blur(6px); }
@@ -6752,3 +6756,22 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .monthly-welcome-rewards .monthly-reward { padding: 8px 4px; }
 .monthly-welcome-rewards .monthly-reward h3 { font-size: 11px; line-height: 1.25; }
 .monthly-welcome-rewards .monthly-reward-preview { height: 64px; }
+
+.coffee-modal {
+  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  padding: 24px; overflow-y: auto; text-align: center;
+}
+.coffee-modal h2 { margin: 4px 40px 8px; }
+.coffee-sub, .coffee-hint { color: var(--app-text-secondary); font-size: 14px; line-height: 1.45; margin: 0 0 14px; }
+.coffee-hint { font-size: 12.5px; margin: 14px 0 0; }
+.coffee-qr {
+  display: block; width: 100%; max-width: 300px; height: auto; margin: 0 auto;
+  border-radius: 16px; box-shadow: 0 6px 20px color-mix(in srgb, var(--app-text) 14%, transparent);
+}
+.coffee-modal .modal-buttons .btn { width: 100%; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.home-coffee-link {
+  background: none; border: none; padding: 4px 8px; margin: 0 0 6px;
+  font: inherit; font-size: 12px; color: var(--app-text-secondary);
+  text-decoration: underline; text-underline-offset: 3px; cursor: pointer; opacity: 0.8;
+}
+.home-coffee-link:hover { opacity: 1; }

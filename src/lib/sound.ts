@@ -12,7 +12,7 @@ const BG_VOL_KEY = 'sudoku_bg_vol_v1';
 // Base scale keeps the synth sfx at the previous overall loudness when the
 // user's sfx volume is at 100%.
 const SFX_BASE = 0.35;
-const BG_URL = '/sounds/felt-loop-garden.mp3';
+const BG_URL = `${import.meta.env.BASE_URL}sounds/felt-loop-garden.mp3`;
 
 let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;

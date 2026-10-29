@@ -4,6 +4,7 @@
 // =====================================================================
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
+import { ACCOUNTS_ENABLED } from '@lib/platform';
 import { formatTime, todayUtc } from '@lib/format';
 import { getMyDailyCalendar, type DailyCalendarEntry } from '@lib/api';
 import { useStore } from '@state/store';
@@ -219,7 +220,7 @@ export function mountCalendarView(root: HTMLElement, props: CalendarProps): { un
     navLabel.textContent = `${MONTH_NAMES[viewMonth - 1]} ${viewYear}`;
     nextBtn.disabled = viewYear === now.getFullYear() && viewMonth === now.getMonth() + 1;
     if (!userId) {
-      grid.innerHTML = `<div class="cal-empty"><div aria-hidden="true">${ic.daily(112)}</div><h2>Your daily journey starts here</h2><p>Sign in to track your Daily Puzzle history, review completed puzzles, and follow your streak.</p><button class="btn btn--primary" id="cal-guest-profile">Go to Profile</button></div>`;
+      grid.innerHTML = `<div class="cal-empty"><div aria-hidden="true">${ic.daily(112)}</div><h2>Your daily journey starts here</h2><p>${ACCOUNTS_ENABLED ? 'Sign in to track your Daily Puzzle history, review completed puzzles, and follow your streak.' : 'Play today’s Daily Puzzle to start your streak.'}</p>${ACCOUNTS_ENABLED ? '<button class="btn btn--primary" id="cal-guest-profile">Go to Profile</button>' : ''}</div>`;
       summary.innerHTML = '';
       grid.querySelector('#cal-guest-profile')?.addEventListener('click', props.nav.onProfile);
       return;

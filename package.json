@@ -1,11 +1,12 @@
 {
   "name": "gridnova",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "type": "module",
   "description": "Gridnova — engagement-focused puzzle game",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:crazygames": "tsc --noEmit && vite build --mode crazygames && node scripts/pack-crazygames.mjs",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",

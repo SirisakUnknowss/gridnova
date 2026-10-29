@@ -1,6 +1,7 @@
 import { ic } from '@ui/icons';
 import infoIcon from '@images/space/replacements/information.webp';
 import { BASE_SCORE, TIME_ATTACK_TIERS } from '@engine/scoring';
+import { ACCOUNTS_ENABLED } from '@lib/platform';
 
 export type ModeInfoKey = 'daily' | 'time-attack' | 'random' | 'book';
 
@@ -113,7 +114,7 @@ export function showModeInfoModal(key: ModeInfoKey): void {
       <img class="mode-info-hero" src="${infoIcon}" alt="" width="56" height="56">
       <h2 id="mode-info-title">${info.title}</h2>
       <h3 class="mode-info-heading">How to play</h3>
-      ${list(info.howToPlay)}
+      ${list(ACCOUNTS_ENABLED ? info.howToPlay : info.howToPlay.filter((line) => !line.includes('heart')))}
       <h3 class="mode-info-heading">Scoring</h3>
       ${list(info.scoring)}
       <button class="btn btn--full" id="mode-info-ok" type="button">Got it</button>

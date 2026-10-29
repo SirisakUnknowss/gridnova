@@ -18,6 +18,8 @@ import { difficultyForDayOfWeek } from '@engine/generator';
 import { listGames, type GameInProgress } from '@lib/local-db';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
+import { ACCOUNTS_ENABLED, IS_CRAZYGAMES } from '@lib/platform';
+import { showCoffeeModal } from './coffee';
 import { heartsPillHTML, wireHeartsPill, refreshHearts } from '../components/hearts';
 
 export interface HomeViewProps {
@@ -79,7 +81,7 @@ export function homeViewHTML(): string {
           <span class="home-avatar">${framedAvatarHTML(userIcon, isGuest ? null : state.equipped.frame_id, 38)}</span>
         </button>
         <div class="home-header-right">
-          ${heartsPillHTML()}
+          ${ACCOUNTS_ENABLED ? heartsPillHTML() : ''}
           <span class="stat-pill">${ic.coin(13)} ${formatCompact(state.coins)}</span>
           <button class="home-icon-btn" id="mute-btn" title="${muted ? 'Unmute' : 'Mute'}">
             ${muted ? ic.soundOff(16) : ic.soundOn(16)}
@@ -99,7 +101,7 @@ export function homeViewHTML(): string {
       </div>
 
       <!-- Guest save banner -->
-      ${isGuest ? `
+      ${isGuest && ACCOUNTS_ENABLED ? `
         <div class="home-save-banner" id="save-banner">
           <span>Playing as a guest — save so you don't lose progress.</span>
           <button class="btn btn--primary btn--small" id="save-progress">Save progress</button>
@@ -114,7 +116,7 @@ export function homeViewHTML(): string {
           <span class="daily-hero-diff">${todayDifficulty.charAt(0).toUpperCase() + todayDifficulty.slice(1)}</span>
         </div>
         <button class="btn playmode-card-v2-btn" id="home-daily-play">Play Daily <span aria-hidden="true">›</span></button>
-        <div class="daily-entry-note" id="home-daily-entry">${ic.heart(14)} 1 heart · Refunded on win</div>
+        <div class="daily-entry-note" id="home-daily-entry">${ACCOUNTS_ENABLED ? `${ic.heart(14)} 1 heart · Refunded on win` : 'Same puzzle for every player worldwide'}</div>
         <div class="daily-hero-stats">
           <div class="daily-hero-stat"><div class="daily-stat-icon" aria-hidden="true">${ic.daily(22)}</div><div class="daily-hero-stat-value" id="home-daily-status">Not played<br>today</div></div>
           <div class="daily-hero-stat"><div class="daily-stat-icon" aria-hidden="true">${ic.trophy(22)}</div><div class="daily-hero-stat-label">Rank</div><div class="daily-hero-stat-value" id="home-daily-rank">—</div></div>
@@ -134,7 +136,7 @@ export function homeViewHTML(): string {
         <span class="pm-row-icon">${ic.gamepad(40)}</span>
         <div class="pm-row-body">
           <span class="pm-row-title">Play Mode</span>
-          <span class="pm-row-sub">Random Mode, Time Attack &amp; more</span>
+          <span class="pm-row-sub">${ACCOUNTS_ENABLED ? 'Random Mode, Time Attack &amp; more' : 'Random Mode &amp; more'}</span>
         </div>
         <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
       </button>
@@ -183,7 +185,7 @@ export function homeViewHTML(): string {
       </div>
 
       <!-- Quests entry -->
-      <button class="pm-row" id="open-quests">
+      <button class="pm-row" id="open-quests"${ACCOUNTS_ENABLED ? '' : ' hidden'}>
         <span class="pm-row-icon">${ic.quests(30)}</span>
         <div class="pm-row-body">
           <div class="pm-row-title-line">
@@ -202,6 +204,7 @@ export function homeViewHTML(): string {
         ${import.meta.env.VITE_APP_ENV === 'staging' ? '<span class="env-badge env-badge--staging">STAGING</span>' : ''}
         <span>v${APP_VERSION}</span>
       </div>
+      ${IS_CRAZYGAMES ? '' : '<button type="button" class="home-coffee-link" id="home-coffee">Enjoying GridNova? Buy me a coffee</button>'}
 
     </section>
     ${bottomNavHTML('home')}
@@ -220,7 +223,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   const monthlyEntry = root.querySelector<HTMLButtonElement>('#open-monthly')!;
   const notifyMonth = () => {
     if (!alive || !sameAccount()) return;
-    monthlyEntry.hidden = !currentMonthly(monthlyToday);
+    monthlyEntry.hidden = !ACCOUNTS_ENABLED || !currentMonthly(monthlyToday);
     if (!monthlyEntry.hidden && monthlyToday) props.onMonthlyReady?.(monthlyToday);
   };
   const refreshMonth = async () => {
@@ -243,6 +246,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   root.querySelector('#open-practice')?.addEventListener('click', props.onOpenPractice);
   root.querySelector('#open-quests')?.addEventListener('click', props.onOpenQuests);
   root.querySelector('#open-monthly')?.addEventListener('click', props.onOpenMonthly);
+  root.querySelector('#home-coffee')?.addEventListener('click', () => showCoffeeModal());
   root.querySelector('#home-daily-more')?.addEventListener('click', props.onOpenDailyDetail);
 
   // --- Daily hero: countdown + rank + play/continue state ---
@@ -299,7 +303,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     savedGame = saved;
     playBtn.textContent = 'Continue Daily';
     root.querySelector('#home-daily-status')!.textContent = 'In progress';
-    root.querySelector('#home-daily-entry')!.textContent = 'Resume free · No extra heart';
+    root.querySelector('#home-daily-entry')!.textContent = ACCOUNTS_ENABLED ? 'Resume free · No extra heart' : 'Pick up where you left off';
   }).catch(() => { });
   wireBottomNav(root, props.nav, 'home');
   const unwireHearts = wireHeartsPill(root);

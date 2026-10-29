@@ -3,6 +3,7 @@
 // =====================================================================
 import { signIn, signUp, upgradeAnonymousToEmail, signInWithGoogle } from '@lib/auth';
 import { ic } from '@ui/icons';
+import { ACCOUNTS_ENABLED } from '@lib/platform';
 
 type Mode = 'signin' | 'signup' | 'upgrade';
 
@@ -16,6 +17,7 @@ export interface AuthModalProps {
 }
 
 export function showAuthModal(props: AuthModalProps): void {
+  if (!ACCOUNTS_ENABLED) { props.onCancel?.(); return; }
   const existing = document.getElementById('auth-modal-root');
   if (existing) existing.remove();
 
