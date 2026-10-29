@@ -11,7 +11,8 @@ import { escapeHtml, formatNumber } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
-import { ACCOUNTS_ENABLED } from '@lib/platform';
+import { ACCOUNTS_ENABLED, IS_CRAZYGAMES } from '@lib/platform';
+import { showCoffeeModal } from './coffee';
 import { isPremium } from '@lib/premium';
 
 export interface ProfileProps {
@@ -135,6 +136,13 @@ ${ic.notes(26)}
           <span style="display:flex;align-items:center;gap:10px;">
             ${ic.puzzle(16)}
             <span><span style="color:var(--app-text)">Settings</span><br><small>Game options, community, help</small></span>
+          </span>
+          ${ic.chevronRight(16)}
+        </button>
+        <button class="profile-row" id="prof-coffee"${IS_CRAZYGAMES ? ' hidden' : ''}>
+          <span style="display:flex;align-items:center;gap:10px;">
+            ${ic.gift(16)}
+            <span><span style="color:var(--app-text)">Buy Me a Coffee</span><br><small>Tip the developer via PromptPay</small></span>
           </span>
           ${ic.chevronRight(16)}
         </button>
@@ -408,6 +416,7 @@ ${ic.notes(26)}
   root.querySelector('#prof-recap')?.addEventListener('click', props.onOpenRecap);
   root.querySelector('#prof-ledger')?.addEventListener('click', props.onOpenLedger);
   root.querySelector('#prof-settings')?.addEventListener('click', props.onOpenSettings);
+  root.querySelector('#prof-coffee')?.addEventListener('click', () => showCoffeeModal());
   root.querySelector('#prof-signout')?.addEventListener('click', props.onSignOut);
   root.querySelector('#prof-upgrade')?.addEventListener('click', props.onUpgradeAccount);
 

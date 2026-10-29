@@ -18,7 +18,8 @@ import { difficultyForDayOfWeek } from '@engine/generator';
 import { listGames, type GameInProgress } from '@lib/local-db';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
-import { ACCOUNTS_ENABLED } from '@lib/platform';
+import { ACCOUNTS_ENABLED, IS_CRAZYGAMES } from '@lib/platform';
+import { showCoffeeModal } from './coffee';
 import { heartsPillHTML, wireHeartsPill, refreshHearts } from '../components/hearts';
 
 export interface HomeViewProps {
@@ -203,6 +204,7 @@ export function homeViewHTML(): string {
         ${import.meta.env.VITE_APP_ENV === 'staging' ? '<span class="env-badge env-badge--staging">STAGING</span>' : ''}
         <span>v${APP_VERSION}</span>
       </div>
+      ${IS_CRAZYGAMES ? '' : '<button type="button" class="home-coffee-link" id="home-coffee">Enjoying GridNova? Buy me a coffee</button>'}
 
     </section>
     ${bottomNavHTML('home')}
@@ -244,6 +246,7 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
   root.querySelector('#open-practice')?.addEventListener('click', props.onOpenPractice);
   root.querySelector('#open-quests')?.addEventListener('click', props.onOpenQuests);
   root.querySelector('#open-monthly')?.addEventListener('click', props.onOpenMonthly);
+  root.querySelector('#home-coffee')?.addEventListener('click', () => showCoffeeModal());
   root.querySelector('#home-daily-more')?.addEventListener('click', props.onOpenDailyDetail);
 
   // --- Daily hero: countdown + rank + play/continue state ---
