@@ -1,7 +1,7 @@
 // generate-daily-puzzle
 // Pre-generates daily puzzles for the next N days.
 // Idempotent: skips dates that already have a puzzle.
-// Auth: service-role only (no JWT) — called by pg_cron or admin trigger.
+// Auth: environment-specific scheduler token — called by pg_cron.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
@@ -186,10 +186,16 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  if (Deno.env.get('SUPABASE_URL') !== 'https://xrtgcxofjisqaigaaboy.supabase.co') return new Response('Staging only', { status: 403 });
+  const projectUrl = Deno.env.get('SUPABASE_URL');
+  const configFunction = projectUrl === 'https://xrtgcxofjisqaigaaboy.supabase.co'
+    ? 'staging_automation_config'
+    : projectUrl === 'https://sqjllqilozhxbzvfjhra.supabase.co'
+      ? 'production_automation_config'
+      : null;
+  if (!serviceKey || !configFunction) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
   const schedulerClient = createClient(Deno.env.get('SUPABASE_URL')!, serviceKey!);
-  const { data: schedulerConfig, error: schedulerError } = await schedulerClient.rpc('staging_automation_config');
-  if (!serviceKey || schedulerError || !schedulerConfig?.scheduler_token || req.headers.get('x-gridnova-scheduler') !== schedulerConfig.scheduler_token) {
+  const { data: schedulerConfig, error: schedulerError } = await schedulerClient.rpc(configFunction);
+  if (schedulerError || !schedulerConfig?.scheduler_token || req.headers.get('x-gridnova-scheduler') !== schedulerConfig.scheduler_token) {
     return new Response('Unauthorized', { status: 401, headers: corsHeaders });
   }
 
