@@ -5,6 +5,9 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
+  // The /admin endpoints are served from the workers.dev URL; per-version preview URLs aren't needed.
+  "workers_dev": true,
+  "preview_urls": false,
 
   // Discord's message events only arrive over the Gateway WebSocket, so one
   // Durable Object holds that connection open. The cron re-opens it if
@@ -18,14 +21,16 @@
   "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
 
   "vars": {
+    // "faq" = free canned answers from src/faq.ts; "ai" = Claude (needs ANTHROPIC_API_KEY).
+    "BOT_MODE": "faq",
     // Comma-separated channel IDs where the bot answers every message.
-    "HELP_CHANNEL_IDS": "",
+    "HELP_CHANNEL_IDS": "1569018616605704312",
     // Optional: channel the bot points players to for bugs / account issues.
-    "BUG_REPORT_CHANNEL_ID": "",
+    "BUG_REPORT_CHANNEL_ID": "1569018654580932649",
     "CLAUDE_MODEL": "claude-opus-5-5",
     // Hard cap on Claude calls per UTC day, so a spam wave can't run up the bill.
     "MAX_DAILY_REPLIES": "400"
   }
   // Secrets (set with `npx wrangler secret put <NAME>`):
-  //   DISCORD_BOT_TOKEN, ANTHROPIC_API_KEY, ADMIN_TOKEN
+  //   DISCORD_BOT_TOKEN, ADMIN_TOKEN, and ANTHROPIC_API_KEY only for BOT_MODE "ai"
 }

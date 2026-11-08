@@ -1,7 +1,14 @@
 # GridNova Discord Bot
 
-AI bot ที่ตอบคำถามผู้เล่น**ทุกข้อความ**ในห้อง help (และเมื่อมีคน @mention / reply bot ในห้องอื่น)
-ตอบตามภาษาที่ผู้เล่นพิมพ์มา ใช้ Claude ตอบจาก knowledge base ใน [src/knowledge.md](src/knowledge.md)
+Bot ตอบคำถามผู้เล่นในห้อง help (และเมื่อมีคน @mention / reply bot ในห้องอื่น) ตอบตามภาษาที่ผู้เล่นพิมพ์ (ไทย/อังกฤษ)
+และ**บันทึกทุกข้อความ**ในห้อง help ไว้ดูว่าผู้เล่นถามอะไร
+
+มี 2 โหมด ตั้งที่ `BOT_MODE` ใน `wrangler.jsonc`:
+
+| โหมด | ตอบยังไง | ค่าใช้จ่าย |
+|---|---|---|
+| `faq` (ค่าเริ่มต้น) | จับ keyword แล้วตอบด้วยคำตอบสำเร็จรูปใน [src/faq.ts](src/faq.ts) · ถ้าเป็นคำถามที่ไม่รู้จัก ตอบว่าบันทึกไว้ให้ทีมงานแล้ว · ข้อความคุยเล่นจะเงียบ · พิมพ์ `faq` เพื่อดูหัวข้อ | ฟรี |
+| `ai` | ให้ Claude ตอบจาก [src/knowledge.md](src/knowledge.md) | จ่ายตามใช้ (ต้องมี `ANTHROPIC_API_KEY`) |
 
 แยกจากตัวเกม 100% — มี `package.json` ของตัวเอง ไม่เข้า bundle ของ PWA และ push ขึ้น `staging`/`main` ก็ไม่ deploy bot
 
@@ -33,15 +40,15 @@ Cron ทุก 5 นาที + alarm ทุก 60 วิ ──► ต่อ We
 4. แท็บ **OAuth2 → URL Generator** → scope `bot` → permissions: View Channels, Send Messages,
    Send Messages in Threads, Read Message History → เปิด URL ที่ได้ แล้วเชิญ bot เข้า server
 
-### 3. Anthropic API key
-https://console.anthropic.com → API Keys → สร้าง key (ต้องมีเครดิต/บัตร)
+### 3. Anthropic API key (เฉพาะโหมด `ai`)
+https://console.anthropic.com → API Keys → สร้าง key (ต้องมีเครดิต/บัตร) — โหมด `faq` ข้ามขั้นนี้ได้
 
 ### 4. Deploy (ใน `discord-bot/`)
 ```bash
 npm install
 npx wrangler login
 npx wrangler secret put DISCORD_BOT_TOKEN
-npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler secret put ANTHROPIC_API_KEY  # เฉพาะโหมด ai
 npx wrangler secret put ADMIN_TOKEN        # ตั้งรหัสอะไรก็ได้ยาวๆ ใช้เรียก /admin/*
 ```
 ใส่ channel ID ใน `wrangler.jsonc` → `vars.HELP_CHANNEL_IDS` (คั่นด้วย comma) และ `BUG_REPORT_CHANNEL_ID` แล้ว
@@ -52,19 +59,31 @@ curl -H "Authorization: Bearer <ADMIN_TOKEN>" https://gridnova-discord-bot.<subd
 `/admin/status` ดูสถานะ (`connected`, `fatalError`, `repliesToday`) · `/admin/reset` ใช้หลังแก้ปัญหาที่ทำให้หลุดถาวร
 ดู log สดได้ด้วย `npx wrangler tail`
 
+## ดูคำถามที่บันทึกไว้
+```bash
+# ทั้งหมด (ล่าสุดก่อน) + สถิติแยกตามหัวข้อ
+curl -H "Authorization: Bearer <ADMIN_TOKEN>" "https://gridnova-discord-bot.<subdomain>.workers.dev/admin/questions?limit=500"
+# เฉพาะที่ FAQ ตอบไม่ได้ — ใช้ตัดสินใจว่าจะเพิ่ม FAQ หรือเปิดโหมด ai
+curl -H "Authorization: Bearer <ADMIN_TOKEN>" "https://gridnova-discord-bot.<subdomain>.workers.dev/admin/questions?unmatched=1"
+```
+เก็บ: เวลา, Discord user ID, ห้อง, ข้อความ, หัวข้อที่จับได้ (`null` = ตอบไม่ได้), ตอบหรือไม่, ภาษา — อยู่ใน SQLite ของ Durable Object
+
 ## อัปเดตความรู้ของ bot
+โหมด `faq`: แก้คำตอบ/keyword ใน [src/faq.ts](src/faq.ts) (ดูจาก `unmatched` ว่าควรเพิ่มอะไร)
+โหมด `ai`:
 แก้ [src/knowledge.md](src/knowledge.md) ทุกครั้งที่กติกา/ราคา/โหมดในเกมเปลี่ยน (ทุก release ที่มี What's New) แล้ว `npx wrangler deploy`
 — bot รู้แค่สิ่งที่อยู่ในไฟล์นี้ ถ้าไม่มีจะตอบว่าไม่แน่ใจแทนการเดา
 
 ## ค่าใช้จ่ายโดยประมาณ
 | ส่วน | ประมาณการ |
 |---|---|
-| Claude Opus 5.5 (ค่าเริ่มต้น) | ~$0.005–0.01 / คำตอบ → เพดาน 400 คำตอบ/วัน ≈ $2–4/วัน ถ้าใช้เต็ม |
+| โหมด `faq` | ฟรี (ไม่เรียก AI) |
+| Claude Opus 5.5 (โหมด `ai`) | ~$0.005–0.01 / คำตอบ → เพดาน 400 คำตอบ/วัน ≈ $2–4/วัน ถ้าใช้เต็ม |
 | Claude Haiku 5.5 (ตั้ง `CLAUDE_MODEL` = `claude-haiku-5-5`) | ถูกกว่าราว 20–40 เท่า เหมาะกับ FAQ ถ้าคุณภาพพอ |
 | Durable Object | เปิดค้าง 24 ชม. ≈ 10,800 GB-s/วัน — ใกล้เพดานฟรีของ Workers Free ควรเช็กใน dashboard; ถ้าเกินใช้ Workers Paid ($5/เดือน) |
 
 ## Dev
 ```bash
-npm test          # unit tests (prompt, การตัดข้อความ 2000 ตัวอักษร, rate limit, memory)
+npm test          # unit tests (FAQ matching ไทย/อังกฤษ, prompt, การตัดข้อความ, rate limit, memory)
 npm run typecheck
 ```

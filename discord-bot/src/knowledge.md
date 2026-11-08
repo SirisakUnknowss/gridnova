@@ -130,6 +130,7 @@ Profile → My Collection.
   Infinite Hearts.
 
 ## Support & community
+- Discord server (this server): https://discord.gg/QFRYAaC8qB — ask in #help, report bugs in #bug-report, news in #announcements. Also linked in the game under Profile → Settings → Official Community.
 - Facebook page (support): https://www.facebook.com/profile.php?id=61591484931870
 - Facebook group: https://www.facebook.com/groups/926777207089534
 - "Buy Me a Coffee" in Profile is an optional PromptPay tip to support the indie developer (scan with any Thai banking app).

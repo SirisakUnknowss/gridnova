@@ -3,6 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { Env } from "./env";
 import { askClaude, buildSystemPrompt, ConversationMemory, RateLimiter, splitForDiscord } from "./answer";
 import { sendReply, triggerTyping } from "./discord";
+import { answerFaq, detectLang, fallbackText, isMenuRequest, looksLikeQuestion, matchFaq, menuText } from "./faq";
+import { QuestionLog, type LoggedQuestion, type QuestionStats } from "./question-log";
 
 const GATEWAY_URL = "https://gateway.discord.gg/?v=10&encoding=json";
 // GUILDS | GUILD_MESSAGES | MESSAGE_CONTENT (privileged — enable it in the Developer Portal)
@@ -52,6 +54,16 @@ export class GatewayBot extends DurableObject<Env> {
   private memory = new ConversationMemory();
   private anthropic: Anthropic | null = null;
   private systemPrompt: string | null = null;
+  private questions: QuestionLog;
+
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
+    this.questions = new QuestionLog(ctx.storage.sql);
+  }
+
+  async listQuestions(unmatchedOnly: boolean, limit: number): Promise<{ stats: QuestionStats; questions: LoggedQuestion[] }> {
+    return { stats: this.questions.stats(), questions: this.questions.list({ unmatchedOnly, limit }) };
+  }
 
   async ensureConnected(): Promise<void> {
     await this.ctx.storage.setAlarm(Date.now() + WATCHDOG_MS);
@@ -249,6 +261,11 @@ export class GatewayBot extends DurableObject<Env> {
     const question = m.content.replace(new RegExp(`<@!?${this.botUserId}>`, "g"), "").trim();
     if (!question) return;
 
+    if (this.env.BOT_MODE !== "ai") {
+      await this.answerFromFaq(m, question);
+      return;
+    }
+
     if (!this.perUser.allow(m.author.id)) return;
     if (!(await this.takeDailySlot())) return;
 
@@ -264,6 +281,15 @@ export class GatewayBot extends DurableObject<Env> {
         question,
         authorName: m.member?.nick || m.author.global_name || m.author.username,
       });
+      this.questions.add({
+        user_id: m.author.id,
+        channel_id: m.channel_id,
+        message_id: m.id,
+        content: question,
+        topic: reply ? "ai" : null,
+        replied: !!reply,
+        lang: detectLang(question),
+      });
       if (!reply) return;
       this.memory.add(memoryKey, question, reply);
       const chunks = splitForDiscord(reply);
@@ -272,6 +298,45 @@ export class GatewayBot extends DurableObject<Env> {
       }
     } catch (err) {
       console.error("Failed to answer message", err);
+    }
+  }
+
+  private async answerFromFaq(m: DiscordMessage, question: string): Promise<void> {
+    const lang = detectLang(question);
+    const bugId = this.env.BUG_REPORT_CHANNEL_ID;
+    const bugMention = bugId ? `<#${bugId}>` : lang === "th" ? "ห้อง bug-report" : "the bug-report channel";
+
+    let reply: string | null = null;
+    let topic: string | null = null;
+    if (isMenuRequest(question)) {
+      reply = menuText(lang);
+      topic = "menu";
+    } else {
+      const entry = matchFaq(question);
+      if (entry) {
+        topic = entry.id;
+        reply = answerFaq(entry, lang, bugMention);
+      } else if (looksLikeQuestion(question)) {
+        reply = fallbackText(lang, bugMention);
+      }
+    }
+
+    const allowed = reply !== null && this.perUser.allow(m.author.id);
+    this.questions.add({
+      user_id: m.author.id,
+      channel_id: m.channel_id,
+      message_id: m.id,
+      content: question,
+      topic,
+      replied: allowed,
+      lang,
+    });
+    if (!allowed || !reply) return;
+
+    try {
+      await sendReply(this.env.DISCORD_BOT_TOKEN, m.channel_id, reply, m.id);
+    } catch (err) {
+      console.error("Failed to send FAQ reply", err);
     }
   }
 
