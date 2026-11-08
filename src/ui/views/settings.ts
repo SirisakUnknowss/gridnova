@@ -27,6 +27,7 @@ import { showWhatsNew } from './whats-new';
 export const COMMUNITY_LINKS = {
   fbGroup: 'https://www.facebook.com/groups/926777207089534',
   fbPage: 'https://www.facebook.com/profile.php?id=61591484931870',
+  discord: 'https://discord.gg/QFRYAaC8qB',
 };
 
 export interface SettingsProps {
@@ -134,6 +135,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
         <div class="card settings-card">
           ${linkRow('set-fb-group', ic.globe(18), 'Sudoku Thailand', 'Facebook group — daily battles with Thai players')}
           ${linkRow('set-fb-page', ic.star(18), 'GridNova', 'Official Facebook page — news and events')}
+          ${linkRow('set-discord', ic.wave(18), 'Discord', 'Chat with players and get help any time')}
         </div>
       </div>
 
@@ -279,6 +281,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
   root.querySelector('#set-signin')?.addEventListener('click', props.onUpgradeAccount);
   root.querySelector('#set-fb-group')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.fbGroup, '_blank', 'noopener'));
   root.querySelector('#set-fb-page')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.fbPage, '_blank', 'noopener'));
+  root.querySelector('#set-discord')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.discord, '_blank', 'noopener'));
   root.querySelector('#set-how-to-play')?.addEventListener('click', props.onOpenHowToPlay);
   root.querySelector('#set-contact')?.addEventListener('click', props.onOpenContactSupport);
   root.querySelector('#set-privacy')?.addEventListener('click', props.onOpenPrivacyPolicy);
