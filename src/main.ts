@@ -18,6 +18,7 @@ import { DIFFICULTIES } from './engine/types';
 import { todayUtc } from './lib/format';
 import { mountHomeView } from './ui/views/home';
 import { mountPlayModeView } from './ui/views/play-mode';
+import { mountStarModePreview } from './ui/views/star-mode-preview';
 import { mountPracticeView } from './ui/views/practice';
 import { mountDailyDetailView } from './ui/views/daily-detail';
 import { mountRandomModeDetailView } from './ui/views/random-mode-detail';
@@ -282,9 +283,16 @@ function showPlayMode() {
     onOpenDaily: () => { dailyDetailBack = showPlayMode; showDailyDetail(); },
     onOpenRandom: showRandomDetail,
     onOpenBook: showBook,
+    onOpenStar: showStarModePreview,
     onOpenTimeAttack: showTimeAttack,
     nav: navCb,
   });
+  currentUnmount = view.unmount;
+}
+
+function showStarModePreview() {
+  clearView('star_mode_preview');
+  const view = mountStarModePreview(root, { onBack: showPlayMode, nav: navCb });
   currentUnmount = view.unmount;
 }
 
