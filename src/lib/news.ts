@@ -6,7 +6,6 @@
 // =====================================================================
 import { getSupabase } from './supabase';
 import { IS_CRAZYGAMES } from './platform';
-import discordQr from '@images/discord-qr.svg';
 import discordLaunchArt from '@images/news/discord-launch.webp';
 
 /** text = words only · image = picture only (title kept for the Inbox list and screen readers) · image_text = picture on top, words below */
@@ -30,12 +29,11 @@ export const BUILTIN_NEWS: NewsItem[] = [
   {
     id: 'builtin:discord-launch-2026-11',
     title: 'Join the GridNova Discord!',
-    body: 'Our community and support now live on Discord.\n\nChat with other players, share your best times, get help in #help, and be first to hear about updates in #announcements.',
+    // Image-only: the headline, blurb and QR code are drawn into the artwork itself.
+    body: 'Chat with players, get help, and hear news first on our new Discord.',
     date: '2026-11-09T00:00:00Z',
-    layout: 'image_text',
+    layout: 'image',
     imageUrl: discordLaunchArt,
-    qrUrl: discordQr,
-    qrAlt: 'QR code for the GridNova Discord invite',
     cta: { label: 'Join Discord', url: DISCORD_INVITE },
   },
 ];
