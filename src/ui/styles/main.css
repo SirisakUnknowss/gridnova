@@ -6836,3 +6836,86 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
   text-decoration: underline; text-underline-offset: 3px; cursor: pointer; opacity: 0.8;
 }
 .home-coffee-link:hover { opacity: 1; }
+
+/* ── Inbox button (home header) ───────────────────────────────────── */
+.home-inbox-btn { position: relative; }
+.home-inbox-dot {
+  position: absolute; top: 5px; right: 5px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--cell-text-conflict);
+  box-shadow: 0 0 0 2px var(--app-card-bg);
+}
+.home-inbox-dot[hidden] { display: none; }
+
+/* ── Full-screen announcement popup ───────────────────────────────── */
+.announce-bg {
+  position: fixed; inset: 0; z-index: 120;
+  display: flex; justify-content: center;
+  background: color-mix(in srgb, var(--app-text) 40%, transparent);
+  backdrop-filter: blur(8px);
+}
+.announce {
+  position: relative;
+  display: flex; flex-direction: column;
+  width: 100%; max-width: 520px; height: 100dvh;
+  background: linear-gradient(170deg, color-mix(in srgb, var(--brand-primary) 12%, var(--app-card-bg)) 0%, var(--app-card-bg) 45%);
+  color: var(--app-text);
+  padding: max(16px, env(safe-area-inset-top)) 0 max(12px, env(safe-area-inset-bottom));
+  animation: announce-in 0.22s ease-out;
+}
+@keyframes announce-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.announce-close { position: absolute; top: max(12px, env(safe-area-inset-top)); right: 12px; z-index: 1; }
+.announce-scroll {
+  flex: 1; overflow-y: auto;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 44px 24px 16px;
+}
+.announce-kicker {
+  margin: 0 0 6px; font-size: 12px; font-weight: 800; letter-spacing: 0.12em;
+  color: var(--brand-primary);
+}
+.announce-title { margin: 0; font-size: 26px; line-height: 1.2; }
+.announce-date { margin: 6px 0 18px; font-size: 13px; color: var(--app-text-secondary); }
+.announce-image { width: 100%; max-height: 240px; object-fit: cover; border-radius: 20px; margin-bottom: 18px; }
+.announce-body { font-size: 16px; line-height: 1.6; max-width: 420px; }
+.announce-body p { margin: 0 0 12px; }
+.announce-qr {
+  margin: 8px 0 20px; padding: 14px 14px 10px;
+  background: var(--app-card-bg);
+  border: 1px solid var(--app-border); border-radius: 20px;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--brand-primary) 14%, transparent);
+}
+.announce-qr img { display: block; width: 168px; height: 168px; image-rendering: pixelated; }
+.announce-qr figcaption { margin-top: 8px; font-size: 12px; color: var(--app-text-secondary); }
+.announce-cta { width: 100%; max-width: 320px; min-height: 50px; border-radius: 16px; font-size: 16px; }
+.announce-hide {
+  align-self: flex-start;
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px 4px; font-size: 14px;
+  color: var(--app-text-secondary); cursor: pointer;
+}
+.announce-hide input { width: 18px; height: 18px; accent-color: var(--brand-primary); }
+
+/* ── Inbox view ───────────────────────────────────────────────────── */
+.view--inbox .top-bar { align-self: stretch; }
+.inbox-section-label {
+  align-self: stretch; margin: 8px 4px 8px;
+  font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--app-text-secondary);
+}
+.inbox-list { align-self: stretch; display: flex; flex-direction: column; gap: 10px; }
+.inbox-empty { text-align: center; color: var(--app-text-secondary); padding: 32px 0; }
+.inbox-row {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 14px 16px; text-align: left; cursor: pointer;
+  background: var(--app-card-bg); color: var(--app-text);
+  border: 1px solid var(--app-border); border-radius: 18px;
+}
+.inbox-row.is-unread { border-color: color-mix(in srgb, var(--brand-primary) 45%, var(--app-border)); }
+.inbox-row:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+.inbox-row-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.inbox-row-title { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; }
+.inbox-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--cell-text-conflict); }
+.inbox-row-snippet { font-size: 13px; color: var(--app-text-secondary); line-height: 1.4; }
+.inbox-row-date { font-size: 12px; color: var(--app-text-secondary); }
+.inbox-row-chevron { color: var(--app-text-secondary); flex: none; }

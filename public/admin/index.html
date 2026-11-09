@@ -233,6 +233,20 @@
     .event-blocked_no_hearts { background:rgba(251,191,36,.15); color:#fbbf24; }
     .event-buy_infinite, .event-infinite_start { background:rgba(102,126,234,.15); color:#818cf8; }
     .event-refill_full { background:rgba(236,72,153,.15); color:#f472b6; }
+    .news-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:16px; align-items:start; }
+    @media (max-width:900px) { .news-grid { grid-template-columns:1fr; } }
+    .news-form label { display:block; font-size:12px; font-weight:600; color:var(--muted); margin:10px 0 4px; }
+    .news-form input[type=text], .news-form input[type=url], .news-form input[type=datetime-local], .news-form textarea, .news-form select {
+      width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px 10px; font-size:13px; font-family:inherit; }
+    .news-form textarea { min-height:140px; resize:vertical; }
+    .news-form .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .news-form .check { display:flex; align-items:center; gap:8px; margin-top:12px; font-size:13px; }
+    .news-form .actions { display:flex; gap:8px; margin-top:14px; }
+    .news-hint { font-size:11px; color:var(--muted); margin-top:4px; }
+    .news-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:700; }
+    .news-live { background:rgba(16,185,129,.15); color:#10b981; }
+    .news-draft { background:rgba(148,163,184,.15); color:#94a3b8; }
+    .news-env { background:rgba(102,126,234,.15); color:#818cf8; }
   </style>
 </head>
 <body>
@@ -284,6 +298,7 @@
       <button class="tab-btn" id="btn-tab-leaderboard"> Leaderboard</button>
       <button class="tab-btn" id="btn-tab-gamemode"> Game Mode</button>
       <button class="tab-btn" id="btn-tab-hearts"> Hearts</button>
+      <button class="tab-btn" id="btn-tab-news"> News</button>
       <button class="tab-btn" id="btn-tab-logs"> Log Monitor & Audit</button>
     </div>
 
@@ -637,6 +652,48 @@
         </div>
       </div>
     </div> <!-- end of panel-hearts -->
+
+    <!-- Panel 7: News / announcements -->
+    <div id="panel-news" style="display:none">
+      <div class="news-grid">
+        <div class="table-card news-form">
+          <h3 id="news-form-title"> ข่าวใหม่</h3>
+          <input type="hidden" id="news-id">
+          <label for="news-title">หัวข้อ (ภาษาอังกฤษ — แสดงในเกม)</label>
+          <input type="text" id="news-title" maxlength="120">
+          <label for="news-body">เนื้อหา (ภาษาอังกฤษ · เว้นบรรทัดว่างเพื่อขึ้นย่อหน้าใหม่)</label>
+          <textarea id="news-body" maxlength="2000"></textarea>
+          <label for="news-image">รูปภาพ URL (https:// ไม่บังคับ)</label>
+          <input type="url" id="news-image" placeholder="https://...">
+          <div class="row2">
+            <div><label for="news-cta-label">ข้อความปุ่ม</label><input type="text" id="news-cta-label" maxlength="40" placeholder="Join Discord"></div>
+            <div><label for="news-cta-url">ลิงก์ปุ่ม (https://)</label><input type="url" id="news-cta-url" placeholder="https://..."></div>
+          </div>
+          <label for="news-env">แสดงบน</label>
+          <select id="news-env">
+            <option value="staging">Staging เท่านั้น (ทดสอบ)</option>
+            <option value="production">Production เท่านั้น</option>
+            <option value="all">ทั้งสองที่</option>
+          </select>
+          <div class="news-hint">ระวัง: Staging กับ Production ใช้ฐานข้อมูลเดียวกัน — ทดสอบด้วย "Staging เท่านั้น" ก่อน</div>
+          <div class="row2">
+            <div><label for="news-starts">เริ่มแสดง</label><input type="datetime-local" id="news-starts"></div>
+            <div><label for="news-ends">หยุดแสดง (ไม่บังคับ)</label><input type="datetime-local" id="news-ends"></div>
+          </div>
+          <label class="check"><input type="checkbox" id="news-published"> เผยแพร่ (ติ๊กแล้วผู้เล่นจะเห็นตามช่วงเวลา)</label>
+          <div class="actions">
+            <button class="btn-action" id="news-save">บันทึก</button>
+            <button class="btn-action" id="news-reset" style="opacity:.7">ล้างฟอร์ม</button>
+          </div>
+          <div class="news-hint" id="news-status"></div>
+        </div>
+        <div class="table-card">
+          <h3> ข่าวทั้งหมด</h3>
+          <div class="news-hint" style="margin:-8px 0 10px">ข่าวที่เขียนไว้ในโค้ด (เช่นข่าว Discord) ไม่อยู่ในรายการนี้</div>
+          <div id="news-list-wrap"><div class="skeleton"></div></div>
+        </div>
+      </div>
+    </div> <!-- end of panel-news -->
 
   </div> <!-- end of content -->
 </div> <!-- end of dashboard -->
@@ -2047,6 +2104,106 @@ async function loadHeartsData() {
   renderHeartEvents(Array.isArray(events) ? events : []);
 }
 
+// ── News ──────────────────────────────────────────────────────────────
+let newsRows = [];
+
+function toLocalInput(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function resetNewsForm() {
+  ['news-id', 'news-title', 'news-body', 'news-image', 'news-cta-label', 'news-cta-url', 'news-ends'].forEach((id) => { document.getElementById(id).value = ''; });
+  document.getElementById('news-env').value = 'staging';
+  document.getElementById('news-starts').value = toLocalInput(new Date().toISOString());
+  document.getElementById('news-published').checked = false;
+  setEl('news-form-title', ' ข่าวใหม่');
+  setEl('news-status', '');
+}
+
+function editNews(id) {
+  const n = newsRows.find((r) => r.id === id);
+  if (!n) return;
+  document.getElementById('news-id').value = n.id;
+  document.getElementById('news-title').value = n.title;
+  document.getElementById('news-body').value = n.body;
+  document.getElementById('news-image').value = n.image_url || '';
+  document.getElementById('news-cta-label').value = n.cta_label || '';
+  document.getElementById('news-cta-url').value = n.cta_url || '';
+  document.getElementById('news-env').value = n.env;
+  document.getElementById('news-starts').value = toLocalInput(n.starts_at);
+  document.getElementById('news-ends').value = toLocalInput(n.ends_at);
+  document.getElementById('news-published').checked = n.published;
+  setEl('news-form-title', ' แก้ไขข่าว');
+  setEl('news-status', '');
+  document.getElementById('news-title').focus();
+}
+
+async function saveNews() {
+  const v = (id) => document.getElementById(id).value.trim();
+  const title = v('news-title');
+  if (!title) { setEl('news-status', 'ใส่หัวข้อก่อน'); return; }
+  for (const id of ['news-image', 'news-cta-url']) {
+    if (v(id) && !/^https:\/\//i.test(v(id))) { setEl('news-status', 'ลิงก์ต้องขึ้นต้นด้วย https://'); return; }
+  }
+  if (!!v('news-cta-label') !== !!v('news-cta-url')) { setEl('news-status', 'ปุ่มต้องมีทั้งข้อความและลิงก์ หรือเว้นว่างทั้งคู่'); return; }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  const res = await callRpcParam('admin_save_announcement', {
+    p_id: v('news-id') || null,
+    p_title: title,
+    p_body: document.getElementById('news-body').value,
+    p_image_url: v('news-image'),
+    p_cta_label: v('news-cta-label'),
+    p_cta_url: v('news-cta-url'),
+    p_env: v('news-env'),
+    p_published: document.getElementById('news-published').checked,
+    p_starts_at: v('news-starts') ? new Date(v('news-starts')).toISOString() : null,
+    p_ends_at: v('news-ends') ? new Date(v('news-ends')).toISOString() : null,
+  }, session.access_token);
+  if (!res || !res.ok) { setEl('news-status', `บันทึกไม่สำเร็จ (${res?.error ?? 'error'})`); return; }
+  resetNewsForm();
+  setEl('news-status', 'บันทึกแล้ว ✓');
+  await loadNewsList();
+}
+
+async function deleteNews(id) {
+  const n = newsRows.find((r) => r.id === id);
+  if (!n || !confirm(`ลบข่าว "${n.title}" ถาวร?`)) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  const res = await callRpcParam('admin_delete_announcement', { p_id: id }, session.access_token);
+  if (!res || !res.ok) { alert('ลบไม่สำเร็จ'); return; }
+  await loadNewsList();
+}
+
+async function loadNewsList() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  if (!document.getElementById('news-starts').value) resetNewsForm();
+  const rows = await callRpc('admin_list_announcements', session.access_token);
+  const wrap = document.getElementById('news-list-wrap');
+  if (!Array.isArray(rows)) { wrap.innerHTML = `<div class="empty">โหลดข่าวไม่ได้ (${escapeHtml(rows?.error ?? 'error')})</div>`; return; }
+  newsRows = rows;
+  if (!rows.length) { wrap.innerHTML = '<div class="empty">ยังไม่มีข่าว</div>'; return; }
+  const now = Date.now();
+  const envLabel = { staging: 'Staging', production: 'Production', all: 'ทั้งสองที่' };
+  wrap.innerHTML = `<table><thead><tr><th>ข่าว</th><th>สถานะ</th><th>ช่วงเวลา</th><th></th></tr></thead><tbody>${rows.map((n) => {
+    const live = n.published && new Date(n.starts_at).getTime() <= now && (!n.ends_at || new Date(n.ends_at).getTime() > now);
+    const status = live ? '<span class="news-badge news-live">กำลังแสดง</span>' : n.published ? '<span class="news-badge news-draft">ตั้งเวลา/หมดเวลา</span>' : '<span class="news-badge news-draft">ร่าง</span>';
+    return `<tr>
+      <td><strong>${escapeHtml(n.title)}</strong><br><span style="color:var(--muted);font-size:11px">${escapeHtml((n.body || '').slice(0, 80))}</span></td>
+      <td>${status}<br><span class="news-badge news-env" style="margin-top:4px">${envLabel[n.env] ?? escapeHtml(n.env)}</span></td>
+      <td style="font-size:12px;color:var(--muted)">${fmtDateTime(n.starts_at)}<br>→ ${n.ends_at ? fmtDateTime(n.ends_at) : 'ไม่กำหนด'}</td>
+      <td style="white-space:nowrap"><button class="btn-action" data-news-edit="${escapeHtml(n.id)}">แก้ไข</button> <button class="btn-ban" data-news-del="${escapeHtml(n.id)}">ลบ</button></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+  wrap.querySelectorAll('[data-news-edit]').forEach((b) => { b.onclick = () => editNews(b.dataset.newsEdit); });
+  wrap.querySelectorAll('[data-news-del]').forEach((b) => { b.onclick = () => deleteNews(b.dataset.newsDel); });
+}
+
 function switchTab(tab) {
   currentTab = tab;
   document.getElementById('btn-tab-analytics').classList.toggle('active',    tab === 'analytics');
@@ -2055,12 +2212,14 @@ function switchTab(tab) {
   document.getElementById('btn-tab-gamemode').classList.toggle('active',     tab === 'gamemode');
   document.getElementById('btn-tab-hearts').classList.toggle('active',       tab === 'hearts');
   document.getElementById('btn-tab-logs').classList.toggle('active',         tab === 'logs');
+  document.getElementById('btn-tab-news').classList.toggle('active',         tab === 'news');
   document.getElementById('panel-analytics').style.display    = tab === 'analytics'    ? 'block' : 'none';
   document.getElementById('panel-members').style.display      = tab === 'members'      ? 'block' : 'none';
   document.getElementById('panel-leaderboard').style.display  = tab === 'leaderboard'  ? 'block' : 'none';
   document.getElementById('panel-gamemode').style.display     = tab === 'gamemode'     ? 'block' : 'none';
   document.getElementById('panel-hearts').style.display       = tab === 'hearts'       ? 'block' : 'none';
   document.getElementById('panel-logs').style.display         = tab === 'logs'         ? 'block' : 'none';
+  document.getElementById('panel-news').style.display         = tab === 'news'         ? 'block' : 'none';
 
   loadData();
 }
@@ -2096,6 +2255,11 @@ async function loadData() {
     await loadGameModeOverview();
     const now = new Date();
     setEl('last-update-txt', `อัปเดต ${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`);
+    return;
+  }
+
+  if (currentTab === 'news') {
+    await loadNewsList();
     return;
   }
 
@@ -2172,6 +2336,9 @@ async function boot() {
     document.getElementById('btn-tab-gamemode').onclick  = () => switchTab('gamemode');
     document.getElementById('btn-tab-hearts').onclick    = () => switchTab('hearts');
     document.getElementById('btn-tab-logs').onclick      = () => switchTab('logs');
+    document.getElementById('btn-tab-news').onclick      = () => switchTab('news');
+    document.getElementById('news-save').onclick         = saveNews;
+    document.getElementById('news-reset').onclick        = resetNewsForm;
 
     // Game Mode: back button
     document.getElementById('gamemode-detail-back-btn').onclick = () => {

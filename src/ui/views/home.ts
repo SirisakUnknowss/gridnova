@@ -19,6 +19,7 @@ import { listGames, type GameInProgress } from '@lib/local-db';
 import { ic } from '@ui/icons';
 import { APP_VERSION } from '@lib/version';
 import { ACCOUNTS_ENABLED, IS_CRAZYGAMES } from '@lib/platform';
+import { countUnread, loadNews } from '@lib/news';
 import { showCoffeeModal } from './coffee';
 import { heartsPillHTML, wireHeartsPill, refreshHearts } from '../components/hearts';
 
@@ -32,6 +33,7 @@ export interface HomeViewProps {
   onOpenMonthly: () => void;
   onMonthlyReady?: (today: string) => void;
   onAuthAction: () => void;
+  onOpenInbox: () => void;
   nav: BottomNavCallbacks;
 }
 
@@ -83,6 +85,9 @@ export function homeViewHTML(): string {
         <div class="home-header-right">
           ${ACCOUNTS_ENABLED ? heartsPillHTML() : ''}
           <span class="stat-pill">${ic.coin(13)} ${formatCompact(state.coins)}</span>
+          ${IS_CRAZYGAMES ? '' : `<button class="home-icon-btn home-inbox-btn" id="inbox-btn" title="Inbox" aria-label="Inbox">
+            ${ic.mail(17)}<span class="home-inbox-dot" id="inbox-dot" hidden></span>
+          </button>`}
           <button class="home-icon-btn" id="mute-btn" title="${muted ? 'Unmute' : 'Mute'}">
             ${muted ? ic.soundOff(16) : ic.soundOn(16)}
           </button>
@@ -321,5 +326,15 @@ export function mountHomeView(root: HTMLElement, props: HomeViewProps): { unmoun
     btn.title = nowMuted ? 'Unmute' : 'Mute';
   });
 
-  return { unmount() { alive = false; window.clearInterval(monthlyClock); window.clearInterval(monthlyNotice); document.removeEventListener('visibilitychange', visible); window.clearInterval(countdownHandle); unwireHearts(); } };
+  root.querySelector('#inbox-btn')?.addEventListener('click', props.onOpenInbox);
+  const refreshInboxDot = () => {
+    void loadNews().then((news) => {
+      const dot = root.querySelector<HTMLElement>('#inbox-dot');
+      if (alive && dot) dot.hidden = countUnread(news) === 0;
+    });
+  };
+  refreshInboxDot();
+  window.addEventListener('gn:news-read', refreshInboxDot);
+
+  return { unmount() { alive = false; window.removeEventListener('gn:news-read', refreshInboxDot); window.clearInterval(monthlyClock); window.clearInterval(monthlyNotice); document.removeEventListener('visibilitychange', visible); window.clearInterval(countdownHandle); unwireHearts(); } };
 }

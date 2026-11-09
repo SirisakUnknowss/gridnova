@@ -257,6 +257,17 @@ global one lives in `src/lib/hearts.ts` + `user_hearts`. Don't conflate them.
 
 ---
 
+## News / Inbox
+
+- Inbox button (mail icon) in the Home header → Inbox view (`src/ui/views/inbox.ts`), also
+  reachable from Settings → Help & About → News. Unread dot = news not yet opened on this device.
+- On every app launch, each live news item the player hasn't hidden is shown as a full-screen
+  popup (`src/ui/views/announcement.ts`), one after another, after onboarding / What's New /
+  the monthly welcome close. "Don't show again" hides that item on this device only.
+- Two sources merged newest-first (`src/lib/news.ts`): `BUILTIN_NEWS` in code (needs a release)
+  and the `announcements` table (admin panel → News tab, no release needed).
+- News copy is player-facing, so English only.
+
 ## Zustand Store (`src/state/store.ts`)
 
 Key state fields:
@@ -308,6 +319,7 @@ currentView: View
 | `visitor_sessions` | One row per session per day + where it came from (referrer/UTM/click-id/in-app browser) |
 | `session_views` | Which views a session visited — powers the admin funnel |
 | `feedbacks` | In-app rating + comment |
+| `announcements` | News posted from the admin panel (`env` = staging / production / all, since staging shares this DB). Built-in news lives in `src/lib/news.ts` |
 
 **Key RPCs (Postgres functions)**
 - `spend_coins(p_user_id, p_amount, p_reason, p_metadata)` → returns `{ ok, balance, reason }`
@@ -322,6 +334,7 @@ currentView: View
 - `get_time_attack_player_count(p_tier)` — `COUNT(DISTINCT user_id)` for a tier
 - `record_visit_attribution(...)` — first-write-wins; a session keeps the origin it arrived with
 - `visitor_source(utm_source, click_id_kind, referrer_host, app_hint)` — one definition of "source" shared by the admin panel and ad-hoc queries
+- `get_announcements(p_env)` — live news for a build (anon-callable); `admin_list_announcements` / `admin_save_announcement` / `admin_delete_announcement` for the admin News tab
 
 **Edge Functions** (`supabase/functions/`)
 - `submit-daily-score` — validates + saves daily puzzle result

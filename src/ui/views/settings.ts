@@ -22,12 +22,13 @@ function pushPermission(): NotificationPermission {
   return isPushSupported() ? Notification.permission : 'denied';
 }
 import { showWhatsNew } from './whats-new';
+import { DISCORD_INVITE } from '@lib/news';
 
 // Official community links — the canonical home for these across the app.
 export const COMMUNITY_LINKS = {
   fbGroup: 'https://www.facebook.com/groups/926777207089534',
   fbPage: 'https://www.facebook.com/profile.php?id=61591484931870',
-  discord: 'https://discord.gg/QFRYAaC8qB',
+  discord: DISCORD_INVITE,
 };
 
 export interface SettingsProps {
@@ -35,6 +36,7 @@ export interface SettingsProps {
   onSignOut: () => void;
   onUpgradeAccount: () => void;
   onOpenHowToPlay: () => void;
+  onOpenInbox: () => void;
   onOpenContactSupport: () => void;
   onOpenPrivacyPolicy: () => void;
   onOpenTermsOfService: () => void;
@@ -142,6 +144,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
       <div class="settings-group">
         <div class="settings-group-label">Help & About</div>
         <div class="card settings-card">
+          ${IS_CRAZYGAMES ? '' : linkRow('set-news', ic.mail(18), 'News', 'Announcements and updates from the team')}
           ${linkRow('set-how-to-play', ic.brain(18), 'How to Play', 'Rules & tips for Sudoku')}
           ${IS_CRAZYGAMES ? '' : linkRow('set-contact', ic.bell(18), 'Contact Support', 'We usually reply within a day')}
           ${linkRow('set-privacy', ic.lock(18), 'Privacy Policy', '')}
@@ -282,6 +285,7 @@ export function mountSettingsView(root: HTMLElement, props: SettingsProps): { un
   root.querySelector('#set-fb-group')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.fbGroup, '_blank', 'noopener'));
   root.querySelector('#set-fb-page')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.fbPage, '_blank', 'noopener'));
   root.querySelector('#set-discord')?.addEventListener('click', () => window.open(COMMUNITY_LINKS.discord, '_blank', 'noopener'));
+  root.querySelector('#set-news')?.addEventListener('click', props.onOpenInbox);
   root.querySelector('#set-how-to-play')?.addEventListener('click', props.onOpenHowToPlay);
   root.querySelector('#set-contact')?.addEventListener('click', props.onOpenContactSupport);
   root.querySelector('#set-privacy')?.addEventListener('click', props.onOpenPrivacyPolicy);

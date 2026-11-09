@@ -53,6 +53,8 @@ import { mountContactSupportView } from './ui/views/contact-support';
 import { mountPrivacyPolicyView } from './ui/views/privacy-policy';
 import { mountTermsOfServiceView } from './ui/views/terms-of-service';
 import { showWhatsNew, shouldAutoShowWhatsNew } from './ui/views/whats-new';
+import { runLaunchAnnouncements } from './ui/views/announcement';
+import { mountInboxView } from './ui/views/inbox';
 import { showLevelUpModal } from './ui/views/level-up';
 import { applyTheme, loadCachedThemeId } from './lib/themes';
 import { applyBackground } from './lib/backgrounds';
@@ -246,6 +248,7 @@ function showHome() {
     onContinueDaily: (saved) => void playDailyResume(saved),
     onOpenDailyDetail: () => { dailyDetailBack = showHome; showDailyDetail(); },
     onAuthAction: openAuthAction,
+    onOpenInbox: () => showInbox(showHome),
     nav: navCb,
   });
   currentUnmount = () => { view.unmount(); closeWelcome?.(); };
@@ -534,6 +537,7 @@ function showSettings() {
     onSignOut: handleSignOut,
     onUpgradeAccount: openAuthAction,
     onOpenHowToPlay: showHowToPlay,
+    onOpenInbox: () => showInbox(showSettings),
     onOpenContactSupport: showContactSupport,
     onOpenPrivacyPolicy: showPrivacyPolicy,
     onOpenTermsOfService: showTermsOfService,
@@ -546,6 +550,12 @@ function showSettings() {
 function showHowToPlay() {
   clearView('how_to_play');
   const view = mountHowToPlayView(root, { onBack: showSettings, nav: navCb });
+  currentUnmount = view.unmount;
+}
+
+function showInbox(back: () => void) {
+  clearView('inbox');
+  const view = mountInboxView(root, { onBack: back, nav: navCb });
   currentUnmount = view.unmount;
 }
 
@@ -1269,6 +1279,8 @@ async function boot() {
     showWhatsNew();
   }
   monthlyWelcomeReady = true;
+  // Waits for onboarding / What's New / the monthly welcome to close first.
+  void runLaunchAnnouncements();
 }
 
 boot().catch((err) => {
