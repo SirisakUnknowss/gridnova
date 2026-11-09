@@ -6896,12 +6896,13 @@ button:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 
 .announce--text .announce-title { padding: 0 28px; }
 .announce-date { margin: 4px 0 14px; font-size: 12px; color: var(--app-text-secondary); }
 .announce-image { display: block; width: 100%; flex-shrink: 0; }
-.announce--image_text .announce-image { height: 200px; object-fit: cover; }
+/* Wide art shows whole; square/tall art is trimmed from the edges so the words stay on screen. */
+.announce--image_text .announce-image { height: auto; max-height: min(34dvh, 300px); object-fit: cover; }
 .announce--image .announce-image { height: auto; max-height: 68dvh; object-fit: contain; background: var(--app-card-bg); }
 .announce-body { font-size: 15px; line-height: 1.55; }
 .announce-body p { margin: 0 0 10px; }
 .announce-qr {
-  margin: 4px 0 16px; padding: 12px 12px 8px;
+  margin: 16px 0 4px; padding: 12px 12px 8px;
   background: var(--app-card-bg);
   border: 1px solid var(--app-border); border-radius: 18px;
 }

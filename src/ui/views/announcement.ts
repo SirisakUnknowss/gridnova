@@ -48,12 +48,12 @@ export function showAnnouncement(item: NewsItem, opts: { allowHide: boolean; pos
           ${layout === 'image'
             ? `<h2 class="sr-only" id="announce-title">${escapeHtml(item.title)}</h2>${opts.position ? `<p class="announce-kicker announce-kicker--overlay">${kicker}</p>` : ''}`
             : `<div class="announce-words">${words}</div>`}
+          ${item.cta ? `<button class="btn btn--primary announce-cta" id="announce-cta">${escapeHtml(item.cta.label)}</button>` : ''}
           ${item.qrUrl ? `
             <figure class="announce-qr">
               <img src="${escapeHtml(item.qrUrl)}" width="168" height="168" alt="${escapeHtml(item.qrAlt ?? 'QR code')}">
-              <figcaption>Scan with your phone camera</figcaption>
+              <figcaption>Or scan with your phone camera</figcaption>
             </figure>` : ''}
-          ${item.cta ? `<button class="btn btn--primary announce-cta" id="announce-cta">${escapeHtml(item.cta.label)}</button>` : ''}
         </div>
         ${opts.allowHide ? `
           <label class="announce-hide">
