@@ -15,7 +15,7 @@
   <style>
     :root {
       --app-bg: #f3f1ff; --app-text: #2e3761; --app-text-secondary: #5f6a8c;
-      --app-border: #d9d3f7; --brand-primary: #667eea;
+      --app-border: #d9d3f7; --brand-primary: #667eea; --app-card: #ffffff;
     }
     * { box-sizing: border-box; }
     html { color-scheme: light; }
@@ -30,7 +30,14 @@
     main { max-width: 720px; margin: 0 auto; padding: 28px 20px 56px; }
     .brand { display: inline-flex; align-items: center; gap: 8px; color: var(--brand-primary); font-weight: 700; text-decoration: none; }
     .brand img { width: 30px; height: 30px; border-radius: 8px; }
-    article { margin-top: 28px; }
+    article {
+      margin-top: 20px; padding: 28px 26px;
+      background: color-mix(in srgb, var(--app-card) 88%, transparent);
+      border: 1px solid var(--app-border); border-radius: 24px;
+      box-shadow: 0 12px 40px color-mix(in srgb, var(--brand-primary) 12%, transparent);
+      backdrop-filter: blur(6px);
+    }
+    @media (max-width: 480px) { article { padding: 22px 18px; border-radius: 20px; } }
     h1 { margin: 0; font-size: 34px; line-height: 1.2; }
     h2 { margin: 30px 0 6px; font-size: 20px; }
     p { margin: 0 0 10px; }
@@ -38,7 +45,7 @@
     li { margin-bottom: 6px; }
     .updated { color: var(--app-text-secondary); font-size: 14px; margin-top: 6px; }
     a { color: var(--brand-primary); }
-    footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--app-border); font-size: 14px; color: var(--app-text-secondary); }
+    footer { margin-top: 20px; text-align: center; font-size: 14px; color: var(--app-text-secondary); }
   </style>
 </head>
 <body>
