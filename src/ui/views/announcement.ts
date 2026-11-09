@@ -1,5 +1,5 @@
 // =====================================================================
-// Full-screen announcement popup. At launch every news item the player
+// Announcement popup (centered modal). At launch every news item the player
 // hasn't hidden on this device is shown one after another; ticking
 // "Don't show again" hides that item from future launches (it stays
 // readable in the Inbox).
@@ -57,18 +57,16 @@ export function showAnnouncement(item: NewsItem, opts: { allowHide: boolean; pos
     const close = () => {
       const hide = wrapper.querySelector<HTMLInputElement>('#announce-hide-box')?.checked;
       if (hide) hideForever(item.id);
-      document.removeEventListener('keydown', onKey);
       wrapper.remove();
       window.dispatchEvent(new CustomEvent('gn:news-read'));
       resolve();
     };
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
 
+    // Only the X closes it — backdrop taps and Escape are deliberately ignored.
     wrapper.querySelector('#announce-close')?.addEventListener('click', close);
     wrapper.querySelector('#announce-cta')?.addEventListener('click', () => {
       if (item.cta) window.open(item.cta.url, '_blank', 'noopener');
     });
-    document.addEventListener('keydown', onKey);
     wrapper.querySelector<HTMLButtonElement>('#announce-close')?.focus();
   });
 }

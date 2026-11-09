@@ -86,7 +86,7 @@ export function homeViewHTML(): string {
           ${ACCOUNTS_ENABLED ? heartsPillHTML() : ''}
           <span class="stat-pill">${ic.coin(13)} ${formatCompact(state.coins)}</span>
           ${IS_CRAZYGAMES ? '' : `<button class="home-icon-btn home-inbox-btn" id="inbox-btn" title="Inbox" aria-label="Inbox">
-            ${ic.mail(17)}<span class="home-inbox-dot" id="inbox-dot" hidden></span>
+            ${ic.mail(22)}<span class="home-inbox-dot" id="inbox-dot" hidden></span>
           </button>`}
           <button class="home-icon-btn" id="mute-btn" title="${muted ? 'Unmute' : 'Mute'}">
             ${muted ? ic.soundOff(16) : ic.soundOn(16)}

@@ -47,6 +47,7 @@ import rocketIcon from '@images/space/replacements/rocket-icon.webp'
 import cloudIcon from '@images/space/replacements/cloud-icon.webp'
 import sparkleIcon from '@images/space/replacements/sparkle-icon.webp'
 import waveIcon from '@images/space/replacements/wave-icon.webp'
+import mailIcon from '@images/space/replacements/mail-icon.webp'
 import emptyIcon from '@images/space/emptyIcon.webp';
 import sharingIcon from '@images/space/replacements/sharing-icon.webp'
 import clockIcon from '@images/space/replacements/clock-icon.webp'
@@ -65,7 +66,7 @@ function img(src: string, size = 18): string {
 
 export const ic = {
   search: (s?: number) => svg('<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>', s),
-  mail: (s?: number) => svg('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/>', s),
+  mail: (s?: number) => img(mailIcon, s),
   shop: (s?: number) => themeArtHTML(shopIcon, s, 'shop'),
   close: (s?: number) => img(closeControl, s),
   back: (s?: number) => img(backControl, s),
