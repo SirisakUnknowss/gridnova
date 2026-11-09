@@ -1,6 +1,8 @@
 {
   "version": 1,
-  "include": ["/*"],
+  "include": [
+    "/*"
+  ],
   "exclude": [
     "/assets/*",
     "/icons/*",
@@ -13,6 +15,10 @@
     "/robots.txt",
     "/sitemap.xml",
     "/google11b4ed3b7b5bad13.html",
-    "/google11b4ed3b7b5bad13"
+    "/google11b4ed3b7b5bad13",
+    "/terms",
+    "/terms.html",
+    "/privacy",
+    "/privacy.html"
   ]
 }

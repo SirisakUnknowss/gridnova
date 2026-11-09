@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy · GridNova</title>
+  <meta name="description" content="Privacy Policy for GridNova, the free daily Sudoku game.">
+  <link rel="canonical" href="https://gridnova.pages.dev/privacy">
+  <meta name="theme-color" content="#667eea">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32-transparent.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Standalone page (no app bundle) so stores and crawlers can read it. Keep the text in sync with src/ui/views/privacy-policy.ts. -->
+  <style>
+    :root {
+      --app-bg: #f3f1ff; --app-card: #ffffff; --app-text: #2e3761;
+      --app-text-secondary: #74809e; --app-border: #e1dcfa; --brand-primary: #667eea;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --app-bg: #14162b; --app-card: #1f2240; --app-text: #e8eaff; --app-text-secondary: #a3a9d1; --app-border: #34386a; --brand-primary: #8c9cff; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--app-bg); color: var(--app-text); font: 16px/1.65 'Fredoka', system-ui, sans-serif; }
+    main { max-width: 720px; margin: 0 auto; padding: 28px 16px 48px; }
+    .brand { display: inline-flex; align-items: center; gap: 8px; color: var(--brand-primary); font-weight: 700; text-decoration: none; }
+    .brand img { width: 28px; height: 28px; border-radius: 8px; }
+    .card { margin-top: 18px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 22px; padding: 24px 22px; }
+    h1 { margin: 0; font-size: 28px; line-height: 1.2; }
+    h2 { margin: 26px 0 6px; font-size: 19px; }
+    p { margin: 0 0 10px; }
+    ul { margin: 0 0 10px; padding-left: 22px; }
+    li { margin-bottom: 6px; }
+    .updated { color: var(--app-text-secondary); font-size: 14px; margin-top: 6px; }
+    a { color: var(--brand-primary); }
+    footer { margin-top: 20px; text-align: center; font-size: 14px; color: var(--app-text-secondary); }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="brand" href="/"><img src="/icons/icon-192.png" alt=""> GridNova</a>
+    <article class="card">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: July 18, 2026</p>
+
+      <h2>What We Collect</h2>
+      <ul>
+        <li><b>Account info</b> — if you sign in, your email address and any display name, avatar, or country you set on your profile.</li>
+        <li><b>Gameplay data</b> — puzzle results, scores, coins, XP, streaks, and medals, so your progress can sync across devices.</li>
+        <li><b>Guest data</b> — if you play without an account, we store your progress against an anonymous device identifier, not tied to your identity.</li>
+        <li><b>Basic usage data</b> — which screens you visit and roughly how long you play, collected by our own systems (no third-party analytics/ad trackers are used). Used only to understand which parts of the app work well.</li>
+        <li><b>Crash reports</b> — if the app errors, technical details are sent to our error-tracking tool so we can fix bugs.</li>
+      </ul>
+
+      <h2>How We Use It</h2>
+      <p>Strictly to run the game: save your progress, show leaderboards, award coins/XP, send an optional daily-puzzle reminder if you enable it, and fix bugs. We do not sell your data, and we do not use third-party ad or tracking networks.</p>
+
+      <h2>Who We Share It With</h2>
+      <p>We use Supabase to host our database and authentication, which processes data on our behalf under their own security practices. If we launch paid purchases, a payment processor will handle that transaction — we never see or store your card details ourselves.</p>
+
+      <h2>Your Choices</h2>
+      <p>You can play entirely as a guest without creating an account. You can turn off push notifications and sound at any time in Settings. To delete your account and data, contact us via Support.</p>
+
+      <h2>Contact</h2>
+      <p>Questions about this policy? Use Contact Support in the game (Settings → Help &amp; About), message our <a href="https://www.facebook.com/profile.php?id=61591484931870" rel="noopener">Facebook page</a>, or ask in #help on our <a href="https://discord.gg/QFRYAaC8qB" rel="noopener">Discord</a>.</p>
+    </article>
+    <footer><a href="/terms">Terms of Service</a> · <a href="/">Play GridNova</a></footer>
+  </main>
+</body>
+</html>

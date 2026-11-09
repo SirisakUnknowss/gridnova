@@ -1,4 +1,5 @@
 import { mountStaticContentView, type StaticContentProps } from './static-content';
+// Keep this text in sync with public/privacy.html (the public link for stores and crawlers).
 import { ic } from '@ui/icons';
 
 export function mountPrivacyPolicyView(root: HTMLElement, props: Pick<StaticContentProps, 'onBack' | 'nav'>) {
