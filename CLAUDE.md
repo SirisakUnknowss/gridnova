@@ -46,18 +46,17 @@ other branch deploys nothing.
 | Env | Branch | Web URL | Supabase project |
 |---|---|---|---|
 | Production | `main` | `gridnova.pages.dev` | `sudoku-daily` (`sqjllqilozhxbzvfjhra`) |
-| Staging | `staging` | `staging.gridnova.pages.dev` | ⚠️ **shares prod DB** (`sudoku-daily`) — not yet separated |
+| Staging | `staging` | `staging.gridnova.pages.dev` | separate project (`xrtgcxofjisqaigaaboy`) |
 
-⚠️ **Staging currently SHARES the production Supabase database.** A dedicated staging
-project is wanted but blocked by the Supabase free-tier limit (2 active projects per org,
-already full: `sudoku-daily` + `Vestly`). Separation is pending a Pro upgrade or freeing a
-slot. **Until then, be careful: staging writes hit production data.** Avoid destructive or
-seed operations from staging.
+Staging and production use **separate Supabase projects**, owned by **different Supabase
+accounts** — check which project you are in before running SQL (the dashboard labels prod
+`main · PRODUCTION`). The web build gets its URL/anon key from GitHub Environment secrets
+(`staging` vs `production`) in `deploy-web.yml`; `scripts/verify-staging-backend.mjs` fails
+a staging build that points anywhere else. The admin panel picks the project by hostname
+(`staging.*` / `localhost` → staging).
 
-When separated, the per-environment Supabase URL/anon key will come from **GitHub
-Environment secrets** (`staging` vs `production` environments), consumed by
-`deploy-web.yml`. Repo-level secrets are the production fallback; staging-scoped secrets
-override them for staging builds.
+Migrations are **not** applied on push (`deploy-supabase.yml` is manual, main-only, edge
+functions only). Apply each new migration to **both** projects by hand, staging first.
 
 ---
 
@@ -319,7 +318,7 @@ currentView: View
 | `visitor_sessions` | One row per session per day + where it came from (referrer/UTM/click-id/in-app browser) |
 | `session_views` | Which views a session visited — powers the admin funnel |
 | `feedbacks` | In-app rating + comment |
-| `announcements` | News posted from the admin panel (`env` = staging / production / all, since staging shares this DB). Built-in news lives in `src/lib/news.ts` |
+| `announcements` | News posted from the admin panel (`env` = staging / production / all — a second guard on top of the separate projects). Built-in news lives in `src/lib/news.ts` |
 
 **Key RPCs (Postgres functions)**
 - `spend_coins(p_user_id, p_amount, p_reason, p_metadata)` → returns `{ ok, balance, reason }`

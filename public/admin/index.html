@@ -683,7 +683,7 @@
             <option value="production">Production เท่านั้น</option>
             <option value="all">ทั้งสองที่</option>
           </select>
-          <div class="news-hint">ระวัง: Staging กับ Production ใช้ฐานข้อมูลเดียวกัน — ทดสอบด้วย "Staging เท่านั้น" ก่อน</div>
+          <div class="news-hint">Admin บน staging เขียนลงฐานข้อมูล staging, admin บน production เขียนลงฐานข้อมูล production — ช่องนี้กันพลาดอีกชั้น</div>
           <div class="row2">
             <div><label for="news-starts">เริ่มแสดง</label><input type="datetime-local" id="news-starts"></div>
             <div><label for="news-ends">หยุดแสดง (ไม่บังคับ)</label><input type="datetime-local" id="news-ends"></div>
@@ -707,8 +707,20 @@
 </div> <!-- end of dashboard -->
 
 <script>
-const SUPABASE_URL  = 'https://sqjllqilozhxbzvfjhra.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxamxscWlsb3poeGJ6dmZqaHJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzQ4NzcsImV4cCI6MjA5NTQ1MDg3N30.jE514bJw8x550rR64ks7X2rN6bO_y7G1e0JjkBaf8xM';
+// Staging and production have separate Supabase projects; the staging admin must manage the staging one.
+const IS_STAGING_ADMIN = /(^|\.)staging\./.test(location.hostname) || location.hostname === 'localhost';
+const SUPABASE_PROJECTS = {
+  production: {
+    url: 'https://sqjllqilozhxbzvfjhra.supabase.co',
+    anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxamxscWlsb3poeGJ6dmZqaHJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzQ4NzcsImV4cCI6MjA5NTQ1MDg3N30.jE514bJw8x550rR64ks7X2rN6bO_y7G1e0JjkBaf8xM',
+  },
+  staging: {
+    url: 'https://xrtgcxofjisqaigaaboy.supabase.co',
+    anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhydGdjeG9mamlzcWFpZ2FhYm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyNjg0NzUsImV4cCI6MjEwNjg0NDQ3NX0.8pl0hx9WOoHlY5HonJCG8muMhtsCSAeV3O_C3DBJXUk',
+  },
+};
+const SUPABASE_URL  = SUPABASE_PROJECTS[IS_STAGING_ADMIN ? 'staging' : 'production'].url;
+const SUPABASE_ANON = SUPABASE_PROJECTS[IS_STAGING_ADMIN ? 'staging' : 'production'].anon;
 const AUTO_REFRESH  = 60_000;
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
