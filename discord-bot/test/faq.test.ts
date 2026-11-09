@@ -61,7 +61,14 @@ describe("reply text", () => {
       expect(e.th.length).toBeLessThan(2000);
       expect(e.en.length).toBeLessThan(2000);
     }
-    expect(menuText("th").length).toBeLessThan(2000);
     expect(fallbackText("en", "<#1>")).toContain("<#1>");
+  });
+
+  it("lists every topic in both Thai and English", () => {
+    const menu = menuText();
+    expect(menu.length).toBeLessThan(2000);
+    for (const e of FAQ) expect(menu).toContain(`${e.title.th} — ${e.title.en}`);
+    expect(menu).toContain("หัวข้อที่ตอบได้");
+    expect(menu).toContain("Topics I can answer");
   });
 });

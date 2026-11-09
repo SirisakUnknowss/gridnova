@@ -309,7 +309,7 @@ export class GatewayBot extends DurableObject<Env> {
     let reply: string | null = null;
     let topic: string | null = null;
     if (isMenuRequest(question)) {
-      reply = menuText(lang);
+      reply = menuText();
       topic = "menu";
     } else {
       const entry = matchFaq(question);

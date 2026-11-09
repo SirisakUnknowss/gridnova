@@ -13,7 +13,10 @@
   // Durable Object holds that connection open. The cron re-opens it if
   // Cloudflare evicts the object (deploys, restarts).
   "durable_objects": {
-    "bindings": [{ "name": "GATEWAY", "class_name": "GatewayBot" }]
+    "bindings": [{ "name": "GATEWAY", "class_name": "GatewayBot" }],
+    // The gateway socket keeps the object active forever, so a deferred update would
+    // always wait out the full delay; the bot resumes its Discord session on restart anyway.
+    "code_update_strategy": { "mode": "immediate" }
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GatewayBot"] }],
   "triggers": { "crons": ["*/5 * * * *"] },

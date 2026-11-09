@@ -140,11 +140,14 @@ export function isMenuRequest(text: string): boolean {
   return /^(!faq|!help|faq|help|menu|เมนู|หัวข้อ|ช่วยด้วย)$/i.test(text.trim());
 }
 
-export function menuText(lang: Lang): string {
-  const list = FAQ.map((e) => `• ${e.title[lang]}`).join("\n");
-  return lang === "th"
-    ? `📖 **หัวข้อที่ตอบได้** — พิมพ์ถามเรื่องที่สนใจได้เลย เช่น "หัวใจหมดทำไง"\n${list}`
-    : `📖 **Topics I can answer** — just ask, e.g. "how do hearts work?"\n${list}`;
+/** Bilingual because "faq"/"help" carry no language signal, and most players read Thai. */
+export function menuText(): string {
+  const list = FAQ.map((e) => `• ${e.title.th} — ${e.title.en}`).join("\n");
+  return [
+    `📖 **หัวข้อที่ตอบได้ · Topics I can answer**`,
+    `พิมพ์ถามได้เลย เช่น "หัวใจหมดทำไง" · Just ask, e.g. "how do hearts work?"`,
+    list,
+  ].join("\n");
 }
 
 export function fallbackText(lang: Lang, bugMention: string): string {
