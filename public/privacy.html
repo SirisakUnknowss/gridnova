@@ -14,32 +14,37 @@
   <!-- Standalone page (no app bundle) so stores and crawlers can read it. Keep the text in sync with src/ui/views/privacy-policy.ts. -->
   <style>
     :root {
-      --app-bg: #f3f1ff; --app-card: #ffffff; --app-text: #2e3761;
-      --app-text-secondary: #74809e; --app-border: #e1dcfa; --brand-primary: #667eea;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root { --app-bg: #14162b; --app-card: #1f2240; --app-text: #e8eaff; --app-text-secondary: #a3a9d1; --app-border: #34386a; --brand-primary: #8c9cff; }
+      --app-bg: #f3f1ff; --app-text: #2e3761; --app-text-secondary: #5f6a8c;
+      --app-border: #d9d3f7; --brand-primary: #667eea;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--app-bg); color: var(--app-text); font: 16px/1.65 'Fredoka', system-ui, sans-serif; }
-    main { max-width: 720px; margin: 0 auto; padding: 28px 16px 48px; }
+    html { color-scheme: light; }
+    body { margin: 0; min-height: 100vh; background: var(--app-bg); color: var(--app-text); font: 16px/1.7 'Fredoka', system-ui, sans-serif; }
+    /* Same art as the game's Home screen, washed out a little more so long text stays easy to read. */
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: -1;
+      background-image: linear-gradient(color-mix(in srgb, var(--app-bg) 90%, transparent), color-mix(in srgb, var(--app-bg) 82%, transparent)), url('/legal/bg-home.webp');
+      background-size: cover; background-position: center;
+    }
+    /* Text column capped near 70 characters per line for comfortable reading on wide screens. */
+    main { max-width: 720px; margin: 0 auto; padding: 28px 20px 56px; }
     .brand { display: inline-flex; align-items: center; gap: 8px; color: var(--brand-primary); font-weight: 700; text-decoration: none; }
-    .brand img { width: 28px; height: 28px; border-radius: 8px; }
-    .card { margin-top: 18px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 22px; padding: 24px 22px; }
-    h1 { margin: 0; font-size: 28px; line-height: 1.2; }
-    h2 { margin: 26px 0 6px; font-size: 19px; }
+    .brand img { width: 30px; height: 30px; border-radius: 8px; }
+    article { margin-top: 28px; }
+    h1 { margin: 0; font-size: 34px; line-height: 1.2; }
+    h2 { margin: 30px 0 6px; font-size: 20px; }
     p { margin: 0 0 10px; }
     ul { margin: 0 0 10px; padding-left: 22px; }
     li { margin-bottom: 6px; }
     .updated { color: var(--app-text-secondary); font-size: 14px; margin-top: 6px; }
     a { color: var(--brand-primary); }
-    footer { margin-top: 20px; text-align: center; font-size: 14px; color: var(--app-text-secondary); }
+    footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--app-border); font-size: 14px; color: var(--app-text-secondary); }
   </style>
 </head>
 <body>
   <main>
     <a class="brand" href="/"><img src="/icons/icon-192.png" alt=""> GridNova</a>
-    <article class="card">
+    <article>
       <h1>Privacy Policy</h1>
       <p class="updated">Last updated: July 18, 2026</p>
 

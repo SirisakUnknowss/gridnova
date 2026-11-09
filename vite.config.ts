@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => {
           // load, and each one invokes the Pages Function (see _routes.json).
           // Players were downloading the admin panel and its chart library, and
           // re-fetching the Search Console verification file, for nothing.
-            globIgnores: ['admin/**', 'google*.html', 'terms.html', 'privacy.html', 'assets/2027-*.webp', 'assets/skin-*.webp', 'assets/star-mode-living-room-*.png', 'assets/coffee-promptpay-*.jpg'],
+            globIgnores: ['admin/**', 'google*.html', 'terms.html', 'privacy.html', 'legal/**', 'assets/2027-*.webp', 'assets/skin-*.webp', 'assets/star-mode-living-room-*.png', 'assets/coffee-promptpay-*.jpg'],
         },
       }),
     ],

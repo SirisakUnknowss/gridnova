@@ -19,6 +19,7 @@
     "/terms",
     "/terms.html",
     "/privacy",
-    "/privacy.html"
+    "/privacy.html",
+    "/legal/*"
   ]
 }
