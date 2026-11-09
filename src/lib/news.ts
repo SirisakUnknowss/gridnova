@@ -8,11 +8,15 @@ import { getSupabase } from './supabase';
 import { IS_CRAZYGAMES } from './platform';
 import discordQr from '@images/discord-qr.svg';
 
+/** text = words only · image = picture only (title kept for the Inbox list and screen readers) · image_text = picture on top, words below */
+export type NewsLayout = 'text' | 'image' | 'image_text';
+
 export interface NewsItem {
   id: string;
   title: string;
   body: string;
   date: string; // ISO
+  layout?: NewsLayout;
   imageUrl?: string;
   qrUrl?: string;
   qrAlt?: string;
@@ -56,6 +60,12 @@ export function hideForever(id: string): void { addToSet(HIDDEN_KEY, [id]); }
 export function markRead(ids: string[]): void { addToSet(READ_KEY, ids); }
 export function readIds(): Set<string> { return readSet(READ_KEY); }
 
+/** An image layout without an image falls back to text, so a bad row never shows an empty card. */
+export function layoutOf(item: NewsItem): NewsLayout {
+  if (!item.imageUrl) return 'text';
+  return item.layout ?? 'image_text';
+}
+
 export function countUnread(items: NewsItem[]): number {
   const read = readSet(READ_KEY);
   return items.filter((n) => !read.has(n.id)).length;
@@ -65,11 +75,14 @@ interface RemoteRow {
   id: string;
   title: string;
   body: string;
+  layout?: string | null;
   image_url: string | null;
   cta_label: string | null;
   cta_url: string | null;
   starts_at: string;
 }
+
+const LAYOUTS: readonly NewsLayout[] = ['text', 'image', 'image_text'];
 
 const httpsOnly = (u: string | null | undefined): string | undefined =>
   u && /^https:\/\//i.test(u) ? u : undefined;
@@ -87,6 +100,7 @@ async function fetchRemote(): Promise<NewsItem[]> {
       title: r.title,
       body: r.body ?? '',
       date: r.starts_at,
+      layout: LAYOUTS.find((l) => l === r.layout),
       imageUrl: httpsOnly(r.image_url),
       cta: r.cta_label && ctaUrl ? { label: r.cta_label, url: ctaUrl } : undefined,
     };

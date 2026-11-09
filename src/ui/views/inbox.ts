@@ -22,6 +22,7 @@ function rowHTML(item: NewsItem, unread: boolean): string {
   const date = new Date(item.date);
   return `
     <button class="inbox-row${unread ? ' is-unread' : ''}" data-news="${escapeHtml(item.id)}">
+      ${item.imageUrl ? `<img class="inbox-thumb" src="${escapeHtml(item.imageUrl)}" alt="" loading="lazy">` : ''}
       <span class="inbox-row-body">
         <span class="inbox-row-title">${unread ? '<span class="inbox-dot" aria-label="Unread"></span>' : ''}${escapeHtml(item.title)}</span>
         <span class="inbox-row-snippet">${escapeHtml(snippet(item.body))}</span>

@@ -659,11 +659,18 @@
         <div class="table-card news-form">
           <h3 id="news-form-title"> ข่าวใหม่</h3>
           <input type="hidden" id="news-id">
+          <label for="news-layout">รูปแบบ</label>
+          <select id="news-layout">
+            <option value="text">ข้อความอย่างเดียว</option>
+            <option value="image_text">ภาพ + ข้อความ (ภาพอยู่บน)</option>
+            <option value="image">ภาพอย่างเดียว</option>
+          </select>
+          <div class="news-hint">ภาพอย่างเดียว: หัวข้อจะไม่โชว์บน popup แต่ใช้เป็นชื่อในหน้า Inbox · ภาพ+ข้อความ: ภาพแนวนอนดีที่สุด (ประมาณ 16:9)</div>
           <label for="news-title">หัวข้อ (ภาษาอังกฤษ — แสดงในเกม)</label>
           <input type="text" id="news-title" maxlength="120">
           <label for="news-body">เนื้อหา (ภาษาอังกฤษ · เว้นบรรทัดว่างเพื่อขึ้นย่อหน้าใหม่)</label>
           <textarea id="news-body" maxlength="2000"></textarea>
-          <label for="news-image">รูปภาพ URL (https:// ไม่บังคับ)</label>
+          <label for="news-image">รูปภาพ URL (https:// — ต้องใส่ถ้าเลือกแบบมีภาพ)</label>
           <input type="url" id="news-image" placeholder="https://...">
           <div class="row2">
             <div><label for="news-cta-label">ข้อความปุ่ม</label><input type="text" id="news-cta-label" maxlength="40" placeholder="Join Discord"></div>
@@ -2117,6 +2124,7 @@ function toLocalInput(iso) {
 function resetNewsForm() {
   ['news-id', 'news-title', 'news-body', 'news-image', 'news-cta-label', 'news-cta-url', 'news-ends'].forEach((id) => { document.getElementById(id).value = ''; });
   document.getElementById('news-env').value = 'staging';
+  document.getElementById('news-layout').value = 'text';
   document.getElementById('news-starts').value = toLocalInput(new Date().toISOString());
   document.getElementById('news-published').checked = false;
   setEl('news-form-title', ' ข่าวใหม่');
@@ -2133,6 +2141,7 @@ function editNews(id) {
   document.getElementById('news-cta-label').value = n.cta_label || '';
   document.getElementById('news-cta-url').value = n.cta_url || '';
   document.getElementById('news-env').value = n.env;
+  document.getElementById('news-layout').value = n.layout || 'text';
   document.getElementById('news-starts').value = toLocalInput(n.starts_at);
   document.getElementById('news-ends').value = toLocalInput(n.ends_at);
   document.getElementById('news-published').checked = n.published;
@@ -2148,6 +2157,8 @@ async function saveNews() {
   for (const id of ['news-image', 'news-cta-url']) {
     if (v(id) && !/^https:\/\//i.test(v(id))) { setEl('news-status', 'ลิงก์ต้องขึ้นต้นด้วย https://'); return; }
   }
+  if (v('news-layout') !== 'text' && !v('news-image')) { setEl('news-status', 'แบบมีภาพต้องใส่รูปภาพ URL'); return; }
+  if (v('news-layout') !== 'image' && !document.getElementById('news-body').value.trim()) { setEl('news-status', 'ใส่เนื้อหาก่อน (หรือเลือกแบบภาพอย่างเดียว)'); return; }
   if (!!v('news-cta-label') !== !!v('news-cta-url')) { setEl('news-status', 'ปุ่มต้องมีทั้งข้อความและลิงก์ หรือเว้นว่างทั้งคู่'); return; }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return;
@@ -2155,6 +2166,7 @@ async function saveNews() {
     p_id: v('news-id') || null,
     p_title: title,
     p_body: document.getElementById('news-body').value,
+    p_layout: v('news-layout'),
     p_image_url: v('news-image'),
     p_cta_label: v('news-cta-label'),
     p_cta_url: v('news-cta-url'),
@@ -2190,12 +2202,13 @@ async function loadNewsList() {
   if (!rows.length) { wrap.innerHTML = '<div class="empty">ยังไม่มีข่าว</div>'; return; }
   const now = Date.now();
   const envLabel = { staging: 'Staging', production: 'Production', all: 'ทั้งสองที่' };
+  const layoutLabel = { text: 'ข้อความ', image: 'ภาพ', image_text: 'ภาพ+ข้อความ' };
   wrap.innerHTML = `<table><thead><tr><th>ข่าว</th><th>สถานะ</th><th>ช่วงเวลา</th><th></th></tr></thead><tbody>${rows.map((n) => {
     const live = n.published && new Date(n.starts_at).getTime() <= now && (!n.ends_at || new Date(n.ends_at).getTime() > now);
     const status = live ? '<span class="news-badge news-live">กำลังแสดง</span>' : n.published ? '<span class="news-badge news-draft">ตั้งเวลา/หมดเวลา</span>' : '<span class="news-badge news-draft">ร่าง</span>';
     return `<tr>
       <td><strong>${escapeHtml(n.title)}</strong><br><span style="color:var(--muted);font-size:11px">${escapeHtml((n.body || '').slice(0, 80))}</span></td>
-      <td>${status}<br><span class="news-badge news-env" style="margin-top:4px">${envLabel[n.env] ?? escapeHtml(n.env)}</span></td>
+      <td>${status}<br><span class="news-badge news-env" style="margin-top:4px">${envLabel[n.env] ?? escapeHtml(n.env)}</span> <span class="news-badge news-draft" style="margin-top:4px">${layoutLabel[n.layout] ?? 'ข้อความ'}</span></td>
       <td style="font-size:12px;color:var(--muted)">${fmtDateTime(n.starts_at)}<br>→ ${n.ends_at ? fmtDateTime(n.ends_at) : 'ไม่กำหนด'}</td>
       <td style="white-space:nowrap"><button class="btn-action" data-news-edit="${escapeHtml(n.id)}">แก้ไข</button> <button class="btn-ban" data-news-del="${escapeHtml(n.id)}">ลบ</button></td>
     </tr>`;

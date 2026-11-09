@@ -6,7 +6,7 @@
 // =====================================================================
 import { ic } from '@ui/icons';
 import { escapeHtml } from '@lib/format';
-import { hideForever, markRead, newsForLaunch, type NewsItem } from '@lib/news';
+import { hideForever, layoutOf, markRead, newsForLaunch, type NewsItem } from '@lib/news';
 
 function bodyHTML(text: string): string {
   return text
@@ -29,15 +29,25 @@ export function showAnnouncement(item: NewsItem, opts: { allowHide: boolean; pos
     const wrapper = document.createElement('div');
     wrapper.id = 'announce-root';
     wrapper.className = 'announce-bg';
-    wrapper.innerHTML = `
-      <div class="announce" role="dialog" aria-modal="true" aria-labelledby="announce-title">
-        <button class="modal-close announce-close" id="announce-close" aria-label="Close">${ic.close(24)}</button>
-        <div class="announce-scroll">
-          <p class="announce-kicker">NEWS${opts.position ? ` · ${escapeHtml(opts.position)}` : ''}</p>
+    const layout = layoutOf(item);
+    const kicker = `NEWS${opts.position ? ` · ${escapeHtml(opts.position)}` : ''}`;
+    const image = item.imageUrl
+      ? `<img class="announce-image" src="${escapeHtml(item.imageUrl)}" alt="${layout === 'image' ? escapeHtml(item.title) : ''}">`
+      : '';
+    const words = `
+          <p class="announce-kicker">${kicker}</p>
           <h2 class="announce-title" id="announce-title">${escapeHtml(item.title)}</h2>
           <p class="announce-date">${escapeHtml(formatDate(item.date))}</p>
-          ${item.imageUrl ? `<img class="announce-image" src="${escapeHtml(item.imageUrl)}" alt="" loading="lazy">` : ''}
-          <div class="announce-body">${bodyHTML(item.body)}</div>
+          ${item.body.trim() ? `<div class="announce-body">${bodyHTML(item.body)}</div>` : ''}`;
+
+    wrapper.innerHTML = `
+      <div class="announce announce--${layout}" role="dialog" aria-modal="true" aria-labelledby="announce-title">
+        <button class="modal-close announce-close" id="announce-close" aria-label="Close">${ic.close(24)}</button>
+        <div class="announce-scroll">
+          ${layout === 'text' ? '' : image}
+          ${layout === 'image'
+            ? `<h2 class="sr-only" id="announce-title">${escapeHtml(item.title)}</h2>${opts.position ? `<p class="announce-kicker announce-kicker--overlay">${kicker}</p>` : ''}`
+            : `<div class="announce-words">${words}</div>`}
           ${item.qrUrl ? `
             <figure class="announce-qr">
               <img src="${escapeHtml(item.qrUrl)}" width="168" height="168" alt="${escapeHtml(item.qrAlt ?? 'QR code')}">
