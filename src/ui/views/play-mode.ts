@@ -14,7 +14,6 @@ export interface PlayModeViewProps {
   onOpenDaily: () => void;
   onOpenRandom: () => void;
   onOpenBook: () => void;
-  onOpenStar: () => void;
   onOpenTimeAttack: () => void;
   nav: BottomNavCallbacks;
 }
@@ -73,14 +72,6 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
           <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
         </div>
 
-        <button class="pm-row" id="pm-star">
-          <span class="pm-row-icon pm-row-icon--star" aria-hidden="true">★</span>
-          <span class="pm-row-body">
-            <span class="pm-row-title">Star Mode <span class="star-demo-tag">UI Preview</span></span>
-            <span class="pm-row-sub">Solve puzzles. Restore a riverside home.</span>
-          </span>
-          <span class="pm-row-chevron">${ic.chevronRight(20)}</span>
-        </button>
       </div>
     </section>
     ${bottomNavHTML('home')}
@@ -90,7 +81,6 @@ export function mountPlayModeView(root: HTMLElement, props: PlayModeViewProps): 
   root.querySelector('#pm-daily')?.addEventListener('click', props.onOpenDaily);
   root.querySelector('#pm-random')?.addEventListener('click', props.onOpenRandom);
   root.querySelector('#pm-book')?.addEventListener('click', props.onOpenBook);
-  root.querySelector('#pm-star')?.addEventListener('click', props.onOpenStar);
   root.querySelector('#pm-time-attack')?.addEventListener('click', props.onOpenTimeAttack);
   wireBottomNav(root, props.nav, 'home');
 

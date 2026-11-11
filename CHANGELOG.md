@@ -1,3 +1,14 @@
+## 2.2.0 — 2026-11-11
+
+### Added
+- เพิ่ม Inbox และระบบ News ที่แสดงประกาศตอนเปิดเกม รองรับข้อความ ภาพอย่างเดียว และภาพพร้อมข้อความ พร้อมลิงก์ประกาศ
+- เพิ่มข่าวชวนเข้าชุมชน Discord และทางเข้าชุมชนใน Settings
+- เพิ่มหน้า Terms of Service และ Privacy Policy
+
+### Changed
+- ซ่อน Star Mode UI Preview จาก Play Mode ระหว่างรอเปิดใช้งานจริง
+- ให้ admin บน staging ใช้ฐานข้อมูล staging แยกจาก production
+
 ## 2.1.6 — 2026-11-05
 
 ### Fixed
