@@ -678,12 +678,11 @@
             <div><label for="news-cta-url">ลิงก์ปุ่ม (https://)</label><input type="url" id="news-cta-url" placeholder="https://..."></div>
           </div>
           <label for="news-env">แสดงบน</label>
-          <select id="news-env">
+          <select id="news-env" disabled>
             <option value="staging">Staging เท่านั้น (ทดสอบ)</option>
             <option value="production">Production เท่านั้น</option>
-            <option value="all">ทั้งสองที่</option>
           </select>
-          <div class="news-hint">Admin บน staging เขียนลงฐานข้อมูล staging, admin บน production เขียนลงฐานข้อมูล production — ช่องนี้กันพลาดอีกชั้น</div>
+          <div class="news-hint">ข่าวจะบันทึกลงฐานข้อมูลของเว็บ admin ที่เปิดอยู่เท่านั้น</div>
           <div class="row2">
             <div><label for="news-starts">เริ่มแสดง</label><input type="datetime-local" id="news-starts"></div>
             <div><label for="news-ends">หยุดแสดง (ไม่บังคับ)</label><input type="datetime-local" id="news-ends"></div>
@@ -721,6 +720,7 @@ const SUPABASE_PROJECTS = {
 };
 const SUPABASE_URL  = SUPABASE_PROJECTS[IS_STAGING_ADMIN ? 'staging' : 'production'].url;
 const SUPABASE_ANON = SUPABASE_PROJECTS[IS_STAGING_ADMIN ? 'staging' : 'production'].anon;
+const NEWS_ENV = IS_STAGING_ADMIN ? 'staging' : 'production';
 const AUTO_REFRESH  = 60_000;
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -2136,7 +2136,7 @@ function toLocalInput(iso) {
 
 function resetNewsForm() {
   ['news-id', 'news-title', 'news-body', 'news-image', 'news-cta-label', 'news-cta-url', 'news-ends'].forEach((id) => { document.getElementById(id).value = ''; });
-  document.getElementById('news-env').value = 'staging';
+  document.getElementById('news-env').value = NEWS_ENV;
   document.getElementById('news-layout').value = 'text';
   document.getElementById('news-starts').value = toLocalInput(new Date().toISOString());
   document.getElementById('news-published').checked = false;
@@ -2153,7 +2153,7 @@ function editNews(id) {
   document.getElementById('news-image').value = n.image_url || '';
   document.getElementById('news-cta-label').value = n.cta_label || '';
   document.getElementById('news-cta-url').value = n.cta_url || '';
-  document.getElementById('news-env').value = n.env;
+  document.getElementById('news-env').value = NEWS_ENV;
   document.getElementById('news-layout').value = n.layout || 'text';
   document.getElementById('news-starts').value = toLocalInput(n.starts_at);
   document.getElementById('news-ends').value = toLocalInput(n.ends_at);
@@ -2183,7 +2183,7 @@ async function saveNews() {
     p_image_url: v('news-image'),
     p_cta_label: v('news-cta-label'),
     p_cta_url: v('news-cta-url'),
-    p_env: v('news-env'),
+    p_env: NEWS_ENV,
     p_published: document.getElementById('news-published').checked,
     p_starts_at: v('news-starts') ? new Date(v('news-starts')).toISOString() : null,
     p_ends_at: v('news-ends') ? new Date(v('news-ends')).toISOString() : null,

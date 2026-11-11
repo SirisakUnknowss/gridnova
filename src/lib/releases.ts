@@ -14,6 +14,14 @@ export interface ReleaseNote {
 
 export const RELEASES: ReleaseNote[] = [
   {
+    version: '2.2.1', date: '2026-11-11', title: 'News and Community',
+    changes: [
+      { icon: 'notes', text: 'Find announcements in your new Inbox. Fresh news can also appear when you open the game.' },
+      { icon: 'sparkle', text: 'News can include text, artwork, or both, with a link when there is more to explore.' },
+      { icon: 'settings', text: 'Join the GridNova community from Settings, and read our Terms of Service and Privacy Policy in the app.' },
+    ],
+  },
+  {
     version: '2.2.0', date: '2026-11-11', title: 'News and Community',
     changes: [
       { icon: 'notes', text: 'Find announcements in your new Inbox. Fresh news can also appear when you open the game.' },
