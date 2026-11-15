@@ -173,7 +173,10 @@ export async function renderProfileCard(data: ProfileCardData): Promise<Blob | n
   ctx.font = '400 12px "Inter", system-ui, sans-serif';
   ctx.fillStyle = palette.muted;
   ctx.textAlign = 'center';
-  ctx.fillText(`gridnova.pages.dev?ref=${referralCode}`, W / 2, H - 30);
+  const footerUrl = referralCode && referralCode !== '—' && referralCode !== 'GRIDNOVA'
+    ? `gridnova.pages.dev?ref=${referralCode}`
+    : 'gridnova.pages.dev';
+  ctx.fillText(footerUrl, W / 2, H - 30);
 
   return canvasToBlob(canvas);
 }

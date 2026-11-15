@@ -423,12 +423,24 @@ ${ic.notes(26)}
   root.querySelector('#prof-share-card')?.addEventListener('click', async () => {
     const st = useStore.getState();
     const uid = st.user?.id;
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = now.getUTCMonth() + 1;
     let referralCode = '';
-    try { if (uid) referralCode = await api.getReferralCode(uid); } catch { /* ignore */ }
+    let monthly: api.MonthlyRecap | null = null;
+    if (uid) {
+      const [code, recapData] = await Promise.all([
+        api.getReferralCode(uid).catch(() => ''),
+        api.getMonthlyRecap(uid, year, month).catch(() => null),
+      ]);
+      referralCode = code;
+      monthly = recapData;
+    }
+    const cardDisplayName = profile.display_name || profile.username || 'Player';
 
     showShareModal({
       profile: {
-        displayName: profile.display_name || profile.username || 'Player',
+        displayName: cardDisplayName,
         avatarUrl: profile.avatar_url,
         avatarId: st.equipped.avatar?.item_id as string | undefined,
         avatarEmoji: (st.equipped.avatar?.emoji as string) || '👤',
@@ -438,6 +450,14 @@ ${ic.notes(26)}
         coins: st.coins,
         referralCode: referralCode || 'GRIDNOVA',
       },
+      recap: monthly ? {
+        year,
+        month,
+        ...monthly,
+        displayName: cardDisplayName,
+        referralCode: referralCode || undefined,
+      } : undefined,
+      referralCode: referralCode || undefined,
       onToast: props.onToast,
     });
   });

@@ -171,7 +171,7 @@ export async function renderInviteCard(data: InviteCardData): Promise<Blob | nul
   }
 
   // Referral code pill
-  if (referralCode) {
+  if (referralCode && referralCode !== '—') {
     const pillY = footerY + (displayName ? 34 : 10);
     ctx.fillStyle = diffColor;
     fillRoundRect(ctx, W / 2 - 90, pillY, 180, 34, 17);
@@ -185,7 +185,10 @@ export async function renderInviteCard(data: InviteCardData): Promise<Blob | nul
   ctx.font = '400 13px "Inter", system-ui, sans-serif';
   ctx.fillStyle = '#a096c8';
   ctx.textAlign = 'center';
-  ctx.fillText('gridnova.pages.dev', W / 2, H - 20);
+  const footerUrl = referralCode && referralCode !== '—' && referralCode !== 'GRIDNOVA'
+    ? `gridnova.pages.dev?ref=${referralCode}`
+    : 'gridnova.pages.dev';
+  ctx.fillText(footerUrl, W / 2, H - 20);
 
   return canvasToBlob(canvas);
 }

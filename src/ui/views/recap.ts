@@ -3,10 +3,12 @@
 // =====================================================================
 import { supabase } from '@lib/supabase';
 import { useStore } from '@state/store';
+import * as api from '@lib/api';
 import { formatTime, escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
-import { SITE_URL } from '@lib/share/text-result';
+import { buildShareUrl } from '@lib/share/text-result';
+import { showShareModal } from './share-modal';
 
 export interface RecapProps {
   onBack: () => void;
@@ -54,7 +56,7 @@ async function loadRecap(): Promise<Recap> {
   };
 }
 
-function buildShareText(r: Recap): string {
+function buildShareText(r: Recap, referralCode?: string): string {
   const lines = [
     'GridNova — Weekly Recap',
     `${r.daysPlayed} / 7 days played`,
@@ -62,7 +64,7 @@ function buildShareText(r: Recap): string {
     r.bestTime != null && isFinite(r.bestTime) ? `Best: ${formatTime(r.bestTime)}` : '',
     `${r.totalMistakes} mistakes`,
     '',
-    `Play: ${SITE_URL}`,
+    `Play: ${buildShareUrl(referralCode)}`,
   ].filter(Boolean);
   return lines.join('\n');
 }
@@ -123,9 +125,54 @@ export function mountRecapView(root: HTMLElement, props: RecapProps): { unmount:
       `;
 
       body.querySelector('#recap-share')?.addEventListener('click', async () => {
-        const text = buildShareText(r);
-        if ((navigator as any).share) {
-          try { await (navigator as any).share({ text }); return; } catch { /* fallback */ }
+        const state = useStore.getState();
+        const userId = state.user?.id;
+        const profile = state.profile;
+        const displayName = profile?.display_name || profile?.username || 'Player';
+        const now = new Date();
+        const year = now.getUTCFullYear();
+        const month = now.getUTCMonth() + 1;
+
+        let referralCode = '';
+        let monthly: api.MonthlyRecap | null = null;
+        if (userId) {
+          const [code, recapData] = await Promise.all([
+            api.getReferralCode(userId).catch(() => ''),
+            api.getMonthlyRecap(userId, year, month).catch(() => null),
+          ]);
+          referralCode = code;
+          monthly = recapData;
+        }
+
+        if (monthly) {
+          showShareModal({
+            recap: {
+              year,
+              month,
+              ...monthly,
+              displayName,
+              referralCode: referralCode || undefined,
+            },
+            profile: userId && profile ? {
+              displayName,
+              avatarUrl: profile.avatar_url,
+              avatarId: state.equipped.avatar?.item_id as string | undefined,
+              avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
+              level: state.level,
+              bestStreak: state.currentStreak,
+              longestStreak: state.longestStreak,
+              coins: state.coins,
+              referralCode: referralCode || 'GRIDNOVA',
+            } : undefined,
+            referralCode: referralCode || undefined,
+            onToast: props.onToast,
+          });
+          return;
+        }
+
+        const text = buildShareText(r, referralCode);
+        if (navigator.share) {
+          try { await navigator.share({ text }); return; } catch { /* fallback */ }
         }
         try {
           await navigator.clipboard.writeText(text);

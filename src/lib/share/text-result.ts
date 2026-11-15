@@ -34,13 +34,21 @@ export interface TextResultOptions {
   /** YYYY-MM-DD — required for the Daily puzzle number. */
   date?: string;
   rank?: number;
+  referralCode?: string;
+}
+
+export type TextResultInput = TextResultOptions;
+
+export function buildShareUrl(referralCode?: string): string {
+  const code = referralCode?.trim();
+  return code && code !== '—' && code !== 'GRIDNOVA' ? `${SITE_URL}?ref=${code}` : SITE_URL;
 }
 
 /**
  * Build the shareable result text. Kept deliberately short: a header line,
  * one stat line, and the link.
  */
-export function buildResultText({ result, date, rank }: TextResultOptions): string {
+export function buildResultText({ result, date, rank, referralCode }: TextResultOptions): string {
   const isDaily = result.mode === 'daily';
   const n = isDaily && date ? dailyNumber(date) : 0;
 
@@ -58,6 +66,6 @@ export function buildResultText({ result, date, rank }: TextResultOptions): stri
     isDaily && n > 0 ? `${header} · ${DIFF_LABEL[result.difficulty] ?? result.difficulty}` : header,
     '',
     stats.join('  ·  '),
-    SITE_URL,
+    buildShareUrl(referralCode),
   ].join('\n');
 }

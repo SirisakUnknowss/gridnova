@@ -5,6 +5,7 @@
 import { supabase } from './supabase';
 import { getAttribution } from './attribution';
 import type { Move, Difficulty } from '@engine/types';
+export { refillHeartsFull } from './hearts';
 
 // === Daily Puzzle ===
 export async function getDailyPuzzle(date: string) {

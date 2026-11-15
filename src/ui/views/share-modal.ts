@@ -10,6 +10,7 @@ export interface ShareModalProps {
   profile?: ProfileCardData;
   recap?: RecapCardData;
   invite?: InviteCardData;
+  referralCode?: string;
   onClose?: () => void;
   onToast?: (msg: string) => void;
 }
@@ -82,8 +83,11 @@ export function showShareModal(props: ShareModalProps): void {
 
   // Spoiler-free text result — only meaningful for the win card, so it's
   // hidden on the other tabs.
+  const rawReferralCode = props.referralCode || props.profile?.referralCode || props.invite?.referralCode;
+  const referralCode = rawReferralCode && rawReferralCode !== '—' && rawReferralCode !== 'GRIDNOVA' ? rawReferralCode : undefined;
+  const shareUrl = referralCode ? `https://gridnova.pages.dev/?ref=${referralCode}` : 'https://gridnova.pages.dev';
   const resultText = props.win
-    ? buildResultText({ result: props.win.result, date: props.win.date, rank: props.win.rank })
+    ? buildResultText({ result: props.win.result, date: props.win.date, rank: props.win.rank, referralCode })
     : '';
   const textBlock = root.querySelector<HTMLElement>('#share-text-block');
   const textPreview = root.querySelector<HTMLElement>('#share-text-preview');
@@ -214,7 +218,7 @@ export function showShareModal(props: ShareModalProps): void {
     if (!activeBlob) return;
     // On the win tab, share the spoiler-free result text — that's the part
     // that travels and gets people curious. Elsewhere just the link.
-    const shareText = activeType === 'win' && resultText ? resultText : 'https://gridnova.pages.dev';
+    const shareText = activeType === 'win' && resultText ? resultText : shareUrl;
     const file = new File([activeBlob], `gridnova-${activeType}.png`, { type: 'image/png' });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {

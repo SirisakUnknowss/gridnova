@@ -37,6 +37,15 @@ const BASE_XP: Record<string, number> = {
   'medium-hard': 150, 'hard': 200, 'hard-expert': 280, 'expert': 350,
 };
 
+// Monday (UTC) of the week containing the given YYYY-MM-DD date string.
+function weekStartUtc(dateStr: string): string {
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  const dow = d.getUTCDay(); // 0=Sun..6=Sat
+  const diff = dow === 0 ? -6 : 1 - dow;
+  d.setUTCDate(d.getUTCDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
 // Mirrors computeTimeAttackScore() in src/engine/scoring.ts — keep in step.
 function computeScore(
   difficulty: string, tier: string, timeSeconds: number, mistakes: number, hints: number,
@@ -159,6 +168,16 @@ Deno.serve(async (req) => {
     return respond(500, { error: { code: 'INTERNAL_ERROR', message: insErr.message } });
   }
 
+  await supabaseAdmin.from('user_game_history').insert({
+    user_id: user.id,
+    mode: 'time-attack',
+    level: ticket.difficulty,
+    score,
+    time_seconds: payload.time_seconds,
+    mistakes: mistakeCount,
+    hints_used: hintCount,
+  });
+
   const coinReward = BASE_COIN[ticket.difficulty] ?? 10;
   const xpReward = BASE_XP[ticket.difficulty] ?? 100;
 
@@ -169,6 +188,20 @@ Deno.serve(async (req) => {
     p_metadata: { tier: ticket.tier, score },
   });
   await supabaseAdmin.rpc('grant_xp', { p_user_id: user.id, p_amount: xpReward });
+
+  const today = new Date().toISOString().slice(0, 10);
+  await supabaseAdmin.rpc('recompute_daily_quests', {
+    p_user_id: user.id,
+    p_date: today,
+  });
+  await supabaseAdmin.rpc('recompute_weekly_quests', {
+    p_user_id: user.id,
+    p_week_start: weekStartUtc(today),
+  });
+
+  const { data: newAchievements } = await supabaseAdmin.rpc('check_and_grant_achievements', {
+    p_user_id: user.id,
+  });
 
   const { data: rankRow } = await supabaseAdmin
     .rpc('get_time_attack_leaderboard', { p_tier: ticket.tier, p_limit: 500 });
@@ -190,5 +223,6 @@ Deno.serve(async (req) => {
     total_players: typeof playerCount === 'number' ? playerCount : null,
     coins: coinReward,
     xp: xpReward,
+    new_achievements: newAchievements ?? [],
   });
 });

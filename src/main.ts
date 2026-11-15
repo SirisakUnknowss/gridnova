@@ -30,6 +30,7 @@ import { mountGameView, type GameResult } from './ui/views/game';
 import { consumeForStart, refundForWin, refreshHearts, showHeartsModal, showHeartConfirm } from './ui/components/hearts';
 import { showWinModal } from './ui/views/win-modal';
 import { showShareModal } from './ui/views/share-modal';
+import type { WinCardData } from './lib/share';
 import { mountSplash } from './ui/views/splash';
 import { showAuthModal } from './ui/views/auth-modal';
 import { mountLeaderboardView } from './ui/views/leaderboard';
@@ -163,6 +164,22 @@ async function loadUserData(): Promise<void> {
   }
 }
 
+async function handlePostLoginSync(fromGuest = false): Promise<number> {
+  const migrated = await migrateGuestScores();
+  const pendingRef = localStorage.getItem('gridnova_ref');
+  if (pendingRef) {
+    localStorage.removeItem('gridnova_ref');
+    await api.claimReferral(pendingRef).catch(() => {});
+  }
+  if (fromGuest) {
+    localStorage.removeItem('gn_guest_hearts_v1');
+    await api.refillHeartsFull().catch(() => {});
+  }
+  await loadUserData();
+  await refreshHearts();
+  return migrated;
+}
+
 // =====================================================================
 // Routing
 // =====================================================================
@@ -202,7 +219,7 @@ async function playDailyResume(saved: GameInProgress) {
     solution: puzzleData.solution as import('./engine/types').Board,
     date,
     resume: saved,
-    onWin: (result) => handleWin(result, date),
+    onWin: (result) => handleWin(result, date, 'daily'),
     onExit: showDailyDetail,
   });
   currentUnmount = view.unmount;
@@ -221,7 +238,7 @@ function playPracticeResume(saved: GameInProgress) {
     solution: puzzleData.solution,
     stage,
     resume: saved,
-    onWin: (result) => handleWin(result),
+    onWin: (result) => handleWin(result, undefined, 'practice'),
     onExit: showPractice,
     onNewGame: () => void playPractice(level),
   });
@@ -299,7 +316,10 @@ function showTimeAttack() {
     onLeaderboard: (tier) => showTimeAttackLeaderboard(tier),
     onRequireLogin: () => showAuthModal({
       mode: 'signup',
-      onSuccess: showTimeAttack,
+      onSuccess: async () => {
+        await handlePostLoginSync(true);
+        showTimeAttack();
+      },
       onCancel: showTimeAttack,
     }),
     nav: navCb,
@@ -337,9 +357,9 @@ async function gateHeart(
     blocked: true,
     isGuest,
     onLogin: () => showAuthModal({
-      isUpgrade: isGuest,
+      isUpgrade: !!st.user?.is_anonymous,
       mode: 'signup',
-      onSuccess: () => { void refreshHearts().then(onRetry); },
+      onSuccess: () => { void handlePostLoginSync(true).then(() => onRetry()); },
       onCancel: () => {},
     }),
     onPurchased: onRetry,
@@ -615,8 +635,7 @@ function openAuthAction() {
     showAuthModal({
       isUpgrade: true,
       onSuccess: async () => {
-        const migrated = await migrateGuestScores();
-        await loadUserData();
+        const migrated = await handlePostLoginSync(true);
         showHome();
         const msg = migrated > 0
           ? `Progress saved! ${migrated} game${migrated > 1 ? 's' : ''} transferred to your account.`
@@ -631,16 +650,9 @@ function openAuthAction() {
   } else {
     showAuthModal({
       onSuccess: async () => {
-        const migrated = await migrateGuestScores();
-        await loadUserData();
+        const migrated = await handlePostLoginSync(true);
         showHome();
         if (migrated > 0) toast(`Welcome back! ${migrated} guest game${migrated > 1 ? 's' : ''} imported.`, 3500);
-        // Claim referral if user arrived via invite link
-        const pendingRef = localStorage.getItem('gridnova_ref');
-        if (pendingRef) {
-          try { await api.claimReferral(pendingRef); } catch { /* ignore */ }
-          localStorage.removeItem('gridnova_ref');
-        }
       },
       onCancel: () => {},
     });
@@ -664,7 +676,14 @@ async function showMonthlyChallenge() {
   const view = mountMonthlyChallengeView(root, {
     onBack: showHome,
     onPlay: playMonthly,
-    onSignIn: () => showAuthModal({ mode: 'signin', onSuccess: showMonthlyChallenge, onCancel: showMonthlyChallenge }),
+    onSignIn: () => showAuthModal({
+      mode: 'signin',
+      onSuccess: async () => {
+        await handlePostLoginSync(true);
+        void showMonthlyChallenge();
+      },
+      onCancel: () => { void showMonthlyChallenge(); },
+    }),
     onCollection: showCollection,
     onToast: toast,
     nav: navCb,
@@ -696,7 +715,14 @@ async function finishMonthly(result: GameResult, ticket: string, consumed: boole
     const response = await submitMonthlyPuzzle(ticket,result.timeSeconds,result.moves);
     useStore.setState({ coins: response.balance });
     if (consumed && !response.duplicate) await refundForWin();
-    showWinModal({ result, coinsEarned: response.coins, xpEarned: 0, isGuest: false, onContinue: showMonthlyChallenge });
+    showWinModal({
+      result,
+      coinsEarned: response.coins,
+      xpEarned: 0,
+      isGuest: false,
+      onContinue: showMonthlyChallenge,
+      onShare: !IS_CRAZYGAMES ? () => void shareResult(result, undefined, undefined, undefined, 'monthly') : undefined,
+    });
   } catch (error) {
     captureError(error,{ feature: 'monthly-challenge' });
     toast('Puzzle not saved. Tap Retry to submit again.');
@@ -744,7 +770,7 @@ async function playDaily() {
     date,
     onWin: (result) => {
       if (gate.consumed) void refundForWin();
-      handleWin(result, date);
+      void handleWin(result, date, 'daily');
     },
     onExit: showDailyDetail,
   });
@@ -771,7 +797,7 @@ async function playPractice(level: Difficulty) {
     puzzle: puzzleData.puzzle,
     solution: puzzleData.solution,
     stage,
-    onWin: (result) => handleWin(result),
+    onWin: (result) => void handleWin(result, undefined, 'practice'),
     onExit: showPractice,
     onNewGame: () => void playPractice(level),
   });
@@ -796,7 +822,7 @@ async function playBook(level: Difficulty) {
     puzzle: puzzleData.puzzle,
     solution: puzzleData.solution,
     stage,
-    onWin: (result) => handleWin(result),
+    onWin: (result) => void handleWin(result, undefined, 'practice'),
     onExit: showBook,
     onNewGame: () => void playBook(level),
   });
@@ -818,7 +844,7 @@ function playBookResume(saved: GameInProgress) {
     solution: puzzleData.solution,
     stage,
     resume: saved,
-    onWin: (result) => handleWin(result),
+    onWin: (result) => void handleWin(result, undefined, 'practice'),
     onExit: showBook,
     onNewGame: () => void playBook(level),
   });
@@ -841,7 +867,7 @@ async function playRandom() {
     solution: puzzleData.solution,
     onWin: (result) => {
       if (gate.consumed) void refundForWin();
-      handleWin(result);
+      void handleWin(result, undefined, 'random');
       void api.recordRandomModeResult(true).catch(() => {});
     },
     onLose: () => {
@@ -865,7 +891,7 @@ function showLoadingOverlay(text = 'Saving your score...'): () => void {
   return () => overlay.remove();
 }
 
-async function handleWin(result: GameResult, date?: string) {
+async function handleWin(result: GameResult, date?: string, modeOverride?: WinCardData['mode']) {
   const scoreInput = {
     difficulty: result.difficulty,
     timeSeconds: result.timeSeconds,
@@ -956,6 +982,8 @@ async function handleWin(result: GameResult, date?: string) {
     hideLoading();
   }
 
+  const cardMode: WinCardData['mode'] = modeOverride ?? (result.mode === 'daily' ? 'daily' : 'practice');
+
   showWinModal({
     result,
     rank,
@@ -964,8 +992,15 @@ async function handleWin(result: GameResult, date?: string) {
     xpEarned: xp,
     isGuest,
     onContinue: showHome,
-    onShare: date && !IS_CRAZYGAMES ? () => shareResult(result, date, rank, totalPlayers) : undefined,
-    onSignUp: isGuest && ACCOUNTS_ENABLED ? () => showAuthModal({ mode: 'signup', onSuccess: showHome, onCancel: showHome }) : undefined,
+    onShare: !IS_CRAZYGAMES ? () => void shareResult(result, date, rank, totalPlayers, cardMode) : undefined,
+    onSignUp: isGuest && ACCOUNTS_ENABLED ? () => showAuthModal({
+      mode: 'signup',
+      onSuccess: async () => {
+        await handlePostLoginSync(true);
+        showHome();
+      },
+      onCancel: showHome,
+    }) : undefined,
   });
 }
 
@@ -1005,14 +1040,16 @@ async function handleTimeAttackWin(result: GameResult, tier: TimeAttackTier, tic
     hideLoading();
   }
 
+  const finalResult = { ...result, score };
   showWinModal({
-    result: { ...result, score },
+    result: finalResult,
     rank: rank ?? undefined,
     totalPlayers: totalPlayers ?? undefined,
     coinsEarned: coins,
     xpEarned: xp,
     isGuest: false,
     onContinue: () => showTimeAttackLeaderboard(tier),
+    onShare: !IS_CRAZYGAMES ? () => void shareResult(finalResult, undefined, rank ?? undefined, totalPlayers ?? undefined, 'time-attack') : undefined,
   });
 }
 
@@ -1051,26 +1088,43 @@ async function refreshStreakAndToast() {
   }
 }
 
-async function shareResult(result: GameResult, date: string, rank?: number, total?: number) {
+async function shareResult(
+  result: GameResult,
+  date?: string,
+  rank?: number,
+  total?: number,
+  mode?: WinCardData['mode'],
+) {
   const state = useStore.getState();
   const profile = state.profile;
   const userId = state.user?.id;
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
 
   let referralCode = '';
-  try {
-    if (userId) referralCode = await api.getReferralCode(userId);
-  } catch { /* ignore */ }
+  let monthly: api.MonthlyRecap | null = null;
+  if (userId) {
+    const [code, recapData] = await Promise.all([
+      api.getReferralCode(userId).catch(() => ''),
+      api.getMonthlyRecap(userId, year, month).catch(() => null),
+    ]);
+    referralCode = code;
+    monthly = recapData;
+  }
+  const displayName = profile?.display_name || profile?.username || 'Player';
 
   showShareModal({
     win: {
       result,
+      mode: mode ?? result.mode,
       date,
       rank,
       totalPlayers: total,
       streak: state.currentStreak,
     },
     profile: profile && userId ? {
-      displayName: profile.display_name || profile.username || 'Player',
+      displayName,
       avatarUrl: profile.avatar_url,
       avatarId: state.equipped.avatar?.item_id as string | undefined,
       avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
@@ -1078,8 +1132,16 @@ async function shareResult(result: GameResult, date: string, rank?: number, tota
       bestStreak: state.currentStreak,
       longestStreak: state.longestStreak,
       coins: state.coins,
-      referralCode,
+      referralCode: referralCode || 'GRIDNOVA',
     } : undefined,
+    recap: monthly ? {
+      year,
+      month,
+      ...monthly,
+      displayName,
+      referralCode: referralCode || undefined,
+    } : undefined,
+    referralCode: referralCode || undefined,
     onToast: toast,
   });
 }
@@ -1151,9 +1213,13 @@ async function boot() {
   initSound();
   void playBgMusic();
 
-  // Capture referral code from URL before any redirect
+  // Capture referral code and OAuth callback params from URL before Supabase or any redirect mutates location
   const refCode = new URLSearchParams(window.location.search).get('ref');
   if (refCode) localStorage.setItem('gridnova_ref', refCode);
+  const initialHasOAuthCallback =
+    window.location.hash.includes('access_token') ||
+    window.location.search.includes('code=') ||
+    window.location.search.includes('error=');
 
   // Init analytics first — safe even with empty keys
   initAnalytics();
@@ -1182,10 +1248,15 @@ async function boot() {
       // Clean up OAuth redirect URL fragments/params after Supabase picks up the session
       // e.g. #access_token=... (implicit flow) or ?code=... (PKCE flow)
       const hasOAuthCallback =
+        initialHasOAuthCallback ||
         window.location.hash.includes('access_token') ||
         window.location.search.includes('code=') ||
         window.location.search.includes('error=');
-      if (hasOAuthCallback) {
+      if (
+        window.location.hash.includes('access_token') ||
+        window.location.search.includes('code=') ||
+        window.location.search.includes('error=')
+      ) {
         window.history.replaceState({}, document.title, window.location.pathname);
       }
 
@@ -1198,15 +1269,8 @@ async function boot() {
             console.info('[Boot] Migrated v1 data:', result.imported);
           }
         }
-        // Migrate any local guest scores (handles Google OAuth redirect login)
-        // migrateGuestScores() is idempotent — safe to call on every boot when user exists
-        if (localStorage.getItem('sudoku_guest_display_id_v1')) {
-          const migrated = await migrateGuestScores();
-          if (migrated > 0) {
-            console.info(`[Boot] Migrated ${migrated} guest score(s) from local session`);
-          }
-        }
-        await loadUserData();
+        const isFromGuest = hasOAuthCallback || localStorage.getItem('gn_guest_hearts_v1') !== null;
+        await handlePostLoginSync(isFromGuest);
       } else {
         // No existing session → run as guest (visitor tracking still works via anon key)
         useStore.setState({ profile: { display_name: getGuestIdentity().name }, coins: 100 });

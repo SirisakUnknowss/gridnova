@@ -5,11 +5,20 @@ import trophy from '@images/space/trophyIcon.webp';
 
 export interface WinCardData {
   result: GameResult;
+  mode?: 'daily' | 'practice' | 'time-attack' | 'random' | 'monthly';
   date?: string;
   rank?: number;
   totalPlayers?: number;
   streak?: number;
 }
+
+const MODE_LABELS: Record<NonNullable<WinCardData['mode']>, string> = {
+  daily: 'Daily Puzzle',
+  practice: 'Practice',
+  'time-attack': 'Time Attack',
+  random: 'Random Streak',
+  monthly: 'Monthly Challenge',
+};
 
 export async function renderWinCard(data: WinCardData): Promise<Blob | null> {
   const palette = sharePalette();
@@ -57,7 +66,8 @@ export async function renderWinCard(data: WinCardData): Promise<Blob | null> {
   if (data.rank) ctx.fillText(`Rank #${data.rank}${data.totalPlayers ? ` / ${data.totalPlayers}` : ''}`, 300, 427);
   ctx.fillStyle = palette.muted;
   ctx.font = '400 16px "Fredoka", system-ui, sans-serif';
-  const mode = data.result.mode === 'daily' ? 'Daily Puzzle' : 'Sudoku';
+  const effectiveMode = data.mode ?? data.result.mode;
+  const mode = MODE_LABELS[effectiveMode] ?? 'Sudoku';
   ctx.fillText([mode, data.date, data.streak && data.streak > 1 ? `${data.streak} day streak` : ''].filter(Boolean).join(' · '), 300, 466);
   ctx.fillStyle = palette.primary;
   ctx.font = '700 22px "Fredoka", system-ui, sans-serif';

@@ -17,10 +17,11 @@ export interface RecapCardData {
   longestStreak: number;
   wins: number;
   displayName?: string;
+  referralCode?: string;
 }
 
 export async function renderRecapCard(data: RecapCardData): Promise<Blob | null> {
-  const { year, month, daysPlayed, totalDays, bestScore, longestStreak, wins, displayName } = data;
+  const { year, month, daysPlayed, totalDays, bestScore, longestStreak, wins, displayName, referralCode } = data;
 
   const icons = await Promise.all([dailyIcon, trophyIcon, streakIcon, playIcon].map(loadImage));
   const canvas = document.createElement('canvas');
@@ -174,7 +175,10 @@ export async function renderRecapCard(data: RecapCardData): Promise<Blob | null>
   ctx.font = '400 13px "Inter", system-ui, sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.25)';
   ctx.textAlign = 'center';
-  ctx.fillText('gridnova.pages.dev', W / 2, H - 36);
+  const footerUrl = referralCode && referralCode !== '—' && referralCode !== 'GRIDNOVA'
+    ? `gridnova.pages.dev?ref=${referralCode}`
+    : 'gridnova.pages.dev';
+  ctx.fillText(footerUrl, W / 2, H - 36);
 
   return canvasToBlob(canvas);
 }
