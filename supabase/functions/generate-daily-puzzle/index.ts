@@ -147,7 +147,7 @@ const TARGET_CLUES: Record<Difficulty, number> = {
 };
 
 function difficultyForDay(dow: number): Difficulty {
-  return (['expert','easy','easy-medium','medium','medium-hard','hard','hard-expert'] as Difficulty[])[dow] ?? 'medium';
+  return (['easy','easy','easy-medium','medium','medium-hard','medium','easy-medium'] as Difficulty[])[dow] ?? 'medium';
 }
 
 function generatePuzzle(difficulty: Difficulty, seed: string) {
@@ -200,7 +200,7 @@ Deno.serve(async (req) => {
   }
 
   const body = await req.json().catch(() => ({}));
-  const days = Number.isInteger(body.days) ? Math.max(1, Math.min(30, body.days)) : 30;
+  const days = Number.isInteger(body.days) ? Math.max(1, Math.min(30, body.days)) : 7;
   const startDate = body.start_date ? new Date(body.start_date + 'T00:00:00Z') : new Date();
 
   if (!Number.isFinite(startDate.getTime())) return new Response('Invalid date', { status: 400 });

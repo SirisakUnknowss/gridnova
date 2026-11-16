@@ -31,13 +31,13 @@ export const MIN_CLUES: Record<Difficulty, number> = {
 /** Pick difficulty for a given day of week (0=Sun ... 6=Sat) */
 export function difficultyForDayOfWeek(dow: number): Difficulty {
   const map: Difficulty[] = [
-    'expert',       // Sun
+    'easy',         // Sun
     'easy',         // Mon
     'easy-medium',  // Tue
     'medium',       // Wed
     'medium-hard',  // Thu
-    'hard',         // Fri
-    'hard-expert',  // Sat
+    'medium',       // Fri
+    'easy-medium',  // Sat
   ];
   return map[dow] ?? 'medium';
 }

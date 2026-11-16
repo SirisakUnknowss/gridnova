@@ -60,14 +60,26 @@ describe('generator', () => {
   });
 
   describe('difficultyForDayOfWeek', () => {
+    it('Sunday is easy', () => {
+      expect(difficultyForDayOfWeek(0)).toBe('easy');
+    });
     it('Monday is easy', () => {
       expect(difficultyForDayOfWeek(1)).toBe('easy');
     });
-    it('Saturday is hard-expert', () => {
-      expect(difficultyForDayOfWeek(6)).toBe('hard-expert');
+    it('Tuesday is easy-medium', () => {
+      expect(difficultyForDayOfWeek(2)).toBe('easy-medium');
     });
-    it('Sunday is expert', () => {
-      expect(difficultyForDayOfWeek(0)).toBe('expert');
+    it('Wednesday is medium', () => {
+      expect(difficultyForDayOfWeek(3)).toBe('medium');
+    });
+    it('Thursday is medium-hard', () => {
+      expect(difficultyForDayOfWeek(4)).toBe('medium-hard');
+    });
+    it('Friday is medium', () => {
+      expect(difficultyForDayOfWeek(5)).toBe('medium');
+    });
+    it('Saturday is easy-medium', () => {
+      expect(difficultyForDayOfWeek(6)).toBe('easy-medium');
     });
   });
 });
