@@ -904,6 +904,7 @@
 <script>
 // Staging and production have separate Supabase projects; the staging admin must manage the staging one.
 const IS_STAGING_ADMIN = /(^|\.)staging\./.test(location.hostname) || location.hostname === 'localhost';
+const IS_PREVIEW_MODE = IS_STAGING_ADMIN && new URLSearchParams(location.search).get('preview') === '1';
 const SUPABASE_PROJECTS = {
   production: {
     url: 'https://sqjllqilozhxbzvfjhra.supabase.co',
@@ -920,6 +921,21 @@ const NEWS_ENV = IS_STAGING_ADMIN ? 'staging' : 'production';
 const AUTO_REFRESH  = 60_000;
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+if (IS_PREVIEW_MODE) {
+  sb.auth.getSession = async () => ({
+    data: {
+      session: {
+        access_token: 'preview-token',
+        user: {
+          id: 'preview-admin-0001',
+          email: 'preview@gridnova.staging',
+          user_metadata: { full_name: 'Preview Mode (Mock Data)' },
+        },
+      },
+    },
+    error: null,
+  });
+}
 
 let trendChart = null, diffChart = null, hourlyChart = null, shopCatChart = null;
 let funnelChart = null, retentionChart = null, sourceChart = null;
@@ -948,8 +964,150 @@ document.getElementById('logout-btn').onclick = async () => {
 
 document.getElementById('refresh-btn').onclick = () => loadData();
 
+// ── Preview Mock Data (staging/localhost ?preview=1 only) ─────────────
+function getPreviewData(name, params) {
+  const daysAgo = (n) => new Date(Date.now() - n * 86400000).toISOString();
+  const dateKey = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+  if (name === 'get_admin_stats') {
+    return {
+      online_now: 4, online_guests: 2, online_members: 2,
+      visitors_today: 28, visitors_guests_today: 15, visitors_members_today: 13,
+      visitors_week: 142, visitors_total: 8910, total_members: 335,
+      games_members_today: 19, games_guests_today: 7,
+      games_members_total: 6915, games_guests_total: 3496,
+      coins_held: 1992400, coins_ever: 2450800,
+      trend_14d: Array.from({ length: 14 }, (_, i) => ({
+        d: dateKey(13 - i), guests: 6 + (i % 9), members: 7 + (i % 6),
+      })),
+      difficulty_breakdown: [
+        { difficulty: 'easy', cnt: 2241, avg_score: 1420, avg_time: 253, avg_mistakes: 0.6 },
+        { difficulty: 'medium', cnt: 3088, avg_score: 1357, avg_time: 338, avg_mistakes: 1.0 },
+        { difficulty: 'hard', cnt: 1828, avg_score: 2217, avg_time: 694, avg_mistakes: 1.0 },
+        { difficulty: 'expert', cnt: 1389, avg_score: 3066, avg_time: 1028, avg_mistakes: 1.1 },
+      ],
+      hourly_today: [
+        { hr: 0, cnt: 2 }, { hr: 8, cnt: 3 }, { hr: 12, cnt: 5 },
+        { hr: 18, cnt: 6 }, { hr: 21, cnt: 7 }, { hr: 22, cnt: 3 },
+      ],
+    };
+  }
+  if (name === 'get_admin_online_list') {
+    return [
+      { is_guest: false, display_name: 'Somchai K.', username: 'somchai', current_view: 'game_daily' },
+      { is_guest: false, display_name: 'Nadia P.', username: 'nadiap', current_view: 'game_time_attack' },
+      { is_guest: true, current_view: 'game_practice' },
+      { is_guest: true, current_view: 'home' },
+    ];
+  }
+  if (name === 'get_admin_member_list') {
+    return [
+      { id: 'm1', display_name: 'Somchai K.', username: 'somchai', coins: 12400, xp: 4800, level: 12, current_streak: 14, games_played: 84, is_banned: false, last_active_at: daysAgo(0), created_at: daysAgo(45) },
+      { id: 'm2', display_name: 'Nadia P.', username: 'nadiap', coins: 6850, xp: 3100, level: 9, current_streak: 6, games_played: 51, is_banned: false, last_active_at: daysAgo(1), created_at: daysAgo(20) },
+      { id: 'm3', display_name: 'Kittipong', username: 'kitti99', coins: 1920, xp: 920, level: 4, current_streak: 0, games_played: 16, is_banned: true, last_active_at: daysAgo(5), created_at: daysAgo(12) },
+    ];
+  }
+  if (name === 'get_admin_member_detail') {
+    return {
+      profile: { id: params?.p_user_id || 'm1', display_name: 'Somchai K.', username: 'somchai', coins: 12400, xp: 4800, level: 12, current_streak: 14, longest_streak: 21, is_banned: false, created_at: daysAgo(45) },
+      recent_games: [
+        { mode: 'daily', difficulty: 'medium', score: 2266, time_seconds: 214, mistakes: 0, hints_used: 0, created_at: daysAgo(0) },
+        { mode: 'time_attack', difficulty: 'medium', score: 3120, time_seconds: 175, mistakes: 1, hints_used: 0, created_at: daysAgo(1) },
+      ],
+      transactions: [{ amount: 250, reason: 'daily_win', created_at: daysAgo(0) }],
+      inventory: ['theme_classic', 'theme_dark', 'theme_neon'],
+    };
+  }
+  if (name === 'get_admin_shop_stats') {
+    return {
+      total_purchases: 18, total_coins_spent: 36400, unique_buyers: 6, avg_coins_per_buyer: 6066,
+      top_items: [
+        { name: 'Neon Cyber', category: 'theme', rarity: 'epic', price_coin: 3500, purchase_count: 6, total_revenue: 21000 },
+        { name: 'Sakura Bloom', category: 'theme', rarity: 'rare', price_coin: 2200, purchase_count: 4, total_revenue: 8800 },
+      ],
+      category_breakdown: [{ category: 'theme', purchase_count: 13 }, { category: 'avatar', purchase_count: 5 }],
+      recent_purchases: [{ item_name: 'Neon Cyber', category: 'theme', rarity: 'epic', buyer_name: 'Somchai K.', buyer_username: 'somchai', price_coin: 3500, acquired_at: daysAgo(1) }],
+    };
+  }
+  if (name === 'get_admin_funnel') {
+    return {
+      total_sessions: 28, played_sessions: 16, avg_duration_seconds: 1840,
+      view_counts: [
+        { view: 'home', sessions: 26 }, { view: 'game_daily', sessions: 11 },
+        { view: 'game_practice', sessions: 9 }, { view: 'quests', sessions: 6 },
+      ],
+    };
+  }
+  if (name === 'get_admin_retention') {
+    return Array.from({ length: 7 }, (_, i) => ({
+      date: dateKey(7 - i), cohort_size: 18 + i, returned_next_day: 6 + (i % 4),
+    }));
+  }
+  if (name === 'get_admin_attribution') {
+    return {
+      total_sessions: 142,
+      by_source: [
+        { source: 'direct', sessions: 78, engaged: 54 },
+        { source: 'facebook', sessions: 41, engaged: 28 },
+        { source: 'reddit', sessions: 14, engaged: 9 },
+        { source: 'line', sessions: 9, engaged: 6 },
+      ],
+      by_referrer: [
+        { referrer_host: 'l.facebook.com', sessions: 19 },
+        { referrer_host: 'reddit.com', sessions: 14 },
+      ],
+    };
+  }
+  if (name === 'get_admin_leaderboard') {
+    return [
+      { rank: 1, display_name: 'Somchai K.', username: 'somchai', score: 2480, time_seconds: 192, mistakes: 0, hints_used: 0 },
+      { rank: 2, display_name: 'Nadia P.', username: 'nadiap', score: 2266, time_seconds: 214, mistakes: 0, hints_used: 0 },
+      { rank: 3, display_name: 'Kittipong', username: 'kitti99', score: 1940, time_seconds: 298, mistakes: 1, hints_used: 1 },
+    ];
+  }
+  if (name === 'get_admin_game_mode_overview') {
+    return [
+      { mode: 'daily', games_today: 11, views_today: 15, active_sessions_today: 10, games_total: 3043, views_total: 9269, active_sessions_total: 3351, avg_score: 1736, top_score: 5638 },
+      { mode: 'practice', games_today: 15, views_today: 19, active_sessions_today: 12, games_total: 7336, views_total: 5809, active_sessions_total: 362, avg_score: 1609, top_score: 4870 },
+      { mode: 'time_attack', games_today: 4, views_today: 7, active_sessions_today: 4, games_total: 629, views_total: 2116, active_sessions_total: 73, avg_score: 2575, top_score: 6361 },
+      { mode: 'random', games_today: 2, views_today: 3, active_sessions_today: 2, games_total: 1491, views_total: 2858, active_sessions_total: 324, avg_score: 1520, top_score: 3910 },
+    ];
+  }
+  if (name === 'get_admin_game_mode_players') {
+    return [
+      { display_name: 'Somchai K.', username: 'somchai', games_played: 42, best_score: 5638, avg_score: 2120, last_played_at: daysAgo(0) },
+      { display_name: 'Nadia P.', username: 'nadiap', games_played: 29, best_score: 4410, avg_score: 1890, last_played_at: daysAgo(1) },
+    ];
+  }
+  if (name === 'get_admin_hearts_overview') {
+    return {
+      tracked_users: 112, full_hearts: 89, low_or_empty: 23, infinite_active: 4,
+      events_today: [{ event_type: 'spend', cnt: 14 }, { event_type: 'refund', cnt: 9 }, { event_type: 'blocked', cnt: 2 }],
+      by_mode: [{ mode: 'daily', spend: 9, blocked: 1, infinite_start: 1, users: 8 }, { mode: 'time_attack', spend: 5, blocked: 1, infinite_start: 0, users: 4 }],
+      current_rows: [
+        { display_name: 'Somchai K.', username: 'somchai', hearts: 5, max_hearts: 5, infinite_until: null, updated_at: daysAgo(0) },
+        { display_name: 'Nadia P.', username: 'nadiap', hearts: 2, max_hearts: 5, infinite_until: null, updated_at: daysAgo(0) },
+      ],
+    };
+  }
+  if (name === 'get_admin_heart_events') {
+    return [
+      { display_name: 'Somchai K.', username: 'somchai', event_type: 'spend', mode: 'daily', hearts_after: 4, created_at: daysAgo(0) },
+      { display_name: 'Somchai K.', username: 'somchai', event_type: 'refund', mode: 'daily', hearts_after: 5, created_at: daysAgo(0) },
+    ];
+  }
+  if (name === 'admin_list_announcements') {
+    return [{ id: 'n1', title: 'Staging Preview Announcement', body: 'Preview mode active.', layout: 'banner', env: 'staging', is_published: true, created_at: daysAgo(2) }];
+  }
+  if (name === 'get_admin_system_logs') {
+    return [{ id: 'l1', level: 'info', category: 'auth', message: 'Preview mode log entry', metadata: { preview: true }, created_at: daysAgo(0) }];
+  }
+  if (name === 'get_admin_audit_anomalies') return [];
+  return null;
+}
+
 // ── API ───────────────────────────────────────────────────────────────
 async function callAdminStats(accessToken) {
+  if (IS_PREVIEW_MODE) return getPreviewData('get_admin_stats');
   const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_admin_stats`, {
     method: 'POST',
     headers: {
@@ -972,6 +1130,7 @@ async function callAdminStats(accessToken) {
 }
 
 async function callRpc(name, accessToken) {
+  if (IS_PREVIEW_MODE) return getPreviewData(name);
   try {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
       method: 'POST',
@@ -2015,6 +2174,7 @@ function renderMemberDetail(d) {
 }
 
 async function callRpcParam(name, params, accessToken) {
+  if (IS_PREVIEW_MODE) return getPreviewData(name, params);
   try {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
       method: 'POST',
@@ -2049,6 +2209,7 @@ async function adminUnban(userId) {
 }
 
 async function callAdminAction(action, payload) {
+  if (IS_PREVIEW_MODE) { alert('Preview Mode: action disabled'); return false; }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return false;
   try {
