@@ -10,17 +10,38 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg:#0b0d17; --surface:#131626; --surface2:#191d32; --surface-glass:rgba(19,22,38,0.85);
-      --border:rgba(255,255,255,0.08); --border-hover:rgba(255,255,255,0.16);
+      --border:rgba(255,255,255,0.08); --border-hover:rgba(255,255,255,0.18);
       --accent:#667eea; --accent2:#764ba2;
       --green:#10b981; --yellow:#fbbf24; --red:#f87171; --pink:#f472b6;
-      --text:#e2e8f0; --muted:rgba(255,255,255,0.5); --radius:12px;
+      --text:#e2e8f0; --muted:rgba(255,255,255,0.52); --radius:14px;
       --sidebar-w:240px; --topbar-h:60px;
+      --shadow-3d:0 12px 28px -8px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07);
+      --shadow-3d-hover:0 22px 42px -10px rgba(102,126,234,0.28), 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.14);
+      --pill-bg:rgba(255,255,255,0.05); --hover-bg:rgba(255,255,255,0.08);
+      --bg-mesh:radial-gradient(circle at 12% 8%, rgba(102,126,234,0.14), transparent 38%),
+                radial-gradient(circle at 88% 14%, rgba(16,185,129,0.08), transparent 34%),
+                radial-gradient(circle at 75% 88%, rgba(118,75,162,0.12), transparent 40%);
+    }
+    [data-theme="light"] {
+      --bg:#f1f5f9; --surface:#ffffff; --surface2:#f8fafc; --surface-glass:rgba(255,255,255,0.88);
+      --border:rgba(15,23,42,0.09); --border-hover:rgba(79,70,229,0.28);
+      --accent:#4f46e5; --accent2:#7c3aed;
+      --green:#059669; --yellow:#d97706; --red:#dc2626; --pink:#db2777;
+      --text:#0f172a; --muted:#64748b;
+      --shadow-3d:0 10px 24px -8px rgba(15,23,42,0.12), 0 2px 6px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+      --shadow-3d-hover:0 20px 38px -10px rgba(79,70,229,0.22), 0 6px 14px rgba(15,23,42,0.08), inset 0 1px 0 #ffffff;
+      --pill-bg:rgba(15,23,42,0.04); --hover-bg:rgba(15,23,42,0.06);
+      --bg-mesh:radial-gradient(circle at 12% 8%, rgba(79,70,229,0.08), transparent 40%),
+                radial-gradient(circle at 88% 14%, rgba(5,150,105,0.06), transparent 36%),
+                radial-gradient(circle at 75% 88%, rgba(124,58,237,0.07), transparent 42%);
     }
     html,body { height:100%; }
     body {
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      background:var(--bg); color:var(--text); font-size:15px; line-height:1.45;
+      background-color:var(--bg); background-image:var(--bg-mesh); background-attachment:fixed;
+      color:var(--text); font-size:15px; line-height:1.45;
       overflow-x:hidden; -webkit-font-smoothing:antialiased;
+      transition:background-color .25s ease, color .25s ease;
     }
 
     /* ── Login ───────────────────────────────────────── */
@@ -138,31 +159,69 @@
     .section-divider { border:none; border-top:1px solid var(--border); margin:28px 0; }
     .section-title { font-size:16px; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
 
-    /* KPI cards */
-    .cards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+    /* KPI cards — 3D Infographic Depth */
+    .cards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; perspective:1100px; }
     .cards-grid.cols-4 { grid-template-columns:repeat(4,1fr); }
     .cards-grid.cols-3 { grid-template-columns:repeat(3,1fr); }
+    @keyframes cardIn3D {
+      from { opacity:0; transform:translateY(14px) rotateX(7deg) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) rotateX(0deg) scale(1); }
+    }
     .stat-card {
       position:relative; overflow:hidden;
-      background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-      padding:20px 22px; transition:border-color .15s, transform .15s;
+      background:linear-gradient(165deg, var(--surface) 0%, var(--surface2) 100%);
+      border:1px solid var(--border); border-radius:var(--radius);
+      padding:20px 22px; box-shadow:var(--shadow-3d);
+      transform-style:preserve-3d; will-change:transform;
+      transition:border-color .2s, box-shadow .25s cubic-bezier(.22,1,.36,1), transform .25s cubic-bezier(.22,1,.36,1);
+      animation:cardIn3D .45s cubic-bezier(.22,1,.36,1) both;
     }
+    .stat-card:nth-child(2) { animation-delay:40ms; }
+    .stat-card:nth-child(3) { animation-delay:80ms; }
+    .stat-card:nth-child(4) { animation-delay:120ms; }
+    .stat-card:nth-child(5) { animation-delay:160ms; }
+    .stat-card:nth-child(6) { animation-delay:200ms; }
     .stat-card::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:2px;
-      background:rgba(255,255,255,0.08);
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:rgba(148,163,184,0.2);
     }
+    .stat-card::after {
+      content:''; position:absolute; top:-40%; right:-20%; width:120px; height:120px;
+      border-radius:50%; pointer-events:none; opacity:0.14;
+      background:radial-gradient(circle, var(--accent), transparent 70%);
+      transition:transform .35s ease, opacity .25s ease;
+    }
+    .stat-card.green::after  { background:radial-gradient(circle, var(--green), transparent 70%); }
+    .stat-card.yellow::after { background:radial-gradient(circle, var(--yellow), transparent 70%); }
+    .stat-card.pink::after   { background:radial-gradient(circle, var(--pink), transparent 70%); }
     .stat-card.green::before  { background:linear-gradient(90deg,var(--green),transparent); }
     .stat-card.yellow::before { background:linear-gradient(90deg,var(--yellow),transparent); }
     .stat-card.purple::before { background:linear-gradient(90deg,var(--accent),transparent); }
     .stat-card.pink::before   { background:linear-gradient(90deg,var(--pink),transparent); }
-    .stat-card:hover { border-color:var(--border-hover); }
-    .stat-card .label { font-size:11.5px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px; }
+    .stat-card:hover { border-color:var(--border-hover); box-shadow:var(--shadow-3d-hover); }
+    .stat-card:hover::after { transform:scale(1.25); opacity:0.24; }
+    .stat-card .label { font-size:11.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.65px; margin-bottom:8px; }
     .stat-card .value { font-size:32px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.05; margin-bottom:6px; letter-spacing:-0.02em; }
     .stat-card .sub   { font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
     .stat-card.green  .value { color:var(--green); }
     .stat-card.yellow .value { color:var(--yellow); }
-    .stat-card.purple .value { color:#818cf8; }
+    .stat-card.purple .value { color:var(--accent); }
     .stat-card.pink   .value { color:var(--pink); }
+    .chart-card, .table-card, .gamemode-card, .member-card {
+      box-shadow:var(--shadow-3d); min-width:0;
+      transition:transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s cubic-bezier(.22,1,.36,1), border-color .2s;
+    }
+    .chart-card:hover, .table-card:hover { border-color:var(--border-hover); box-shadow:var(--shadow-3d-hover); }
+    .heart-monitor-grid > *, .lists-grid > *, .charts-grid > *, .shop-mid-grid > * { min-width:0; }
+    .table-card { overflow-x:auto; }
+    [data-theme="light"] .tab-btn.active { color:white; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-color:transparent; box-shadow:0 6px 16px -4px rgba(79,70,229,0.45); }
+    [data-theme="light"] .tab-btn.active svg { color:white; }
+    [data-theme="light"] .refresh-btn, [data-theme="light"] .user-pill { background:var(--pill-bg); }
+    [data-theme="light"] .refresh-btn:hover { background:var(--hover-bg); }
+    [data-theme="light"] .tab-btn:hover { background:var(--hover-bg); }
+    @media (prefers-reduced-motion: reduce) {
+      .stat-card, .chart-card, .table-card, .gamemode-card { animation:none !important; transition:none !important; transform:none !important; }
+    }
 
     /* Charts & Tables */
     .charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:14px; margin-bottom:18px; }
@@ -426,6 +485,7 @@
     <div class="topbar-right">
       <span class="last-update"><span id="live-dot"></span><span id="last-update-txt">—</span></span>
       <a href="https://staging.gridnova.pages.dev" target="_blank" rel="noopener" class="refresh-btn">Staging</a>
+      <button class="refresh-btn" id="theme-toggle-btn" title="Switch Light / Dark Mode">☀️ Light</button>
       <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
       <div class="user-pill">
         <img id="user-avatar" src="" alt="" style="display:none">
@@ -964,6 +1024,32 @@ document.getElementById('logout-btn').onclick = async () => {
 };
 
 document.getElementById('refresh-btn').onclick = () => loadData();
+document.getElementById('theme-toggle-btn').onclick = () => {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+  loadData();
+};
+
+function init3DTilt() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(pointer: coarse)').matches) return;
+  const content = document.querySelector('.content');
+  if (!content) return;
+  let activeCard = null;
+  content.addEventListener('mousemove', (e) => {
+    const card = e.target.closest('.stat-card, .gamemode-card');
+    if (activeCard && activeCard !== card) { activeCard.style.transform = ''; activeCard = null; }
+    if (!card) return;
+    activeCard = card;
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `translateY(-4px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg)`;
+  });
+  content.addEventListener('mouseleave', () => {
+    if (activeCard) { activeCard.style.transform = ''; activeCard = null; }
+  });
+}
+init3DTilt();
 
 // ── Preview Mock Data (staging/localhost ?preview=1 only) ─────────────
 function getPreviewData(name, params) {
@@ -1153,6 +1239,26 @@ async function callRpc(name, accessToken) {
   } catch { return null; }
 }
 
+function getChartTheme() {
+  const light = document.documentElement.dataset.theme === 'light';
+  return {
+    tick: light ? '#475569' : '#94a3b8',
+    legend: light ? '#1e293b' : '#e2e8f0',
+    grid: light ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.05)',
+    border: light ? '#ffffff' : '#131626',
+  };
+}
+
+function applyTheme(theme) {
+  const t = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem('gn_admin_theme', t); } catch {}
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = t === 'light' ? '🌙 Dark' : '☀️ Light';
+}
+
+applyTheme((() => { try { return localStorage.getItem('gn_admin_theme'); } catch { return null; } })() || 'dark');
+
 // ── Render helpers ────────────────────────────────────────────────────
 function fmt(n) {
   if (n == null) return '—';
@@ -1213,42 +1319,45 @@ function renderTrend(data) {
     guests.push(map[key]?.guests||0);
     members.push(map[key]?.members||0);
   }
+  const ct = getChartTheme();
   const ctx = document.getElementById('trend-chart').getContext('2d');
   if (trendChart) trendChart.destroy();
   trendChart = new Chart(ctx, { type:'bar', data: { labels, datasets:[
-    { label:'Guests',  data:guests,  backgroundColor:'rgba(102,126,234,.6)', borderRadius:4, borderSkipped:false },
-    { label:'Members', data:members, backgroundColor:'rgba(16,185,129,.7)',  borderRadius:4, borderSkipped:false },
-  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#e2e8f0',font:{size:11}}}},
-    scales:{ x:{stacked:true,ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-             y:{stacked:true,ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.06)'}} } }
+    { label:'Guests',  data:guests,  backgroundColor:'rgba(102,126,234,.7)', borderRadius:5, borderSkipped:false },
+    { label:'Members', data:members, backgroundColor:'rgba(16,185,129,.78)', borderRadius:5, borderSkipped:false },
+  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:ct.legend,font:{size:11}}}},
+    scales:{ x:{stacked:true,ticks:{color:ct.tick,font:{size:10}},grid:{color:ct.grid}},
+             y:{stacked:true,ticks:{color:ct.tick,font:{size:10}},grid:{color:ct.grid}} } }
   });
 }
 
 function renderDiffChart(data) {
   data = data || [];
+  const ct = getChartTheme();
   const colors = {easy:'#10b981',medium:'#fbbf24',hard:'#f87171',expert:'#a78bfa'};
   const ctx = document.getElementById('diff-chart').getContext('2d');
   if (diffChart) diffChart.destroy();
   diffChart = new Chart(ctx, { type:'doughnut', data:{
     labels: data.map(r=>r.difficulty),
-    datasets:[{ data:data.map(r=>r.cnt), backgroundColor:data.map(r=>colors[r.difficulty]||'#667eea'), borderWidth:2, borderColor:'#1a1a2e' }]
+    datasets:[{ data:data.map(r=>r.cnt), backgroundColor:data.map(r=>colors[r.difficulty]||'#667eea'), borderWidth:2, borderColor:ct.border }]
   }, options:{ responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ position:'right', labels:{color:'#e2e8f0',font:{size:11},padding:12} } } }
+    plugins:{ legend:{ position:'right', labels:{color:ct.legend,font:{size:11},padding:12} } } }
   });
 }
 
 function renderHourly(data) {
   data = data || [];
+  const ct = getChartTheme();
   const hours=Array.from({length:24},(_,i)=>i);
   const counts=hours.map(h=>(data.find(r=>r.hr===h)?.cnt||0));
   const ctx = document.getElementById('hourly-chart').getContext('2d');
   if (hourlyChart) hourlyChart.destroy();
   hourlyChart = new Chart(ctx, { type:'bar', data:{
     labels:hours.map(h=>`${h}:00`),
-    datasets:[{ label:'Games', data:counts, backgroundColor:'rgba(118,75,162,.7)', borderRadius:3, borderSkipped:false }]
+    datasets:[{ label:'Games', data:counts, backgroundColor:'rgba(118,75,162,.75)', borderRadius:4, borderSkipped:false }]
   }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-    scales:{ x:{ticks:{color:'#94a3b8',font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},
-             y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}} } }
+    scales:{ x:{ticks:{color:ct.tick,font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},
+             y:{ticks:{color:ct.tick,font:{size:10}},grid:{color:ct.grid}} } }
   });
 }
 
@@ -1260,20 +1369,22 @@ function renderFunnel(d) {
   setEl('c-played-today', total ? `${played}/${total}` : '—');
   setEl('c-played-today-sub', total ? `${Math.round((played/total)*100)}% เริ่มเล่นเกม` : 'visited / started a game');
 
+  const ct = getChartTheme();
   const views = (d.view_counts || []).slice(0, 10);
   const ctx = document.getElementById('funnel-chart').getContext('2d');
   if (funnelChart) funnelChart.destroy();
   funnelChart = new Chart(ctx, { type:'bar', data:{
     labels: views.map(v=>v.view),
-    datasets:[{ label:'Sessions', data: views.map(v=>v.sessions), backgroundColor:'rgba(236,72,153,.7)', borderRadius:4, borderSkipped:false }]
+    datasets:[{ label:'Sessions', data: views.map(v=>v.sessions), backgroundColor:'rgba(236,72,153,.75)', borderRadius:4, borderSkipped:false }]
   }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-    scales:{ x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-             y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}} } }
+    scales:{ x:{ticks:{color:ct.tick,font:{size:10}},grid:{color:ct.grid}},
+             y:{ticks:{color:ct.tick,font:{size:10}},grid:{display:false}} } }
   });
 }
 
 function renderAttribution(d) {
   d = d || { by_source: [], by_referrer: [], total_sessions: 0 };
+  const ct = getChartTheme();
   const sources = (d.by_source || []).slice(0, 10);
 
   const ctx = document.getElementById('source-chart').getContext('2d');
@@ -1281,13 +1392,13 @@ function renderAttribution(d) {
   sourceChart = new Chart(ctx, { type:'bar', data:{
     labels: sources.map(s=>s.source),
     datasets:[
-      { label:'Sessions', data: sources.map(s=>s.sessions), backgroundColor:'rgba(99,102,241,.7)', borderRadius:4, borderSkipped:false },
-      { label:'Engaged',  data: sources.map(s=>s.engaged),  backgroundColor:'rgba(16,185,129,.75)', borderRadius:4, borderSkipped:false },
+      { label:'Sessions', data: sources.map(s=>s.sessions), backgroundColor:'rgba(99,102,241,.75)', borderRadius:4, borderSkipped:false },
+      { label:'Engaged',  data: sources.map(s=>s.engaged),  backgroundColor:'rgba(16,185,129,.78)', borderRadius:4, borderSkipped:false },
     ]
   }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},boxWidth:10}}},
-    scales:{ x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-             y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}} } }
+    plugins:{legend:{labels:{color:ct.legend,font:{size:10},boxWidth:10}}},
+    scales:{ x:{ticks:{color:ct.tick,font:{size:10}},grid:{color:ct.grid}},
+             y:{ticks:{color:ct.tick,font:{size:10}},grid:{display:false}} } }
   });
 
   const refs = d.by_referrer || [];
@@ -1307,16 +1418,17 @@ function renderAttribution(d) {
 
 function renderRetention(rows) {
   rows = rows || [];
+  const ct = getChartTheme();
   const labels = rows.map(r => r.date.slice(5));
   const rates = rows.map(r => r.cohort_size ? Math.round((r.returned_next_day / r.cohort_size) * 100) : 0);
   const ctx = document.getElementById('retention-chart').getContext('2d');
   if (retentionChart) retentionChart.destroy();
   retentionChart = new Chart(ctx, { type:'bar', data:{
     labels,
-    datasets:[{ label:'D1 retention %', data: rates, backgroundColor:'rgba(16,185,129,.7)', borderRadius:4, borderSkipped:false }]
+    datasets:[{ label:'D1 retention %', data: rates, backgroundColor:'rgba(16,185,129,.75)', borderRadius:4, borderSkipped:false }]
   }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-    scales:{ x:{ticks:{color:'#94a3b8',font:{size:9},maxRotation:0},grid:{display:false}},
-             y:{ min:0, max:100, ticks:{color:'#94a3b8',font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'}} } }
+    scales:{ x:{ticks:{color:ct.tick,font:{size:9},maxRotation:0},grid:{display:false}},
+             y:{ min:0, max:100, ticks:{color:ct.tick,font:{size:10},callback:v=>v+'%'},grid:{color:ct.grid}} } }
   });
 }
 
@@ -1430,17 +1542,16 @@ async function loadGameModeOverview() {
 
 function renderGameModePieChart(data) {
   data = data || [];
-  // Today's view counts if there's any activity today, else fall back to
-  // all-time so the chart isn't empty during quiet early-morning hours.
+  const ct = getChartTheme();
   const useToday = data.some(m => (m.views_today || 0) > 0);
   const values = data.map(m => useToday ? (m.views_today || 0) : (m.views_total || 0));
   const ctx = document.getElementById('gamemode-pie-chart').getContext('2d');
   if (gamemodePieChart) gamemodePieChart.destroy();
-  gamemodePieChart = new Chart(ctx, { type: 'pie', data: {
+  gamemodePieChart = new Chart(ctx, { type: 'doughnut', data: {
     labels: data.map(m => `${MODE_META[m.mode_key]?.icon || ''} ${MODE_META[m.mode_key]?.label || m.mode_key}`),
-    datasets: [{ data: values, backgroundColor: data.map(m => MODE_META[m.mode_key]?.color || '#667eea'), borderWidth: 2, borderColor: '#1a1a2e' }]
-  }, options: { responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { position: 'right', labels: { color: '#e2e8f0', font: { size: 11 }, padding: 12 } },
+    datasets: [{ data: values, backgroundColor: data.map(m => MODE_META[m.mode_key]?.color || '#667eea'), borderWidth: 2, borderColor: ct.border }]
+  }, options: { responsive: true, maintainAspectRatio: false, cutout: '56%',
+    plugins: { legend: { position: 'bottom', labels: { color: ct.legend, font: { size: 11 }, padding: 10, boxWidth: 12 } },
       tooltip: { callbacks: { label: (c) => {
         const total = values.reduce((a,b) => a+b, 0) || 1;
         return ` ${c.label}: ${c.raw} (${Math.round(c.raw/total*100)}%)`;
@@ -1450,15 +1561,16 @@ function renderGameModePieChart(data) {
 
 function renderGameModeOnlineChart(data) {
   data = data || [];
+  const ct = getChartTheme();
   const ctx = document.getElementById('gamemode-online-chart').getContext('2d');
   if (gamemodeOnlineChart) gamemodeOnlineChart.destroy();
   gamemodeOnlineChart = new Chart(ctx, { type: 'bar', data: {
     labels: data.map(m => `${MODE_META[m.mode_key]?.icon || ''} ${MODE_META[m.mode_key]?.label || m.mode_key}`),
     datasets: [{ label: 'กำลังเล่นอยู่', data: data.map(m => m.currently_playing || 0),
-      backgroundColor: data.map(m => MODE_META[m.mode_key]?.color || '#667eea'), borderRadius: 6, borderSkipped: false }]
+      backgroundColor: data.map(m => MODE_META[m.mode_key]?.color || '#667eea'), borderRadius: 6, borderSkipped:false }]
   }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-    scales: { x: { ticks: { color: '#94a3b8', font: { size: 10 }, precision: 0 }, grid: { color: 'rgba(255,255,255,.04)' } },
-              y: { ticks: { color: '#e2e8f0', font: { size: 12 } }, grid: { display: false } } } }
+    scales: { x: { ticks: { color: ct.tick, font: { size: 10 }, precision: 0 }, grid: { color: ct.grid } },
+              y: { ticks: { color: ct.legend, font: { size: 12 } }, grid: { display: false } } } }
   });
 }
 
@@ -1686,15 +1798,16 @@ function renderShopCatChart(data) {
   }
   canvas.style.display = '';
   if (emptyEl) emptyEl.style.display = 'none';
+  const ct = getChartTheme();
   const ctx = canvas.getContext('2d');
   const palette = ['#667eea','#10b981','#fbbf24','#f87171','#a78bfa','#60a5fa','#f472b6','#34d399'];
   shopCatChart = new Chart(ctx, { type:'doughnut', data:{
     labels: data.map(r => r.category),
     datasets:[{ data:data.map(r => r.purchase_count),
       backgroundColor: data.map((_,i) => palette[i % palette.length]),
-      borderWidth:2, borderColor:'#131626' }]
+      borderWidth:2, borderColor:ct.border }]
   }, options:{ responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ position:'bottom', labels:{color:'#e2e8f0',font:{size:11},padding:10} } } }
+    plugins:{ legend:{ position:'bottom', labels:{color:ct.legend,font:{size:11},padding:10} } } }
   });
 }
 
