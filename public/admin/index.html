@@ -9,139 +9,242 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#0f0f1a; --surface:#1a1a2e; --surface2:#16213e;
-      --border:rgba(255,255,255,0.08); --accent:#667eea; --accent2:#764ba2;
-      --green:#10b981; --yellow:#fbbf24; --red:#f87171;
-      --text:#e2e8f0; --muted:rgba(255,255,255,0.45); --radius:12px;
+      --bg:#0b0d17; --surface:#131626; --surface2:#191d32; --surface-glass:rgba(19,22,38,0.85);
+      --border:rgba(255,255,255,0.08); --border-hover:rgba(255,255,255,0.16);
+      --accent:#667eea; --accent2:#764ba2;
+      --green:#10b981; --yellow:#fbbf24; --red:#f87171; --pink:#f472b6;
+      --text:#e2e8f0; --muted:rgba(255,255,255,0.5); --radius:12px;
+      --sidebar-w:240px; --topbar-h:60px;
     }
     html,body { height:100%; }
-    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); font-size:16px; }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:var(--bg); color:var(--text); font-size:15px; line-height:1.45;
+      overflow-x:hidden; -webkit-font-smoothing:antialiased;
+    }
 
     /* ── Login ───────────────────────────────────────── */
     #login-screen {
       display:flex; align-items:center; justify-content:center;
-      min-height:100vh;
-      background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#0f0f1a);
+      min-height:100vh; padding:20px;
+      background:radial-gradient(circle at 20% 20%, rgba(102,126,234,0.14), transparent 45%),
+                 radial-gradient(circle at 80% 80%, rgba(118,75,162,0.14), transparent 45%),
+                 linear-gradient(135deg,#0b0d17,#131626,#0b0d17);
     }
     .login-card {
       background:var(--surface); border:1px solid var(--border);
       border-radius:20px; padding:40px 36px;
-      width:100%; max-width:360px; text-align:center;
+      width:100%; max-width:380px; text-align:center;
+      box-shadow:0 20px 50px rgba(0,0,0,0.45);
     }
-    .login-card .logo { font-size:52px; margin-bottom:14px; }
-    .login-card h1   { font-size:22px; font-weight:700; margin-bottom:6px; }
-    .login-card p    { color:var(--muted); font-size:13px; margin-bottom:30px; }
+    .login-card .logo { margin-bottom:14px; }
+    .login-card .logo img { width:52px; height:52px; border-radius:14px; }
+    .login-card h1   { font-size:22px; font-weight:700; margin-bottom:6px; letter-spacing:-0.01em; }
+    .login-card p    { color:var(--muted); font-size:13px; margin-bottom:28px; }
     .btn-google {
       width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
       background:white; color:#1f1f1f; border:none; border-radius:10px;
       padding:13px 16px; font-size:15px; font-weight:600; cursor:pointer;
-      box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:background .15s,box-shadow .15s;
+      box-shadow:0 1px 3px rgba(0,0,0,0.3); transition:background .15s,box-shadow .15s,transform .15s;
     }
-    .btn-google:hover  { background:#f5f5f5; box-shadow:0 2px 6px rgba(0,0,0,0.35); }
-    .btn-google:disabled { opacity:0.6; cursor:not-allowed; }
+    .btn-google:hover  { background:#f5f5f5; box-shadow:0 4px 12px rgba(0,0,0,0.35); transform:translateY(-1px); }
+    .btn-google:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
     .login-error { color:var(--red); font-size:13px; margin-top:14px; min-height:20px; }
 
-    /* ── Dashboard ───────────────────────────────────── */
-    #dashboard { display:none; }
+    /* ── Admin Shell & Topbar ────────────────────────── */
+    #dashboard { display:none; min-height:100vh; }
     .topbar {
-      background:var(--surface); border-bottom:1px solid var(--border);
-      padding:14px 24px; display:flex; align-items:center; justify-content:space-between;
-      position:sticky; top:0; z-index:10;
+      background:var(--surface-glass); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
+      padding:0 24px; height:var(--topbar-h);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      position:sticky; top:0; z-index:30;
     }
-    .topbar-left  { display:flex; align-items:center; gap:10px; }
-    .topbar-left .logo { font-size:22px; }
-    .topbar-left h1 { font-size:17px; font-weight:700; }
-    .topbar-left .badge { background:var(--accent); color:white; font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; }
-    .topbar-right { display:flex; align-items:center; gap:14px; }
-    .refresh-btn { background:rgba(255,255,255,0.07); border:1px solid var(--border); color:var(--text); padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; }
-    .refresh-btn:hover { background:rgba(255,255,255,0.14); }
-    .logout-btn { background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:13px; padding:7px 10px; }
-    .logout-btn:hover { color:var(--red); }
-    .user-pill { display:flex; align-items:center; gap:8px; }
-    .user-pill img { width:28px; height:28px; border-radius:50%; object-fit:cover; }
-    .user-pill span { font-size:13px; font-weight:600; }
-    #live-dot { display:inline-block; width:7px; height:7px; background:var(--green); border-radius:50%; margin-right:5px; animation:pulse 2s ease-in-out infinite; }
+    .topbar-left  { display:flex; align-items:center; gap:10px; min-width:0; }
+    .topbar-left .logo img { width:28px; height:28px; border-radius:8px; display:block; }
+    .topbar-left h1 { font-size:16px; font-weight:700; letter-spacing:-0.01em; white-space:nowrap; }
+    .topbar-left .badge {
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:white; font-size:10px; font-weight:700; letter-spacing:.6px;
+      padding:2px 8px; border-radius:99px;
+    }
+    .topbar-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .refresh-btn {
+      background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text);
+      padding:6px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600;
+      text-decoration:none; display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+      transition:background .15s, border-color .15s;
+    }
+    .refresh-btn:hover { background:rgba(255,255,255,0.12); border-color:var(--border-hover); }
+    .logout-btn {
+      background:transparent; border:1px solid transparent; color:var(--muted);
+      cursor:pointer; font-size:12px; font-weight:600; padding:6px 10px; border-radius:8px;
+      transition:color .15s, background .15s;
+    }
+    .logout-btn:hover { color:var(--red); background:rgba(248,113,113,0.08); }
+    .user-pill {
+      display:flex; align-items:center; gap:8px; padding:3px 10px 3px 4px;
+      background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:99px;
+    }
+    .user-pill img { width:24px; height:24px; border-radius:50%; object-fit:cover; }
+    .user-pill span { font-size:12px; font-weight:600; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    #live-dot { display:inline-block; width:7px; height:7px; background:var(--green); border-radius:50%; margin-right:6px; box-shadow:0 0 8px var(--green); animation:pulse 2s ease-in-out infinite; }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
-    .last-update { font-size:11px; color:var(--muted); }
+    .last-update { font-size:11px; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums; }
 
-    .content { padding:24px; max-width:1280px; margin:0 auto; }
+    .admin-shell { display:flex; align-items:flex-start; min-height:calc(100vh - var(--topbar-h)); }
+
+    /* Desktop Sidebar Navigation (>= 1024px) */
+    .sidebar {
+      width:var(--sidebar-w); flex-shrink:0;
+      position:sticky; top:var(--topbar-h); height:calc(100vh - var(--topbar-h));
+      background:var(--surface); border-right:1px solid var(--border);
+      padding:18px 12px; display:flex; flex-direction:column; gap:6px; overflow-y:auto;
+    }
+    .sidebar-label {
+      font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+      color:var(--muted); padding:0 12px 6px;
+    }
+    .tab-container { display:flex; flex-direction:column; gap:4px; }
+    .tab-btn {
+      background:transparent; border:1px solid transparent; color:var(--muted);
+      padding:10px 12px; border-radius:10px; font-size:13.5px; font-weight:600;
+      cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:10px;
+      text-align:left; width:100%; white-space:nowrap;
+    }
+    .tab-btn svg { width:17px; height:17px; flex-shrink:0; opacity:0.75; }
+    .tab-btn:hover { color:var(--text); background:rgba(255,255,255,0.05); }
+    .tab-btn.active {
+      color:white; background:linear-gradient(135deg,rgba(102,126,234,0.22),rgba(118,75,162,0.18));
+      border-color:rgba(102,126,234,0.4);
+      box-shadow:inset 3px 0 0 var(--accent);
+    }
+    .tab-btn.active svg { opacity:1; color:#a5b4fc; }
+
+    .main-area { flex:1; min-width:0; }
+    .content { padding:24px 28px 48px; max-width:1360px; margin:0 auto; }
+
+    /* Section Headers */
+    .section-header {
+      display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      margin:28px 0 14px; padding-bottom:10px; border-bottom:1px solid var(--border);
+    }
+    .section-header:first-child { margin-top:0; }
+    .section-header h2 {
+      font-size:15px; font-weight:700; letter-spacing:-0.01em; color:var(--text);
+      display:flex; align-items:center; gap:8px;
+    }
+    .section-header .section-sub { font-size:12px; color:var(--muted); }
+    .section-divider { border:none; border-top:1px solid var(--border); margin:28px 0; }
+    .section-title { font-size:16px; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
 
     /* KPI cards */
-    .cards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:28px; }
-    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:26px 28px; }
-    .stat-card .label { font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px; }
-    .stat-card .value { font-size:40px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1; margin-bottom:6px; }
-    .stat-card .sub   { font-size:14px; color:var(--muted); }
+    .cards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+    .cards-grid.cols-4 { grid-template-columns:repeat(4,1fr); }
+    .cards-grid.cols-3 { grid-template-columns:repeat(3,1fr); }
+    .stat-card {
+      position:relative; overflow:hidden;
+      background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+      padding:20px 22px; transition:border-color .15s, transform .15s;
+    }
+    .stat-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:rgba(255,255,255,0.08);
+    }
+    .stat-card.green::before  { background:linear-gradient(90deg,var(--green),transparent); }
+    .stat-card.yellow::before { background:linear-gradient(90deg,var(--yellow),transparent); }
+    .stat-card.purple::before { background:linear-gradient(90deg,var(--accent),transparent); }
+    .stat-card.pink::before   { background:linear-gradient(90deg,var(--pink),transparent); }
+    .stat-card:hover { border-color:var(--border-hover); }
+    .stat-card .label { font-size:11.5px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px; }
+    .stat-card .value { font-size:32px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.05; margin-bottom:6px; letter-spacing:-0.02em; }
+    .stat-card .sub   { font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
     .stat-card.green  .value { color:var(--green); }
     .stat-card.yellow .value { color:var(--yellow); }
-    .stat-card.purple .value { color:var(--accent); }
-    .stat-card.pink   .value { color:#f472b6; }
+    .stat-card.purple .value { color:#818cf8; }
+    .stat-card.pink   .value { color:var(--pink); }
 
-    /* Charts */
-    .charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:14px; margin-bottom:24px; }
-    @media(max-width:768px){ .charts-grid,.bottom-grid { grid-template-columns:1fr; } }
-    .chart-card  { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
-    .chart-card h3 { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:16px; }
-    .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    .lists-grid  { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
-    .table-card  { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
-    .table-card h3 { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; }
+    /* Charts & Tables */
+    .charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:14px; margin-bottom:18px; }
+    .chart-card  { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; min-width:0; }
+    .chart-card h3 { font-size:12.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; }
+    .chart-box     { position:relative; height:220px; width:100%; }
+    .chart-box-sm  { position:relative; height:180px; width:100%; }
+    .chart-box-lg  { position:relative; height:260px; width:100%; }
+    .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+    .lists-grid  { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+    .table-card  { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; min-width:0; }
+    .table-card h3 { font-size:12.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; }
+    .table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
     table { width:100%; border-collapse:collapse; }
-    th { text-align:left; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; padding:0 8px 10px; border-bottom:1px solid var(--border); }
-    td { padding:10px 8px; font-size:14px; border-bottom:1px solid rgba(255,255,255,.04); }
+    th { text-align:left; font-size:11.5px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; padding:0 8px 10px; border-bottom:1px solid var(--border); white-space:nowrap; }
+    td { padding:10px 8px; font-size:13.5px; border-bottom:1px solid rgba(255,255,255,.04); font-variant-numeric:tabular-nums; }
     tr:last-child td { border-bottom:none; }
-    .diff-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:12px; font-weight:600; }
+    .text-muted { color:var(--muted); font-size:12.5px; }
+    .num { text-align:right; font-variant-numeric:tabular-nums; }
+    .diff-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11.5px; font-weight:600; }
     .diff-easy   { background:rgba(16,185,129,.15); color:#10b981; }
     .diff-medium { background:rgba(251,191,36,.15);  color:#fbbf24; }
     .diff-hard   { background:rgba(248,113,113,.15); color:#f87171; }
     .diff-expert { background:rgba(167,139,250,.15); color:#a78bfa; }
-    .skeleton { background:linear-gradient(90deg,var(--surface2) 25%,rgba(255,255,255,.05) 50%,var(--surface2) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:6px; height:32px; width:80%; }
+    .skeleton { background:linear-gradient(90deg,var(--surface2) 25%,rgba(255,255,255,.06) 50%,var(--surface2) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:6px; height:32px; width:80%; }
     @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
-    .empty { color:var(--muted); text-align:center; padding:24px; font-size:14px; }
+    .empty { color:var(--muted); text-align:center; padding:28px 16px; font-size:13.5px; }
     .online-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
-    .online-dot.member { background:var(--green); }
+    .online-dot.member { background:var(--green); box-shadow:0 0 6px var(--green); }
     .online-dot.guest  { background:var(--muted); }
-    .badge-online { background:rgba(16,185,129,.15); color:#10b981; padding:2px 8px; border-radius:99px; font-size:12px; font-weight:600; }
-    .badge-banned { background:rgba(248,113,113,.15); color:#f87171; padding:2px 8px; border-radius:99px; font-size:12px; font-weight:600; }
-    .list-scroll { max-height:340px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+    .badge-online { background:rgba(16,185,129,.15); color:#10b981; padding:2px 8px; border-radius:99px; font-size:11.5px; font-weight:600; }
+    .badge-banned { background:rgba(248,113,113,.15); color:#f87171; padding:2px 8px; border-radius:99px; font-size:11.5px; font-weight:600; }
+    .list-scroll { max-height:340px; overflow-y:auto; overflow-x:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+    .list-scroll-tall { max-height:430px; }
+    .list-scroll-logs { max-height:520px; }
+    .referrer-scroll { max-height:220px; overflow-y:auto; font-size:12px; }
+
     /* ── Shop ── */
-    .section-divider { border:none; border-top:1px solid var(--border); margin:28px 0; }
-    .section-title { font-size:16px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
-    .shop-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+    .shop-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
     .shop-mid-grid { display:grid; grid-template-columns:2fr 1fr; gap:14px; margin-bottom:14px; }
     .rarity-common    { color:#94a3b8; }
     .rarity-uncommon  { color:#10b981; }
     .rarity-rare      { color:#60a5fa; }
     .rarity-epic      { color:#a78bfa; }
     .rarity-legendary { color:#fbbf24; }
-    .cat-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:600; background:rgba(102,126,234,.15); color:#667eea; }
+    .cat-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:600; background:rgba(102,126,234,.15); color:#818cf8; }
 
-    /* ── Tab Bar ── */
-    .tab-container { display:flex; gap:10px; margin-bottom:24px; border-bottom:1px solid var(--border); padding-bottom:12px; }
-    .tab-btn { background:transparent; border:none; color:var(--muted); padding:8px 16px; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
-    .tab-btn:hover { color:var(--text); background:rgba(255,255,255,0.05); }
-    .tab-btn.active { color:white; background:var(--accent); }
+    /* ── Leaderboard Rank Badges ── */
+    .rank-badge {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:26px; height:26px; border-radius:8px; font-size:12px; font-weight:800;
+      font-variant-numeric:tabular-nums;
+    }
+    .rank-1 { background:linear-gradient(135deg,#fbbf24,#d97706); color:#1a1100; box-shadow:0 2px 8px rgba(251,191,36,0.35); }
+    .rank-2 { background:linear-gradient(135deg,#e2e8f0,#94a3b8); color:#0f172a; box-shadow:0 2px 8px rgba(148,163,184,0.3); }
+    .rank-3 { background:linear-gradient(135deg,#f59e0b,#b45309); color:#fff7ed; box-shadow:0 2px 8px rgba(180,83,9,0.35); }
+    .rank-num { color:var(--muted); font-weight:700; font-size:13px; }
+    .lb-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+    .lb-date-input { background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:6px 12px; font-size:13px; outline:none; cursor:pointer; }
+    .lb-date-input:focus { border-color:var(--accent); }
 
     /* ── Members Panel ── */
-    .members-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:12px; flex-wrap:wrap; }
-    .members-search { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 14px; color:var(--text); font-size:14px; width:260px; outline:none; }
+    .members-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; gap:12px; flex-wrap:wrap; }
+    .members-toolbar-right { display:flex; align-items:center; gap:10px; }
+    .members-search { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 14px; color:var(--text); font-size:14px; width:280px; max-width:100%; outline:none; }
     .members-search:focus { border-color:var(--accent); }
     .view-toggle { display:flex; gap:4px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:3px; }
     .view-btn { background:none; border:none; color:var(--muted); padding:5px 10px; border-radius:6px; cursor:pointer; font-size:14px; transition:all .15s; }
     .view-btn.active { background:var(--accent); color:white; }
-    .members-filter-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; flex-wrap:wrap; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:10px 14px; }
-    .members-sort-select { background:var(--surface); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:5px 8px; font-size:12px; cursor:pointer; outline:none; }
+    .members-filter-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:10px 14px; }
+    .members-sort-select { background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:5px 8px; font-size:12px; cursor:pointer; outline:none; }
     .members-sort-select:focus { border-color:var(--accent); }
 
     /* Card grid */
-    .member-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+    .member-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(205px,1fr)); gap:14px; }
     .member-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 16px; cursor:pointer; transition:border-color .15s,transform .15s; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; }
     .member-card:hover { border-color:var(--accent); transform:translateY(-2px); }
     .member-avatar { width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:white; flex-shrink:0; overflow:hidden; }
     .member-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
     .member-card-name { font-weight:700; font-size:14px; line-height:1.2; }
     .member-card-username { color:var(--muted); font-size:12px; }
-    .member-card-stats { display:flex; gap:10px; margin-top:4px; }
+    .member-card-stats { display:flex; gap:10px; margin-top:4px; font-variant-numeric:tabular-nums; }
     .member-card-stat { font-size:12px; color:var(--muted); }
     .member-card-stat strong { color:var(--text); }
     .member-status-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
@@ -160,47 +263,42 @@
     .mode-card-note { font-size:11px; color:var(--muted); margin-top:6px; line-height:1.4; }
 
     /* Member list table */
-    .members-table-wrap { overflow-x:auto; }
+    .members-table-wrap { overflow-x:auto; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; }
 
     /* Member detail panel */
     #member-detail { display:none; }
     .detail-back { background:rgba(255,255,255,.07); border:1px solid var(--border); color:var(--text); padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; margin-bottom:20px; }
     .detail-back:hover { background:rgba(255,255,255,.14); }
-    .detail-header { display:flex; align-items:center; gap:18px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; margin-bottom:18px; }
+    .detail-header { display:flex; align-items:center; gap:18px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; margin-bottom:18px; }
     .detail-avatar { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; color:white; flex-shrink:0; }
     .detail-info h2 { font-size:20px; font-weight:800; margin-bottom:2px; }
     .detail-info .detail-sub { color:var(--muted); font-size:13px; margin-bottom:6px; }
     .detail-info .detail-tags { display:flex; gap:6px; flex-wrap:wrap; }
-    .detail-actions { margin-left:auto; display:flex; gap:8px; }
+    .detail-actions { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
     .btn-ban   { background:rgba(248,113,113,.15); border:1px solid rgba(248,113,113,.3); color:#f87171; padding:7px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
     .btn-unban { background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3); color:#10b981; padding:7px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
     .btn-ban:hover   { background:rgba(248,113,113,.3); }
     .btn-unban:hover { background:rgba(16,185,129,.3); }
-    .btn-action { background:rgba(102,126,234,.12); border:1px solid rgba(102,126,234,.3); color:#667eea; padding:7px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+    .btn-action { background:rgba(102,126,234,.12); border:1px solid rgba(102,126,234,.3); color:#818cf8; padding:7px 14px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
     .btn-action:hover { background:rgba(102,126,234,.25); }
-    .detail-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
     .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
     .detail-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px; }
-    @media(max-width:768px){ .detail-grid,.detail-grid-3 { grid-template-columns:1fr; } .member-cards { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); } }
     .kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:14px; }
-    @media(max-width:900px){ .kpi-row { grid-template-columns:repeat(3,1fr); } }
     .kpi-mini { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 12px; text-align:center; }
-    .kpi-mini .kv { font-size:22px; font-weight:800; line-height:1; margin-bottom:4px; }
+    .kpi-mini .kv { font-size:22px; font-weight:800; line-height:1; margin-bottom:4px; font-variant-numeric:tabular-nums; }
     .kpi-mini .kl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
     .section-h { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
     .uuid-box { font-family:monospace; font-size:11px; color:#a3e635; background:#07070d; padding:4px 8px; border-radius:4px; word-break:break-all; }
 
     /* ── Log Monitor ── */
     .log-filter-bar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px; background:var(--surface2); padding:12px 16px; border-radius:var(--radius); border:1px solid var(--border); }
-    .filter-group { display:flex; align-items:center; gap:8px; }
+    .filter-group { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
     .filter-label { font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; }
     .filter-btn { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text); padding:5px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:background .15s; }
     .filter-btn:hover { background:rgba(255,255,255,0.12); }
     .filter-btn.active { background:var(--accent); border-color:var(--accent); color:white; }
-    
     .clear-btn { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#f87171; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:background .15s; }
     .clear-btn:hover { background:rgba(239,68,68,0.25); }
-
     .audit-card { background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); border-radius:var(--radius); padding:16px 20px; margin-bottom:20px; }
     .audit-card.success { background:rgba(16,185,129,0.06); border-color:rgba(16,185,129,0.2); }
     .audit-card h3 { font-size:14px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
@@ -209,12 +307,10 @@
     .audit-list { margin-top:10px; display:flex; flex-direction:column; gap:8px; }
     .audit-item { font-size:13px; background:rgba(0,0,0,0.2); padding:12px; border-radius:6px; border-left:3px solid var(--red); display:flex; flex-direction:column; gap:4px; }
     .audit-item.payment-missing { border-left-color:var(--yellow); }
-    
     .badge-level { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; text-transform:uppercase; text-align:center; min-width:60px; }
     .level-info { background:rgba(16,185,129,0.15); color:#10b981; }
     .level-warn { background:rgba(251,191,36,0.15); color:#fbbf24; }
     .level-error { background:rgba(248,113,113,0.15); color:#f87171; }
-    
     .log-row { cursor:pointer; transition:background .15s; }
     .log-row:hover { background:rgba(255,255,255,0.02); }
     .log-meta-box { background:#07070d; padding:12px; border-radius:6px; border:1px dashed var(--border); font-family:monospace; font-size:12px; color:#a3e635; overflow-x:auto; margin:8px 0; white-space:pre-wrap; }
@@ -222,22 +318,23 @@
     .log-meta-toggle:hover { color:var(--text); }
 
     /* ── Hearts Monitor ── */
-    .heart-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+    .heart-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
     .heart-monitor-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
-    @media(max-width:900px){ .heart-kpi-grid { grid-template-columns:repeat(2,1fr); } .heart-monitor-grid { grid-template-columns:1fr; } }
-    .heart-status { font-size:18px; letter-spacing:1px; white-space:nowrap; }
-    .heart-empty { opacity:.25; filter:grayscale(1); }
+    .heart-status { display:inline-flex; align-items:center; gap:3px; vertical-align:middle; }
+    .heart-icon { width:15px; height:15px; color:#f43f5e; fill:#f43f5e; flex-shrink:0; }
+    .heart-icon.heart-empty { color:rgba(255,255,255,0.22); fill:none; }
     .event-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:700; text-transform:uppercase; }
     .event-consume { background:rgba(248,113,113,.15); color:#f87171; }
     .event-refund { background:rgba(16,185,129,.15); color:#10b981; }
     .event-blocked_no_hearts { background:rgba(251,191,36,.15); color:#fbbf24; }
     .event-buy_infinite, .event-infinite_start { background:rgba(102,126,234,.15); color:#818cf8; }
     .event-refill_full { background:rgba(236,72,153,.15); color:#f472b6; }
+
+    /* ── News ── */
     .news-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:16px; align-items:start; }
-    @media (max-width:900px) { .news-grid { grid-template-columns:1fr; } }
     .news-form label { display:block; font-size:12px; font-weight:600; color:var(--muted); margin:10px 0 4px; }
     .news-form input[type=text], .news-form input[type=url], .news-form input[type=datetime-local], .news-form textarea, .news-form select {
-      width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px 10px; font-size:13px; font-family:inherit; }
+      width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px 10px; font-size:13px; font-family:inherit; }
     .news-form textarea { min-height:140px; resize:vertical; }
     .news-form .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .news-form .check { display:flex; align-items:center; gap:8px; margin-top:12px; font-size:13px; }
@@ -247,6 +344,53 @@
     .news-live { background:rgba(16,185,129,.15); color:#10b981; }
     .news-draft { background:rgba(148,163,184,.15); color:#94a3b8; }
     .news-env { background:rgba(102,126,234,.15); color:#818cf8; }
+
+    /* ── Responsive Breakpoints ──────────────────────── */
+    @media (max-width: 1024px) {
+      .admin-shell { flex-direction:column; }
+      .sidebar {
+        width:100%; height:auto; position:sticky; top:var(--topbar-h); z-index:20;
+        border-right:none; border-bottom:1px solid var(--border);
+        padding:8px 14px; background:var(--surface-glass); backdrop-filter:blur(12px);
+      }
+      .sidebar-label { display:none; }
+      .tab-container {
+        flex-direction:row; overflow-x:auto; -webkit-overflow-scrolling:touch;
+        scrollbar-width:none; gap:6px;
+      }
+      .tab-container::-webkit-scrollbar { display:none; }
+      .tab-btn { width:auto; padding:8px 12px; font-size:13px; }
+      .tab-btn.active { box-shadow:none; }
+      .content { padding:20px 16px 40px; }
+      .cards-grid, .cards-grid.cols-4, .cards-grid.cols-3,
+      .shop-kpi-grid, .heart-kpi-grid, .lb-kpi-grid { grid-template-columns:repeat(2,1fr); }
+      .charts-grid, .shop-mid-grid, .lists-grid, .bottom-grid,
+      .heart-monitor-grid, .news-grid, .detail-grid, .detail-grid-3 { grid-template-columns:1fr; }
+      .kpi-row { grid-template-columns:repeat(3,1fr); }
+    }
+    @media (max-width: 640px) {
+      .topbar { padding:0 12px; gap:8px; }
+      .topbar-left h1 { font-size:15px; }
+      .last-update { display:none; }
+      .user-pill span { display:none; }
+      .user-pill { padding:2px; }
+      .refresh-btn { padding:6px 9px; font-size:11.5px; }
+      .logout-btn { padding:6px 8px; font-size:11.5px; }
+      .content { padding:14px 12px 36px; }
+      .cards-grid, .cards-grid.cols-4, .cards-grid.cols-3,
+      .shop-kpi-grid, .heart-kpi-grid { grid-template-columns:1fr; }
+      .lb-kpi-grid { grid-template-columns:repeat(2,1fr); }
+      .kpi-row { grid-template-columns:repeat(2,1fr); }
+      .stat-card { padding:16px 18px; }
+      .stat-card .value { font-size:26px; }
+      .members-toolbar { flex-direction:column; align-items:stretch; }
+      .members-search { width:100%; }
+      .members-toolbar-right { justify-content:space-between; }
+      .member-cards { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+      .news-form .row2 { grid-template-columns:1fr; }
+      .detail-header { padding:16px; }
+      .detail-actions { margin-left:0; width:100%; }
+    }
   </style>
 </head>
 <body>
@@ -274,13 +418,13 @@
 <div id="dashboard">
   <div class="topbar">
     <div class="topbar-left">
-      <span class="logo"><img src="/icons/logo.png" alt="" style="width:28px;height:28px;border-radius:7px;vertical-align:middle;"></span>
+      <span class="logo"><img src="/icons/logo.png" alt=""></span>
       <h1>Gridnova</h1>
       <span class="badge">ADMIN</span>
     </div>
     <div class="topbar-right">
       <span class="last-update"><span id="live-dot"></span><span id="last-update-txt">—</span></span>
-      <a href="https://staging.gridnova.pages.dev" target="_blank" rel="noopener" class="refresh-btn" style="text-decoration:none;"> Staging</a>
+      <a href="https://staging.gridnova.pages.dev" target="_blank" rel="noopener" class="refresh-btn">Staging</a>
       <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
       <div class="user-pill">
         <img id="user-avatar" src="" alt="" style="display:none">
@@ -290,181 +434,231 @@
     </div>
   </div>
 
-  <div class="content">
-    <!-- Tab Bar -->
-    <div class="tab-container">
-      <button class="tab-btn active" id="btn-tab-analytics"> Dashboard & Analytics</button>
-      <button class="tab-btn" id="btn-tab-members"> Members</button>
-      <button class="tab-btn" id="btn-tab-leaderboard"> Leaderboard</button>
-      <button class="tab-btn" id="btn-tab-gamemode"> Game Mode</button>
-      <button class="tab-btn" id="btn-tab-hearts"> Hearts</button>
-      <button class="tab-btn" id="btn-tab-news"> News</button>
-      <button class="tab-btn" id="btn-tab-logs"> Log Monitor & Audit</button>
-    </div>
+  <div class="admin-shell">
+    <aside class="sidebar">
+      <div class="sidebar-label">Navigation</div>
+      <div class="tab-container">
+        <button class="tab-btn active" id="btn-tab-analytics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span>Analytics</span>
+        </button>
+        <button class="tab-btn" id="btn-tab-members">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Members</span>
+        </button>
+        <button class="tab-btn" id="btn-tab-leaderboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+          <span>Leaderboard</span>
+        </button>
+        <button class="tab-btn" id="btn-tab-gamemode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4"/><path d="M8 10v4"/><circle cx="15.5" cy="11.5" r="1"/><circle cx="17.5" cy="13.5" r="1"/></svg>
+          <span>Game Mode</span>
+        </button>
+        <button class="tab-btn" id="btn-tab-hearts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <span>Hearts</span>
+        </button>
+        <button class="tab-btn" id="btn-tab-news">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+          <span>News</span>
+        </button>
+        <button class="tab-btn" id="btn-tab-logs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Log Monitor</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <div class="content">
 
     <!-- Panel 1: Analytics -->
     <div id="panel-analytics">
-      <div class="cards-grid">
-      <div class="stat-card green">
-        <div class="label"> Online Now</div>
-        <div class="value" id="c-online">—</div>
-        <div class="sub"  id="c-online-sub">guests / members</div>
+      <!-- Section 1: Live & Traffic Overview -->
+      <div class="section-header">
+        <h2>Live &amp; Traffic Overview</h2>
+        <span class="section-sub">Real-time visitors, 14-day trend, and acquisition</span>
       </div>
-      <div class="stat-card yellow">
-        <div class="label"> Visitors Today</div>
-        <div class="value" id="c-today">—</div>
-        <div class="sub"  id="c-today-sub">guests / members</div>
-      </div>
-      <div class="stat-card purple">
-        <div class="label"> This Week</div>
-        <div class="value" id="c-week">—</div>
-        <div class="sub">unique sessions</div>
-      </div>
-      <div class="stat-card purple">
-        <div class="label"> All-Time</div>
-        <div class="value" id="c-total">—</div>
-        <div class="sub">unique sessions</div>
-      </div>
-      <div class="stat-card pink">
-        <div class="label"> Members</div>
-        <div class="value" id="c-members">—</div>
-        <div class="sub">registered accounts</div>
-      </div>
-      <div class="stat-card yellow">
-        <div class="label"> Games Today</div>
-        <div class="value" id="c-games-today">—</div>
-        <div class="sub"  id="c-games-today-sub">members / guests</div>
-      </div>
-      <div class="stat-card purple">
-        <div class="label"> Games Total</div>
-        <div class="value" id="c-games-total">—</div>
-        <div class="sub"  id="c-games-total-sub">members / guests</div>
-      </div>
-      <div class="stat-card yellow">
-        <div class="label"> Coins in Circulation</div>
-        <div class="value" id="c-coins-held">—</div>
-        <div class="sub"  id="c-coins-ever-sub">หาได้รวมทั้งหมด —</div>
-      </div>
-      <div class="stat-card green">
-        <div class="label"> Avg. Duration Today</div>
-        <div class="value" id="c-avg-duration">—</div>
-        <div class="sub">last_seen − first visit</div>
-      </div>
-      <div class="stat-card pink">
-        <div class="label"> Played Today</div>
-        <div class="value" id="c-played-today">—</div>
-        <div class="sub" id="c-played-today-sub">visited / started a game</div>
-      </div>
-    </div>
-
-    <div class="charts-grid">
-      <div class="chart-card">
-        <h3> 14-Day Visitor Trend</h3>
-        <div style="position:relative;height:220px"><canvas id="trend-chart"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3> Difficulty Breakdown</h3>
-        <div style="position:relative;height:220px"><canvas id="diff-chart"></canvas></div>
-      </div>
-    </div>
-
-    <div class="charts-grid">
-      <div class="chart-card">
-        <h3> Today's Funnel — where sessions actually go</h3>
-        <div style="position:relative;height:220px"><canvas id="funnel-chart"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3> D1 Retention (14 days) — % back the next day</h3>
-        <div style="position:relative;height:220px"><canvas id="retention-chart"></canvas></div>
-      </div>
-    </div>
-
-    <div class="charts-grid">
-      <div class="chart-card">
-        <h3> Where Sessions Come From (7 days)</h3>
-        <div style="position:relative;height:220px"><canvas id="source-chart"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3> Top Referrers (7 days)</h3>
-        <div id="referrer-list" style="max-height:220px;overflow-y:auto;font-size:12px"></div>
-      </div>
-    </div>
-
-    <div class="bottom-grid">
-      <div class="chart-card">
-        <h3> Hourly Activity (Today, Bangkok)</h3>
-        <div style="position:relative;height:180px"><canvas id="hourly-chart"></canvas></div>
-      </div>
-      <div class="table-card">
-        <h3> Difficulty Stats (All-Time)</h3>
-        <div id="diff-table-wrap"><div class="skeleton"></div></div>
-      </div>
-    </div>
-
-    <div class="lists-grid">
-      <div class="table-card">
-        <h3> Online Now <span id="online-count" style="font-weight:400;color:var(--muted);font-size:12px"></span></h3>
-        <div class="list-scroll">
-          <div id="online-list-wrap"><div class="skeleton"></div></div>
+      <div class="cards-grid cols-4">
+        <div class="stat-card green">
+          <div class="label">Online Now</div>
+          <div class="value" id="c-online">—</div>
+          <div class="sub" id="c-online-sub">guests / members</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="label">Visitors Today</div>
+          <div class="value" id="c-today">—</div>
+          <div class="sub" id="c-today-sub">guests / members</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">This Week</div>
+          <div class="value" id="c-week">—</div>
+          <div class="sub">unique sessions</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">All-Time</div>
+          <div class="value" id="c-total">—</div>
+          <div class="sub">unique sessions</div>
         </div>
       </div>
-      <div class="table-card">
-        <h3> Members <span id="member-count" style="font-weight:400;color:var(--muted);font-size:12px"></span></h3>
-        <div class="list-scroll">
-          <div id="member-list-wrap"><div class="skeleton"></div></div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>14-Day Visitor Trend</h3>
+          <div class="chart-box"><canvas id="trend-chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Hourly Activity (Today, Bangkok)</h3>
+          <div class="chart-box"><canvas id="hourly-chart"></canvas></div>
         </div>
       </div>
-    </div>
 
-    <hr class="section-divider">
-    <div class="section-title"> Shop Analytics</div>
-
-    <!-- Shop KPI cards -->
-    <div class="shop-kpi-grid">
-      <div class="stat-card yellow">
-        <div class="label"> Total Purchases</div>
-        <div class="value" id="s-total">—</div>
-        <div class="sub">items bought</div>
-      </div>
-      <div class="stat-card pink">
-        <div class="label"> Coins Spent</div>
-        <div class="value" id="s-coins">—</div>
-        <div class="sub">total revenue</div>
-      </div>
-      <div class="stat-card green">
-        <div class="label"> Unique Buyers</div>
-        <div class="value" id="s-buyers">—</div>
-        <div class="sub">members</div>
-      </div>
-      <div class="stat-card purple">
-        <div class="label"> Avg / Buyer</div>
-        <div class="value" id="s-avg">—</div>
-        <div class="sub">coins per person</div>
-      </div>
-    </div>
-
-    <!-- Top items + Category chart -->
-    <div class="shop-mid-grid">
-      <div class="table-card">
-        <h3> Top Purchased Items</h3>
-        <div class="list-scroll">
-          <div id="shop-top-wrap"><div class="skeleton"></div></div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Where Sessions Come From (7 days)</h3>
+          <div class="chart-box"><canvas id="source-chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Top Referrers (7 days)</h3>
+          <div id="referrer-list" class="referrer-scroll"></div>
         </div>
       </div>
-      <div class="chart-card">
-        <h3> By Category</h3>
-        <div style="position:relative;height:260px"><canvas id="shop-cat-chart"></canvas></div>
-      </div>
-    </div>
 
-    <!-- Recent purchases full-width -->
-    <div class="table-card">
-      <h3> Recent Purchases</h3>
-      <div class="list-scroll" style="max-height:320px">
-        <div id="shop-recent-wrap"><div class="skeleton"></div></div>
+      <!-- Section 2: Engagement & Retention -->
+      <div class="section-header">
+        <h2>Engagement &amp; Retention</h2>
+        <span class="section-sub">Gameplay volume, economy, funnel, and D1 retention</span>
       </div>
-    </div>
-    
+      <div class="cards-grid cols-3">
+        <div class="stat-card pink">
+          <div class="label">Members</div>
+          <div class="value" id="c-members">—</div>
+          <div class="sub">registered accounts</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="label">Games Today</div>
+          <div class="value" id="c-games-today">—</div>
+          <div class="sub" id="c-games-today-sub">members / guests</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">Games Total</div>
+          <div class="value" id="c-games-total">—</div>
+          <div class="sub" id="c-games-total-sub">members / guests</div>
+        </div>
+        <div class="stat-card pink">
+          <div class="label">Played Today</div>
+          <div class="value" id="c-played-today">—</div>
+          <div class="sub" id="c-played-today-sub">visited / started a game</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">Avg. Duration Today</div>
+          <div class="value" id="c-avg-duration">—</div>
+          <div class="sub">last_seen − first visit</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="label">Coins in Circulation</div>
+          <div class="value" id="c-coins-held">—</div>
+          <div class="sub" id="c-coins-ever-sub">หาได้รวมทั้งหมด —</div>
+        </div>
+      </div>
+
+      <div class="bottom-grid">
+        <div class="chart-card">
+          <h3>Today's Funnel — where sessions actually go</h3>
+          <div class="chart-box"><canvas id="funnel-chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>D1 Retention (14 days) — % back the next day</h3>
+          <div class="chart-box"><canvas id="retention-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Section 3: Difficulty Breakdown -->
+      <div class="section-header">
+        <h2>Difficulty Breakdown</h2>
+        <span class="section-sub">Share and performance across puzzle difficulties</span>
+      </div>
+      <div class="bottom-grid">
+        <div class="chart-card">
+          <h3>Difficulty Breakdown</h3>
+          <div class="chart-box"><canvas id="diff-chart"></canvas></div>
+        </div>
+        <div class="table-card">
+          <h3>Difficulty Stats (All-Time)</h3>
+          <div class="table-scroll" id="diff-table-wrap"><div class="skeleton"></div></div>
+        </div>
+      </div>
+
+      <!-- Section 4: Active Users -->
+      <div class="section-header">
+        <h2>Active Users</h2>
+        <span class="section-sub">Currently online sessions and registered members</span>
+      </div>
+      <div class="lists-grid">
+        <div class="table-card">
+          <h3><span>Online Now</span> <span id="online-count" class="text-muted"></span></h3>
+          <div class="list-scroll">
+            <div id="online-list-wrap"><div class="skeleton"></div></div>
+          </div>
+        </div>
+        <div class="table-card">
+          <h3><span>Members</span> <span id="member-count" class="text-muted"></span></h3>
+          <div class="list-scroll">
+            <div id="member-list-wrap"><div class="skeleton"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Shop Analytics -->
+      <div class="section-header">
+        <h2>Shop Analytics</h2>
+        <span class="section-sub">Purchases, revenue, and category share</span>
+      </div>
+      <div class="shop-kpi-grid">
+        <div class="stat-card yellow">
+          <div class="label">Total Purchases</div>
+          <div class="value" id="s-total">—</div>
+          <div class="sub">items bought</div>
+        </div>
+        <div class="stat-card pink">
+          <div class="label">Coins Spent</div>
+          <div class="value" id="s-coins">—</div>
+          <div class="sub">total revenue</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">Unique Buyers</div>
+          <div class="value" id="s-buyers">—</div>
+          <div class="sub">members</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">Avg / Buyer</div>
+          <div class="value" id="s-avg">—</div>
+          <div class="sub">coins per person</div>
+        </div>
+      </div>
+
+      <div class="shop-mid-grid">
+        <div class="table-card">
+          <h3>Top Purchased Items</h3>
+          <div class="list-scroll">
+            <div id="shop-top-wrap"><div class="skeleton"></div></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>By Category</h3>
+          <div class="chart-box-lg">
+            <canvas id="shop-cat-chart"></canvas>
+            <div id="shop-cat-empty" class="empty" style="display:none">ยังไม่มีข้อมูล</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <h3>Recent Purchases</h3>
+        <div class="list-scroll">
+          <div id="shop-recent-wrap"><div class="skeleton"></div></div>
+        </div>
+      </div>
     </div> <!-- end of panel-analytics -->
 
     <!-- Panel 2: Members -->
@@ -473,8 +667,8 @@
       <div id="members-list-view">
         <div class="members-toolbar">
           <input class="members-search" id="members-search" placeholder="ค้นหาชื่อ / username…" autocomplete="off">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span id="members-count" style="font-size:13px;color:var(--muted)"></span>
+          <div class="members-toolbar-right">
+            <span id="members-count" class="text-muted"></span>
             <div class="view-toggle">
               <button class="view-btn active" id="view-btn-card" title="Card view">⊞</button>
               <button class="view-btn" id="view-btn-list" title="List view">☰</button>
@@ -541,8 +735,8 @@
           </div>
         </div>
 
-        <h3> System Activity & Error Logs</h3>
-        <div class="list-scroll" style="max-height:500px">
+        <h3>System Activity &amp; Error Logs</h3>
+        <div class="list-scroll list-scroll-logs">
           <div id="system-logs-wrap"><div class="skeleton"></div></div>
         </div>
       </div>
@@ -551,10 +745,10 @@
     <!-- Panel 4: Leaderboard -->
     <div id="panel-leaderboard" style="display:none">
       <!-- Filter bar -->
-      <div class="members-filter-bar" style="margin-bottom:20px;">
+      <div class="members-filter-bar">
         <div class="filter-group">
           <span class="filter-label">วันที่:</span>
-          <input type="date" id="lb-date-pick" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 12px;font-size:13px;outline:none;cursor:pointer;">
+          <input type="date" id="lb-date-pick" class="lb-date-input">
         </div>
         <div class="filter-group">
           <span class="filter-label">ด่วน:</span>
@@ -567,7 +761,7 @@
       </div>
 
       <!-- KPI mini row -->
-      <div id="lb-kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+      <div id="lb-kpi-row" class="lb-kpi-grid">
         <div class="kpi-mini"><div class="kv" id="lb-kpi-players">—</div><div class="kl">ผู้เล่น</div></div>
         <div class="kpi-mini"><div class="kv" id="lb-kpi-top">—</div><div class="kl">คะแนนสูงสุด</div></div>
         <div class="kpi-mini"><div class="kv" id="lb-kpi-avg">—</div><div class="kl">คะแนนเฉลี่ย</div></div>
@@ -628,25 +822,25 @@
 
       <div class="heart-monitor-grid">
         <div class="chart-card">
-          <h3> Heart Events Today</h3>
-          <div style="position:relative;height:260px"><canvas id="hearts-events-chart"></canvas></div>
+          <h3>Heart Events Today</h3>
+          <div class="chart-box-lg"><canvas id="hearts-events-chart"></canvas></div>
         </div>
         <div class="table-card">
-          <h3> Usage by Mode Today</h3>
+          <h3>Usage by Mode Today</h3>
           <div id="hearts-mode-wrap"><div class="skeleton"></div></div>
         </div>
       </div>
 
       <div class="heart-monitor-grid">
         <div class="table-card">
-          <h3> Current Member Hearts <span style="font-weight:400;color:var(--muted);font-size:12px">lowest first</span></h3>
-          <div class="list-scroll" style="max-height:430px">
+          <h3><span>Current Member Hearts</span> <span class="text-muted">lowest first</span></h3>
+          <div class="list-scroll list-scroll-tall">
             <div id="hearts-current-wrap"><div class="skeleton"></div></div>
           </div>
         </div>
         <div class="table-card">
-          <h3> Recent Heart Events</h3>
-          <div class="list-scroll" style="max-height:430px">
+          <h3>Recent Heart Events</h3>
+          <div class="list-scroll list-scroll-tall">
             <div id="hearts-events-wrap"><div class="skeleton"></div></div>
           </div>
         </div>
@@ -702,7 +896,9 @@
       </div>
     </div> <!-- end of panel-news -->
 
-  </div> <!-- end of content -->
+      </div> <!-- end of content -->
+    </main> <!-- end of main-area -->
+  </div> <!-- end of admin-shell -->
 </div> <!-- end of dashboard -->
 
 <script>
@@ -823,20 +1019,20 @@ function escapeHtml(str) {
 
 function renderCards(d) {
   setEl('c-online',          fmt(d.online_now));
-  setEl('c-online-sub',      ` ${fmt(d.online_guests)} guests ·  ${fmt(d.online_members)} members`);
+  setEl('c-online-sub',      `👤 ${fmt(d.online_guests)} guests · ⭐ ${fmt(d.online_members)} members`);
   setEl('c-today',           fmt(d.visitors_today));
-  setEl('c-today-sub',       ` ${fmt(d.visitors_guests_today)} ·  ${fmt(d.visitors_members_today)}`);
+  setEl('c-today-sub',       `👤 ${fmt(d.visitors_guests_today)} guests · ⭐ ${fmt(d.visitors_members_today)} members`);
   setEl('c-week',            fmt(d.visitors_week));
   setEl('c-total',           fmt(d.visitors_total));
   setEl('c-members',         fmt(d.total_members));
   const gt = (d.games_members_today||0)+(d.games_guests_today||0);
   setEl('c-games-today',     fmt(gt));
-  setEl('c-games-today-sub', ` ${fmt(d.games_members_today)} ·  ${fmt(d.games_guests_today)}`);
+  setEl('c-games-today-sub', `⭐ ${fmt(d.games_members_today)} members · 👤 ${fmt(d.games_guests_today)} guests`);
   const gT = (d.games_members_total||0)+(d.games_guests_total||0);
   setEl('c-games-total',     fmt(gT));
-  setEl('c-games-total-sub', ` ${fmt(d.games_members_total)} ·  ${fmt(d.games_guests_total)}`);
+  setEl('c-games-total-sub', `⭐ ${fmt(d.games_members_total)} members · 👤 ${fmt(d.games_guests_total)} guests`);
   setEl('c-coins-held',      fmt(d.coins_held));
-  setEl('c-coins-ever-sub',  `หาได้รวมทั้งหมด ${fmt(d.coins_ever)} `);
+  setEl('c-coins-ever-sub',  `หาได้รวมทั้งหมด ${fmt(d.coins_ever)} coins`);
 }
 
 function renderTrend(data) {
@@ -978,11 +1174,11 @@ function renderTable(data) {
 }
 
 const ONLINE_MODE_LABELS = {
-  game_daily: ' Daily',
-  game_practice: ' Practice',
-  game_random: ' Random',
-  game_time_attack: ' Time Attack',
-  game_book: ' Book',
+  game_daily: '📅 Daily',
+  game_practice: '🧩 Practice',
+  game_random: '🎲 Random',
+  game_time_attack: '⏱️ Time Attack',
+  game_book: '📖 Book',
 };
 function modeLabelFor(view) {
   return ONLINE_MODE_LABELS[view] || '<span style="color:var(--muted)">In menu</span>';
@@ -1042,11 +1238,11 @@ function renderMemberList(data) {
 
 // ── Game Mode Renders ────────────────────────────────────────────────
 const MODE_META = {
-  daily:       { label: 'Daily',       icon: '', color: '#667eea' },
-  practice:    { label: 'Practice',    icon: '', color: '#10b981' },
-  random:      { label: 'Random',      icon: '', color: '#f59e0b' },
-  time_attack: { label: 'Time Attack', icon: '', color: '#ef4444' },
-  book:        { label: 'Book',        icon: '', color: '#a78bfa' },
+  daily:       { label: 'Daily',       icon: '📅', color: '#667eea' },
+  practice:    { label: 'Practice',    icon: '🧩', color: '#10b981' },
+  random:      { label: 'Random',      icon: '🎲', color: '#f59e0b' },
+  time_attack: { label: 'Time Attack', icon: '⏱️', color: '#ef4444' },
+  book:        { label: 'Book',        icon: '📖', color: '#a78bfa' },
 };
 let gamemodePieChart = null, gamemodeOnlineChart = null;
 let gamemodeOverviewData = [];
@@ -1313,15 +1509,23 @@ function renderShopTopItems(data) {
 
 function renderShopCatChart(data) {
   data = (data || []).filter(r => r.purchase_count > 0);
-  const ctx = document.getElementById('shop-cat-chart').getContext('2d');
-  if (shopCatChart) shopCatChart.destroy();
-  if (!data.length) { ctx.canvas.parentElement.innerHTML = '<div class="empty">ยังไม่มีข้อมูล</div>'; return; }
+  const canvas = document.getElementById('shop-cat-chart');
+  const emptyEl = document.getElementById('shop-cat-empty');
+  if (shopCatChart) { shopCatChart.destroy(); shopCatChart = null; }
+  if (!data.length) {
+    canvas.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+  canvas.style.display = '';
+  if (emptyEl) emptyEl.style.display = 'none';
+  const ctx = canvas.getContext('2d');
   const palette = ['#667eea','#10b981','#fbbf24','#f87171','#a78bfa','#60a5fa','#f472b6','#34d399'];
   shopCatChart = new Chart(ctx, { type:'doughnut', data:{
     labels: data.map(r => r.category),
     datasets:[{ data:data.map(r => r.purchase_count),
       backgroundColor: data.map((_,i) => palette[i % palette.length]),
-      borderWidth:2, borderColor:'#1a1a2e' }]
+      borderWidth:2, borderColor:'#131626' }]
   }, options:{ responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{ position:'bottom', labels:{color:'#e2e8f0',font:{size:11},padding:10} } } }
   });
@@ -1955,10 +2159,12 @@ function renderLeaderboard(rows, difficulty, date) {
               const p = r.profiles || {};
               const name = escapeHtml(p.display_name || p.username || 'Member');
               const b = calcBreakdown(difficulty, r.time_seconds, r.mistakes, r.hints_used);
-              const medal = i === 0 ? '' : i === 1 ? '' : i === 2 ? '' : `${i+1}`;
+              const medal = i < 3
+                ? `<span class="rank-badge rank-${i+1}">${i+1}</span>`
+                : `<span class="rank-num">${i+1}</span>`;
               const isTop = i < 3;
-              return `<tr style="${isTop ? 'background:rgba(255,255,255,0.02)' : ''}">
-                <td style="text-align:center;font-weight:700;font-size:15px">${medal}</td>
+              return `<tr style="${isTop ? 'background:rgba(255,255,255,0.025)' : ''}">
+                <td style="text-align:center">${medal}</td>
                 <td><strong>${name}</strong><br><span style="color:var(--muted);font-size:11px">@${escapeHtml(p.username||'—')}</span></td>
                 <td style="text-align:right;color:var(--muted);font-size:13px">${b.base}</td>
                 <td style="text-align:right;color:#f87171;font-size:13px">−${b.timePenalty}</td>
@@ -1990,10 +2196,9 @@ async function loadMembersData() {
 
 // ── Hearts Monitor ───────────────────────────────────────────────────
 function heartDots(n) {
-  const count = Number(n) || 0;
-  return `<span class="heart-status">${Array.from({ length: 5 }, (_, i) =>
-    `<span class="${i < count ? '' : 'heart-empty'}"></span>`
-  ).join('')}</span>`;
+  const count = Math.max(0, Math.min(5, Number(n) || 0));
+  const svg = (filled) => `<svg class="heart-icon${filled ? '' : ' heart-empty'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
+  return `<span class="heart-status" aria-label="${count}/5 hearts" title="${count}/5">${Array.from({ length: 5 }, (_, i) => svg(i < count)).join('')}</span>`;
 }
 
 function eventLabel(type) {
