@@ -214,7 +214,8 @@
     .chart-card:hover, .table-card:hover { border-color:var(--border-hover); box-shadow:var(--shadow-3d-hover); }
     .heart-monitor-grid > *, .lists-grid > *, .charts-grid > *, .shop-mid-grid > * { min-width:0; }
     .table-card { overflow-x:auto; }
-    [data-theme="light"] .tab-btn.active { color:white; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-color:transparent; box-shadow:0 6px 16px -4px rgba(79,70,229,0.45); }
+    [data-theme="light"] .tab-btn.active,
+    [data-theme="light"] .tab-btn.active:hover { color:#ffffff; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-color:transparent; box-shadow:0 6px 16px -4px rgba(79,70,229,0.45); }
     [data-theme="light"] .tab-btn.active svg { color:white; }
     [data-theme="light"] .refresh-btn, [data-theme="light"] .user-pill { background:var(--pill-bg); }
     [data-theme="light"] .refresh-btn:hover { background:var(--hover-bg); }
@@ -1410,9 +1411,9 @@ function renderAttribution(d) {
     return;
   }
   el.innerHTML = refs.map(r => `
-    <div style="display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.06)">
-      <span style="color:#cbd5e1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(r.referrer_host)}</span>
-      <strong style="color:#818cf8">${r.sessions}</strong>
+    <div style="display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-bottom:1px solid var(--border)">
+      <span style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(r.referrer_host)}</span>
+      <strong style="color:var(--accent)">${r.sessions}</strong>
     </div>`).join('');
 }
 
