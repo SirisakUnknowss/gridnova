@@ -369,13 +369,14 @@
       .kpi-row { grid-template-columns:repeat(3,1fr); }
     }
     @media (max-width: 640px) {
-      .topbar { padding:0 12px; gap:8px; }
+      .topbar { padding:8px 12px; height:auto; flex-wrap:wrap; gap:6px 8px; }
       .topbar-left h1 { font-size:15px; }
+      .topbar-left .badge { flex-shrink:0; }
+      .topbar-right { flex-wrap:wrap; gap:6px; margin-left:auto; }
       .last-update { display:none; }
-      .user-pill span { display:none; }
-      .user-pill { padding:2px; }
-      .refresh-btn { padding:6px 9px; font-size:11.5px; }
-      .logout-btn { padding:6px 8px; font-size:11.5px; }
+      .user-pill { max-width:140px; padding:3px 8px; }
+      .refresh-btn { padding:5px 9px; font-size:11.5px; }
+      .logout-btn { padding:5px 8px; font-size:11.5px; }
       .content { padding:14px 12px 36px; }
       .cards-grid, .cards-grid.cols-4, .cards-grid.cols-3,
       .shop-kpi-grid, .heart-kpi-grid { grid-template-columns:1fr; }
@@ -929,7 +930,7 @@ if (IS_PREVIEW_MODE) {
         user: {
           id: 'preview-admin-0001',
           email: 'preview@gridnova.staging',
-          user_metadata: { full_name: 'Preview Mode (Mock Data)' },
+          user_metadata: { full_name: 'Preview Mode' },
         },
       },
     },
@@ -1058,18 +1059,22 @@ function getPreviewData(name, params) {
     };
   }
   if (name === 'get_admin_leaderboard') {
-    return [
-      { rank: 1, display_name: 'Somchai K.', username: 'somchai', score: 2480, time_seconds: 192, mistakes: 0, hints_used: 0 },
-      { rank: 2, display_name: 'Nadia P.', username: 'nadiap', score: 2266, time_seconds: 214, mistakes: 0, hints_used: 0 },
-      { rank: 3, display_name: 'Kittipong', username: 'kitti99', score: 1940, time_seconds: 298, mistakes: 1, hints_used: 1 },
-    ];
+    return {
+      difficulty: 'medium',
+      rows: [
+        { rank: 1, display_name: 'Somchai K.', username: 'somchai', score: 2480, time_seconds: 192, mistakes: 0, hints_used: 0 },
+        { rank: 2, display_name: 'Nadia P.', username: 'nadiap', score: 2266, time_seconds: 214, mistakes: 0, hints_used: 0 },
+        { rank: 3, display_name: 'Kittipong', username: 'kitti99', score: 1940, time_seconds: 298, mistakes: 1, hints_used: 1 },
+      ],
+    };
   }
   if (name === 'get_admin_game_mode_overview') {
     return [
-      { mode: 'daily', games_today: 11, views_today: 15, active_sessions_today: 10, games_total: 3043, views_total: 9269, active_sessions_total: 3351, avg_score: 1736, top_score: 5638 },
-      { mode: 'practice', games_today: 15, views_today: 19, active_sessions_today: 12, games_total: 7336, views_total: 5809, active_sessions_total: 362, avg_score: 1609, top_score: 4870 },
-      { mode: 'time_attack', games_today: 4, views_today: 7, active_sessions_today: 4, games_total: 629, views_total: 2116, active_sessions_total: 73, avg_score: 2575, top_score: 6361 },
-      { mode: 'random', games_today: 2, views_today: 3, active_sessions_today: 2, games_total: 1491, views_total: 2858, active_sessions_total: 324, avg_score: 1520, top_score: 3910 },
+      { mode_key: 'daily', currently_playing: 1, games_today: 11, views_today: 15, active_sessions_today: 10, games_total: 3043, views_total: 9269, active_sessions_total: 3351, avg_score: 1736, top_score: 5638 },
+      { mode_key: 'practice', currently_playing: 1, games_today: 15, views_today: 19, active_sessions_today: 12, games_total: 7336, views_total: 5809, active_sessions_total: 362, avg_score: 1609, top_score: 4870 },
+      { mode_key: 'time_attack', currently_playing: 1, games_today: 4, views_today: 7, active_sessions_today: 4, games_total: 629, views_total: 2116, active_sessions_total: 73, avg_score: 2575, top_score: 6361 },
+      { mode_key: 'random', currently_playing: 0, games_today: 2, views_today: 3, active_sessions_today: 2, random_total_played: 1491, random_players: 108, random_top_streak: 284, views_total: 2858, active_sessions_total: 324 },
+      { mode_key: 'book', currently_playing: 0, views_today: 2, views_total: 344, active_sessions_total: 97 },
     ];
   }
   if (name === 'get_admin_game_mode_players') {
@@ -1080,9 +1085,12 @@ function getPreviewData(name, params) {
   }
   if (name === 'get_admin_hearts_overview') {
     return {
-      tracked_users: 112, full_hearts: 89, low_or_empty: 23, infinite_active: 4,
-      events_today: [{ event_type: 'spend', cnt: 14 }, { event_type: 'refund', cnt: 9 }, { event_type: 'blocked', cnt: 2 }],
-      by_mode: [{ mode: 'daily', spend: 9, blocked: 1, infinite_start: 1, users: 8 }, { mode: 'time_attack', spend: 5, blocked: 1, infinite_start: 0, users: 4 }],
+      current: { tracked_members: 112, full_hearts: 89, low_hearts: 18, zero_hearts: 5, avg_hearts: 4.3, infinite_active: 4 },
+      events_today: { spend: 14, refund: 9, blocked: 2, infinite_buy: 1 },
+      by_mode_today: [
+        { mode: 'daily', spend: 9, blocked: 1, infinite_start: 1, unique_users: 8 },
+        { mode: 'time_attack', spend: 5, blocked: 1, infinite_start: 0, unique_users: 4 },
+      ],
       current_rows: [
         { display_name: 'Somchai K.', username: 'somchai', hearts: 5, max_hearts: 5, infinite_until: null, updated_at: daysAgo(0) },
         { display_name: 'Nadia P.', username: 'nadiap', hearts: 2, max_hearts: 5, infinite_until: null, updated_at: daysAgo(0) },
@@ -1091,8 +1099,8 @@ function getPreviewData(name, params) {
   }
   if (name === 'get_admin_heart_events') {
     return [
-      { display_name: 'Somchai K.', username: 'somchai', event_type: 'spend', mode: 'daily', hearts_after: 4, created_at: daysAgo(0) },
-      { display_name: 'Somchai K.', username: 'somchai', event_type: 'refund', mode: 'daily', hearts_after: 5, created_at: daysAgo(0) },
+      { display_name: 'Somchai K.', username: 'somchai', event_type: 'spend', mode: 'daily', hearts_before: 5, hearts_after: 4, created_at: daysAgo(0) },
+      { display_name: 'Somchai K.', username: 'somchai', event_type: 'refund', mode: 'daily', hearts_before: 4, hearts_after: 5, created_at: daysAgo(0) },
     ];
   }
   if (name === 'admin_list_announcements') {
