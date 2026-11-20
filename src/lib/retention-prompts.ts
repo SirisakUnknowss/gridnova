@@ -11,7 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-export type RetentionOfferKind = 'pwa-native' | 'pwa-ios' | 'push';
+export type RetentionOfferKind = 'pwa-native' | 'pwa-ios' | 'pwa-manual' | 'push';
 
 export interface RetentionOffer {
   kind: RetentionOfferKind;
@@ -38,12 +38,10 @@ export function isRunningStandalone(): boolean {
   return window.matchMedia('(display-mode: standalone)').matches || nav.standalone === true;
 }
 
-export function isIosSafari(): boolean {
+export function isIosDevice(): boolean {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent;
-  const isIos = /iPhone|iPad|iPod/i.test(ua);
-  const isSafari = /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
-  return isIos && isSafari;
+  return /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
 }
 
 export function initInstallPromptCapture(): void {
@@ -68,13 +66,13 @@ export function recordWinAndGetCount(): number {
   return next;
 }
 
-function canOfferPwa(): 'pwa-native' | 'pwa-ios' | null {
+function canOfferPwa(): 'pwa-native' | 'pwa-ios' | 'pwa-manual' | null {
   if (isRunningStandalone() || safeGet(PWA_INSTALLED_KEY) === '1' || safeGet(PWA_DISMISSED_KEY) === '1') {
     return null;
   }
   if (deferredInstallPrompt) return 'pwa-native';
-  if (isIosSafari()) return 'pwa-ios';
-  return null;
+  if (isIosDevice()) return 'pwa-ios';
+  return 'pwa-manual';
 }
 
 function canOfferPush(isGuest: boolean): boolean {
@@ -104,6 +102,15 @@ export function getPostWinRetentionOffer(winCount: number, isGuest: boolean): Re
       kind: 'pwa-ios',
       title: 'Add GridNova to Home Screen',
       body: 'Tap Share, then "Add to Home Screen" for 1-tap Daily Puzzles.',
+      ctaLabel: 'Got it',
+      dismissLabel: 'Not now',
+    };
+  }
+  if (pwaKind === 'pwa-manual') {
+    return {
+      kind: 'pwa-manual',
+      title: 'Add GridNova to Home Screen',
+      body: 'Open your browser menu and choose "Add to Home Screen" for 1-tap Daily Puzzles.',
       ctaLabel: 'Got it',
       dismissLabel: 'Not now',
     };
@@ -148,7 +155,7 @@ export async function triggerRetentionOffer(kind: RetentionOfferKind): Promise<'
     return 'dismissed';
   }
 
-  if (kind === 'pwa-ios') {
+  if (kind === 'pwa-ios' || kind === 'pwa-manual') {
     safeSet(PWA_DISMISSED_KEY, '1');
     return 'accepted';
   }
