@@ -193,32 +193,37 @@ const navCb = {
   onProfile:      () => showProfile(),
 };
 
+async function loadDailyPuzzle(date: string) {
+  try {
+    const remote = await api.getDailyPuzzle(date);
+    if (remote?.puzzle) {
+      const board = stringToBoard(remote.puzzle as string);
+      // daily_puzzles_public intentionally omits `solution`; solve the server
+      // board directly so client and server stay in sync even if schedules differ.
+      const solution = solve(board)
+        ?? generatePuzzle({ difficulty: remote.difficulty as Difficulty, seed: 'daily:' + date }).solution;
+      return {
+        puzzle: board,
+        solution,
+        difficulty: remote.difficulty as Difficulty,
+      };
+    }
+  } catch {
+    // Offline or server puzzle unavailable — fall back to deterministic local generation.
+  }
+  return generateDailyPuzzle(date);
+}
+
 async function playDailyResume(saved: GameInProgress) {
   if (saved.origin === 'monthly') { await playMonthly(saved.date!); return; }
   const date = saved.date!;
-  let puzzleData: { puzzle: number[][]; solution: number[][]; difficulty: import('./engine/types').Difficulty };
-  try {
-    const resp = await api.getDailyPuzzle(date);
-    if (resp) {
-      puzzleData = {
-        puzzle: (resp.puzzle as string).split('').map(Number).reduce((acc: number[][], v, i) => {
-          if (i % 9 === 0) acc.push([]); acc[acc.length - 1].push(v); return acc;
-        }, []),
-        solution: (resp.solution as string).split('').map(Number).reduce((acc: number[][], v, i) => {
-          if (i % 9 === 0) acc.push([]); acc[acc.length - 1].push(v); return acc;
-        }, []),
-        difficulty: resp.difficulty as import('./engine/types').Difficulty,
-      };
-    } else throw new Error('no puzzle');
-  } catch {
-    puzzleData = generateDailyPuzzle(date);
-  }
+  const puzzleData = await loadDailyPuzzle(date);
   clearView('game_daily');
   const view = mountGameView(root, {
     mode: 'daily',
     difficulty: puzzleData.difficulty,
-    puzzle: puzzleData.puzzle as import('./engine/types').Board,
-    solution: puzzleData.solution as import('./engine/types').Board,
+    puzzle: puzzleData.puzzle,
+    solution: puzzleData.solution,
     date,
     resume: saved,
     onWin: (result) => handleWin(result, date, 'daily'),
@@ -740,28 +745,7 @@ async function playDaily() {
   const gate = await gateHeart('daily', () => void playDaily());
   if (!gate.allowed) return;
   const date = todayUtc();
-  let puzzleData;
-  // Try fetch from server; fallback to local generation
-  try {
-    const remote = await api.getDailyPuzzle(date);
-    if (remote) {
-      const puzzleStr = remote.puzzle as string;
-      const board = stringToBoard(puzzleStr);
-      // Solution comes from local gen (same seed)
-      const local = generateDailyPuzzle(date);
-      puzzleData = {
-        puzzle: board,
-        solution: local.solution,
-        difficulty: remote.difficulty,
-      };
-    } else {
-      throw new Error('No daily on server');
-    }
-  } catch {
-    // Local fallback (deterministic via date seed)
-    const local = generateDailyPuzzle(date);
-    puzzleData = local;
-  }
+  const puzzleData = await loadDailyPuzzle(date);
 
   clearView('game_daily');
   const view = mountGameView(root, {

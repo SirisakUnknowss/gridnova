@@ -169,8 +169,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
       hintsLeft = Math.max(0, Math.min(r.hints_left ?? FREE_HINTS, FREE_HINTS));
       moves.push(...(r.moves as Move[]));
       const savedElapsed = r.elapsed_seconds ?? 0;
-      // Set pausedMs so elapsedSeconds() returns savedElapsed immediately on resume
-      pausedMs = Date.now() - startTime - savedElapsed * 1000;
+      const lastMoveMs = moves.length > 0 ? moves[moves.length - 1].t : 0;
+      // Floor resumed clock at lastMoveMs so sub-second truncation in elapsed_seconds
+      // can never make the next move's timestamp precede a saved move (TIME_NON_MONOTONIC).
+      const resumedMs = Math.max(savedElapsed * 1000, lastMoveMs);
+      pausedMs = Date.now() - startTime - resumedMs;
     } catch {
       // Corrupted save — start fresh (board/masks already initialized as-new)
       mistakes = 0; livesLost = 0; hintsLeft = FREE_HINTS;
@@ -355,6 +358,11 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
 
   function elapsedSeconds(): number {
     return Math.floor(elapsedMs() / 1000);
+  }
+
+  function nextMoveTime(): number {
+    const last = moves.length > 0 ? moves[moves.length - 1].t : 0;
+    return Math.max(elapsedMs(), last);
   }
 
   function secondsLeft(): number {
@@ -575,7 +583,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
         history.push({ r, c, prevDigit, nextDigit: n, prevNotes, nextNotes: [], mistakesDelta });
         future.length = 0;
         syncUndoRedo();
-        moves.push({ r, c, n, t: elapsedMs() });
+        moves.push({ r, c, n, t: nextMoveTime() });
         rerender();
         triggerGameOver();
         return;
@@ -594,7 +602,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     history.push({ r, c, prevDigit, nextDigit: n, prevNotes, nextNotes: [], mistakesDelta });
     future.length = 0;
     syncUndoRedo();
-    moves.push({ r, c, n, t: elapsedMs() });
+    moves.push({ r, c, n, t: nextMoveTime() });
     rerender();
 
     // Animate only after the rerender that rebuilt this cell — the element
@@ -629,6 +637,9 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (prevDigit === 0 && noteMask[r][c].size === 0) return;
     userBoard[r][c] = 0;
     noteMask[r][c].clear();
+    if (prevDigit !== 0) {
+      moves.push({ r, c, n: 0, t: nextMoveTime() });
+    }
     history.push({ r, c, prevDigit, nextDigit: 0, prevNotes, nextNotes: [], mistakesDelta: 0 });
     future.length = 0;
     syncUndoRedo();
@@ -642,6 +653,15 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     future.push(entry);
     userBoard[entry.r][entry.c] = entry.prevDigit;
     noteMask[entry.r][entry.c] = new Set(entry.prevNotes);
+    // Keep the server move log in sync when undo clears a cell or restores the
+    // correct digit, without re-logging a wrong digit (which would inflate
+    // server-side mistakeCount).
+    if (
+      entry.prevDigit !== entry.nextDigit &&
+      (entry.prevDigit === 0 || entry.prevDigit === solution[entry.r][entry.c])
+    ) {
+      moves.push({ r: entry.r, c: entry.c, n: entry.prevDigit, t: nextMoveTime() });
+    }
     // Mistakes are permanent — undo restores the board but never refunds a lost
     // heart, otherwise undo would create a no-lose exploit.
     syncUndoRedo();
@@ -654,6 +674,12 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     history.push(entry);
     userBoard[entry.r][entry.c] = entry.nextDigit;
     noteMask[entry.r][entry.c] = new Set(entry.nextNotes);
+    if (
+      entry.nextDigit !== entry.prevDigit &&
+      (entry.nextDigit === 0 || entry.nextDigit === solution[entry.r][entry.c])
+    ) {
+      moves.push({ r: entry.r, c: entry.c, n: entry.nextDigit, t: nextMoveTime() });
+    }
     syncUndoRedo();
     rerender();
   }
@@ -678,7 +704,7 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     hintMask[target.r][target.c] = true;
     sfxHint();
     selected = target;
-    moves.push({ r: target.r, c: target.c, n: solution[target.r][target.c], t: elapsedMs(), isHint: true });
+    moves.push({ r: target.r, c: target.c, n: solution[target.r][target.c], t: nextMoveTime(), isHint: true });
     history.length = 0;
     future.length = 0;
     syncUndoRedo();
@@ -818,7 +844,8 @@ export function mountGameView(root: HTMLElement, props: GameViewProps): { unmoun
     if (autosaveHandle) { clearInterval(autosaveHandle); autosaveHandle = null; }
     void deleteGame(gameId);
 
-    const timeSeconds = elapsedSeconds();
+    const lastMoveMs = moves.length > 0 ? moves[moves.length - 1].t : 0;
+    const timeSeconds = Math.max(elapsedSeconds(), Math.floor(lastMoveMs / 1000));
     const hintsUsed = FREE_HINTS - hintsLeft;
     // Book Mode never counts mistakes as you play, so a wrong entry that you
     // spot and fix yourself costs nothing — which is the point of the mode.
