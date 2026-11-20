@@ -1,3 +1,15 @@
+## 2.2.5 — 2026-11-20
+
+### Fixed
+- แก้บั๊กส่งคะแนน Daily Leaderboard ไม่ขึ้น (`403 SOLUTION_MISMATCH` / `TIME_NON_MONOTONIC`) โดยแก้ `playDailyResume` ไม่ให้อ่าน `resp.solution` ที่ไม่มีใน `daily_puzzles_public` และใช้ `solve(board)` จากกระดาน server โดยตรง
+- ซิงก์ `moves[]` ใน `undoMove()`, `redoMove()` และ `eraseCell()` โดยไม่บวก `mistakeCount` ซ้ำ และกัน move timestamp ถอยหลังตอน Resume
+
+### Changed
+- ย้ายคำแนะนำการติดตั้ง PWA และ Daily reminder เข้าไปอยู่ในระบบ News/Inbox และคืนหน้า Win Modal ให้สะอาดเหมือนเดิม พร้อมรองรับ iOS/fallback browsers
+
+### Added
+- เพิ่มสคริปต์ส่ง win-back email แบบ zero-dep สำหรับ Resend และ Brevo
+
 ## 2.2.4 — 2026-11-20
 
 ### Changed
