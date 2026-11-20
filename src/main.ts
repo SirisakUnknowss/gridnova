@@ -68,8 +68,10 @@ import { computeDailyCoinReward, computePracticeCoinReward, computeXpReward } fr
 import { trackVisit, heartbeat, leaveOnline, getVisitorStats, submitGuestScore, migrateGuestScores, logView } from './lib/api';
 import { useVisitorStore } from './state/visitor-store';
 import { ACCOUNTS_ENABLED, IS_CRAZYGAMES, initCrazyGames } from './lib/platform';
+import { initInstallPromptCapture } from './lib/retention-prompts';
 
 initCrazyGames();
+initInstallPromptCapture();
 import { type GameInProgress, listGames, deleteGame } from './lib/local-db';
 
 // Show update banner when a new service worker takes control
