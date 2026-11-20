@@ -1,3 +1,12 @@
+## 2.2.4 — 2026-11-20
+
+### Changed
+- รีแบรนด์หน้า Admin Dashboard (`public/admin/index.html`) เป็น **GRIDNOVA COMMAND** สไตล์ 3D Animation Infographic พร้อมโลโก้ 3D Spinning Cube, Hero 3D Telemetry Deck (Live Radar, Daily Growth Target 30++/day, Play Conversion Ring) และจัดแบ่งหน้า Analytics เป็น 3 โซน (`Pulse & Growth`, `Funnel & Retention`, `Shop & Economy`)
+- เพิ่ม **Light Mode / Dark Mode** พร้อมปุ่มสลับธีมที่จำค่าใน `localStorage` และปรับสีกราฟ Chart.js อัตโนมัติ
+
+### Fixed
+- เพิ่ม Responsive Breakpoints (`<= 1024px`, `<= 640px`), แก้ Topbar มือถือไม่ให้ทับซ้อนกัน, แก้ตารางแท็บ Hearts ไม่ให้ล้นหน้าจอมือถือ, แก้กราฟ Game Mode Doughnut แสดงครบ 360°, แก้ไอคอนหัวใจ SVG และ Top-3 Leaderboard badges
+
 ## 2.2.3 — 2026-11-16
 
 ### Changed
