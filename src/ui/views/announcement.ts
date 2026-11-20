@@ -7,6 +7,7 @@
 import { ic } from '@ui/icons';
 import { escapeHtml } from '@lib/format';
 import { hideForever, layoutOf, markRead, newsForLaunch, type NewsItem } from '@lib/news';
+import { runInstallPrompt, runPushReminderPrompt } from '@lib/retention-prompts';
 
 function bodyHTML(text: string): string {
   return text
@@ -74,8 +75,35 @@ export function showAnnouncement(item: NewsItem, opts: { allowHide: boolean; pos
 
     // Only the X closes it — backdrop taps and Escape are deliberately ignored.
     wrapper.querySelector('#announce-close')?.addEventListener('click', close);
-    wrapper.querySelector('#announce-cta')?.addEventListener('click', () => {
-      if (item.cta) window.open(item.cta.url, '_blank', 'noopener');
+    const ctaBtn = wrapper.querySelector<HTMLButtonElement>('#announce-cta');
+    ctaBtn?.addEventListener('click', async () => {
+      if (!item.cta) return;
+      if (item.cta.action === 'install-pwa') {
+        ctaBtn.disabled = true;
+        const outcome = await runInstallPrompt();
+        if (outcome === 'accepted') {
+          ctaBtn.textContent = 'Added to Home Screen!';
+          hideForever(item.id);
+        } else {
+          ctaBtn.disabled = false;
+        }
+        return;
+      }
+      if (item.cta.action === 'enable-push') {
+        ctaBtn.disabled = true;
+        const outcome = await runPushReminderPrompt();
+        if (outcome === 'accepted') {
+          ctaBtn.textContent = 'Daily reminders enabled!';
+          hideForever(item.id);
+        } else if (outcome === 'blocked') {
+          ctaBtn.textContent = 'Notifications blocked in browser settings';
+        } else {
+          ctaBtn.textContent = 'Sign in to enable reminders';
+          ctaBtn.disabled = false;
+        }
+        return;
+      }
+      if (item.cta.url) window.open(item.cta.url, '_blank', 'noopener');
     });
     wrapper.querySelector<HTMLButtonElement>('#announce-close')?.focus();
   });

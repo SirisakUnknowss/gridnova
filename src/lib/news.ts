@@ -6,10 +6,17 @@
 // =====================================================================
 import { getSupabase } from './supabase';
 import { IS_CRAZYGAMES } from './platform';
+import {
+  canEnablePushReminders,
+  hasNativeInstallPrompt,
+  isIosDevice,
+  isPwaInstalled,
+} from './retention-prompts';
 import discordLaunchArt from '@images/news/discord-launch.webp';
 
 /** text = words only · image = picture only (title kept for the Inbox list and screen readers) · image_text = picture on top, words below */
 export type NewsLayout = 'text' | 'image' | 'image_text';
+export type NewsCtaAction = 'install-pwa' | 'enable-push';
 
 export interface NewsItem {
   id: string;
@@ -20,7 +27,7 @@ export interface NewsItem {
   imageUrl?: string;
   qrUrl?: string;
   qrAlt?: string;
-  cta?: { label: string; url: string };
+  cta?: { label: string; url?: string; action?: NewsCtaAction };
 }
 
 export const DISCORD_INVITE = 'https://discord.gg/QFRYAaC8qB';
@@ -110,13 +117,41 @@ async function fetchRemote(): Promise<NewsItem[]> {
 
 let cache: Promise<NewsItem[]> | null = null;
 
+function getRetentionNews(): NewsItem[] {
+  const items: NewsItem[] = [];
+  if (!isPwaInstalled()) {
+    const body = isIosDevice()
+      ? 'Tap Share, then "Add to Home Screen" to launch GridNova in 1 tap and keep your Daily Puzzle streak alive.'
+      : 'Install GridNova on your Home Screen for 1-tap access to Daily Puzzles and faster loading.';
+    items.push({
+      id: 'builtin:pwa-install-2026-11',
+      title: 'Add GridNova to Home Screen',
+      body,
+      date: '2026-11-20T00:00:00Z',
+      layout: 'text',
+      cta: hasNativeInstallPrompt() ? { label: 'Install App', action: 'install-pwa' } : undefined,
+    });
+  }
+  if (canEnablePushReminders()) {
+    items.push({
+      id: 'builtin:daily-reminders-2026-11',
+      title: 'Enable Daily Puzzle Reminders',
+      body: 'Get a quick notification each day when a fresh Daily Puzzle drops so you never lose your streak.',
+      date: '2026-11-19T00:00:00Z',
+      layout: 'text',
+      cta: { label: 'Enable Reminders', action: 'enable-push' },
+    });
+  }
+  return items;
+}
+
 /** All live news, newest first. Remote failures fall back to the built-in list. */
 export function loadNews(force = false): Promise<NewsItem[]> {
   if (IS_CRAZYGAMES) return Promise.resolve([]);
   if (!cache || force) {
     cache = fetchRemote()
       .catch(() => [])
-      .then((remote) => [...remote, ...BUILTIN_NEWS].sort((a, b) => b.date.localeCompare(a.date)));
+      .then((remote) => [...remote, ...getRetentionNews(), ...BUILTIN_NEWS].sort((a, b) => b.date.localeCompare(a.date)));
   }
   return cache;
 }

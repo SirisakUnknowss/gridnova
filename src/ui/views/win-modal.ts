@@ -4,12 +4,6 @@ import celebration from '@images/space/trophyIcon.webp';
 // =====================================================================
 import type { GameResult } from './game';
 import { formatTime } from '@lib/format';
-import {
-  dismissRetentionOffer,
-  getPostWinRetentionOffer,
-  recordWinAndGetCount,
-  triggerRetentionOffer,
-} from '@lib/retention-prompts';
 import { ic } from '@ui/icons';
 
 export interface WinModalProps {
@@ -106,9 +100,6 @@ export function showWinModal(props: WinModalProps): void {
   const existing = document.getElementById('win-modal-root');
   if (existing) existing.remove();
 
-  const winCount = recordWinAndGetCount();
-  const retentionOffer = getPostWinRetentionOffer(winCount, Boolean(isGuest));
-
   const wrapper = document.createElement('div');
   wrapper.id = 'win-modal-root';
   wrapper.className = 'modal-bg active';
@@ -149,17 +140,6 @@ export function showWinModal(props: WinModalProps): void {
         </div>
       ` : ''}
 
-      ${retentionOffer ? `
-        <div class="win-retention-banner" id="win-retention-banner">
-          <div class="win-retention-title">${retentionOffer.title}</div>
-          <p class="win-retention-body">${retentionOffer.body}</p>
-          <div class="win-retention-actions">
-            <button class="btn btn--accent" id="win-retention-action">${retentionOffer.ctaLabel}</button>
-            <button class="btn btn--secondary" id="win-retention-dismiss">${retentionOffer.dismissLabel}</button>
-          </div>
-        </div>
-      ` : ''}
-
       <div class="modal-buttons">
         ${props.onShare ? `<button class="btn btn--secondary" id="win-share">Share</button>` : ''}
         <button class="btn${isGuest ? ' btn--secondary' : ''}" id="win-continue">${isGuest ? 'Continue as Guest' : 'Continue'}</button>
@@ -186,33 +166,4 @@ export function showWinModal(props: WinModalProps): void {
     close();
     props.onSignUp?.();
   });
-
-  if (retentionOffer) {
-    const banner = wrapper.querySelector<HTMLElement>('#win-retention-banner');
-    const actionBtn = wrapper.querySelector<HTMLButtonElement>('#win-retention-action');
-    const dismissBtn = wrapper.querySelector<HTMLButtonElement>('#win-retention-dismiss');
-
-    dismissBtn?.addEventListener('click', () => {
-      dismissRetentionOffer(retentionOffer.kind);
-      banner?.remove();
-    });
-
-    actionBtn?.addEventListener('click', async () => {
-      actionBtn.disabled = true;
-      const outcome = await triggerRetentionOffer(retentionOffer.kind);
-      if (!banner) return;
-      if (outcome === 'accepted') {
-        const msg = retentionOffer.kind === 'push'
-          ? 'Daily reminders enabled!'
-          : retentionOffer.kind === 'pwa-native'
-            ? 'Added to your Home Screen!'
-            : 'See you tomorrow!';
-        banner.innerHTML = `<p class="win-retention-done">${msg}</p>`;
-      } else if (outcome === 'blocked') {
-        banner.innerHTML = '<p class="win-retention-done">Notifications are blocked in your browser settings.</p>';
-      } else {
-        banner.remove();
-      }
-    });
-  }
 }
