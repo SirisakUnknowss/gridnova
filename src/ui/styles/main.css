@@ -2811,6 +2811,8 @@ h3 {
 .win-retention-actions .btn {
   padding: 9px 14px;
   font-size: 13px;
+  width: auto;
+  flex: 1;
 }
 
 .win-retention-done {
