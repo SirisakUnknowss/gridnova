@@ -150,7 +150,7 @@ ${ic.notes(26)}
           <button class="profile-row danger" id="prof-signout">
             <span style="display:flex;align-items:center;gap:10px;">
               ${ic.back(20)}
-              <span style="color:#ef4444">Sign out</span>
+              <span style="color:var(--color-danger)">Sign out</span>
             </span>
             ${ic.chevronRight(16)}
           </button>
@@ -260,7 +260,7 @@ ${ic.notes(26)}
       avatarModal.classList.remove('active');
       const oldHtml = avatarBtn.innerHTML;
       avatarBtn.innerHTML = `
-        <div class="spinner" style="width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-left-color: white;"></div>
+        <div class="spinner" style="width: 24px; height: 24px; border: 3px solid var(--spinner-track); border-left-color: white;"></div>
       `;
       try {
         await api.updateProfile({ avatar_url: null });
@@ -294,7 +294,7 @@ ${ic.notes(26)}
 
       const oldHtml = avatarBtn.innerHTML;
       avatarBtn.innerHTML = `
-        <div class="spinner" style="width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-left-color: white;"></div>
+        <div class="spinner" style="width: 24px; height: 24px; border: 3px solid var(--spinner-track); border-left-color: white;"></div>
       `;
 
       try {

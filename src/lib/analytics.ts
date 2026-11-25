@@ -16,7 +16,6 @@ export function initAnalytics(): void {
       tracesSampleRate: APP_ENV === 'production' ? 0.1 : 1.0,
       integrations: [Sentry.browserTracingIntegration()],
     });
-    console.info('[Analytics] Sentry initialized');
   }
 }
 

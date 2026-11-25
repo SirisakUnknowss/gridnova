@@ -25,6 +25,19 @@
   --color-gold: #ffd700;
   --color-xp: #ffeb3b;
 
+  /* Status & accent colors used from TS views (never hardcode in .ts —
+     eslint `no-hardcoded-colors` enforces CLAUDE.md Hard Rule #2) */
+  --color-danger: #ef4444;
+  --color-online: #10b981;
+  --difficulty-easy: #10b981;
+  --difficulty-medium: #f59e0b;
+  --difficulty-hard: #ef4444;
+  --difficulty-expert: #6c5ce7;
+  --ledger-earned: #a5d6a7;
+  --ledger-spent: #ffab91;
+  --score-badge-bg: #ede9fe;
+  --spinner-track: rgba(255,255,255,0.3);
+
   /* Board color pack (overridden at runtime by applyBoardColor) */
   --board-cell-bg:    var(--cell-bg);
   --board-cell-given: var(--cell-bg);

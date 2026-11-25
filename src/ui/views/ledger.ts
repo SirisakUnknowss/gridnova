@@ -91,8 +91,8 @@ export function mountLedgerView(root: HTMLElement, props: LedgerProps): { unmoun
 
       body.innerHTML = `
         <div class="profile-stats">
-          <div class="stat-tile"><div class="stat-label">Earned</div><div class="stat-value" style="color:#a5d6a7;">+${formatNumber(earned)}</div></div>
-          <div class="stat-tile"><div class="stat-label">Spent</div><div class="stat-value" style="color:#ffab91;">${formatNumber(spent)}</div></div>
+          <div class="stat-tile"><div class="stat-label">Earned</div><div class="stat-value" style="color:var(--ledger-earned);">+${formatNumber(earned)}</div></div>
+          <div class="stat-tile"><div class="stat-label">Spent</div><div class="stat-value" style="color:var(--ledger-spent);">${formatNumber(spent)}</div></div>
           <div class="stat-tile"><div class="stat-label">Balance</div><div class="stat-value">${formatNumber(useStore.getState().coins)}</div></div>
         </div>
 
@@ -101,7 +101,7 @@ export function mountLedgerView(root: HTMLElement, props: LedgerProps): { unmoun
           <div class="ledger-list">
             ${txs.map((t) => {
         const sign = t.amount > 0 ? '+' : '';
-        const color = t.amount > 0 ? '#a5d6a7' : '#ffab91';
+        const color = t.amount > 0 ? 'var(--ledger-earned)' : 'var(--ledger-spent)';
         return `
                 <div class="ledger-row">
                   <div class="ledger-reason">

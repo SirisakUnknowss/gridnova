@@ -146,7 +146,7 @@ export function mountDailyDetailView(root: HTMLElement, props: DailyDetailProps)
             <span class="pm-row-title">${name}${isMe ? ' <span class="lb-you">you</span>' : ''}</span>
             <span class="pm-row-sub">${formatTime(r.time_seconds)}</span>
           </div>
-          <span class="pm-streak-badge" style="color:var(--brand-primary);background:#ede9fe">${r.score.toLocaleString()}</span>
+          <span class="pm-streak-badge" style="color:var(--brand-primary);background:var(--score-badge-bg)">${r.score.toLocaleString()}</span>
         </div>
       `;
     }).join('')}</div>`;

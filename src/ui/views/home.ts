@@ -164,7 +164,7 @@ export function homeViewHTML(): string {
         </div>
         <div class="live-stats-grid">
           <div class="ls-block ls-block--online">
-            <div class="ls-value" style="color:#10b981"><span id="vs-online">${visitorStats.loaded ? fmtCount(visitorStats.online) : '—'}</span></div>
+            <div class="ls-value" style="color:var(--color-online)"><span id="vs-online">${visitorStats.loaded ? fmtCount(visitorStats.online) : '—'}</span></div>
             <div class="ls-label">online now</div>
             <div class="ls-sub">
               <span>${ic.guest(11)} <span id="vs-online-guests">${visitorStats.loaded ? fmtCount(visitorStats.online_guests) : '—'}</span></span>

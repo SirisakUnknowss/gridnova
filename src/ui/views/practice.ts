@@ -18,10 +18,10 @@ export interface PracticeViewProps {
 }
 
 const PRACTICE_META: Record<string, { label: string; sub: string; color: string }> = {
-  easy: { label: 'Easy', sub: 'Relaxed', color: '#10b981' },
-  medium: { label: 'Medium', sub: 'Balanced', color: '#f59e0b' },
-  hard: { label: 'Hard', sub: 'Tricky', color: '#ef4444' },
-  expert: { label: 'Expert', sub: 'Brutal', color: '#6c5ce7' },
+  easy: { label: 'Easy', sub: 'Relaxed', color: 'var(--difficulty-easy)' },
+  medium: { label: 'Medium', sub: 'Balanced', color: 'var(--difficulty-medium)' },
+  hard: { label: 'Hard', sub: 'Tricky', color: 'var(--difficulty-hard)' },
+  expert: { label: 'Expert', sub: 'Brutal', color: 'var(--difficulty-expert)' },
 };
 
 export function mountPracticeView(root: HTMLElement, props: PracticeViewProps): { unmount: () => void } {

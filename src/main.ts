@@ -1250,10 +1250,7 @@ async function boot() {
         useStore.getState().setUser(user);
         // Run v1 migration if applicable
         if (shouldMigrate()) {
-          const result = await migrateFromV1();
-          if (result.ran && result.imported) {
-            console.info('[Boot] Migrated v1 data:', result.imported);
-          }
+          await migrateFromV1();
         }
         const isFromGuest = hasOAuthCallback || localStorage.getItem('gn_guest_hearts_v1') !== null;
         await handlePostLoginSync(isFromGuest);
@@ -1267,7 +1264,6 @@ async function boot() {
       useStore.setState({ profile: { display_name: getGuestIdentity().name }, coins: 100 });
     }
   } else {
-    console.info('[Boot] No Supabase config — running in offline demo mode');
     useStore.setState({ profile: { display_name: getGuestIdentity().name }, coins: 100 });
   }
 
