@@ -23,6 +23,9 @@ function portrait(src: string, size = 48): string {
   return `<img class="ui-art-icon" src="${src}" width="${size}" height="${size}" alt="" decoding="async">`;
 }
 
+/** Legacy avatar id used when nothing is equipped; resolves to ic.guest art. */
+export const DEFAULT_AVATAR_ID = '👤';
+
 export const AVATAR_OPTIONS = [
   { id: 'space_lunar-fox', name: 'Lunar Fox', art: (size?: number) => portrait(avatar0, size) },
   { id: 'space_nebula-cat', name: 'Nebula Cat', art: (size?: number) => portrait(avatar1, size) },

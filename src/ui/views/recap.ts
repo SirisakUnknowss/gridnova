@@ -7,6 +7,7 @@ import * as api from '@lib/api';
 import { formatTime, escapeHtml } from '@lib/format';
 import { bottomNavHTML, wireBottomNav, type BottomNavCallbacks } from '../components/bottom-nav';
 import { ic } from '@ui/icons';
+import { DEFAULT_AVATAR_ID } from '../components/avatar-art';
 import { buildShareUrl } from '@lib/share/text-result';
 import { showShareModal } from './share-modal';
 
@@ -157,7 +158,7 @@ export function mountRecapView(root: HTMLElement, props: RecapProps): { unmount:
               displayName,
               avatarUrl: profile.avatar_url,
               avatarId: state.equipped.avatar?.item_id as string | undefined,
-              avatarEmoji: (state.equipped.avatar?.emoji as string) || '👤',
+              avatarEmoji: (state.equipped.avatar?.emoji as string) || DEFAULT_AVATAR_ID,
               level: state.level,
               bestStreak: state.currentStreak,
               longestStreak: state.longestStreak,
